@@ -1,0 +1,585 @@
+{
+ "schema": 1,
+ "generated_from": "TRENING.html (EX, EX_ROM)",
+ "days": {
+  "pon": [
+   {
+    "id": "ex.pon.1.wyciskanie_sztangi_lezac",
+    "name": "Wyciskanie sztangi leżąc",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2–3 min",
+    "note_html": "Start ~45 kg",
+    "src": "TRENING:EX.pon[0]"
+   },
+   {
+    "id": "ex.pon.2.wioslowanie_siedzac_v_grip",
+    "name": "Wiosłowanie siedząc (V-grip)",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": "Start ~45 kg",
+    "src": "TRENING:EX.pon[1]"
+   },
+   {
+    "id": "ex.pon.3.wyciskanie_hantli_nad_glowe",
+    "name": "Wyciskanie hantli nad głowę",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": "Start ~10 kg/rękę",
+    "src": "TRENING:EX.pon[2]"
+   },
+   {
+    "id": "ex.pon.4.sciaganie_drazka",
+    "name": "Ściąganie drążka",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": "Start ~40 kg",
+    "src": "TRENING:EX.pon[3]"
+   },
+   {
+    "id": "ex.pon.5.face_pull",
+    "name": "Face pull",
+    "tag": "nowe",
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pon[4]"
+   },
+   {
+    "id": "ex.pon.6.rozpietki_bramka",
+    "name": "Rozpiętki bramka",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "10–15",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pon[5]"
+   },
+   {
+    "id": "ex.pon.7.wznosy_bokiem",
+    "name": "Wznosy bokiem",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.pon[6]"
+   },
+   {
+    "id": "ex.pon.8.triceps_na_linkach",
+    "name": "Triceps na linkach",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "10–15",
+    "rir": "1",
+    "rest": "60 s",
+    "note_html": "<b>Tułów nieruchomy</b> — bez bujania",
+    "src": "TRENING:EX.pon[7]"
+   },
+   {
+    "id": "ex.pon.9.uginanie_ez",
+    "name": "Uginanie EZ",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": "Start ~20 kg",
+    "src": "TRENING:EX.pon[8]"
+   }
+  ],
+  "pt": [
+   {
+    "id": "ex.pt.1.wyciskanie_sztangi_na_skosie",
+    "name": "Wyciskanie sztangi na skosie",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2–3 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[0]"
+   },
+   {
+    "id": "ex.pt.2.wioslowanie_sztanga",
+    "name": "Wiosłowanie sztangą",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[1]"
+   },
+   {
+    "id": "ex.pt.3.wyciskanie_nad_glowe_ohp",
+    "name": "Wyciskanie nad głowę (OHP)",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[2]"
+   },
+   {
+    "id": "ex.pt.4.podciaganie_z_asysta",
+    "name": "Podciąganie z asystą",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[3]"
+   },
+   {
+    "id": "ex.pt.5.odwodzenie_w_opadzie_wyciag",
+    "name": "Odwodzenie w opadzie (wyciąg)",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[4]"
+   },
+   {
+    "id": "ex.pt.6.wznosy_bokiem",
+    "name": "Wznosy bokiem",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[5]"
+   },
+   {
+    "id": "ex.pt.7.wyciskanie_francuskie_lezac",
+    "name": "Wyciskanie francuskie leżąc",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[6]"
+   },
+   {
+    "id": "ex.pt.8.uginanie_hantlami",
+    "name": "Uginanie hantlami",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "10–12",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[7]"
+   }
+  ],
+  "sr": [
+   {
+    "id": "ex.sr.1.reverse_crunch",
+    "name": "Reverse crunch",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1–2",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.sr[0]"
+   },
+   {
+    "id": "ex.sr.2.levitation_crunch",
+    "name": "Levitation crunch",
+    "tag": "nowe",
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "10–12",
+    "rir": "1–2",
+    "rest": "60 s",
+    "note_html": "Pauza 1–2 s w górze",
+    "src": "TRENING:EX.sr[1]"
+   },
+   {
+    "id": "ex.sr.3.plank",
+    "name": "Plank",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "30–45 s",
+    "rir": "—",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.sr[2]"
+   },
+   {
+    "id": "ex.sr.4.side_plank",
+    "name": "Side plank",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "20–30 s/str.",
+    "rir": "—",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.sr[3]"
+   }
+  ],
+  "wt": [
+   {
+    "id": "ex.wt.1.suwnica_leg_press",
+    "name": "Suwnica (leg press)",
+    "raw": [
+     "Suwnica (leg press)",
+     [
+      2,
+      2,
+      3
+     ],
+     "10–12",
+     "2–3",
+     "2 min",
+     "zgięcie ~60°",
+     "+10–15°/1–2 tyg. do pełnego"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[0]"
+   },
+   {
+    "id": "ex.wt.2.martwy_ciag_rumunski",
+    "name": "Martwy ciąg rumuński",
+    "raw": [
+     "Martwy ciąg rumuński",
+     [
+      0,
+      2,
+      3
+     ],
+     "10–12*",
+     "3–4*",
+     "2 min",
+     "pełny",
+     "*po 4 tyg. → 8–10 / RIR 2–3. Kolano prawie proste"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[1]"
+   },
+   {
+    "id": "ex.wt.3.prostowanie_nog",
+    "name": "Prostowanie nóg",
+    "raw": [
+     "Prostowanie nóg",
+     [
+      0,
+      2,
+      3
+     ],
+     "12–15",
+     "1–2",
+     "90 s",
+     "90°→~45°",
+     "Obciążenie rzepki największe blisko wyprostu"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[2]"
+   },
+   {
+    "id": "ex.wt.4.spanish_squat_wall_sit",
+    "name": "Spanish squat / wall-sit",
+    "raw": [
+     "Spanish squat / wall-sit",
+     [
+      2,
+      2,
+      3
+     ],
+     "30–45 s",
+     "—",
+     "90 s",
+     "~60°",
+     "Opcja niskoprogowa na dni z objawami"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[3]"
+   },
+   {
+    "id": "ex.wt.5.lydki_stojac",
+    "name": "Łydki stojąc",
+    "raw": [
+     "Łydki stojąc",
+     [
+      0,
+      2,
+      3
+     ],
+     "12–15",
+     "1–2",
+     "60 s",
+     "pełny",
+     ""
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[4]"
+   }
+  ],
+  "sob": [
+   {
+    "id": "ex.sob.1.hip_thrust",
+    "name": "Hip thrust",
+    "raw": [
+     "Hip thrust",
+     [
+      2,
+      2,
+      3
+     ],
+     "10–12",
+     "2",
+     "2 min",
+     "pełny",
+     "Znikome obciążenie rzepki"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[0]"
+   },
+   {
+    "id": "ex.sob.2.uginanie_nog",
+    "name": "Uginanie nóg",
+    "raw": [
+     "Uginanie nóg",
+     [
+      0,
+      2,
+      4
+     ],
+     "10–12",
+     "2",
+     "90 s",
+     "pełny",
+     "Bezpieczne od dnia 1"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 4
+    },
+    "src": "TRENING:EX_ROM.sob[1]"
+   },
+   {
+    "id": "ex.sob.3.step_up_bulgarski",
+    "name": "Step-up / bułgarski",
+    "raw": [
+     "Step-up / bułgarski",
+     [
+      0,
+      2,
+      3
+     ],
+     "8–10/nogę",
+     "2–3",
+     "2 min",
+     "niski stopień",
+     "Od Fazy 1. Wyższy stopień = większe zgięcie"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[2]"
+   },
+   {
+    "id": "ex.sob.4.suwnica_stopy_wyzej",
+    "name": "Suwnica (stopy wyżej)",
+    "raw": [
+     "Suwnica (stopy wyżej)",
+     [
+      0,
+      2,
+      3
+     ],
+     "10–12",
+     "2",
+     "2 min",
+     "~60°",
+     "Akcent pośladek + dwugłowy"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[3]"
+   },
+   {
+    "id": "ex.sob.5.odwodzenie_biodra",
+    "name": "Odwodzenie biodra",
+    "raw": [
+     "Odwodzenie biodra",
+     [
+      2,
+      2,
+      3
+     ],
+     "15",
+     "1",
+     "60 s",
+     "pełny",
+     "Poprawia mechanikę rzepki"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[4]"
+   },
+   {
+    "id": "ex.sob.6.lydki_siedzac",
+    "name": "Łydki siedząc",
+    "raw": [
+     "Łydki siedząc",
+     [
+      2,
+      2,
+      3
+     ],
+     "12–15",
+     "1–2",
+     "60 s",
+     "pełny",
+     ""
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[5]"
+   }
+  ]
+ },
+ "note": "Opisy techniki (INFO), wizualizacje (VIZ) i treści arkuszy zostaną przeniesione w Etapie 5."
+}

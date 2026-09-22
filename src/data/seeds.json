@@ -1,0 +1,24 @@
+{
+ "schema": 1,
+ "note": "Stany z decyzji użytkownika (nie z pliku kopii)",
+ "counts": [
+  {
+   "prod": "chondroityna",
+   "qty": 360,
+   "date": "2026-09-22",
+   "decision": "D-015"
+  },
+  {
+   "prod": "glukozamina",
+   "qty": 180,
+   "date": "2026-09-22",
+   "decision": "D-015"
+  },
+  {
+   "prod": "boswellia",
+   "qty": 180,
+   "date": "2026-09-22",
+   "decision": "D-015"
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+tests/e2e/*.png
+# Dane prywatne i źródła — NIGDY w repozytorium (D-035)
+*prywatne*.json
+zapasy_kopia_*.json
+2027-sync*.json
+sources/

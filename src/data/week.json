@@ -1,0 +1,99 @@
+{
+ "schema": 1,
+ "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING)",
+ "days": {
+  "1": {
+   "dayType": "strength_sauna",
+   "session": "pon",
+   "sessionName": "UPPER 1",
+   "sauna": 1,
+   "diet": "T",
+   "recall": true
+  },
+  "2": {
+   "dayType": "strength",
+   "session": "wt",
+   "sessionName": "LOWER 1",
+   "sauna": 0,
+   "diet": "T",
+   "recall": true
+  },
+  "3": {
+   "dayType": "cardio_sauna",
+   "session": "sr",
+   "sessionName": "Rower + ABS",
+   "sauna": 1,
+   "diet": "T",
+   "recall": true
+  },
+  "4": {
+   "dayType": "rest_sauna2",
+   "session": null,
+   "sessionName": "Bez treningu, 2 × sauna",
+   "sauna": 2,
+   "diet": "NT",
+   "recall": true
+  },
+  "5": {
+   "dayType": "strength",
+   "session": "pt",
+   "sessionName": "UPPER 2",
+   "sauna": 0,
+   "diet": "T",
+   "recall": false
+  },
+  "6": {
+   "dayType": "strength_sauna",
+   "session": "sob",
+   "sessionName": "LOWER 2",
+   "sauna": 1,
+   "diet": "T",
+   "recall": false
+  },
+  "7": {
+   "dayType": "swim",
+   "session": "nd",
+   "sessionName": "Basen",
+   "sauna": 0,
+   "diet": "T",
+   "recall": true
+  }
+ },
+ "activity": {
+  "strength_sauna": {
+   "warmup": "Rozgrzewka",
+   "main": "Trening siłowy",
+   "sauna": "Sauna"
+  },
+  "strength": {
+   "warmup": "Rozgrzewka",
+   "main": "Trening siłowy",
+   "sauna": "Wolne"
+  },
+  "cardio_sauna": {
+   "warmup": "Rower (początek sesji)",
+   "main": "Rower 55 min + ABS",
+   "sauna": "Sauna"
+  },
+  "rest_sauna2": {
+   "warmup": "Sauna — przygotowanie",
+   "main": "2 rundy sauny wg protokołu",
+   "sauna": "Wolne"
+  },
+  "swim": {
+   "warmup": "Basen (przygotowanie)",
+   "main": "Basen 55 min",
+   "sauna": "Wolne"
+  }
+ },
+ "mock": {
+  "decision": "D-019",
+  "replace": {
+   "A": "S1",
+   "B": "S1",
+   "C": "S2",
+   "D": "S2"
+  },
+  "free_when_no_block": "D-036"
+ }
+}

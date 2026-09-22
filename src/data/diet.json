@@ -1,0 +1,5427 @@
+{
+ "schema": 1,
+ "generated_from": "6 × DIETA_PLAN (warstwa tekstowa)",
+ "plans": [
+  {
+   "variant": "T",
+   "phase": 0,
+   "header_src": "DNI TRENINGOWE + CARDIO (Faza 0)",
+   "meals": [
+    {
+     "id": "breakfast",
+     "label_src": "ŚNIADANIE",
+     "items": [
+      {
+       "order": 0,
+       "name_src": "Słonecznik łuskany",
+       "name": "Słonecznik łuskany",
+       "label": "15",
+       "kcal": 65.0,
+       "p": 3.1,
+       "c": 2.0,
+       "f": 5.0,
+       "prod": "slonecznik",
+       "src": "PDF:T_F0#breakfast/Słonecznik łuskany",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 1,
+       "name_src": "Nasiona chia",
+       "name": "Nasiona chia",
+       "label": "10",
+       "kcal": 43.0,
+       "p": 2.1,
+       "c": 0.5,
+       "f": 2.9,
+       "prod": "chia",
+       "src": "PDF:T_F0#breakfast/Nasiona chia",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 2,
+       "name_src": "Płatki owsiane zwykłe",
+       "name": "Płatki owsiane zwykłe",
+       "label": "70",
+       "kcal": 249.0,
+       "p": 8.8,
+       "c": 39.4,
+       "f": 4.4,
+       "prod": "platki_owsiane",
+       "src": "PDF:T_F0#breakfast/Płatki owsiane zwykłe",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 3,
+       "name_src": "Pestki dyni",
+       "name": "Pestki dyni",
+       "label": "15",
+       "kcal": 62.5,
+       "p": 2.7,
+       "c": 1.4,
+       "f": 5.2,
+       "prod": "pestki_dyni",
+       "src": "PDF:T_F0#breakfast/Pestki dyni",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 4,
+       "name_src": "Orzechy włoskie",
+       "name": "Orzechy włoskie",
+       "label": "15",
+       "kcal": 100.0,
+       "p": 2.7,
+       "c": 1.7,
+       "f": 9.0,
+       "prod": "orzechy_wloskie",
+       "src": "PDF:T_F0#breakfast/Orzechy włoskie",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 5,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "3",
+       "kcal": 7.5,
+       "p": 0.1,
+       "c": 1.7,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:T_F0#breakfast/Cynamon mielony",
+       "use": {
+        "qty": 3.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 6,
+       "name_src": "Borówki",
+       "name": "Borówki",
+       "label": "60",
+       "kcal": 35.0,
+       "p": 0.6,
+       "c": 8.4,
+       "f": 0.0,
+       "prod": "borowki",
+       "src": "PDF:T_F0#breakfast/Borówki",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 7,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:T_F0#breakfast/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 629.0,
+      "p": 32.1,
+      "c": 58.9,
+      "f": 26.5
+     }
+    },
+    {
+     "id": "lunch",
+     "label_src": "LUNCH",
+     "items": [
+      {
+       "order": 8,
+       "name_src": "Makaron penne pełnoziarnisty",
+       "name": "Makaron penne pełnoziarnisty",
+       "label": "70",
+       "kcal": 230.0,
+       "p": 12.6,
+       "c": 35.7,
+       "f": 2.0,
+       "prod": "penne",
+       "src": "PDF:T_F0#lunch/Makaron penne pełnoziarnisty",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 9,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:T_F0#lunch/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 10,
+       "name_src": "Pomidory szuszone",
+       "name": "Pomidory suszone",
+       "label": "40 (2 widelce)",
+       "kcal": 77.0,
+       "p": 1.3,
+       "c": 4.4,
+       "f": 5.6,
+       "prod": "pomidory_suszone",
+       "src": "PDF:T_F0#lunch/Pomidory szuszone",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 40.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 11,
+       "name_src": "Szpinak mrożony",
+       "name": "Szpinak mrożony",
+       "label": "100",
+       "kcal": 33.0,
+       "p": 4.2,
+       "c": 0.9,
+       "f": 0.6,
+       "prod": "szpinak_mrozony",
+       "src": "PDF:T_F0#lunch/Szpinak mrożony",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 12,
+       "name_src": "Oliwa z oliwek",
+       "name": "Oliwa z oliwek",
+       "label": "5",
+       "kcal": 50.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 5.0,
+       "prod": "oliwa",
+       "src": "PDF:T_F0#lunch/Oliwa z oliwek",
+       "use": {
+        "qty": 5,
+        "unit": "ml",
+        "basis": "PDF: 5"
+       }
+      },
+      {
+       "order": 13,
+       "name_src": "Czosnek",
+       "name": "Czosnek",
+       "label": "1 ząbek (5 g)",
+       "kcal": 8.0,
+       "p": 0.4,
+       "c": 1.6,
+       "f": 0.0,
+       "prod": "czosnek",
+       "src": "PDF:T_F0#lunch/Czosnek",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 465.0,
+      "p": 30.5,
+      "c": 46.4,
+      "f": 13.2
+     }
+    },
+    {
+     "id": "snack",
+     "label_src": "PRZEKĄSKA",
+     "items": [
+      {
+       "order": 14,
+       "name_src": "Kefir 1,5%",
+       "name": "Kefir 1,5%",
+       "label": "200",
+       "kcal": 88.0,
+       "p": 6.4,
+       "c": 9.0,
+       "f": 3.0,
+       "prod": "kefir",
+       "src": "PDF:T_F0#snack/Kefir 1,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 g/ml"
+       }
+      },
+      {
+       "order": 15,
+       "name_src": "Siemię lniane",
+       "name": "Siemię lniane",
+       "label": "10",
+       "kcal": 50.0,
+       "p": 2.9,
+       "c": 1.7,
+       "f": 3.1,
+       "prod": "siemie_lniane",
+       "src": "PDF:T_F0#snack/Siemię lniane",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 16,
+       "name_src": "Ostropest plamisty",
+       "name": "Ostropest plamisty",
+       "label": "5",
+       "kcal": 15.0,
+       "p": 0.6,
+       "c": 0.3,
+       "f": 1.7,
+       "prod": "ostropest",
+       "src": "PDF:T_F0#snack/Ostropest plamisty",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 17,
+       "name_src": "Kakao",
+       "name": "Kakao",
+       "label": "1 łyżeczka (5 g)",
+       "kcal": 23.0,
+       "p": 0.9,
+       "c": 2.2,
+       "f": 1.1,
+       "prod": "kakao",
+       "src": "PDF:T_F0#snack/Kakao",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 18,
+       "name_src": "Ekstrakt z wanilii",
+       "name": "Ekstrakt z wanilii",
+       "label": "5 kropel",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "wanilia",
+       "src": "PDF:T_F0#snack/Ekstrakt z wanilii",
+       "use": {
+        "qty": 0.25,
+        "unit": "ml",
+        "basis": "D-021: 0,25 ml (5 kropel)"
+       }
+      },
+      {
+       "order": 19,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "2",
+       "kcal": 5.0,
+       "p": 0.7,
+       "c": 1.1,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:T_F0#snack/Cynamon mielony",
+       "use": {
+        "qty": 2.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 20,
+       "name_src": "Orzech brazylijski",
+       "name": "Orzech brazylijski",
+       "label": "1 sztuka (4 g)",
+       "kcal": 29.0,
+       "p": 0.7,
+       "c": 0.1,
+       "f": 2.8,
+       "prod": "orzech_brazylijski",
+       "src": "PDF:T_F0#snack/Orzech brazylijski",
+       "use": {
+        "qty": 4.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 210.0,
+      "p": 12.2,
+      "c": 14.4,
+      "f": 11.7
+     }
+    },
+    {
+     "id": "post",
+     "label_src": "PO TRENINGU",
+     "items": [
+      {
+       "order": 21,
+       "name_src": "Białko KFD",
+       "name": "Białko WPC",
+       "label": "30",
+       "kcal": 114.0,
+       "p": 21.5,
+       "c": 2.4,
+       "f": 2.4,
+       "prod": "bialko_kfd",
+       "src": "PDF:T_F0#post/Białko KFD",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 30.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 22,
+       "name_src": "Banan",
+       "name": "Banan",
+       "label": "120 (1 szt.)",
+       "kcal": 116.0,
+       "p": 1.2,
+       "c": 26.2,
+       "f": 0.4,
+       "prod": "banan",
+       "src": "PDF:T_F0#post/Banan",
+       "use": {
+        "qty": 120.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 230.0,
+      "p": 22.7,
+      "c": 28.6,
+      "f": 2.8
+     }
+    },
+    {
+     "id": "dinner",
+     "label_src": "OBIAD",
+     "items": [
+      {
+       "order": 23,
+       "name_src": "Ryż biały paraboiled",
+       "name": "Ryż biały parboiled",
+       "label": "70",
+       "kcal": 245.0,
+       "p": 5.5,
+       "c": 54.5,
+       "f": 0.5,
+       "prod": "ryz_parboiled",
+       "src": "PDF:T_F0#dinner/Ryż biały paraboiled",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 24,
+       "name_src": "Kurczak",
+       "name": "Kurczak",
+       "label": "150",
+       "kcal": 150.0,
+       "p": 30.0,
+       "c": 1.0,
+       "f": 2.7,
+       "prod": "kurczak",
+       "src": "PDF:T_F0#dinner/Kurczak",
+       "use": {
+        "qty": 150.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 25,
+       "name_src": "Mieszanka warzyw (po hiszpańsku)",
+       "name": "Mieszanka warzyw (po hiszpańsku)",
+       "label": "130",
+       "kcal": 69.0,
+       "p": 2.4,
+       "c": 9.2,
+       "f": 1.5,
+       "prod": "mieszanka_warzyw",
+       "src": "PDF:T_F0#dinner/Mieszanka warzyw (po hiszpańsku)",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 26,
+       "name_src": "Brokuły",
+       "name": "Brokuły mrożone",
+       "label": "130",
+       "kcal": 26.0,
+       "p": 2.3,
+       "c": 2.3,
+       "f": 0.7,
+       "prod": "brokuly",
+       "src": "PDF:T_F0#dinner/Brokuły",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 27,
+       "name_src": "Buraczki tarte (ze słoika)",
+       "name": "Buraczki tarte (ze słoika)",
+       "label": "100",
+       "kcal": 50.0,
+       "p": 1.3,
+       "c": 9.7,
+       "f": 0.5,
+       "prod": "buraczki",
+       "src": "PDF:T_F0#dinner/Buraczki tarte (ze słoika)",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 28,
+       "name_src": "Marchew",
+       "name": "Marchew",
+       "label": "50",
+       "kcal": 16.0,
+       "p": 0.5,
+       "c": 2.5,
+       "f": 0.1,
+       "prod": "marchew",
+       "src": "PDF:T_F0#dinner/Marchew",
+       "use": {
+        "qty": 50.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 29,
+       "name_src": "Ogórek kiszony",
+       "name": "Ogórek kiszony",
+       "label": "60 (1 sztuka)",
+       "kcal": 7.0,
+       "p": 0.6,
+       "c": 0.8,
+       "f": 0.1,
+       "prod": "ogorek_kiszony",
+       "src": "PDF:T_F0#dinner/Ogórek kiszony",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 563.0,
+      "p": 42.6,
+      "c": 80.0,
+      "f": 6.1
+     }
+    },
+    {
+     "id": "supper",
+     "label_src": "KOLACJA",
+     "items": [
+      {
+       "order": 30,
+       "name_src": "Jajka",
+       "name": "Jajka",
+       "label": "3 szt./ M",
+       "kcal": 214.0,
+       "p": 19.0,
+       "c": 0.9,
+       "f": 15.0,
+       "prod": "jajka",
+       "src": "PDF:T_F0#supper/Jajka",
+       "use": {
+        "qty": 3.0,
+        "unit": "szt.",
+        "basis": "PDF: 3 szt."
+       }
+      },
+      {
+       "order": 31,
+       "name_src": "Twaróg chudy",
+       "name": "Twaróg chudy",
+       "label": "125",
+       "kcal": 105.0,
+       "p": 21.3,
+       "c": 3.7,
+       "f": 0.6,
+       "prod": "twarog",
+       "src": "PDF:T_F0#supper/Twaróg chudy",
+       "use": {
+        "qty": 125.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 32,
+       "name_src": "Chleb żytni na zakwasie bez drożdzy",
+       "name": "Chleb żytni na zakwasie bez drożdży",
+       "label": "35 (1 kromka)",
+       "kcal": 79.0,
+       "p": 2.2,
+       "c": 15.0,
+       "f": 0.6,
+       "prod": "chleb_zytni",
+       "src": "PDF:T_F0#supper/Chleb żytni na zakwasie bez drożdzy",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 35.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 33,
+       "name_src": "Szczypiorek",
+       "name": "Szczypiorek",
+       "label": "1 łyżka (5 g)",
+       "kcal": 2.0,
+       "p": 0.2,
+       "c": 0.1,
+       "f": 0.0,
+       "prod": "szczypiorek",
+       "src": "PDF:T_F0#supper/Szczypiorek",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "D-021: 5 g"
+       }
+      },
+      {
+       "order": 34,
+       "name_src": "Pomidorki koktajlowe",
+       "name": "Pomidorki koktajlowe",
+       "label": "4 sztuki (80 g)",
+       "kcal": 16.0,
+       "p": 0.8,
+       "c": 2.5,
+       "f": 0.2,
+       "prod": "pomidorki_kokt",
+       "src": "PDF:T_F0#supper/Pomidorki koktajlowe",
+       "use": {
+        "qty": 80.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 35,
+       "name_src": "Papryka",
+       "name": "Papryka",
+       "label": "1/3 sztuki (70 g)",
+       "kcal": 22.0,
+       "p": 0.9,
+       "c": 3.2,
+       "f": 0.3,
+       "prod": "papryka",
+       "src": "PDF:T_F0#supper/Papryka",
+       "use": {
+        "qty": 0.3333333333333333,
+        "unit": "szt.",
+        "basis": "PDF: 1/3 sztuki"
+       }
+      },
+      {
+       "order": 36,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "2 szczypty (1 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F0#supper/Sól jodowana"
+      }
+     ],
+     "total": {
+      "kcal": 438.0,
+      "p": 44.4,
+      "c": 25.4,
+      "f": 16.7
+     }
+    },
+    {
+     "id": "drinks",
+     "label_src": "NAPOJE",
+     "items": [
+      {
+       "order": 37,
+       "name_src": "Woda",
+       "name": "Woda",
+       "label": "3+2 bidony, 500 ml rano",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F0#drinks/Woda"
+      },
+      {
+       "order": 38,
+       "name_src": "Zielona herbata (imbir, miód, cytryna)",
+       "name": "Zielona herbata (imbir, miód, cytryna)",
+       "label": "400 ml (1.5 łyżki suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "herbata_zielona",
+       "src": "PDF:T_F0#drinks/Zielona herbata (imbir, miód, cytryna)",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "ZAPASY v31: 5 g/d (PDF: 1,5 łyżki suszu)"
+       }
+      },
+      {
+       "order": 39,
+       "name_src": "Mleko 0,5%",
+       "name": "Mleko 0,5%",
+       "label": "200 ml",
+       "kcal": 70.0,
+       "p": 6.0,
+       "c": 9.4,
+       "f": 1.0,
+       "prod": "mleko",
+       "src": "PDF:T_F0#drinks/Mleko 0,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 ml"
+       }
+      },
+      {
+       "order": 40,
+       "name_src": "Kawa (espresso)",
+       "name": "Kawa (espresso)",
+       "label": "60 ml (2x30ml)",
+       "kcal": 5.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "kawa_ziarno",
+       "src": "PDF:T_F0#drinks/Kawa (espresso)",
+       "use": {
+        "qty": 16,
+        "unit": "g",
+        "basis": "ZAPASY v31 / REKOMPOZYCJA: 2 × 8 g"
+       }
+      },
+      {
+       "order": 41,
+       "name_src": "Miód",
+       "name": "Miód",
+       "label": "1 łyżeczka (6 g)",
+       "kcal": 19.0,
+       "p": 0.0,
+       "c": 4.8,
+       "f": 0.0,
+       "prod": "miod",
+       "src": "PDF:T_F0#drinks/Miód",
+       "use": {
+        "qty": 6.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 42,
+       "name_src": "Sok z cytryny",
+       "name": "Sok z cytryny",
+       "label": "1/2 łyżeczki (3 ml)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "cytryna",
+       "src": "PDF:T_F0#drinks/Sok z cytryny",
+       "use": {
+        "qty": 0.14285714285714285,
+        "unit": "szt.",
+        "basis": "D-021: 1/7 szt."
+       }
+      },
+      {
+       "order": 43,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "3 szczypty (1,5 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F0#drinks/Sól jodowana"
+      },
+      {
+       "order": 44,
+       "name_src": "Melisa",
+       "name": "Melisa",
+       "label": "200 ml (1 łyżka suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "melisa",
+       "src": "PDF:T_F0#drinks/Melisa",
+       "use": {
+        "qty": 2,
+        "unit": "g",
+        "basis": "D-021: 2 g"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 94.0,
+      "p": 6.0,
+      "c": 14.2,
+      "f": 1.0
+     }
+    }
+   ],
+   "total": {
+    "kcal": 2629.0,
+    "p": 190.5,
+    "c": 267.9,
+    "f": 78.0
+   },
+   "atwater_kcal": 2535.6,
+   "pct": {
+    "p": 30.1,
+    "c": 42.3,
+    "f": 27.7
+   },
+   "spices_raw": [
+    "Cynamon",
+    "Koperek",
+    "Papryka słod.",
+    "Czosnek granulowany",
+    "Kurkuma",
+    "Papryka węd.",
+    "Oregano",
+    "Curry",
+    "Chili",
+    "Pieprz czarny",
+    "Rozmaryn",
+    "Bazylia",
+    "Imbir",
+    "Natka pietruszki",
+    "Szczypiorek",
+    "Sól jodowana",
+    "Zioła prowan.",
+    "Tymianek"
+   ],
+   "optional": [
+    {
+     "name": "Makaron pełnoziarnisty spaghetti",
+     "label": "200 g",
+     "kcal": 315.0,
+     "p": 14.2,
+     "c": 52.0,
+     "f": 2.8
+    },
+    {
+     "name": "Kasza gryczana niepalona",
+     "label": "100 g",
+     "kcal": 356.0,
+     "p": 14.0,
+     "c": 62.0,
+     "f": 4.0
+    },
+    {
+     "name": "Bataty",
+     "label": "2 średnie (400 g b/s)",
+     "kcal": 344.0,
+     "p": 6.4,
+     "c": 80.4,
+     "f": 0.4
+    },
+    {
+     "name": "Ziemniaki",
+     "label": "6 sztuk (450 g b/s)",
+     "kcal": 356.0,
+     "p": 8.6,
+     "c": 75.6,
+     "f": 0.4
+    },
+    {
+     "name": "Łosoś",
+     "label": "100 g",
+     "kcal": 201.0,
+     "p": 19.9,
+     "c": 0.0,
+     "f": 13.6
+    },
+    {
+     "name": "Indyk",
+     "label": "150 g",
+     "kcal": 126.0,
+     "p": 28.8,
+     "c": 0.0,
+     "f": 1.2
+    },
+    {
+     "name": "Wołowina (mięso mielone)",
+     "label": "130 g",
+     "kcal": 240.0,
+     "p": 22.1,
+     "c": 0.0,
+     "f": 16.9
+    },
+    {
+     "name": "Dorsz",
+     "label": "100 g",
+     "kcal": 78.0,
+     "p": 17.7,
+     "c": 0.0,
+     "f": 0.7
+    },
+    {
+     "name": "Kapusta kiszona",
+     "label": "100 g",
+     "kcal": 16.0,
+     "p": 1.1,
+     "c": 1.3,
+     "f": 0.2
+    },
+    {
+     "name": "Awokado",
+     "label": "1/2 sztuki (70 g)",
+     "kcal": 118.0,
+     "p": 1.4,
+     "c": 2.9,
+     "f": 10.7
+    }
+   ],
+   "src": "DIETA_PLAN_-_2027_T_faza_0.pdf"
+  },
+  {
+   "variant": "T",
+   "phase": 1,
+   "header_src": "DNI TRENINGOWE + CARDIO (Faza 1)",
+   "meals": [
+    {
+     "id": "breakfast",
+     "label_src": "ŚNIADANIE",
+     "items": [
+      {
+       "order": 0,
+       "name_src": "Słonecznik łuskany",
+       "name": "Słonecznik łuskany",
+       "label": "15",
+       "kcal": 65.0,
+       "p": 3.1,
+       "c": 2.0,
+       "f": 5.0,
+       "prod": "slonecznik",
+       "src": "PDF:T_F1#breakfast/Słonecznik łuskany",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 1,
+       "name_src": "Nasiona chia",
+       "name": "Nasiona chia",
+       "label": "10",
+       "kcal": 43.0,
+       "p": 2.1,
+       "c": 0.5,
+       "f": 2.9,
+       "prod": "chia",
+       "src": "PDF:T_F1#breakfast/Nasiona chia",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 2,
+       "name_src": "Płatki owsiane zwykłe",
+       "name": "Płatki owsiane zwykłe",
+       "label": "85",
+       "kcal": 302.0,
+       "p": 10.7,
+       "c": 47.9,
+       "f": 5.3,
+       "prod": "platki_owsiane",
+       "src": "PDF:T_F1#breakfast/Płatki owsiane zwykłe",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 3,
+       "name_src": "Pestki dyni",
+       "name": "Pestki dyni",
+       "label": "15",
+       "kcal": 62.5,
+       "p": 2.7,
+       "c": 1.4,
+       "f": 5.2,
+       "prod": "pestki_dyni",
+       "src": "PDF:T_F1#breakfast/Pestki dyni",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 4,
+       "name_src": "Orzechy włoskie",
+       "name": "Orzechy włoskie",
+       "label": "15",
+       "kcal": 100.0,
+       "p": 2.7,
+       "c": 1.7,
+       "f": 9.0,
+       "prod": "orzechy_wloskie",
+       "src": "PDF:T_F1#breakfast/Orzechy włoskie",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 5,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "3",
+       "kcal": 7.5,
+       "p": 0.1,
+       "c": 1.7,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:T_F1#breakfast/Cynamon mielony",
+       "use": {
+        "qty": 3.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 6,
+       "name_src": "Borówki",
+       "name": "Borówki",
+       "label": "60",
+       "kcal": 35.0,
+       "p": 0.6,
+       "c": 8.4,
+       "f": 0.0,
+       "prod": "borowki",
+       "src": "PDF:T_F1#breakfast/Borówki",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 7,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:T_F1#breakfast/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 682.0,
+      "p": 34.0,
+      "c": 67.4,
+      "f": 27.4
+     }
+    },
+    {
+     "id": "lunch",
+     "label_src": "LUNCH",
+     "items": [
+      {
+       "order": 8,
+       "name_src": "Makaron penne pełnoziarnisty",
+       "name": "Makaron penne pełnoziarnisty",
+       "label": "85",
+       "kcal": 279.0,
+       "p": 15.3,
+       "c": 43.4,
+       "f": 2.4,
+       "prod": "penne",
+       "src": "PDF:T_F1#lunch/Makaron penne pełnoziarnisty",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 9,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:T_F1#lunch/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 10,
+       "name_src": "Pomidory szuszone",
+       "name": "Pomidory suszone",
+       "label": "40 (2 widelce)",
+       "kcal": 77.0,
+       "p": 1.3,
+       "c": 4.4,
+       "f": 5.6,
+       "prod": "pomidory_suszone",
+       "src": "PDF:T_F1#lunch/Pomidory szuszone",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 40.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 11,
+       "name_src": "Szpinak mrożony",
+       "name": "Szpinak mrożony",
+       "label": "100",
+       "kcal": 33.0,
+       "p": 4.2,
+       "c": 0.9,
+       "f": 0.6,
+       "prod": "szpinak_mrozony",
+       "src": "PDF:T_F1#lunch/Szpinak mrożony",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 12,
+       "name_src": "Oliwa z oliwek",
+       "name": "Oliwa z oliwek",
+       "label": "5",
+       "kcal": 50.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 5.0,
+       "prod": "oliwa",
+       "src": "PDF:T_F1#lunch/Oliwa z oliwek",
+       "use": {
+        "qty": 5,
+        "unit": "ml",
+        "basis": "PDF: 5"
+       }
+      },
+      {
+       "order": 13,
+       "name_src": "Czosnek",
+       "name": "Czosnek",
+       "label": "1 ząbek (5 g)",
+       "kcal": 8.0,
+       "p": 0.4,
+       "c": 1.6,
+       "f": 0.0,
+       "prod": "czosnek",
+       "src": "PDF:T_F1#lunch/Czosnek",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 514.0,
+      "p": 33.2,
+      "c": 54.1,
+      "f": 13.6
+     }
+    },
+    {
+     "id": "snack",
+     "label_src": "PRZEKĄSKA",
+     "items": [
+      {
+       "order": 14,
+       "name_src": "Kefir 1,5%",
+       "name": "Kefir 1,5%",
+       "label": "200",
+       "kcal": 88.0,
+       "p": 6.4,
+       "c": 9.0,
+       "f": 3.0,
+       "prod": "kefir",
+       "src": "PDF:T_F1#snack/Kefir 1,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 g/ml"
+       }
+      },
+      {
+       "order": 15,
+       "name_src": "Siemię lniane",
+       "name": "Siemię lniane",
+       "label": "10",
+       "kcal": 50.0,
+       "p": 2.9,
+       "c": 1.7,
+       "f": 3.1,
+       "prod": "siemie_lniane",
+       "src": "PDF:T_F1#snack/Siemię lniane",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 16,
+       "name_src": "Ostropest plamisty",
+       "name": "Ostropest plamisty",
+       "label": "5",
+       "kcal": 15.0,
+       "p": 0.6,
+       "c": 0.3,
+       "f": 1.7,
+       "prod": "ostropest",
+       "src": "PDF:T_F1#snack/Ostropest plamisty",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 17,
+       "name_src": "Kakao",
+       "name": "Kakao",
+       "label": "1 łyżeczka (5 g)",
+       "kcal": 23.0,
+       "p": 0.9,
+       "c": 2.2,
+       "f": 1.1,
+       "prod": "kakao",
+       "src": "PDF:T_F1#snack/Kakao",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 18,
+       "name_src": "Ekstrakt z wanilii",
+       "name": "Ekstrakt z wanilii",
+       "label": "5 kropel",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "wanilia",
+       "src": "PDF:T_F1#snack/Ekstrakt z wanilii",
+       "use": {
+        "qty": 0.25,
+        "unit": "ml",
+        "basis": "D-021: 0,25 ml (5 kropel)"
+       }
+      },
+      {
+       "order": 19,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "2",
+       "kcal": 5.0,
+       "p": 0.7,
+       "c": 1.1,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:T_F1#snack/Cynamon mielony",
+       "use": {
+        "qty": 2.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 20,
+       "name_src": "Orzech brazylijski",
+       "name": "Orzech brazylijski",
+       "label": "1 sztuka (4 g)",
+       "kcal": 29.0,
+       "p": 0.7,
+       "c": 0.1,
+       "f": 2.8,
+       "prod": "orzech_brazylijski",
+       "src": "PDF:T_F1#snack/Orzech brazylijski",
+       "use": {
+        "qty": 4.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 210.0,
+      "p": 12.2,
+      "c": 14.4,
+      "f": 11.7
+     }
+    },
+    {
+     "id": "post",
+     "label_src": "PO TRENINGU",
+     "items": [
+      {
+       "order": 21,
+       "name_src": "Białko KFD",
+       "name": "Białko WPC",
+       "label": "30",
+       "kcal": 114.0,
+       "p": 21.5,
+       "c": 2.4,
+       "f": 2.4,
+       "prod": "bialko_kfd",
+       "src": "PDF:T_F1#post/Białko KFD",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 30.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 22,
+       "name_src": "Banan",
+       "name": "Banan",
+       "label": "120 (1 szt.)",
+       "kcal": 116.0,
+       "p": 1.2,
+       "c": 26.2,
+       "f": 0.4,
+       "prod": "banan",
+       "src": "PDF:T_F1#post/Banan",
+       "use": {
+        "qty": 120.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 230.0,
+      "p": 22.7,
+      "c": 28.6,
+      "f": 2.8
+     }
+    },
+    {
+     "id": "dinner",
+     "label_src": "OBIAD",
+     "items": [
+      {
+       "order": 23,
+       "name_src": "Ryż biały paraboiled",
+       "name": "Ryż biały parboiled",
+       "label": "85",
+       "kcal": 298.0,
+       "p": 6.7,
+       "c": 66.2,
+       "f": 0.6,
+       "prod": "ryz_parboiled",
+       "src": "PDF:T_F1#dinner/Ryż biały paraboiled",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 24,
+       "name_src": "Kurczak",
+       "name": "Kurczak",
+       "label": "150",
+       "kcal": 150.0,
+       "p": 30.0,
+       "c": 1.0,
+       "f": 2.7,
+       "prod": "kurczak",
+       "src": "PDF:T_F1#dinner/Kurczak",
+       "use": {
+        "qty": 150.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 25,
+       "name_src": "Mieszanka warzyw (po hiszpańsku)",
+       "name": "Mieszanka warzyw (po hiszpańsku)",
+       "label": "130",
+       "kcal": 69.0,
+       "p": 2.4,
+       "c": 9.2,
+       "f": 1.5,
+       "prod": "mieszanka_warzyw",
+       "src": "PDF:T_F1#dinner/Mieszanka warzyw (po hiszpańsku)",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 26,
+       "name_src": "Brokuły",
+       "name": "Brokuły mrożone",
+       "label": "130",
+       "kcal": 26.0,
+       "p": 2.3,
+       "c": 2.3,
+       "f": 0.7,
+       "prod": "brokuly",
+       "src": "PDF:T_F1#dinner/Brokuły",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 27,
+       "name_src": "Buraczki tarte (ze słoika)",
+       "name": "Buraczki tarte (ze słoika)",
+       "label": "100",
+       "kcal": 50.0,
+       "p": 1.3,
+       "c": 9.7,
+       "f": 0.5,
+       "prod": "buraczki",
+       "src": "PDF:T_F1#dinner/Buraczki tarte (ze słoika)",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 28,
+       "name_src": "Marchew",
+       "name": "Marchew",
+       "label": "50",
+       "kcal": 16.0,
+       "p": 0.5,
+       "c": 2.5,
+       "f": 0.1,
+       "prod": "marchew",
+       "src": "PDF:T_F1#dinner/Marchew",
+       "use": {
+        "qty": 50.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 29,
+       "name_src": "Ogórek kiszony",
+       "name": "Ogórek kiszony",
+       "label": "60 (1 sztuka)",
+       "kcal": 7.0,
+       "p": 0.6,
+       "c": 0.8,
+       "f": 0.1,
+       "prod": "ogorek_kiszony",
+       "src": "PDF:T_F1#dinner/Ogórek kiszony",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 616.0,
+      "p": 43.8,
+      "c": 91.7,
+      "f": 6.2
+     }
+    },
+    {
+     "id": "supper",
+     "label_src": "KOLACJA",
+     "items": [
+      {
+       "order": 30,
+       "name_src": "Jajka",
+       "name": "Jajka",
+       "label": "3 szt./ M",
+       "kcal": 214.0,
+       "p": 19.0,
+       "c": 0.9,
+       "f": 15.0,
+       "prod": "jajka",
+       "src": "PDF:T_F1#supper/Jajka",
+       "use": {
+        "qty": 3.0,
+        "unit": "szt.",
+        "basis": "PDF: 3 szt."
+       }
+      },
+      {
+       "order": 31,
+       "name_src": "Twaróg chudy",
+       "name": "Twaróg chudy",
+       "label": "125",
+       "kcal": 105.0,
+       "p": 21.3,
+       "c": 3.7,
+       "f": 0.6,
+       "prod": "twarog",
+       "src": "PDF:T_F1#supper/Twaróg chudy",
+       "use": {
+        "qty": 125.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 32,
+       "name_src": "Chleb żytni na zakwasie bez drożdzy",
+       "name": "Chleb żytni na zakwasie bez drożdży",
+       "label": "35 (1 kromka)",
+       "kcal": 79.0,
+       "p": 2.2,
+       "c": 15.0,
+       "f": 0.6,
+       "prod": "chleb_zytni",
+       "src": "PDF:T_F1#supper/Chleb żytni na zakwasie bez drożdzy",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 35.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 33,
+       "name_src": "Szczypiorek",
+       "name": "Szczypiorek",
+       "label": "1 łyżka (5 g)",
+       "kcal": 2.0,
+       "p": 0.2,
+       "c": 0.1,
+       "f": 0.0,
+       "prod": "szczypiorek",
+       "src": "PDF:T_F1#supper/Szczypiorek",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "D-021: 5 g"
+       }
+      },
+      {
+       "order": 34,
+       "name_src": "Pomidorki koktajlowe",
+       "name": "Pomidorki koktajlowe",
+       "label": "4 sztuki (80 g)",
+       "kcal": 16.0,
+       "p": 0.8,
+       "c": 2.5,
+       "f": 0.2,
+       "prod": "pomidorki_kokt",
+       "src": "PDF:T_F1#supper/Pomidorki koktajlowe",
+       "use": {
+        "qty": 80.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 35,
+       "name_src": "Papryka",
+       "name": "Papryka",
+       "label": "1/3 sztuki (70 g)",
+       "kcal": 22.0,
+       "p": 0.9,
+       "c": 3.2,
+       "f": 0.3,
+       "prod": "papryka",
+       "src": "PDF:T_F1#supper/Papryka",
+       "use": {
+        "qty": 0.3333333333333333,
+        "unit": "szt.",
+        "basis": "PDF: 1/3 sztuki"
+       }
+      },
+      {
+       "order": 36,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "2 szczypty (1 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F1#supper/Sól jodowana"
+      }
+     ],
+     "total": {
+      "kcal": 438.0,
+      "p": 44.4,
+      "c": 25.4,
+      "f": 16.7
+     }
+    },
+    {
+     "id": "drinks",
+     "label_src": "NAPOJE",
+     "items": [
+      {
+       "order": 37,
+       "name_src": "Woda",
+       "name": "Woda",
+       "label": "3+2 bidony, 500 ml rano",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F1#drinks/Woda"
+      },
+      {
+       "order": 38,
+       "name_src": "Zielona herbata (imbir, miód, cytryna)",
+       "name": "Zielona herbata (imbir, miód, cytryna)",
+       "label": "400 ml (1.5 łyżki suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "herbata_zielona",
+       "src": "PDF:T_F1#drinks/Zielona herbata (imbir, miód, cytryna)",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "ZAPASY v31: 5 g/d (PDF: 1,5 łyżki suszu)"
+       }
+      },
+      {
+       "order": 39,
+       "name_src": "Mleko 0,5%",
+       "name": "Mleko 0,5%",
+       "label": "200 ml",
+       "kcal": 70.0,
+       "p": 6.0,
+       "c": 9.4,
+       "f": 1.0,
+       "prod": "mleko",
+       "src": "PDF:T_F1#drinks/Mleko 0,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 ml"
+       }
+      },
+      {
+       "order": 40,
+       "name_src": "Kawa (espresso)",
+       "name": "Kawa (espresso)",
+       "label": "60 ml (2x30ml)",
+       "kcal": 5.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "kawa_ziarno",
+       "src": "PDF:T_F1#drinks/Kawa (espresso)",
+       "use": {
+        "qty": 16,
+        "unit": "g",
+        "basis": "ZAPASY v31 / REKOMPOZYCJA: 2 × 8 g"
+       }
+      },
+      {
+       "order": 41,
+       "name_src": "Miód",
+       "name": "Miód",
+       "label": "1 łyżeczka (6 g)",
+       "kcal": 19.0,
+       "p": 0.0,
+       "c": 4.8,
+       "f": 0.0,
+       "prod": "miod",
+       "src": "PDF:T_F1#drinks/Miód",
+       "use": {
+        "qty": 6.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 42,
+       "name_src": "Sok z cytryny",
+       "name": "Sok z cytryny",
+       "label": "1/2 łyżeczki (3 ml)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "cytryna",
+       "src": "PDF:T_F1#drinks/Sok z cytryny",
+       "use": {
+        "qty": 0.14285714285714285,
+        "unit": "szt.",
+        "basis": "D-021: 1/7 szt."
+       }
+      },
+      {
+       "order": 43,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "3 szczypty (1,5 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F1#drinks/Sól jodowana"
+      },
+      {
+       "order": 44,
+       "name_src": "Melisa",
+       "name": "Melisa",
+       "label": "200 ml (1 łyżka suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "melisa",
+       "src": "PDF:T_F1#drinks/Melisa",
+       "use": {
+        "qty": 2,
+        "unit": "g",
+        "basis": "D-021: 2 g"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 94.0,
+      "p": 6.0,
+      "c": 14.2,
+      "f": 1.0
+     }
+    }
+   ],
+   "total": {
+    "kcal": 2784.0,
+    "p": 196.3,
+    "c": 295.8,
+    "f": 79.4
+   },
+   "atwater_kcal": 2683.0,
+   "pct": {
+    "p": 29.3,
+    "c": 44.1,
+    "f": 26.6
+   },
+   "spices_raw": [
+    "Cynamon",
+    "Koperek",
+    "Papryka słod.",
+    "Czosnek granulowany",
+    "Kurkuma",
+    "Papryka węd.",
+    "Oregano",
+    "Curry",
+    "Chili",
+    "Pieprz czarny",
+    "Rozmaryn",
+    "Bazylia",
+    "Imbir",
+    "Natka pietruszki",
+    "Szczypiorek",
+    "Sól jodowana",
+    "Zioła prowan.",
+    "Tymianek"
+   ],
+   "optional": [
+    {
+     "name": "Makaron pełnoziarnisty spaghetti",
+     "label": "200 g",
+     "kcal": 315.0,
+     "p": 14.2,
+     "c": 52.0,
+     "f": 2.8
+    },
+    {
+     "name": "Kasza gryczana niepalona",
+     "label": "100 g",
+     "kcal": 356.0,
+     "p": 14.0,
+     "c": 62.0,
+     "f": 4.0
+    },
+    {
+     "name": "Bataty",
+     "label": "2 średnie (400 g b/s)",
+     "kcal": 344.0,
+     "p": 6.4,
+     "c": 80.4,
+     "f": 0.4
+    },
+    {
+     "name": "Ziemniaki",
+     "label": "6 sztuk (450 g b/s)",
+     "kcal": 356.0,
+     "p": 8.6,
+     "c": 75.6,
+     "f": 0.4
+    },
+    {
+     "name": "Łosoś",
+     "label": "100 g",
+     "kcal": 201.0,
+     "p": 19.9,
+     "c": 0.0,
+     "f": 13.6
+    },
+    {
+     "name": "Indyk",
+     "label": "150 g",
+     "kcal": 126.0,
+     "p": 28.8,
+     "c": 0.0,
+     "f": 1.2
+    },
+    {
+     "name": "Wołowina (mięso mielone)",
+     "label": "130 g",
+     "kcal": 240.0,
+     "p": 22.1,
+     "c": 0.0,
+     "f": 16.9
+    },
+    {
+     "name": "Dorsz",
+     "label": "100 g",
+     "kcal": 78.0,
+     "p": 17.7,
+     "c": 0.0,
+     "f": 0.7
+    },
+    {
+     "name": "Kapusta kiszona",
+     "label": "100 g",
+     "kcal": 16.0,
+     "p": 1.1,
+     "c": 1.3,
+     "f": 0.2
+    },
+    {
+     "name": "Awokado",
+     "label": "1/2 sztuki (70 g)",
+     "kcal": 118.0,
+     "p": 1.4,
+     "c": 2.9,
+     "f": 10.7
+    }
+   ],
+   "src": "DIETA_PLAN_-_2027_T_faza_1.pdf"
+  },
+  {
+   "variant": "T",
+   "phase": 2,
+   "header_src": "DNI TRENINGOWE + CARDIO (Faza 2)",
+   "meals": [
+    {
+     "id": "breakfast",
+     "label_src": "ŚNIADANIE",
+     "items": [
+      {
+       "order": 0,
+       "name_src": "Słonecznik łuskany",
+       "name": "Słonecznik łuskany",
+       "label": "15",
+       "kcal": 65.0,
+       "p": 3.1,
+       "c": 2.0,
+       "f": 5.0,
+       "prod": "slonecznik",
+       "src": "PDF:T_F2#breakfast/Słonecznik łuskany",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 1,
+       "name_src": "Nasiona chia",
+       "name": "Nasiona chia",
+       "label": "10",
+       "kcal": 43.0,
+       "p": 2.1,
+       "c": 0.5,
+       "f": 2.9,
+       "prod": "chia",
+       "src": "PDF:T_F2#breakfast/Nasiona chia",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 2,
+       "name_src": "Płatki owsiane zwykłe",
+       "name": "Płatki owsiane zwykłe",
+       "label": "85",
+       "kcal": 302.0,
+       "p": 10.7,
+       "c": 47.9,
+       "f": 5.3,
+       "prod": "platki_owsiane",
+       "src": "PDF:T_F2#breakfast/Płatki owsiane zwykłe",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 3,
+       "name_src": "Pestki dyni",
+       "name": "Pestki dyni",
+       "label": "15",
+       "kcal": 62.5,
+       "p": 2.7,
+       "c": 1.4,
+       "f": 5.2,
+       "prod": "pestki_dyni",
+       "src": "PDF:T_F2#breakfast/Pestki dyni",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 4,
+       "name_src": "Orzechy włoskie",
+       "name": "Orzechy włoskie",
+       "label": "15",
+       "kcal": 100.0,
+       "p": 2.7,
+       "c": 1.7,
+       "f": 9.0,
+       "prod": "orzechy_wloskie",
+       "src": "PDF:T_F2#breakfast/Orzechy włoskie",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 5,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "3",
+       "kcal": 7.5,
+       "p": 0.1,
+       "c": 1.7,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:T_F2#breakfast/Cynamon mielony",
+       "use": {
+        "qty": 3.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 6,
+       "name_src": "Borówki",
+       "name": "Borówki",
+       "label": "60",
+       "kcal": 35.0,
+       "p": 0.6,
+       "c": 8.4,
+       "f": 0.0,
+       "prod": "borowki",
+       "src": "PDF:T_F2#breakfast/Borówki",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 7,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:T_F2#breakfast/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 682.0,
+      "p": 34.0,
+      "c": 67.4,
+      "f": 27.4
+     }
+    },
+    {
+     "id": "lunch",
+     "label_src": "LUNCH",
+     "items": [
+      {
+       "order": 8,
+       "name_src": "Makaron penne pełnoziarnisty",
+       "name": "Makaron penne pełnoziarnisty",
+       "label": "100",
+       "kcal": 329.0,
+       "p": 18.0,
+       "c": 51.0,
+       "f": 2.9,
+       "prod": "penne",
+       "src": "PDF:T_F2#lunch/Makaron penne pełnoziarnisty",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 9,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:T_F2#lunch/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 10,
+       "name_src": "Pomidory szuszone",
+       "name": "Pomidory suszone",
+       "label": "40 (2 widelce)",
+       "kcal": 77.0,
+       "p": 1.3,
+       "c": 4.4,
+       "f": 5.6,
+       "prod": "pomidory_suszone",
+       "src": "PDF:T_F2#lunch/Pomidory szuszone",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 40.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 11,
+       "name_src": "Szpinak mrożony",
+       "name": "Szpinak mrożony",
+       "label": "100",
+       "kcal": 33.0,
+       "p": 4.2,
+       "c": 0.9,
+       "f": 0.6,
+       "prod": "szpinak_mrozony",
+       "src": "PDF:T_F2#lunch/Szpinak mrożony",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 12,
+       "name_src": "Oliwa z oliwek",
+       "name": "Oliwa z oliwek",
+       "label": "5",
+       "kcal": 50.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 5.0,
+       "prod": "oliwa",
+       "src": "PDF:T_F2#lunch/Oliwa z oliwek",
+       "use": {
+        "qty": 5,
+        "unit": "ml",
+        "basis": "PDF: 5"
+       }
+      },
+      {
+       "order": 13,
+       "name_src": "Czosnek",
+       "name": "Czosnek",
+       "label": "1 ząbek (5 g)",
+       "kcal": 8.0,
+       "p": 0.4,
+       "c": 1.6,
+       "f": 0.0,
+       "prod": "czosnek",
+       "src": "PDF:T_F2#lunch/Czosnek",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 564.0,
+      "p": 35.9,
+      "c": 61.7,
+      "f": 14.1
+     }
+    },
+    {
+     "id": "snack",
+     "label_src": "PRZEKĄSKA",
+     "items": [
+      {
+       "order": 14,
+       "name_src": "Kefir 1,5%",
+       "name": "Kefir 1,5%",
+       "label": "200",
+       "kcal": 88.0,
+       "p": 6.4,
+       "c": 9.0,
+       "f": 3.0,
+       "prod": "kefir",
+       "src": "PDF:T_F2#snack/Kefir 1,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 g/ml"
+       }
+      },
+      {
+       "order": 15,
+       "name_src": "Siemię lniane",
+       "name": "Siemię lniane",
+       "label": "10",
+       "kcal": 50.0,
+       "p": 2.9,
+       "c": 1.7,
+       "f": 3.1,
+       "prod": "siemie_lniane",
+       "src": "PDF:T_F2#snack/Siemię lniane",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 16,
+       "name_src": "Ostropest plamisty",
+       "name": "Ostropest plamisty",
+       "label": "5",
+       "kcal": 15.0,
+       "p": 0.6,
+       "c": 0.3,
+       "f": 1.7,
+       "prod": "ostropest",
+       "src": "PDF:T_F2#snack/Ostropest plamisty",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 17,
+       "name_src": "Kakao",
+       "name": "Kakao",
+       "label": "1 łyżeczka (5 g)",
+       "kcal": 23.0,
+       "p": 0.9,
+       "c": 2.2,
+       "f": 1.1,
+       "prod": "kakao",
+       "src": "PDF:T_F2#snack/Kakao",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 18,
+       "name_src": "Ekstrakt z wanilii",
+       "name": "Ekstrakt z wanilii",
+       "label": "5 kropel",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "wanilia",
+       "src": "PDF:T_F2#snack/Ekstrakt z wanilii",
+       "use": {
+        "qty": 0.25,
+        "unit": "ml",
+        "basis": "D-021: 0,25 ml (5 kropel)"
+       }
+      },
+      {
+       "order": 19,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "2",
+       "kcal": 5.0,
+       "p": 0.7,
+       "c": 1.1,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:T_F2#snack/Cynamon mielony",
+       "use": {
+        "qty": 2.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 20,
+       "name_src": "Orzech brazylijski",
+       "name": "Orzech brazylijski",
+       "label": "1 sztuka (4 g)",
+       "kcal": 29.0,
+       "p": 0.7,
+       "c": 0.1,
+       "f": 2.8,
+       "prod": "orzech_brazylijski",
+       "src": "PDF:T_F2#snack/Orzech brazylijski",
+       "use": {
+        "qty": 4.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 210.0,
+      "p": 12.2,
+      "c": 14.4,
+      "f": 11.7
+     }
+    },
+    {
+     "id": "post",
+     "label_src": "PO TRENINGU",
+     "items": [
+      {
+       "order": 21,
+       "name_src": "Białko KFD",
+       "name": "Białko WPC",
+       "label": "30",
+       "kcal": 114.0,
+       "p": 21.5,
+       "c": 2.4,
+       "f": 2.4,
+       "prod": "bialko_kfd",
+       "src": "PDF:T_F2#post/Białko KFD",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 30.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 22,
+       "name_src": "Banan",
+       "name": "Banan",
+       "label": "120 (1 szt.)",
+       "kcal": 116.0,
+       "p": 1.2,
+       "c": 26.2,
+       "f": 0.4,
+       "prod": "banan",
+       "src": "PDF:T_F2#post/Banan",
+       "use": {
+        "qty": 120.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 230.0,
+      "p": 22.7,
+      "c": 28.6,
+      "f": 2.8
+     }
+    },
+    {
+     "id": "dinner",
+     "label_src": "OBIAD",
+     "items": [
+      {
+       "order": 23,
+       "name_src": "Ryż biały paraboiled",
+       "name": "Ryż biały parboiled",
+       "label": "100",
+       "kcal": 350.0,
+       "p": 7.9,
+       "c": 77.9,
+       "f": 0.7,
+       "prod": "ryz_parboiled",
+       "src": "PDF:T_F2#dinner/Ryż biały paraboiled",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 24,
+       "name_src": "Kurczak",
+       "name": "Kurczak",
+       "label": "150",
+       "kcal": 150.0,
+       "p": 30.0,
+       "c": 1.0,
+       "f": 2.7,
+       "prod": "kurczak",
+       "src": "PDF:T_F2#dinner/Kurczak",
+       "use": {
+        "qty": 150.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 25,
+       "name_src": "Mieszanka warzyw (po hiszpańsku)",
+       "name": "Mieszanka warzyw (po hiszpańsku)",
+       "label": "130",
+       "kcal": 69.0,
+       "p": 2.4,
+       "c": 9.2,
+       "f": 1.5,
+       "prod": "mieszanka_warzyw",
+       "src": "PDF:T_F2#dinner/Mieszanka warzyw (po hiszpańsku)",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 26,
+       "name_src": "Brokuły",
+       "name": "Brokuły mrożone",
+       "label": "130",
+       "kcal": 26.0,
+       "p": 2.3,
+       "c": 2.3,
+       "f": 0.7,
+       "prod": "brokuly",
+       "src": "PDF:T_F2#dinner/Brokuły",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 27,
+       "name_src": "Buraczki tarte (ze słoika)",
+       "name": "Buraczki tarte (ze słoika)",
+       "label": "100",
+       "kcal": 50.0,
+       "p": 1.3,
+       "c": 9.7,
+       "f": 0.5,
+       "prod": "buraczki",
+       "src": "PDF:T_F2#dinner/Buraczki tarte (ze słoika)",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 28,
+       "name_src": "Marchew",
+       "name": "Marchew",
+       "label": "50",
+       "kcal": 16.0,
+       "p": 0.5,
+       "c": 2.5,
+       "f": 0.1,
+       "prod": "marchew",
+       "src": "PDF:T_F2#dinner/Marchew",
+       "use": {
+        "qty": 50.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 29,
+       "name_src": "Ogórek kiszony",
+       "name": "Ogórek kiszony",
+       "label": "60 (1 sztuka)",
+       "kcal": 7.0,
+       "p": 0.6,
+       "c": 0.8,
+       "f": 0.1,
+       "prod": "ogorek_kiszony",
+       "src": "PDF:T_F2#dinner/Ogórek kiszony",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 668.0,
+      "p": 45.0,
+      "c": 103.4,
+      "f": 6.3
+     }
+    },
+    {
+     "id": "supper",
+     "label_src": "KOLACJA",
+     "items": [
+      {
+       "order": 30,
+       "name_src": "Jajka",
+       "name": "Jajka",
+       "label": "3 szt./ M",
+       "kcal": 214.0,
+       "p": 19.0,
+       "c": 0.9,
+       "f": 15.0,
+       "prod": "jajka",
+       "src": "PDF:T_F2#supper/Jajka",
+       "use": {
+        "qty": 3.0,
+        "unit": "szt.",
+        "basis": "PDF: 3 szt."
+       }
+      },
+      {
+       "order": 31,
+       "name_src": "Twaróg chudy",
+       "name": "Twaróg chudy",
+       "label": "125",
+       "kcal": 105.0,
+       "p": 21.3,
+       "c": 3.7,
+       "f": 0.6,
+       "prod": "twarog",
+       "src": "PDF:T_F2#supper/Twaróg chudy",
+       "use": {
+        "qty": 125.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 32,
+       "name_src": "Chleb żytni na zakwasie bez drożdzy",
+       "name": "Chleb żytni na zakwasie bez drożdży",
+       "label": "70 (2 kromki)",
+       "kcal": 158.0,
+       "p": 4.4,
+       "c": 30.0,
+       "f": 1.2,
+       "prod": "chleb_zytni",
+       "src": "PDF:T_F2#supper/Chleb żytni na zakwasie bez drożdzy",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 33,
+       "name_src": "Szczypiorek",
+       "name": "Szczypiorek",
+       "label": "1 łyżka (5 g)",
+       "kcal": 2.0,
+       "p": 0.2,
+       "c": 0.1,
+       "f": 0.0,
+       "prod": "szczypiorek",
+       "src": "PDF:T_F2#supper/Szczypiorek",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "D-021: 5 g"
+       }
+      },
+      {
+       "order": 34,
+       "name_src": "Pomidorki koktajlowe",
+       "name": "Pomidorki koktajlowe",
+       "label": "4 sztuki (80 g)",
+       "kcal": 16.0,
+       "p": 0.8,
+       "c": 2.5,
+       "f": 0.2,
+       "prod": "pomidorki_kokt",
+       "src": "PDF:T_F2#supper/Pomidorki koktajlowe",
+       "use": {
+        "qty": 80.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 35,
+       "name_src": "Papryka",
+       "name": "Papryka",
+       "label": "1/3 sztuki (70 g)",
+       "kcal": 22.0,
+       "p": 0.9,
+       "c": 3.2,
+       "f": 0.3,
+       "prod": "papryka",
+       "src": "PDF:T_F2#supper/Papryka",
+       "use": {
+        "qty": 0.3333333333333333,
+        "unit": "szt.",
+        "basis": "PDF: 1/3 sztuki"
+       }
+      },
+      {
+       "order": 36,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "2 szczypty (1 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F2#supper/Sól jodowana"
+      }
+     ],
+     "total": {
+      "kcal": 517.0,
+      "p": 46.6,
+      "c": 40.4,
+      "f": 17.3
+     }
+    },
+    {
+     "id": "drinks",
+     "label_src": "NAPOJE",
+     "items": [
+      {
+       "order": 37,
+       "name_src": "Woda",
+       "name": "Woda",
+       "label": "3+2 bidony, 500 ml rano",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F2#drinks/Woda"
+      },
+      {
+       "order": 38,
+       "name_src": "Zielona herbata (imbir, miód, cytryna)",
+       "name": "Zielona herbata (imbir, miód, cytryna)",
+       "label": "400 ml (1.5 łyżki suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "herbata_zielona",
+       "src": "PDF:T_F2#drinks/Zielona herbata (imbir, miód, cytryna)",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "ZAPASY v31: 5 g/d (PDF: 1,5 łyżki suszu)"
+       }
+      },
+      {
+       "order": 39,
+       "name_src": "Mleko 0,5%",
+       "name": "Mleko 0,5%",
+       "label": "200 ml",
+       "kcal": 70.0,
+       "p": 6.0,
+       "c": 9.4,
+       "f": 1.0,
+       "prod": "mleko",
+       "src": "PDF:T_F2#drinks/Mleko 0,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 ml"
+       }
+      },
+      {
+       "order": 40,
+       "name_src": "Kawa (espresso)",
+       "name": "Kawa (espresso)",
+       "label": "60 ml (2x30ml)",
+       "kcal": 5.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "kawa_ziarno",
+       "src": "PDF:T_F2#drinks/Kawa (espresso)",
+       "use": {
+        "qty": 16,
+        "unit": "g",
+        "basis": "ZAPASY v31 / REKOMPOZYCJA: 2 × 8 g"
+       }
+      },
+      {
+       "order": 41,
+       "name_src": "Miód",
+       "name": "Miód",
+       "label": "1 łyżeczka (6 g)",
+       "kcal": 19.0,
+       "p": 0.0,
+       "c": 4.8,
+       "f": 0.0,
+       "prod": "miod",
+       "src": "PDF:T_F2#drinks/Miód",
+       "use": {
+        "qty": 6.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 42,
+       "name_src": "Sok z cytryny",
+       "name": "Sok z cytryny",
+       "label": "1/2 łyżeczki (3 ml)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "cytryna",
+       "src": "PDF:T_F2#drinks/Sok z cytryny",
+       "use": {
+        "qty": 0.14285714285714285,
+        "unit": "szt.",
+        "basis": "D-021: 1/7 szt."
+       }
+      },
+      {
+       "order": 43,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "3 szczypty (1,5 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:T_F2#drinks/Sól jodowana"
+      },
+      {
+       "order": 44,
+       "name_src": "Melisa",
+       "name": "Melisa",
+       "label": "200 ml (1 łyżka suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "melisa",
+       "src": "PDF:T_F2#drinks/Melisa",
+       "use": {
+        "qty": 2,
+        "unit": "g",
+        "basis": "D-021: 2 g"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 94.0,
+      "p": 6.0,
+      "c": 14.2,
+      "f": 1.0
+     }
+    }
+   ],
+   "total": {
+    "kcal": 2965.0,
+    "p": 202.4,
+    "c": 330.1,
+    "f": 80.6
+   },
+   "atwater_kcal": 2855.4,
+   "pct": {
+    "p": 28.4,
+    "c": 46.2,
+    "f": 25.4
+   },
+   "spices_raw": [
+    "Cynamon",
+    "Koperek",
+    "Papryka słod.",
+    "Czosnek granulowany",
+    "Kurkuma",
+    "Papryka węd.",
+    "Oregano",
+    "Curry",
+    "Chili",
+    "Pieprz czarny",
+    "Rozmaryn",
+    "Bazylia",
+    "Imbir",
+    "Natka pietruszki",
+    "Szczypiorek",
+    "Sól jodowana",
+    "Zioła prowan.",
+    "Tymianek"
+   ],
+   "optional": [
+    {
+     "name": "Makaron pełnoziarnisty spaghetti",
+     "label": "200 g",
+     "kcal": 315.0,
+     "p": 14.2,
+     "c": 52.0,
+     "f": 2.8
+    },
+    {
+     "name": "Kasza gryczana niepalona",
+     "label": "100 g",
+     "kcal": 356.0,
+     "p": 14.0,
+     "c": 62.0,
+     "f": 4.0
+    },
+    {
+     "name": "Bataty",
+     "label": "2 średnie (400 g b/s)",
+     "kcal": 344.0,
+     "p": 6.4,
+     "c": 80.4,
+     "f": 0.4
+    },
+    {
+     "name": "Ziemniaki",
+     "label": "6 sztuk (450 g b/s)",
+     "kcal": 356.0,
+     "p": 8.6,
+     "c": 75.6,
+     "f": 0.4
+    },
+    {
+     "name": "Łosoś",
+     "label": "100 g",
+     "kcal": 201.0,
+     "p": 19.9,
+     "c": 0.0,
+     "f": 13.6
+    },
+    {
+     "name": "Indyk",
+     "label": "150 g",
+     "kcal": 126.0,
+     "p": 28.8,
+     "c": 0.0,
+     "f": 1.2
+    },
+    {
+     "name": "Wołowina (mięso mielone)",
+     "label": "130 g",
+     "kcal": 240.0,
+     "p": 22.1,
+     "c": 0.0,
+     "f": 16.9
+    },
+    {
+     "name": "Dorsz",
+     "label": "100 g",
+     "kcal": 78.0,
+     "p": 17.7,
+     "c": 0.0,
+     "f": 0.7
+    },
+    {
+     "name": "Kapusta kiszona",
+     "label": "100 g",
+     "kcal": 16.0,
+     "p": 1.1,
+     "c": 1.3,
+     "f": 0.2
+    },
+    {
+     "name": "Awokado",
+     "label": "1/2 sztuki (70 g)",
+     "kcal": 118.0,
+     "p": 1.4,
+     "c": 2.9,
+     "f": 10.7
+    }
+   ],
+   "src": "DIETA_PLAN_-_2027_T_faza_2.pdf"
+  },
+  {
+   "variant": "NT",
+   "phase": 0,
+   "header_src": "DNI NIETRENINGOWE (Faza 0)",
+   "meals": [
+    {
+     "id": "breakfast",
+     "label_src": "ŚNIADANIE",
+     "items": [
+      {
+       "order": 0,
+       "name_src": "Słonecznik łuskany",
+       "name": "Słonecznik łuskany",
+       "label": "15",
+       "kcal": 65.0,
+       "p": 3.1,
+       "c": 2.0,
+       "f": 5.0,
+       "prod": "slonecznik",
+       "src": "PDF:NT_F0#breakfast/Słonecznik łuskany",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 1,
+       "name_src": "Nasiona chia",
+       "name": "Nasiona chia",
+       "label": "10",
+       "kcal": 43.0,
+       "p": 2.1,
+       "c": 0.5,
+       "f": 2.9,
+       "prod": "chia",
+       "src": "PDF:NT_F0#breakfast/Nasiona chia",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 2,
+       "name_src": "Płatki owsiane zwykłe",
+       "name": "Płatki owsiane zwykłe",
+       "label": "70",
+       "kcal": 249.0,
+       "p": 8.8,
+       "c": 39.4,
+       "f": 4.4,
+       "prod": "platki_owsiane",
+       "src": "PDF:NT_F0#breakfast/Płatki owsiane zwykłe",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 3,
+       "name_src": "Pestki dyni",
+       "name": "Pestki dyni",
+       "label": "15",
+       "kcal": 62.5,
+       "p": 2.7,
+       "c": 1.4,
+       "f": 5.2,
+       "prod": "pestki_dyni",
+       "src": "PDF:NT_F0#breakfast/Pestki dyni",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 4,
+       "name_src": "Orzechy włoskie",
+       "name": "Orzechy włoskie",
+       "label": "15",
+       "kcal": 100.0,
+       "p": 2.7,
+       "c": 1.7,
+       "f": 9.0,
+       "prod": "orzechy_wloskie",
+       "src": "PDF:NT_F0#breakfast/Orzechy włoskie",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 5,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "3",
+       "kcal": 7.5,
+       "p": 0.1,
+       "c": 1.7,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:NT_F0#breakfast/Cynamon mielony",
+       "use": {
+        "qty": 3.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 6,
+       "name_src": "Borówki",
+       "name": "Borówki",
+       "label": "60",
+       "kcal": 35.0,
+       "p": 0.6,
+       "c": 8.4,
+       "f": 0.0,
+       "prod": "borowki",
+       "src": "PDF:NT_F0#breakfast/Borówki",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 7,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:NT_F0#breakfast/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 629.0,
+      "p": 32.1,
+      "c": 58.9,
+      "f": 26.5
+     }
+    },
+    {
+     "id": "lunch",
+     "label_src": "LUNCH",
+     "items": [
+      {
+       "order": 8,
+       "name_src": "Makaron penne pełnoziarnisty",
+       "name": "Makaron penne pełnoziarnisty",
+       "label": "70",
+       "kcal": 230.0,
+       "p": 12.6,
+       "c": 35.7,
+       "f": 2.0,
+       "prod": "penne",
+       "src": "PDF:NT_F0#lunch/Makaron penne pełnoziarnisty",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 9,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:NT_F0#lunch/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 10,
+       "name_src": "Pomidory szuszone",
+       "name": "Pomidory suszone",
+       "label": "40 (2 widelce)",
+       "kcal": 77.0,
+       "p": 1.3,
+       "c": 4.4,
+       "f": 5.6,
+       "prod": "pomidory_suszone",
+       "src": "PDF:NT_F0#lunch/Pomidory szuszone",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 40.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 11,
+       "name_src": "Szpinak mrożony",
+       "name": "Szpinak mrożony",
+       "label": "100",
+       "kcal": 33.0,
+       "p": 4.2,
+       "c": 0.9,
+       "f": 0.6,
+       "prod": "szpinak_mrozony",
+       "src": "PDF:NT_F0#lunch/Szpinak mrożony",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 12,
+       "name_src": "Oliwa z oliwek",
+       "name": "Oliwa z oliwek",
+       "label": "5",
+       "kcal": 50.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 5.0,
+       "prod": "oliwa",
+       "src": "PDF:NT_F0#lunch/Oliwa z oliwek",
+       "use": {
+        "qty": 5,
+        "unit": "ml",
+        "basis": "PDF: 5"
+       }
+      },
+      {
+       "order": 13,
+       "name_src": "Czosnek",
+       "name": "Czosnek",
+       "label": "1 ząbek (5 g)",
+       "kcal": 8.0,
+       "p": 0.4,
+       "c": 1.6,
+       "f": 0.0,
+       "prod": "czosnek",
+       "src": "PDF:NT_F0#lunch/Czosnek",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 465.0,
+      "p": 30.5,
+      "c": 46.4,
+      "f": 13.2
+     }
+    },
+    {
+     "id": "snack",
+     "label_src": "PRZEKĄSKA",
+     "items": [
+      {
+       "order": 14,
+       "name_src": "Orzech brazylijski",
+       "name": "Orzech brazylijski",
+       "label": "1 sztuka (4 g)",
+       "kcal": 29.0,
+       "p": 0.7,
+       "c": 0.1,
+       "f": 2.8,
+       "prod": "orzech_brazylijski",
+       "src": "PDF:NT_F0#snack/Orzech brazylijski",
+       "use": {
+        "qty": 4.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 29.0,
+      "p": 0.7,
+      "c": 0.1,
+      "f": 2.8
+     }
+    },
+    {
+     "id": "post",
+     "label_src": "PO SAUNIE",
+     "items": [
+      {
+       "order": 15,
+       "name_src": "Białko KFD",
+       "name": "Białko WPC",
+       "label": "30",
+       "kcal": 114.0,
+       "p": 21.5,
+       "c": 2.4,
+       "f": 2.4,
+       "prod": "bialko_kfd",
+       "src": "PDF:NT_F0#post/Białko KFD",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 30.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 114.0,
+      "p": 21.5,
+      "c": 2.4,
+      "f": 2.4
+     }
+    },
+    {
+     "id": "dinner",
+     "label_src": "OBIAD",
+     "items": [
+      {
+       "order": 16,
+       "name_src": "Ryż biały paraboiled",
+       "name": "Ryż biały parboiled",
+       "label": "70",
+       "kcal": 245.0,
+       "p": 5.5,
+       "c": 54.5,
+       "f": 0.5,
+       "prod": "ryz_parboiled",
+       "src": "PDF:NT_F0#dinner/Ryż biały paraboiled",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 17,
+       "name_src": "Kurczak",
+       "name": "Kurczak",
+       "label": "150",
+       "kcal": 150.0,
+       "p": 30.0,
+       "c": 1.0,
+       "f": 2.7,
+       "prod": "kurczak",
+       "src": "PDF:NT_F0#dinner/Kurczak",
+       "use": {
+        "qty": 150.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 18,
+       "name_src": "Mieszanka warzyw (po hiszpańsku)",
+       "name": "Mieszanka warzyw (po hiszpańsku)",
+       "label": "130",
+       "kcal": 69.0,
+       "p": 2.4,
+       "c": 9.2,
+       "f": 1.5,
+       "prod": "mieszanka_warzyw",
+       "src": "PDF:NT_F0#dinner/Mieszanka warzyw (po hiszpańsku)",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 19,
+       "name_src": "Brokuły",
+       "name": "Brokuły mrożone",
+       "label": "130",
+       "kcal": 26.0,
+       "p": 2.3,
+       "c": 2.3,
+       "f": 0.7,
+       "prod": "brokuly",
+       "src": "PDF:NT_F0#dinner/Brokuły",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 20,
+       "name_src": "Buraczki tarte (ze słoika)",
+       "name": "Buraczki tarte (ze słoika)",
+       "label": "100",
+       "kcal": 50.0,
+       "p": 1.3,
+       "c": 9.7,
+       "f": 0.5,
+       "prod": "buraczki",
+       "src": "PDF:NT_F0#dinner/Buraczki tarte (ze słoika)",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 21,
+       "name_src": "Marchew",
+       "name": "Marchew",
+       "label": "50",
+       "kcal": 16.0,
+       "p": 0.5,
+       "c": 2.5,
+       "f": 0.1,
+       "prod": "marchew",
+       "src": "PDF:NT_F0#dinner/Marchew",
+       "use": {
+        "qty": 50.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 22,
+       "name_src": "Ogórek kiszony",
+       "name": "Ogórek kiszony",
+       "label": "60 (1 sztuka)",
+       "kcal": 7.0,
+       "p": 0.6,
+       "c": 0.8,
+       "f": 0.1,
+       "prod": "ogorek_kiszony",
+       "src": "PDF:NT_F0#dinner/Ogórek kiszony",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 563.0,
+      "p": 42.6,
+      "c": 80.0,
+      "f": 6.1
+     }
+    },
+    {
+     "id": "supper",
+     "label_src": "KOLACJA",
+     "items": [
+      {
+       "order": 23,
+       "name_src": "Jajka",
+       "name": "Jajka",
+       "label": "3 szt./ M",
+       "kcal": 214.0,
+       "p": 19.0,
+       "c": 0.9,
+       "f": 15.0,
+       "prod": "jajka",
+       "src": "PDF:NT_F0#supper/Jajka",
+       "use": {
+        "qty": 3.0,
+        "unit": "szt.",
+        "basis": "PDF: 3 szt."
+       }
+      },
+      {
+       "order": 24,
+       "name_src": "Twaróg chudy",
+       "name": "Twaróg chudy",
+       "label": "125",
+       "kcal": 105.0,
+       "p": 21.3,
+       "c": 3.7,
+       "f": 0.6,
+       "prod": "twarog",
+       "src": "PDF:NT_F0#supper/Twaróg chudy",
+       "use": {
+        "qty": 125.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 25,
+       "name_src": "Chleb żytni na zakwasie bez drożdzy",
+       "name": "Chleb żytni na zakwasie bez drożdży",
+       "label": "35 (1 kromka)",
+       "kcal": 79.0,
+       "p": 2.2,
+       "c": 15.0,
+       "f": 0.6,
+       "prod": "chleb_zytni",
+       "src": "PDF:NT_F0#supper/Chleb żytni na zakwasie bez drożdzy",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 35.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 26,
+       "name_src": "Szczypiorek",
+       "name": "Szczypiorek",
+       "label": "1 łyżka (5 g)",
+       "kcal": 2.0,
+       "p": 0.2,
+       "c": 0.1,
+       "f": 0.0,
+       "prod": "szczypiorek",
+       "src": "PDF:NT_F0#supper/Szczypiorek",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "D-021: 5 g"
+       }
+      },
+      {
+       "order": 27,
+       "name_src": "Pomidorki koktajlowe",
+       "name": "Pomidorki koktajlowe",
+       "label": "4 sztuki (80 g)",
+       "kcal": 16.0,
+       "p": 0.8,
+       "c": 2.5,
+       "f": 0.2,
+       "prod": "pomidorki_kokt",
+       "src": "PDF:NT_F0#supper/Pomidorki koktajlowe",
+       "use": {
+        "qty": 80.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 28,
+       "name_src": "Papryka",
+       "name": "Papryka",
+       "label": "1/3 sztuki (70 g)",
+       "kcal": 22.0,
+       "p": 0.9,
+       "c": 3.2,
+       "f": 0.3,
+       "prod": "papryka",
+       "src": "PDF:NT_F0#supper/Papryka",
+       "use": {
+        "qty": 0.3333333333333333,
+        "unit": "szt.",
+        "basis": "PDF: 1/3 sztuki"
+       }
+      },
+      {
+       "order": 29,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "2 szczypty (1 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F0#supper/Sól jodowana"
+      }
+     ],
+     "total": {
+      "kcal": 438.0,
+      "p": 44.4,
+      "c": 25.4,
+      "f": 16.7
+     }
+    },
+    {
+     "id": "drinks",
+     "label_src": "NAPOJE",
+     "items": [
+      {
+       "order": 30,
+       "name_src": "Woda",
+       "name": "Woda",
+       "label": "3+2 bidony, 500 ml rano",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F0#drinks/Woda"
+      },
+      {
+       "order": 31,
+       "name_src": "Zielona herbata (imbir, miód, cytryna)",
+       "name": "Zielona herbata (imbir, miód, cytryna)",
+       "label": "400 ml (1.5 łyżki suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "herbata_zielona",
+       "src": "PDF:NT_F0#drinks/Zielona herbata (imbir, miód, cytryna)",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "ZAPASY v31: 5 g/d (PDF: 1,5 łyżki suszu)"
+       }
+      },
+      {
+       "order": 32,
+       "name_src": "Mleko 0,5%",
+       "name": "Mleko 0,5%",
+       "label": "200 ml",
+       "kcal": 70.0,
+       "p": 6.0,
+       "c": 9.4,
+       "f": 1.0,
+       "prod": "mleko",
+       "src": "PDF:NT_F0#drinks/Mleko 0,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 ml"
+       }
+      },
+      {
+       "order": 33,
+       "name_src": "Kawa (espresso)",
+       "name": "Kawa (espresso)",
+       "label": "60 ml (2x30ml)",
+       "kcal": 5.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "kawa_ziarno",
+       "src": "PDF:NT_F0#drinks/Kawa (espresso)",
+       "use": {
+        "qty": 16,
+        "unit": "g",
+        "basis": "ZAPASY v31 / REKOMPOZYCJA: 2 × 8 g"
+       }
+      },
+      {
+       "order": 34,
+       "name_src": "Miód",
+       "name": "Miód",
+       "label": "1 łyżeczka (6 g)",
+       "kcal": 19.0,
+       "p": 0.0,
+       "c": 4.8,
+       "f": 0.0,
+       "prod": "miod",
+       "src": "PDF:NT_F0#drinks/Miód",
+       "use": {
+        "qty": 6.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 35,
+       "name_src": "Sok z cytryny",
+       "name": "Sok z cytryny",
+       "label": "1/2 łyżeczki (3 ml)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "cytryna",
+       "src": "PDF:NT_F0#drinks/Sok z cytryny",
+       "use": {
+        "qty": 0.14285714285714285,
+        "unit": "szt.",
+        "basis": "D-021: 1/7 szt."
+       }
+      },
+      {
+       "order": 36,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "3 szczypty (1,5 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F0#drinks/Sól jodowana"
+      },
+      {
+       "order": 37,
+       "name_src": "Melisa",
+       "name": "Melisa",
+       "label": "200 ml (1 łyżka suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "melisa",
+       "src": "PDF:NT_F0#drinks/Melisa",
+       "use": {
+        "qty": 2,
+        "unit": "g",
+        "basis": "D-021: 2 g"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 94.0,
+      "p": 6.0,
+      "c": 14.2,
+      "f": 1.0
+     }
+    }
+   ],
+   "total": {
+    "kcal": 2332.0,
+    "p": 177.8,
+    "c": 227.4,
+    "f": 68.7
+   },
+   "atwater_kcal": 2239.1,
+   "pct": {
+    "p": 31.8,
+    "c": 40.6,
+    "f": 27.6
+   },
+   "spices_raw": [
+    "Cynamon",
+    "Koperek",
+    "Papryka słod.",
+    "Czosnek granulowany",
+    "Kurkuma",
+    "Papryka węd.",
+    "Oregano",
+    "Curry",
+    "Chili",
+    "Pieprz czarny",
+    "Rozmaryn",
+    "Bazylia",
+    "Imbir",
+    "Natka pietruszki",
+    "Szczypiorek",
+    "Sól jodowana",
+    "Zioła prowan.",
+    "Tymianek"
+   ],
+   "optional": [
+    {
+     "name": "Makaron pełnoziarnisty spaghetti",
+     "label": "200 g",
+     "kcal": 315.0,
+     "p": 14.2,
+     "c": 52.0,
+     "f": 2.8
+    },
+    {
+     "name": "Kasza gryczana niepalona",
+     "label": "100 g",
+     "kcal": 356.0,
+     "p": 14.0,
+     "c": 62.0,
+     "f": 4.0
+    },
+    {
+     "name": "Bataty",
+     "label": "2 średnie (400 g b/s)",
+     "kcal": 344.0,
+     "p": 6.4,
+     "c": 80.4,
+     "f": 0.4
+    },
+    {
+     "name": "Ziemniaki",
+     "label": "6 sztuk (450 g b/s)",
+     "kcal": 356.0,
+     "p": 8.6,
+     "c": 75.6,
+     "f": 0.4
+    },
+    {
+     "name": "Łosoś",
+     "label": "100 g",
+     "kcal": 201.0,
+     "p": 19.9,
+     "c": 0.0,
+     "f": 13.6
+    },
+    {
+     "name": "Indyk",
+     "label": "150 g",
+     "kcal": 126.0,
+     "p": 28.8,
+     "c": 0.0,
+     "f": 1.2
+    },
+    {
+     "name": "Wołowina (mięso mielone)",
+     "label": "130 g",
+     "kcal": 240.0,
+     "p": 22.1,
+     "c": 0.0,
+     "f": 16.9
+    },
+    {
+     "name": "Dorsz",
+     "label": "100 g",
+     "kcal": 78.0,
+     "p": 17.7,
+     "c": 0.0,
+     "f": 0.7
+    },
+    {
+     "name": "Kapusta kiszona",
+     "label": "100 g",
+     "kcal": 16.0,
+     "p": 1.1,
+     "c": 1.3,
+     "f": 0.2
+    },
+    {
+     "name": "Awokado",
+     "label": "1/2 sztuki (70 g)",
+     "kcal": 118.0,
+     "p": 1.4,
+     "c": 2.9,
+     "f": 10.7
+    }
+   ],
+   "src": "DIETA_PLAN_-_2027_NT_faza_0.pdf"
+  },
+  {
+   "variant": "NT",
+   "phase": 1,
+   "header_src": "DNI NIETRENINGOWE (Faza 1)",
+   "meals": [
+    {
+     "id": "breakfast",
+     "label_src": "ŚNIADANIE",
+     "items": [
+      {
+       "order": 0,
+       "name_src": "Słonecznik łuskany",
+       "name": "Słonecznik łuskany",
+       "label": "15",
+       "kcal": 65.0,
+       "p": 3.1,
+       "c": 2.0,
+       "f": 5.0,
+       "prod": "slonecznik",
+       "src": "PDF:NT_F1#breakfast/Słonecznik łuskany",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 1,
+       "name_src": "Nasiona chia",
+       "name": "Nasiona chia",
+       "label": "10",
+       "kcal": 43.0,
+       "p": 2.1,
+       "c": 0.5,
+       "f": 2.9,
+       "prod": "chia",
+       "src": "PDF:NT_F1#breakfast/Nasiona chia",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 2,
+       "name_src": "Płatki owsiane zwykłe",
+       "name": "Płatki owsiane zwykłe",
+       "label": "85",
+       "kcal": 302.0,
+       "p": 10.7,
+       "c": 47.9,
+       "f": 5.3,
+       "prod": "platki_owsiane",
+       "src": "PDF:NT_F1#breakfast/Płatki owsiane zwykłe",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 3,
+       "name_src": "Pestki dyni",
+       "name": "Pestki dyni",
+       "label": "15",
+       "kcal": 62.5,
+       "p": 2.7,
+       "c": 1.4,
+       "f": 5.2,
+       "prod": "pestki_dyni",
+       "src": "PDF:NT_F1#breakfast/Pestki dyni",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 4,
+       "name_src": "Orzechy włoskie",
+       "name": "Orzechy włoskie",
+       "label": "15",
+       "kcal": 100.0,
+       "p": 2.7,
+       "c": 1.7,
+       "f": 9.0,
+       "prod": "orzechy_wloskie",
+       "src": "PDF:NT_F1#breakfast/Orzechy włoskie",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 5,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "3",
+       "kcal": 7.5,
+       "p": 0.1,
+       "c": 1.7,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:NT_F1#breakfast/Cynamon mielony",
+       "use": {
+        "qty": 3.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 6,
+       "name_src": "Borówki",
+       "name": "Borówki",
+       "label": "60",
+       "kcal": 35.0,
+       "p": 0.6,
+       "c": 8.4,
+       "f": 0.0,
+       "prod": "borowki",
+       "src": "PDF:NT_F1#breakfast/Borówki",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 7,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:NT_F1#breakfast/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 682.0,
+      "p": 34.0,
+      "c": 67.4,
+      "f": 27.4
+     }
+    },
+    {
+     "id": "lunch",
+     "label_src": "LUNCH",
+     "items": [
+      {
+       "order": 8,
+       "name_src": "Makaron penne pełnoziarnisty",
+       "name": "Makaron penne pełnoziarnisty",
+       "label": "85",
+       "kcal": 279.0,
+       "p": 15.3,
+       "c": 43.4,
+       "f": 2.4,
+       "prod": "penne",
+       "src": "PDF:NT_F1#lunch/Makaron penne pełnoziarnisty",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 9,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:NT_F1#lunch/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 10,
+       "name_src": "Pomidory szuszone",
+       "name": "Pomidory suszone",
+       "label": "40 (2 widelce)",
+       "kcal": 77.0,
+       "p": 1.3,
+       "c": 4.4,
+       "f": 5.6,
+       "prod": "pomidory_suszone",
+       "src": "PDF:NT_F1#lunch/Pomidory szuszone",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 40.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 11,
+       "name_src": "Szpinak mrożony",
+       "name": "Szpinak mrożony",
+       "label": "100",
+       "kcal": 33.0,
+       "p": 4.2,
+       "c": 0.9,
+       "f": 0.6,
+       "prod": "szpinak_mrozony",
+       "src": "PDF:NT_F1#lunch/Szpinak mrożony",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 12,
+       "name_src": "Oliwa z oliwek",
+       "name": "Oliwa z oliwek",
+       "label": "5",
+       "kcal": 50.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 5.0,
+       "prod": "oliwa",
+       "src": "PDF:NT_F1#lunch/Oliwa z oliwek",
+       "use": {
+        "qty": 5,
+        "unit": "ml",
+        "basis": "PDF: 5"
+       }
+      },
+      {
+       "order": 13,
+       "name_src": "Czosnek",
+       "name": "Czosnek",
+       "label": "1 ząbek (5 g)",
+       "kcal": 8.0,
+       "p": 0.4,
+       "c": 1.6,
+       "f": 0.0,
+       "prod": "czosnek",
+       "src": "PDF:NT_F1#lunch/Czosnek",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 514.0,
+      "p": 33.2,
+      "c": 54.1,
+      "f": 13.6
+     }
+    },
+    {
+     "id": "snack",
+     "label_src": "PRZEKĄSKA",
+     "items": [
+      {
+       "order": 14,
+       "name_src": "Orzech brazylijski",
+       "name": "Orzech brazylijski",
+       "label": "1 sztuka (4 g)",
+       "kcal": 29.0,
+       "p": 0.7,
+       "c": 0.1,
+       "f": 2.8,
+       "prod": "orzech_brazylijski",
+       "src": "PDF:NT_F1#snack/Orzech brazylijski",
+       "use": {
+        "qty": 4.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 29.0,
+      "p": 0.7,
+      "c": 0.1,
+      "f": 2.8
+     }
+    },
+    {
+     "id": "post",
+     "label_src": "PO TRENINGU",
+     "items": [
+      {
+       "order": 15,
+       "name_src": "Białko KFD",
+       "name": "Białko WPC",
+       "label": "30",
+       "kcal": 114.0,
+       "p": 21.5,
+       "c": 2.4,
+       "f": 2.4,
+       "prod": "bialko_kfd",
+       "src": "PDF:NT_F1#post/Białko KFD",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 30.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 114.0,
+      "p": 21.5,
+      "c": 2.4,
+      "f": 2.4
+     }
+    },
+    {
+     "id": "dinner",
+     "label_src": "OBIAD",
+     "items": [
+      {
+       "order": 16,
+       "name_src": "Ryż biały paraboiled",
+       "name": "Ryż biały parboiled",
+       "label": "85",
+       "kcal": 298.0,
+       "p": 6.7,
+       "c": 66.2,
+       "f": 0.6,
+       "prod": "ryz_parboiled",
+       "src": "PDF:NT_F1#dinner/Ryż biały paraboiled",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 17,
+       "name_src": "Kurczak",
+       "name": "Kurczak",
+       "label": "150",
+       "kcal": 150.0,
+       "p": 30.0,
+       "c": 1.0,
+       "f": 2.7,
+       "prod": "kurczak",
+       "src": "PDF:NT_F1#dinner/Kurczak",
+       "use": {
+        "qty": 150.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 18,
+       "name_src": "Mieszanka warzyw (po hiszpańsku)",
+       "name": "Mieszanka warzyw (po hiszpańsku)",
+       "label": "130",
+       "kcal": 69.0,
+       "p": 2.4,
+       "c": 9.2,
+       "f": 1.5,
+       "prod": "mieszanka_warzyw",
+       "src": "PDF:NT_F1#dinner/Mieszanka warzyw (po hiszpańsku)",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 19,
+       "name_src": "Brokuły",
+       "name": "Brokuły mrożone",
+       "label": "130",
+       "kcal": 26.0,
+       "p": 2.3,
+       "c": 2.3,
+       "f": 0.7,
+       "prod": "brokuly",
+       "src": "PDF:NT_F1#dinner/Brokuły",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 20,
+       "name_src": "Buraczki tarte (ze słoika)",
+       "name": "Buraczki tarte (ze słoika)",
+       "label": "100",
+       "kcal": 50.0,
+       "p": 1.3,
+       "c": 9.7,
+       "f": 0.5,
+       "prod": "buraczki",
+       "src": "PDF:NT_F1#dinner/Buraczki tarte (ze słoika)",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 21,
+       "name_src": "Marchew",
+       "name": "Marchew",
+       "label": "50",
+       "kcal": 16.0,
+       "p": 0.5,
+       "c": 2.5,
+       "f": 0.1,
+       "prod": "marchew",
+       "src": "PDF:NT_F1#dinner/Marchew",
+       "use": {
+        "qty": 50.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 22,
+       "name_src": "Ogórek kiszony",
+       "name": "Ogórek kiszony",
+       "label": "60 (1 sztuka)",
+       "kcal": 7.0,
+       "p": 0.6,
+       "c": 0.8,
+       "f": 0.1,
+       "prod": "ogorek_kiszony",
+       "src": "PDF:NT_F1#dinner/Ogórek kiszony",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 616.0,
+      "p": 43.8,
+      "c": 91.7,
+      "f": 6.2
+     }
+    },
+    {
+     "id": "supper",
+     "label_src": "KOLACJA",
+     "items": [
+      {
+       "order": 23,
+       "name_src": "Jajka",
+       "name": "Jajka",
+       "label": "3 szt./ M",
+       "kcal": 214.0,
+       "p": 19.0,
+       "c": 0.9,
+       "f": 15.0,
+       "prod": "jajka",
+       "src": "PDF:NT_F1#supper/Jajka",
+       "use": {
+        "qty": 3.0,
+        "unit": "szt.",
+        "basis": "PDF: 3 szt."
+       }
+      },
+      {
+       "order": 24,
+       "name_src": "Twaróg chudy",
+       "name": "Twaróg chudy",
+       "label": "125",
+       "kcal": 105.0,
+       "p": 21.3,
+       "c": 3.7,
+       "f": 0.6,
+       "prod": "twarog",
+       "src": "PDF:NT_F1#supper/Twaróg chudy",
+       "use": {
+        "qty": 125.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 25,
+       "name_src": "Chleb żytni na zakwasie bez drożdzy",
+       "name": "Chleb żytni na zakwasie bez drożdży",
+       "label": "35 (1 kromka)",
+       "kcal": 79.0,
+       "p": 2.2,
+       "c": 15.0,
+       "f": 0.6,
+       "prod": "chleb_zytni",
+       "src": "PDF:NT_F1#supper/Chleb żytni na zakwasie bez drożdzy",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 35.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 26,
+       "name_src": "Szczypiorek",
+       "name": "Szczypiorek",
+       "label": "1 łyżka (5 g)",
+       "kcal": 2.0,
+       "p": 0.2,
+       "c": 0.1,
+       "f": 0.0,
+       "prod": "szczypiorek",
+       "src": "PDF:NT_F1#supper/Szczypiorek",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "D-021: 5 g"
+       }
+      },
+      {
+       "order": 27,
+       "name_src": "Pomidorki koktajlowe",
+       "name": "Pomidorki koktajlowe",
+       "label": "4 sztuki (80 g)",
+       "kcal": 16.0,
+       "p": 0.8,
+       "c": 2.5,
+       "f": 0.2,
+       "prod": "pomidorki_kokt",
+       "src": "PDF:NT_F1#supper/Pomidorki koktajlowe",
+       "use": {
+        "qty": 80.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 28,
+       "name_src": "Papryka",
+       "name": "Papryka",
+       "label": "1/3 sztuki (70 g)",
+       "kcal": 22.0,
+       "p": 0.9,
+       "c": 3.2,
+       "f": 0.3,
+       "prod": "papryka",
+       "src": "PDF:NT_F1#supper/Papryka",
+       "use": {
+        "qty": 0.3333333333333333,
+        "unit": "szt.",
+        "basis": "PDF: 1/3 sztuki"
+       }
+      },
+      {
+       "order": 29,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "2 szczypty (1 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F1#supper/Sól jodowana"
+      }
+     ],
+     "total": {
+      "kcal": 438.0,
+      "p": 44.4,
+      "c": 25.4,
+      "f": 16.7
+     }
+    },
+    {
+     "id": "drinks",
+     "label_src": "NAPOJE",
+     "items": [
+      {
+       "order": 30,
+       "name_src": "Woda",
+       "name": "Woda",
+       "label": "3+2 bidony, 500 ml rano",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F1#drinks/Woda"
+      },
+      {
+       "order": 31,
+       "name_src": "Zielona herbata (imbir, miód, cytryna)",
+       "name": "Zielona herbata (imbir, miód, cytryna)",
+       "label": "400 ml (1.5 łyżki suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "herbata_zielona",
+       "src": "PDF:NT_F1#drinks/Zielona herbata (imbir, miód, cytryna)",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "ZAPASY v31: 5 g/d (PDF: 1,5 łyżki suszu)"
+       }
+      },
+      {
+       "order": 32,
+       "name_src": "Mleko 0,5%",
+       "name": "Mleko 0,5%",
+       "label": "200 ml",
+       "kcal": 70.0,
+       "p": 6.0,
+       "c": 9.4,
+       "f": 1.0,
+       "prod": "mleko",
+       "src": "PDF:NT_F1#drinks/Mleko 0,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 ml"
+       }
+      },
+      {
+       "order": 33,
+       "name_src": "Kawa (espresso)",
+       "name": "Kawa (espresso)",
+       "label": "60 ml (2x30ml)",
+       "kcal": 5.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "kawa_ziarno",
+       "src": "PDF:NT_F1#drinks/Kawa (espresso)",
+       "use": {
+        "qty": 16,
+        "unit": "g",
+        "basis": "ZAPASY v31 / REKOMPOZYCJA: 2 × 8 g"
+       }
+      },
+      {
+       "order": 34,
+       "name_src": "Miód",
+       "name": "Miód",
+       "label": "1 łyżeczka (6 g)",
+       "kcal": 19.0,
+       "p": 0.0,
+       "c": 4.8,
+       "f": 0.0,
+       "prod": "miod",
+       "src": "PDF:NT_F1#drinks/Miód",
+       "use": {
+        "qty": 6.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 35,
+       "name_src": "Sok z cytryny",
+       "name": "Sok z cytryny",
+       "label": "1/2 łyżeczki (3 ml)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "cytryna",
+       "src": "PDF:NT_F1#drinks/Sok z cytryny",
+       "use": {
+        "qty": 0.14285714285714285,
+        "unit": "szt.",
+        "basis": "D-021: 1/7 szt."
+       }
+      },
+      {
+       "order": 36,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "3 szczypty (1,5 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F1#drinks/Sól jodowana"
+      },
+      {
+       "order": 37,
+       "name_src": "Melisa",
+       "name": "Melisa",
+       "label": "200 ml (1 łyżka suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "melisa",
+       "src": "PDF:NT_F1#drinks/Melisa",
+       "use": {
+        "qty": 2,
+        "unit": "g",
+        "basis": "D-021: 2 g"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 94.0,
+      "p": 6.0,
+      "c": 14.2,
+      "f": 1.0
+     }
+    }
+   ],
+   "total": {
+    "kcal": 2487.0,
+    "p": 183.6,
+    "c": 255.3,
+    "f": 70.1
+   },
+   "atwater_kcal": 2386.5,
+   "pct": {
+    "p": 30.8,
+    "c": 42.8,
+    "f": 26.4
+   },
+   "spices_raw": [
+    "Cynamon",
+    "Koperek",
+    "Papryka słod.",
+    "Czosnek granulowany",
+    "Kurkuma",
+    "Papryka węd.",
+    "Oregano",
+    "Curry",
+    "Chili",
+    "Pieprz czarny",
+    "Rozmaryn",
+    "Bazylia",
+    "Imbir",
+    "Natka pietruszki",
+    "Szczypiorek",
+    "Sól jodowana",
+    "Zioła prowan.",
+    "Tymianek"
+   ],
+   "optional": [
+    {
+     "name": "Makaron pełnoziarnisty spaghetti",
+     "label": "200 g",
+     "kcal": 315.0,
+     "p": 14.2,
+     "c": 52.0,
+     "f": 2.8
+    },
+    {
+     "name": "Kasza gryczana niepalona",
+     "label": "100 g",
+     "kcal": 356.0,
+     "p": 14.0,
+     "c": 62.0,
+     "f": 4.0
+    },
+    {
+     "name": "Bataty",
+     "label": "2 średnie (400 g b/s)",
+     "kcal": 344.0,
+     "p": 6.4,
+     "c": 80.4,
+     "f": 0.4
+    },
+    {
+     "name": "Ziemniaki",
+     "label": "6 sztuk (450 g b/s)",
+     "kcal": 356.0,
+     "p": 8.6,
+     "c": 75.6,
+     "f": 0.4
+    },
+    {
+     "name": "Łosoś",
+     "label": "100 g",
+     "kcal": 201.0,
+     "p": 19.9,
+     "c": 0.0,
+     "f": 13.6
+    },
+    {
+     "name": "Indyk",
+     "label": "150 g",
+     "kcal": 126.0,
+     "p": 28.8,
+     "c": 0.0,
+     "f": 1.2
+    },
+    {
+     "name": "Wołowina (mięso mielone)",
+     "label": "130 g",
+     "kcal": 240.0,
+     "p": 22.1,
+     "c": 0.0,
+     "f": 16.9
+    },
+    {
+     "name": "Dorsz",
+     "label": "100 g",
+     "kcal": 78.0,
+     "p": 17.7,
+     "c": 0.0,
+     "f": 0.7
+    },
+    {
+     "name": "Kapusta kiszona",
+     "label": "100 g",
+     "kcal": 16.0,
+     "p": 1.1,
+     "c": 1.3,
+     "f": 0.2
+    },
+    {
+     "name": "Awokado",
+     "label": "1/2 sztuki (70 g)",
+     "kcal": 118.0,
+     "p": 1.4,
+     "c": 2.9,
+     "f": 10.7
+    }
+   ],
+   "src": "DIETA_PLAN_-_2027_NT_faza_1.pdf"
+  },
+  {
+   "variant": "NT",
+   "phase": 2,
+   "header_src": "DNI NIETRENINGOWE (Faza 2)",
+   "meals": [
+    {
+     "id": "breakfast",
+     "label_src": "ŚNIADANIE",
+     "items": [
+      {
+       "order": 0,
+       "name_src": "Słonecznik łuskany",
+       "name": "Słonecznik łuskany",
+       "label": "15",
+       "kcal": 65.0,
+       "p": 3.1,
+       "c": 2.0,
+       "f": 5.0,
+       "prod": "slonecznik",
+       "src": "PDF:NT_F2#breakfast/Słonecznik łuskany",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 1,
+       "name_src": "Nasiona chia",
+       "name": "Nasiona chia",
+       "label": "10",
+       "kcal": 43.0,
+       "p": 2.1,
+       "c": 0.5,
+       "f": 2.9,
+       "prod": "chia",
+       "src": "PDF:NT_F2#breakfast/Nasiona chia",
+       "use": {
+        "qty": 10.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 2,
+       "name_src": "Płatki owsiane zwykłe",
+       "name": "Płatki owsiane zwykłe",
+       "label": "85",
+       "kcal": 302.0,
+       "p": 10.7,
+       "c": 47.9,
+       "f": 5.3,
+       "prod": "platki_owsiane",
+       "src": "PDF:NT_F2#breakfast/Płatki owsiane zwykłe",
+       "use": {
+        "qty": 85.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 3,
+       "name_src": "Pestki dyni",
+       "name": "Pestki dyni",
+       "label": "15",
+       "kcal": 62.5,
+       "p": 2.7,
+       "c": 1.4,
+       "f": 5.2,
+       "prod": "pestki_dyni",
+       "src": "PDF:NT_F2#breakfast/Pestki dyni",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 4,
+       "name_src": "Orzechy włoskie",
+       "name": "Orzechy włoskie",
+       "label": "15",
+       "kcal": 100.0,
+       "p": 2.7,
+       "c": 1.7,
+       "f": 9.0,
+       "prod": "orzechy_wloskie",
+       "src": "PDF:NT_F2#breakfast/Orzechy włoskie",
+       "use": {
+        "qty": 15.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 5,
+       "name_src": "Cynamon mielony",
+       "name": "Cynamon mielony",
+       "label": "3",
+       "kcal": 7.5,
+       "p": 0.1,
+       "c": 1.7,
+       "f": 0.0,
+       "prod": "cynamon",
+       "src": "PDF:NT_F2#breakfast/Cynamon mielony",
+       "use": {
+        "qty": 3.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 6,
+       "name_src": "Borówki",
+       "name": "Borówki",
+       "label": "60",
+       "kcal": 35.0,
+       "p": 0.6,
+       "c": 8.4,
+       "f": 0.0,
+       "prod": "borowki",
+       "src": "PDF:NT_F2#breakfast/Borówki",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 7,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:NT_F2#breakfast/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 682.0,
+      "p": 34.0,
+      "c": 67.4,
+      "f": 27.4
+     }
+    },
+    {
+     "id": "lunch",
+     "label_src": "LUNCH",
+     "items": [
+      {
+       "order": 8,
+       "name_src": "Makaron penne pełnoziarnisty",
+       "name": "Makaron penne pełnoziarnisty",
+       "label": "100",
+       "kcal": 329.0,
+       "p": 18.0,
+       "c": 51.0,
+       "f": 2.9,
+       "prod": "penne",
+       "src": "PDF:NT_F2#lunch/Makaron penne pełnoziarnisty",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 9,
+       "name_src": "Skyr naturalny",
+       "name": "Skyr",
+       "label": "100",
+       "kcal": 67.0,
+       "p": 12.0,
+       "c": 3.8,
+       "f": 0.0,
+       "prod": "skyr",
+       "src": "PDF:NT_F2#lunch/Skyr naturalny",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 10,
+       "name_src": "Pomidory szuszone",
+       "name": "Pomidory suszone",
+       "label": "40 (2 widelce)",
+       "kcal": 77.0,
+       "p": 1.3,
+       "c": 4.4,
+       "f": 5.6,
+       "prod": "pomidory_suszone",
+       "src": "PDF:NT_F2#lunch/Pomidory szuszone",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 40.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 11,
+       "name_src": "Szpinak mrożony",
+       "name": "Szpinak mrożony",
+       "label": "100",
+       "kcal": 33.0,
+       "p": 4.2,
+       "c": 0.9,
+       "f": 0.6,
+       "prod": "szpinak_mrozony",
+       "src": "PDF:NT_F2#lunch/Szpinak mrożony",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 12,
+       "name_src": "Oliwa z oliwek",
+       "name": "Oliwa z oliwek",
+       "label": "5",
+       "kcal": 50.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 5.0,
+       "prod": "oliwa",
+       "src": "PDF:NT_F2#lunch/Oliwa z oliwek",
+       "use": {
+        "qty": 5,
+        "unit": "ml",
+        "basis": "PDF: 5"
+       }
+      },
+      {
+       "order": 13,
+       "name_src": "Czosnek",
+       "name": "Czosnek",
+       "label": "1 ząbek (5 g)",
+       "kcal": 8.0,
+       "p": 0.4,
+       "c": 1.6,
+       "f": 0.0,
+       "prod": "czosnek",
+       "src": "PDF:NT_F2#lunch/Czosnek",
+       "use": {
+        "qty": 5.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 564.0,
+      "p": 35.9,
+      "c": 61.7,
+      "f": 14.1
+     }
+    },
+    {
+     "id": "snack",
+     "label_src": "PRZEKĄSKA",
+     "items": [
+      {
+       "order": 14,
+       "name_src": "Orzech brazylijski",
+       "name": "Orzech brazylijski",
+       "label": "1 sztuka (4 g)",
+       "kcal": 29.0,
+       "p": 0.7,
+       "c": 0.1,
+       "f": 2.8,
+       "prod": "orzech_brazylijski",
+       "src": "PDF:NT_F2#snack/Orzech brazylijski",
+       "use": {
+        "qty": 4.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 29.0,
+      "p": 0.7,
+      "c": 0.1,
+      "f": 2.8
+     }
+    },
+    {
+     "id": "post",
+     "label_src": "PO TRENINGU",
+     "items": [
+      {
+       "order": 15,
+       "name_src": "Białko KFD",
+       "name": "Białko WPC",
+       "label": "30",
+       "kcal": 114.0,
+       "p": 21.5,
+       "c": 2.4,
+       "f": 2.4,
+       "prod": "bialko_kfd",
+       "src": "PDF:NT_F2#post/Białko KFD",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 30.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 114.0,
+      "p": 21.5,
+      "c": 2.4,
+      "f": 2.4
+     }
+    },
+    {
+     "id": "dinner",
+     "label_src": "OBIAD",
+     "items": [
+      {
+       "order": 16,
+       "name_src": "Ryż biały paraboiled",
+       "name": "Ryż biały parboiled",
+       "label": "100",
+       "kcal": 350.0,
+       "p": 7.9,
+       "c": 77.9,
+       "f": 0.7,
+       "prod": "ryz_parboiled",
+       "src": "PDF:NT_F2#dinner/Ryż biały paraboiled",
+       "name_decision": "literówka w PDF",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 17,
+       "name_src": "Kurczak",
+       "name": "Kurczak",
+       "label": "150",
+       "kcal": 150.0,
+       "p": 30.0,
+       "c": 1.0,
+       "f": 2.7,
+       "prod": "kurczak",
+       "src": "PDF:NT_F2#dinner/Kurczak",
+       "use": {
+        "qty": 150.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 18,
+       "name_src": "Mieszanka warzyw (po hiszpańsku)",
+       "name": "Mieszanka warzyw (po hiszpańsku)",
+       "label": "130",
+       "kcal": 69.0,
+       "p": 2.4,
+       "c": 9.2,
+       "f": 1.5,
+       "prod": "mieszanka_warzyw",
+       "src": "PDF:NT_F2#dinner/Mieszanka warzyw (po hiszpańsku)",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 19,
+       "name_src": "Brokuły",
+       "name": "Brokuły mrożone",
+       "label": "130",
+       "kcal": 26.0,
+       "p": 2.3,
+       "c": 2.3,
+       "f": 0.7,
+       "prod": "brokuly",
+       "src": "PDF:NT_F2#dinner/Brokuły",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 130.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 20,
+       "name_src": "Buraczki tarte (ze słoika)",
+       "name": "Buraczki tarte (ze słoika)",
+       "label": "100",
+       "kcal": 50.0,
+       "p": 1.3,
+       "c": 9.7,
+       "f": 0.5,
+       "prod": "buraczki",
+       "src": "PDF:NT_F2#dinner/Buraczki tarte (ze słoika)",
+       "use": {
+        "qty": 100.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 21,
+       "name_src": "Marchew",
+       "name": "Marchew",
+       "label": "50",
+       "kcal": 16.0,
+       "p": 0.5,
+       "c": 2.5,
+       "f": 0.1,
+       "prod": "marchew",
+       "src": "PDF:NT_F2#dinner/Marchew",
+       "use": {
+        "qty": 50.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 22,
+       "name_src": "Ogórek kiszony",
+       "name": "Ogórek kiszony",
+       "label": "60 (1 sztuka)",
+       "kcal": 7.0,
+       "p": 0.6,
+       "c": 0.8,
+       "f": 0.1,
+       "prod": "ogorek_kiszony",
+       "src": "PDF:NT_F2#dinner/Ogórek kiszony",
+       "use": {
+        "qty": 60.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 668.0,
+      "p": 45.0,
+      "c": 103.4,
+      "f": 6.3
+     }
+    },
+    {
+     "id": "supper",
+     "label_src": "KOLACJA",
+     "items": [
+      {
+       "order": 23,
+       "name_src": "Jajka",
+       "name": "Jajka",
+       "label": "3 szt./ M",
+       "kcal": 214.0,
+       "p": 19.0,
+       "c": 0.9,
+       "f": 15.0,
+       "prod": "jajka",
+       "src": "PDF:NT_F2#supper/Jajka",
+       "use": {
+        "qty": 3.0,
+        "unit": "szt.",
+        "basis": "PDF: 3 szt."
+       }
+      },
+      {
+       "order": 24,
+       "name_src": "Twaróg chudy",
+       "name": "Twaróg chudy",
+       "label": "125",
+       "kcal": 105.0,
+       "p": 21.3,
+       "c": 3.7,
+       "f": 0.6,
+       "prod": "twarog",
+       "src": "PDF:NT_F2#supper/Twaróg chudy",
+       "use": {
+        "qty": 125.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 25,
+       "name_src": "Chleb żytni na zakwasie bez drożdzy",
+       "name": "Chleb żytni na zakwasie bez drożdży",
+       "label": "70 (2 kromki)",
+       "kcal": 158.0,
+       "p": 4.4,
+       "c": 30.0,
+       "f": 1.2,
+       "prod": "chleb_zytni",
+       "src": "PDF:NT_F2#supper/Chleb żytni na zakwasie bez drożdzy",
+       "name_decision": "D-020",
+       "use": {
+        "qty": 70.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 26,
+       "name_src": "Szczypiorek",
+       "name": "Szczypiorek",
+       "label": "1 łyżka (5 g)",
+       "kcal": 2.0,
+       "p": 0.2,
+       "c": 0.1,
+       "f": 0.0,
+       "prod": "szczypiorek",
+       "src": "PDF:NT_F2#supper/Szczypiorek",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "D-021: 5 g"
+       }
+      },
+      {
+       "order": 27,
+       "name_src": "Pomidorki koktajlowe",
+       "name": "Pomidorki koktajlowe",
+       "label": "4 sztuki (80 g)",
+       "kcal": 16.0,
+       "p": 0.8,
+       "c": 2.5,
+       "f": 0.2,
+       "prod": "pomidorki_kokt",
+       "src": "PDF:NT_F2#supper/Pomidorki koktajlowe",
+       "use": {
+        "qty": 80.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 28,
+       "name_src": "Papryka",
+       "name": "Papryka",
+       "label": "1/3 sztuki (70 g)",
+       "kcal": 22.0,
+       "p": 0.9,
+       "c": 3.2,
+       "f": 0.3,
+       "prod": "papryka",
+       "src": "PDF:NT_F2#supper/Papryka",
+       "use": {
+        "qty": 0.3333333333333333,
+        "unit": "szt.",
+        "basis": "PDF: 1/3 sztuki"
+       }
+      },
+      {
+       "order": 29,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "2 szczypty (1 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F2#supper/Sól jodowana"
+      }
+     ],
+     "total": {
+      "kcal": 517.0,
+      "p": 46.6,
+      "c": 40.4,
+      "f": 17.3
+     }
+    },
+    {
+     "id": "drinks",
+     "label_src": "NAPOJE",
+     "items": [
+      {
+       "order": 30,
+       "name_src": "Woda",
+       "name": "Woda",
+       "label": "3+2 bidony, 500 ml rano",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F2#drinks/Woda"
+      },
+      {
+       "order": 31,
+       "name_src": "Zielona herbata (imbir, miód, cytryna)",
+       "name": "Zielona herbata (imbir, miód, cytryna)",
+       "label": "400 ml (1.5 łyżki suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "herbata_zielona",
+       "src": "PDF:NT_F2#drinks/Zielona herbata (imbir, miód, cytryna)",
+       "use": {
+        "qty": 5,
+        "unit": "g",
+        "basis": "ZAPASY v31: 5 g/d (PDF: 1,5 łyżki suszu)"
+       }
+      },
+      {
+       "order": 32,
+       "name_src": "Mleko 0,5%",
+       "name": "Mleko 0,5%",
+       "label": "200 ml",
+       "kcal": 70.0,
+       "p": 6.0,
+       "c": 9.4,
+       "f": 1.0,
+       "prod": "mleko",
+       "src": "PDF:NT_F2#drinks/Mleko 0,5%",
+       "use": {
+        "qty": 200,
+        "unit": "ml",
+        "basis": "PDF: 200 ml"
+       }
+      },
+      {
+       "order": 33,
+       "name_src": "Kawa (espresso)",
+       "name": "Kawa (espresso)",
+       "label": "60 ml (2x30ml)",
+       "kcal": 5.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "kawa_ziarno",
+       "src": "PDF:NT_F2#drinks/Kawa (espresso)",
+       "use": {
+        "qty": 16,
+        "unit": "g",
+        "basis": "ZAPASY v31 / REKOMPOZYCJA: 2 × 8 g"
+       }
+      },
+      {
+       "order": 34,
+       "name_src": "Miód",
+       "name": "Miód",
+       "label": "1 łyżeczka (6 g)",
+       "kcal": 19.0,
+       "p": 0.0,
+       "c": 4.8,
+       "f": 0.0,
+       "prod": "miod",
+       "src": "PDF:NT_F2#drinks/Miód",
+       "use": {
+        "qty": 6.0,
+        "unit": "g",
+        "basis": "PDF: waga [g]"
+       }
+      },
+      {
+       "order": 35,
+       "name_src": "Sok z cytryny",
+       "name": "Sok z cytryny",
+       "label": "1/2 łyżeczki (3 ml)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "cytryna",
+       "src": "PDF:NT_F2#drinks/Sok z cytryny",
+       "use": {
+        "qty": 0.14285714285714285,
+        "unit": "szt.",
+        "basis": "D-021: 1/7 szt."
+       }
+      },
+      {
+       "order": 36,
+       "name_src": "Sól jodowana",
+       "name": "Sól jodowana",
+       "label": "3 szczypty (1,5 g)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": null,
+       "src": "PDF:NT_F2#drinks/Sól jodowana"
+      },
+      {
+       "order": 37,
+       "name_src": "Melisa",
+       "name": "Melisa",
+       "label": "200 ml (1 łyżka suszu)",
+       "kcal": 0.0,
+       "p": 0.0,
+       "c": 0.0,
+       "f": 0.0,
+       "prod": "melisa",
+       "src": "PDF:NT_F2#drinks/Melisa",
+       "use": {
+        "qty": 2,
+        "unit": "g",
+        "basis": "D-021: 2 g"
+       }
+      }
+     ],
+     "total": {
+      "kcal": 94.0,
+      "p": 6.0,
+      "c": 14.2,
+      "f": 1.0
+     }
+    }
+   ],
+   "total": {
+    "kcal": 2668.0,
+    "p": 189.7,
+    "c": 289.6,
+    "f": 71.3
+   },
+   "atwater_kcal": 2558.9,
+   "pct": {
+    "p": 29.7,
+    "c": 45.3,
+    "f": 25.1
+   },
+   "spices_raw": [
+    "Cynamon",
+    "Koperek",
+    "Papryka słod.",
+    "Czosnek granulowany",
+    "Kurkuma",
+    "Papryka węd.",
+    "Oregano",
+    "Curry",
+    "Chili",
+    "Pieprz czarny",
+    "Rozmaryn",
+    "Bazylia",
+    "Imbir",
+    "Natka pietruszki",
+    "Szczypiorek",
+    "Sól jodowana",
+    "Zioła prowan.",
+    "Tymianek"
+   ],
+   "optional": [
+    {
+     "name": "Makaron pełnoziarnisty spaghetti",
+     "label": "200 g",
+     "kcal": 315.0,
+     "p": 14.2,
+     "c": 52.0,
+     "f": 2.8
+    },
+    {
+     "name": "Kasza gryczana niepalona",
+     "label": "100 g",
+     "kcal": 356.0,
+     "p": 14.0,
+     "c": 62.0,
+     "f": 4.0
+    },
+    {
+     "name": "Bataty",
+     "label": "2 średnie (400 g b/s)",
+     "kcal": 344.0,
+     "p": 6.4,
+     "c": 80.4,
+     "f": 0.4
+    },
+    {
+     "name": "Ziemniaki",
+     "label": "6 sztuk (450 g b/s)",
+     "kcal": 356.0,
+     "p": 8.6,
+     "c": 75.6,
+     "f": 0.4
+    },
+    {
+     "name": "Łosoś",
+     "label": "100 g",
+     "kcal": 201.0,
+     "p": 19.9,
+     "c": 0.0,
+     "f": 13.6
+    },
+    {
+     "name": "Indyk",
+     "label": "150 g",
+     "kcal": 126.0,
+     "p": 28.8,
+     "c": 0.0,
+     "f": 1.2
+    },
+    {
+     "name": "Wołowina (mięso mielone)",
+     "label": "130 g",
+     "kcal": 240.0,
+     "p": 22.1,
+     "c": 0.0,
+     "f": 16.9
+    },
+    {
+     "name": "Dorsz",
+     "label": "100 g",
+     "kcal": 78.0,
+     "p": 17.7,
+     "c": 0.0,
+     "f": 0.7
+    },
+    {
+     "name": "Kapusta kiszona",
+     "label": "100 g",
+     "kcal": 16.0,
+     "p": 1.1,
+     "c": 1.3,
+     "f": 0.2
+    },
+    {
+     "name": "Awokado",
+     "label": "1/2 sztuki (70 g)",
+     "kcal": 118.0,
+     "p": 1.4,
+     "c": 2.9,
+     "f": 10.7
+    }
+   ],
+   "src": "DIETA_PLAN_-_2027_NT_faza_2.pdf"
+  }
+ ]
+}

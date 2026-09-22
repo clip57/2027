@@ -1,0 +1,15 @@
+{
+  "name": "p2027",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Projekt 2027 — osobista platforma: dieta, suplementacja, meal prep, zapasy, trening, CFA",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.mjs",
+    "build": "node tools/build.mjs",
+    "verify": "python3 tools/verify/verify_all.py"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12"
+  }
+}
