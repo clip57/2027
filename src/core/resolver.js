@@ -43,9 +43,15 @@ export function resolveDay(date) {
   const exercises = w.session && SRC.training.days[w.session]; // basen (nd) nie ma listy ćwiczeń w TRENING
   const session = exercises ? exercises.map(e => ({ ...e, seriesToday: e.series[String(effPhase)] })) : null;
 
+  const mealName = key => (key === 'post' && w.diet === 'NT' ? 'Posiłek po saunie' : MEAL_NAMES[key]); // D-018
+  const sessionLabel = w.sauna === 1 ? `${w.sessionName} + sauna` : w.sessionName; // D-040
   const slots = SRC.dayTemplate.slots.map(s => {
-    const out = { id: s.id, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src,
-      desc: s.desc_src, doses: doses.filter(d => d.time >= s.from && (s.to < s.from || d.time < s.to)) };
+    // Podpunkty: suplementy z tekstu PLAN_DNIA są ukryte — pokazywane są wyłącznie dawki z SUPLEMENTACJI (D-001).
+    const items = (s.items || []).filter(i => i.kind === 'task' || i.kind === 'meal').map(i => i.kind === 'meal'
+      ? { kind: 'meal', meal: i.meal, time: i.time, text: `${mealName(i.meal)} (${i.time})`, kcal: p.meals.find(m => m.id === i.meal)?.total.kcal ?? null }
+      : { kind: 'task', text: i.text, decision: i.decision });
+    const out = { id: s.id, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items,
+      doses: doses.filter(d => d.time >= s.from && (s.to < s.from || d.time < s.to)) };
     if (s.role === 'cfa') {
       const letter = isMock && SRC.week.mock.replace[s.key] ? SRC.week.mock.replace[s.key] : s.key;
       const bl = blocks.filter(b => b.blok === letter);
@@ -54,15 +60,15 @@ export function resolveDay(date) {
       else if (isMock && letter.startsWith('S')) {
         // Bloki sesji przypisane tylko do pierwszego slotu sesji (A lub C); drugi slot = kontynuacja.
         const first = Object.entries(SRC.week.mock.replace).find(([, v]) => v === letter)[0] === s.key;
-        Object.assign(out, { title: `Mock CFA — sesja ${letter[1]}`, desc: first ? `${bl[0].godz} · ${bl[0].temat}` : `kontynuacja sesji (${bl[0].godz})`, cfa: first ? bl : [] });
+        Object.assign(out, { title: `Mock CFA — sesja ${letter[1]}`, desc: first ? '' : `Kontynuacja sesji (${bl[0].godz})`, cfa: first ? bl : [] });
       }
-      else Object.assign(out, { title: `CFA blok ${s.key}`, desc: bl.map(b => b.temat).join(' · '), cfa: bl });
+      else Object.assign(out, { title: `CFA blok ${s.key}`, cfa: bl });
     } else if (s.role === 'meal') {
       const m = p.meals.find(x => x.id === s.key);
-      Object.assign(out, { meal: s.key, kcal: m ? m.total.kcal : null,
-        mealName: s.key === 'post' && w.diet === 'NT' ? 'Posiłek po saunie' : MEAL_NAMES[s.key] });
+      Object.assign(out, { meal: s.key, kcal: m ? m.total.kcal : null, mealName: mealName(s.key) });
     } else if (s.role === 'activity') {
       out.title = SRC.week.activity[w.dayType][s.key];
+      if (s.key === 'main' && w.session && SRC.training.days[w.session] && w.dayType.startsWith('strength')) out.title = `Trening siłowy: ${w.sessionName}`;
     } else if (s.role === 'recall') {
       const on = inCfa && w.recall;
       Object.assign(out, { recall: on, title: on ? 'CFA Active Recall' : 'Wieczór wolny',
@@ -72,8 +78,11 @@ export function resolveDay(date) {
   });
 
   return {
-    date, weekday: wd, dayName: dayName(date), phase, dayType: w.dayType, sessionName: w.sessionName,
+    date, weekday: wd, dayName: dayName(date), phase, dayType: w.dayType, sessionName: w.sessionName, sessionLabel,
     sauna: w.sauna, dietVariant: w.diet, kcal: p.total.kcal, meals: mealsFor(w.diet, effPhase),
     doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall }, slots,
   };
 }
+
+// Linia źródła bloku CFA (D-039), np. „Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)”.
+export const cfaSourceLine = b => `${b.zrodlo}, ${b.do_przeczytania}`;

@@ -65,6 +65,54 @@ for sl in soup.select(".slot"):
                   "title_src": sl.select_one(".slot-title").get_text(" ", strip=True),
                   "badges_src": [b.get_text(strip=True) for b in sl.select(".badge")],
                   "desc_src": desc.get_text(" ", strip=True) if desc else "", "role": role[0], "key": role[1]})
+
+# Podpunkty slotów (przejrzystość widoku „Dziś”). kind:
+#   task  — pokazywany; meal — posiłek (nazwa i kcal z resolvera); supp — ukryty, bo suplementy wylicza
+#   resolver z SUPLEMENTACJI (D-001, usunięcie dublowania); derived — ukryty, bo wylicza go resolver.
+# 'src' = dokładny fragment tekstu źródłowego; kontrola niżej sprawdza, że fragmenty odtwarzają cały opis.
+ITEMS = {
+  "07:00": [("task", "Odsłonięcie okien, złożenie łóżka i nastawienie wody."), ("task", "Zakroplenie oczu, skrobak i irygator."),
+            ("task", "Pomiar wagi na czczo po toalecie.", "Pomiar wagi i ciśnienia na czczo po toalecie.", "D-038"),
+            ("task", "Wypicie 500 ml ciepłej wody z 0,5 g soli jodowanej."),
+            ("supp", "Suplementy (na czczo): Siarczan chondroityny + Cynk pikolinian (w czwartki i niedziele)."), ("task", "Poranna pielęgnacja.")],
+  "08:53": [("supp", "Suplementy: Boswellia Serrata Witamina D3 + K2 Omega-3 Askorbinian sodu")],
+  "10:10": [("task", "Kawa Mrożona (10:30)", "Kawa mrożona (10:30)"), ("supp", "+ L-teanina")],
+  "11:03": [("meal", "Przekąska (11:15)", None, None, "snack", "11:15")],
+  "12:13": [("task", "Druga Kawa (12:20)", "Druga kawa (12:20)"), ("task", "Spacer regeneracyjny (12:30–13:20)"),
+            ("meal", "Lunch (13:20)", None, None, "lunch", "13:20"), ("supp", "Siarczan glukozaminy")],
+  "14:30": [("task", "Zielona Herbata (15:00)", "Zielona herbata (15:00)")],
+  "16:23": [("meal", "Obiad (16:23)", None, None, "dinner", "16:23")],
+  "16:40": [("supp", "Pre-trening (17:15): Kolagen + Askorbinian sodu + Tauryna")],
+  "19:35": [("task", "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha.")],
+  "20:05": [("task", "10 min wychłodzenia w spoczynku, letni prysznic bez żelu."), ("task", "Wypicie 1 bidonu wody z sodem."),
+            ("task", "Przebranie się w ubranie wyjściowe.")],
+  "20:15": [("meal", "Posiłek potreningowy (20:15)", None, None, "post", "20:15")],
+  "21:00": [("meal", "Kolacja (21:00)", None, None, "supper", "21:00"), ("supp", "Siarczan chondroityny")],
+  "21:45": [("task", "1. Przygotowanie melisy", "Przygotowanie melisy"), ("task", "2. Wieczorna pielęgnacja", "Wieczorna pielęgnacja"),
+            ("task", "3. Rozmrażanie & overnight oats", "Rozmrażanie i overnight oats")],
+  "22:00": [("task", "22:00 Melisa", "Melisa (22:00)"), ("supp", "i suplementy: Glicyna Magnez glicynian Melatonina"),
+            ("derived", "(W piątki i soboty: brak sesji recall — wieczór wolny).")],
+  "22:53": [("task", "Mycie zębów, przewietrzenie sypialni, całkowite zaciemnienie okien, odłożenie telefonu z dala od łóżka.")],
+  "23:00": [("task", "Stabilna pora spoczynku (23:00 ± 30 min, także w weekendy).")],
+}
+MEAL_KEY_BY_SLOT = {"08:53": ("breakfast", "09:00")}  # śniadanie: posiłek jest w tytule slotu
+squash = lambda t: re.sub(r"[\s·]", "", t)
+for sl in slots:
+    spec = ITEMS.get(sl["from"], [])
+    if squash(" ".join(x[1] for x in spec)) != squash(sl["desc_src"]):
+        sys.exit(f"Podpunkty slotu {sl['from']} nie odtwarzają tekstu źródłowego: {sl['desc_src']!r}")
+    items = []
+    for x in spec:
+        kind, src = x[0], x[1]
+        it = {"kind": kind, "src": src, "text": (x[2] if len(x) > 2 and x[2] else src)}
+        if len(x) > 3 and x[3]: it["decision"] = x[3]
+        if kind == "meal": it["meal"], it["time"] = x[4], x[5]
+        if kind in ("supp", "derived"): it["hidden_reason"] = "D-001: suplementy z SUPLEMENTACJI" if kind == "supp" else "wyliczane przez resolver"
+        items.append(it)
+    if sl["from"] in MEAL_KEY_BY_SLOT:
+        k, t = MEAL_KEY_BY_SLOT[sl["from"]]
+        items.insert(0, {"kind": "meal", "src": sl["title_src"], "text": sl["title_src"], "meal": k, "time": t})
+    sl["items"] = items
 w("day_template.json", {"schema": 1, "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004)", "slots": slots,
                         "note": "Pola *_src to tekst źródłowy. Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."})
 print("day_template.json:", len(slots), "slotów")

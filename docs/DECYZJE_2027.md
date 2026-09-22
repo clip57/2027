@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 22.09.2026 (D-036, D-037) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 22.09.2026 (D-036 – D-042) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -40,6 +40,11 @@
 | D-034 | **Zero płatnych usług:** bez Apple Developer Program, CloudKit, backendu i jakichkolwiek płatnych usług synchronizacji. Hosting wyłącznie w bezpłatnym GitHub Pages (repozytorium publiczne). Warianty B i C wykluczone |
 | D-036 | Dzień mocka: sloty CFA E i F (13:30–15:23), dla których plan CFA nie ma bloków, wyświetlane jako „Wolne” (zatwierdza I-10) |
 | D-037 | Plan dnia zachowuje godzinę obiadu „16:23” z PLAN_DNIA (SUPLEMENTACJA podaje 16:20 — bez zmian) |
+| D-038 | Plan dnia 07:00: „Pomiar wagi i ciśnienia na czczo po toalecie.” (zamiast „Pomiar wagi na czczo po toalecie.”) |
+| D-039 | Bloki CFA w zakładce Dziś pokazują źródło i zakres do przeczytania, np. „Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)” |
+| D-040 | Nagłówek dnia pokazuje nazwę treningu: UPPER 1 + sauna · LOWER 1 · Rower + ABS + sauna · Bez treningu, 2 × sauna · UPPER 2 · LOWER 2 + sauna · Basen |
+| D-041 | Zakładka Dziś: suplementy wyłącznie z SUPLEMENTACJI (fragmenty o suplementach w tekstach PLAN_DNIA ukryte — usunięcie dublowania, wykonanie D-001); podpunkty slotów jako lista |
+| D-042 | Test akceptacyjny Etapu 2 zaliczony na MacBooku, iPhonie i offline (9/9 kroków, 22.09.2026) |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
 ## Decyzje zastąpione

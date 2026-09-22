@@ -24,5 +24,9 @@ Każda różnica między `src/data/*.json` a plikami źródłowymi ma przypisan�
 | Suplementy: kreatyna | — | w czwartek opis bez banana | D-030 |
 | Posiłek 20:15 w czwartek | PDF NT F1/F2: „PO TRENINGU” | „Posiłek po saunie” | D-018 |
 | Plan dnia: sloty E/F w dniu mocka | — | „Wolne” | D-036 |
+| Plan dnia 07:00 | Pomiar wagi na czczo po toalecie. | Pomiar wagi i ciśnienia na czczo po toalecie. | D-038 |
+| Plan dnia: suplementy w opisach slotów (07:00, 08:53, 10:10, 12:13, 16:40, 21:00, 22:00) | wpisane w tekst | ukryte; pokazywane dawki z SUPLEMENTACJI | D-041 (D-001) |
+| Plan dnia 22:00 | „(W piątki i soboty: brak sesji recall — wieczór wolny)” | wyliczane przez resolver | D-041 |
+| Plan dnia: wielkość liter | Kawa Mrożona · Druga Kawa · Zielona Herbata · „1. Przygotowanie melisy …” · „&” | Kawa mrożona · Druga kawa · Zielona herbata · lista bez numerów · „i” | redakcja (D-041) |
 
 Zmiany w treści dokumentów (MEAL_PREP, REKOMPOZYCJA, Bezpieczne v3) — lista w `SPEC_2027_etap1_v1.1.md`, sekcja 3. Teksty „przed → po” zostaną przedstawione do akceptacji w Etapach 4 i 6.

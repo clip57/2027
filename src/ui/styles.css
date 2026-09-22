@@ -82,11 +82,34 @@ table.data { border-collapse: collapse; width: 100%; font-size: .9rem; }
 table.data th, table.data td { text-align: left; padding: .45rem .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
 table.data td.num, table.data th.num { text-align: right; }
 
-/* Podgląd dnia (Etap 2) */
-.slot { display: grid; grid-template-columns: 4.2rem 1fr; gap: .75rem; padding: .6rem 0; border-bottom: 1px solid var(--line); }
-.slot time { font-family: var(--font-round); font-weight: 650; color: var(--ink-2); }
-.slot .t { font-weight: 650; border-left: 3px solid var(--dc); padding-left: .6rem; }
-.slot .d { color: var(--ink-2); font-size: .9rem; padding-left: calc(.6rem + 3px); }
+/* Widok dnia — slot = godzina + treść; podpunkty jako lista, suplementy i bloki CFA jako wyraźne podsekcje */
+.daynav { margin-bottom: 1rem; }
+.day { display: grid; gap: .5rem; }
+.slot { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: .75rem; padding: .85rem 1rem; background: var(--surface);
+  border: 1px solid var(--line); border-left: 4px solid var(--dc, var(--line)); border-radius: var(--r-1); }
+.slot-time { display: flex; flex-direction: column; font-family: var(--font-round); line-height: 1.2; }
+.slot-time time { font-weight: 700; font-size: 1.05rem; }
+.slot-time .to { color: var(--ink-2); font-size: .8rem; }
+.slot-title { font-size: 1.02rem; margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .6rem; }
+.kcal { font-family: var(--font-round); font-size: .8rem; font-weight: 650; color: var(--diet); white-space: nowrap; }
+.slot-note { color: var(--ink-2); font-size: .9rem; margin: .35rem 0 0; }
+.slot-items { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .35rem; }
+.slot-items li { position: relative; padding-left: 1rem; font-size: .93rem; line-height: 1.4; }
+.slot-items li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--dc, var(--ink-2)); opacity: .7; }
+.slot-items li.is-meal { font-weight: 600; }
+.slot-items li .kcal { margin-left: .5rem; }
+.slot-supps { margin-top: .6rem; padding: .5rem .7rem; border-radius: 8px; background: color-mix(in srgb, var(--diet) 8%, transparent); }
+.supps-h { margin: 0 0 .25rem; font-size: .75rem; font-weight: 700; letter-spacing: .02em; color: var(--diet); }
+.slot-supps ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; }
+.slot-supps li { display: flex; flex-wrap: wrap; gap: 0 .5rem; font-size: .9rem; }
+.slot-supps time { font-family: var(--font-round); font-weight: 650; color: var(--ink-2); min-width: 2.8rem; }
+.slot-supps .sn { font-weight: 600; }
+.cfa-block { margin-top: .5rem; padding: .5rem .7rem; border-radius: 8px; background: color-mix(in srgb, var(--cfa) 8%, transparent); }
+.cfa-block p { margin: 0; }
+.cfa-src { font-weight: 650; }
+.cfa-topic { font-size: .9rem; margin-top: .15rem !important; }
+.cfa-meta { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: .35rem !important; font-size: .85rem; }
+@media (min-width: 900px) { .slot { grid-template-columns: 4.5rem minmax(0, 1fr); } }
 [data-domain="cfa"] { --dc: var(--cfa); } [data-domain="diet"] { --dc: var(--diet); } [data-domain="prep"] { --dc: var(--prep); }
 [data-domain="train"] { --dc: var(--train); } [data-domain="regen"] { --dc: var(--regen); }
 

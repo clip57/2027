@@ -110,3 +110,36 @@ test('trening: liczba serii wg fazy', () => {
   assert.equal(s('2026-11-16'), 26); // UPPER 1 F2
   assert.equal(resolveDay('2026-09-24').training, null);
 });
+
+// --- Poprawki po teście akceptacyjnym (D-038, D-039, D-040, D-001)
+import { cfaSourceLine } from '../../src/core/resolver.js';
+const SUPP_WORDS = /chondroityn|cynk|boswelli|d3|omega|askorbinian|witamina c|l-teanin|glukozamin|kolagen|tauryn|kreatyn|glicyn|magnez|melatonin/i;
+
+test('D-001: żaden widoczny podpunkt slotu nie powtarza suplementów (wszystkie dni)', () => {
+  for (const d of ALL) for (const s of resolveDay(d).slots)
+    for (const i of s.items) assert.ok(!SUPP_WORDS.test(i.text), `${d} ${s.from}: „${i.text}”`);
+});
+
+test('D-038: pomiar wagi i ciśnienia', () => {
+  const t = resolveDay('2026-09-22').slots[0].items.map(i => i.text);
+  assert.ok(t.includes('Pomiar wagi i ciśnienia na czczo po toalecie.'));
+  assert.ok(!t.includes('Pomiar wagi na czczo po toalecie.'));
+});
+
+test('D-040: nazwa treningu w nagłówku dnia', () => {
+  const exp = ['UPPER 1 + sauna', 'LOWER 1', 'Rower + ABS + sauna', 'Bez treningu, 2 × sauna', 'UPPER 2', 'LOWER 2 + sauna', 'Basen'];
+  exp.forEach((e, i) => assert.equal(resolveDay(`2026-09-${21 + i}`).sessionLabel, e));
+});
+
+test('D-039: linia źródła bloku CFA', () => {
+  const a = resolveDay('2026-09-21').slots.find(s => s.id === 'slot.0800').cfa[0];
+  assert.equal(cfaSourceLine(a), 'Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)');
+});
+
+test('podpunkty posiłków: nazwa i kcal z właściwej fazy i wariantu', () => {
+  const lunch = d => resolveDay(d).slots.find(s => s.id === 'slot.1213').items.find(i => i.kind === 'meal');
+  assert.equal(lunch('2026-09-21').kcal, 465);
+  assert.ok(lunch('2026-10-12').kcal > 465, 'Faza 1: większa porcja makaronu');
+  const post = resolveDay('2026-09-24').slots.find(s => s.id === 'slot.2015').items[0];
+  assert.deepEqual([post.text, post.kcal], ['Posiłek po saunie (20:15)', 114]);
+});
