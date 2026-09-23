@@ -1,0 +1,659 @@
+{
+ "schema": 1,
+ "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004)",
+ "slots": [
+  {
+   "id": "slot.0700",
+   "from": "07:00",
+   "to": "07:15",
+   "domain": "prep",
+   "title_src": "Pobudka",
+   "badges_src": [
+    "Pielęgnacja"
+   ],
+   "desc_src": "· Odsłonięcie okien, złożenie łóżka i nastawienie wody. · Zakroplenie oczu, skrobak i irygator. · Pomiar wagi na czczo po toalecie. · Wypicie 500 ml ciepłej wody z 0,5 g soli jodowanej. · Suplementy (na czczo): Siarczan chondroityny + Cynk pikolinian (w czwartki i niedziele). · Poranna pielęgnacja.",
+   "role": "static",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "Odsłonięcie okien, złożenie łóżka i nastawienie wody.",
+     "text": "Odsłonięcie okien, złożenie łóżka i nastawienie wody."
+    },
+    {
+     "kind": "task",
+     "src": "Zakroplenie oczu, skrobak i irygator.",
+     "text": "Zakroplenie oczu, skrobak i irygator."
+    },
+    {
+     "kind": "task",
+     "src": "Pomiar wagi na czczo po toalecie.",
+     "text": "Pomiar wagi i ciśnienia na czczo po toalecie.",
+     "decision": "D-038"
+    },
+    {
+     "kind": "task",
+     "src": "Wypicie 500 ml ciepłej wody z 0,5 g soli jodowanej.",
+     "text": "Wypicie 500 ml ciepłej wody z 0,5 g soli jodowanej."
+    },
+    {
+     "kind": "supp",
+     "src": "Suplementy (na czczo): Siarczan chondroityny + Cynk pikolinian (w czwartki i niedziele).",
+     "text": "Suplementy (na czczo): Siarczan chondroityny + Cynk pikolinian (w czwartki i niedziele).",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    },
+    {
+     "kind": "task",
+     "src": "Poranna pielęgnacja.",
+     "text": "Poranna pielęgnacja."
+    }
+   ]
+  },
+  {
+   "id": "slot.0715",
+   "from": "07:15",
+   "to": "08:00",
+   "domain": "prep",
+   "title_src": "Poranne przygotowywanie posiłków",
+   "badges_src": [
+    "Meal Prep"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.0800",
+   "from": "08:00",
+   "to": "08:53",
+   "domain": "cfa",
+   "title_src": "CFA BLOK A",
+   "badges_src": [
+    "CFA Blok 1/8"
+   ],
+   "desc_src": "",
+   "role": "cfa",
+   "key": "A",
+   "items": []
+  },
+  {
+   "id": "slot.0853",
+   "from": "08:53",
+   "to": "09:10",
+   "domain": "diet",
+   "title_src": "Śniadanie (09:00)",
+   "badges_src": [
+    "629 kcal"
+   ],
+   "desc_src": "Suplementy: Boswellia Serrata Witamina D3 + K2 Omega-3 Askorbinian sodu",
+   "role": "meal",
+   "key": "breakfast",
+   "items": [
+    {
+     "kind": "meal",
+     "src": "Śniadanie (09:00)",
+     "text": "Śniadanie (09:00)",
+     "meal": "breakfast",
+     "time": "09:00"
+    },
+    {
+     "kind": "supp",
+     "src": "Suplementy: Boswellia Serrata Witamina D3 + K2 Omega-3 Askorbinian sodu",
+     "text": "Suplementy: Boswellia Serrata Witamina D3 + K2 Omega-3 Askorbinian sodu",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    }
+   ]
+  },
+  {
+   "id": "slot.0910",
+   "from": "09:10",
+   "to": "10:03",
+   "domain": "cfa",
+   "title_src": "CFA BLOK B",
+   "badges_src": [
+    "CFA Blok 2/8"
+   ],
+   "desc_src": "",
+   "role": "cfa",
+   "key": "B",
+   "items": []
+  },
+  {
+   "id": "slot.1003",
+   "from": "10:03",
+   "to": "10:10",
+   "domain": "regen",
+   "title_src": "Przerwa kognitywna",
+   "badges_src": [
+    "Regeneracja"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.1010",
+   "from": "10:10",
+   "to": "11:03",
+   "domain": "cfa",
+   "title_src": "CFA BLOK C",
+   "badges_src": [
+    "CFA Blok 3/8"
+   ],
+   "desc_src": "· Kawa Mrożona (10:30) + L-teanina",
+   "role": "cfa",
+   "key": "C",
+   "items": [
+    {
+     "kind": "task",
+     "src": "Kawa Mrożona (10:30)",
+     "text": "Kawa mrożona (10:30)"
+    },
+    {
+     "kind": "supp",
+     "src": "+ L-teanina",
+     "text": "+ L-teanina",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    }
+   ]
+  },
+  {
+   "id": "slot.1103",
+   "from": "11:03",
+   "to": "11:20",
+   "domain": "diet",
+   "title_src": "Przerwa żywieniowa",
+   "badges_src": [
+    "210 kcal"
+   ],
+   "desc_src": "· Przekąska (11:15)",
+   "role": "meal",
+   "key": "snack",
+   "items": [
+    {
+     "kind": "meal",
+     "src": "Przekąska (11:15)",
+     "text": "Przekąska (11:15)",
+     "meal": "snack",
+     "time": "11:15"
+    }
+   ]
+  },
+  {
+   "id": "slot.1120",
+   "from": "11:20",
+   "to": "12:13",
+   "domain": "cfa",
+   "title_src": "CFA BLOK D",
+   "badges_src": [
+    "CFA Blok 4/8"
+   ],
+   "desc_src": "",
+   "role": "cfa",
+   "key": "D",
+   "items": []
+  },
+  {
+   "id": "slot.1213",
+   "from": "12:13",
+   "to": "13:30",
+   "domain": "diet",
+   "title_src": "Długa przerwa",
+   "badges_src": [
+    "465 kcal"
+   ],
+   "desc_src": "· Druga Kawa (12:20) · Spacer regeneracyjny (12:30–13:20) · Lunch (13:20) · Siarczan glukozaminy",
+   "role": "meal",
+   "key": "lunch",
+   "items": [
+    {
+     "kind": "task",
+     "src": "Druga Kawa (12:20)",
+     "text": "Druga kawa (12:20)"
+    },
+    {
+     "kind": "task",
+     "src": "Spacer regeneracyjny (12:30–13:20)",
+     "text": "Spacer regeneracyjny (12:30–13:20)"
+    },
+    {
+     "kind": "meal",
+     "src": "Lunch (13:20)",
+     "text": "Lunch (13:20)",
+     "meal": "lunch",
+     "time": "13:20"
+    },
+    {
+     "kind": "supp",
+     "src": "Siarczan glukozaminy",
+     "text": "Siarczan glukozaminy",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    }
+   ]
+  },
+  {
+   "id": "slot.1330",
+   "from": "13:30",
+   "to": "14:23",
+   "domain": "cfa",
+   "title_src": "CFA BLOK E",
+   "badges_src": [
+    "CFA Blok 5/8"
+   ],
+   "desc_src": "",
+   "role": "cfa",
+   "key": "E",
+   "items": []
+  },
+  {
+   "id": "slot.1423",
+   "from": "14:23",
+   "to": "14:30",
+   "domain": "regen",
+   "title_src": "Przerwa kognitywna",
+   "badges_src": [
+    "Regeneracja"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.1430",
+   "from": "14:30",
+   "to": "15:23",
+   "domain": "cfa",
+   "title_src": "CFA BLOK F",
+   "badges_src": [
+    "CFA Blok 6/8"
+   ],
+   "desc_src": "· Zielona Herbata (15:00)",
+   "role": "cfa",
+   "key": "F",
+   "items": [
+    {
+     "kind": "task",
+     "src": "Zielona Herbata (15:00)",
+     "text": "Zielona herbata (15:00)"
+    }
+   ]
+  },
+  {
+   "id": "slot.1523",
+   "from": "15:23",
+   "to": "15:30",
+   "domain": "prep",
+   "title_src": "Przygotowywanie obiadu",
+   "badges_src": [
+    "Kuchnia"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.1530",
+   "from": "15:30",
+   "to": "16:23",
+   "domain": "cfa",
+   "title_src": "CFA BLOK G",
+   "badges_src": [
+    "CFA Blok 7/8"
+   ],
+   "desc_src": "",
+   "role": "cfa",
+   "key": "G",
+   "items": []
+  },
+  {
+   "id": "slot.1623",
+   "from": "16:23",
+   "to": "16:40",
+   "domain": "diet",
+   "title_src": "Przerwa obiadowa",
+   "badges_src": [
+    "563 kcal"
+   ],
+   "desc_src": "· Obiad (16:23)",
+   "role": "meal",
+   "key": "dinner",
+   "items": [
+    {
+     "kind": "meal",
+     "src": "Obiad (16:23)",
+     "text": "Obiad (16:23)",
+     "meal": "dinner",
+     "time": "16:23"
+    }
+   ]
+  },
+  {
+   "id": "slot.1640",
+   "from": "16:40",
+   "to": "17:33",
+   "domain": "cfa",
+   "title_src": "CFA BLOK H",
+   "badges_src": [
+    "CFA Blok 8/8"
+   ],
+   "desc_src": "· Pre-trening (17:15): Kolagen + Askorbinian sodu + Tauryna",
+   "role": "cfa",
+   "key": "H",
+   "items": [
+    {
+     "kind": "supp",
+     "src": "Pre-trening (17:15): Kolagen + Askorbinian sodu + Tauryna",
+     "text": "Pre-trening (17:15): Kolagen + Askorbinian sodu + Tauryna",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    }
+   ]
+  },
+  {
+   "id": "slot.1733",
+   "from": "17:33",
+   "to": "17:45",
+   "domain": "prep",
+   "title_src": "Zmywanie popołudniowe",
+   "badges_src": [
+    "Zmywanie"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.1745",
+   "from": "17:45",
+   "to": "18:05",
+   "domain": "train",
+   "title_src": "Transport na siłownię i przebieranie",
+   "badges_src": [
+    "Dojazd / Szatnia"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.1805",
+   "from": "18:05",
+   "to": "18:15",
+   "domain": "train",
+   "title_src": "Rozgrzewka",
+   "badges_src": [
+    "Warm-up"
+   ],
+   "desc_src": "",
+   "role": "activity",
+   "key": "warmup",
+   "items": []
+  },
+  {
+   "id": "slot.1815",
+   "from": "18:15",
+   "to": "19:35",
+   "domain": "train",
+   "title_src": "Trening Siłowy / Cardio / Sauna",
+   "badges_src": [
+    "Trening"
+   ],
+   "desc_src": "",
+   "role": "activity",
+   "key": "main",
+   "items": []
+  },
+  {
+   "id": "slot.1935",
+   "from": "19:35",
+   "to": "19:45",
+   "domain": "train",
+   "title_src": "Prysznic",
+   "badges_src": [
+    "Higiena"
+   ],
+   "desc_src": "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha.",
+   "role": "static",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha.",
+     "text": "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha."
+    }
+   ]
+  },
+  {
+   "id": "slot.1945",
+   "from": "19:45",
+   "to": "20:05",
+   "domain": "train",
+   "title_src": "Sauna",
+   "badges_src": [
+    "SAUNA"
+   ],
+   "desc_src": "",
+   "role": "activity",
+   "key": "sauna",
+   "items": []
+  },
+  {
+   "id": "slot.2005",
+   "from": "20:05",
+   "to": "20:15",
+   "domain": "train",
+   "title_src": "Chłodzenie i przebieranie",
+   "badges_src": [
+    "Wychłodzenie"
+   ],
+   "desc_src": "10 min wychłodzenia w spoczynku, letni prysznic bez żelu. Wypicie 1 bidonu wody z sodem. Przebranie się w ubranie wyjściowe.",
+   "role": "static",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "10 min wychłodzenia w spoczynku, letni prysznic bez żelu.",
+     "text": "10 min wychłodzenia w spoczynku, letni prysznic bez żelu."
+    },
+    {
+     "kind": "task",
+     "src": "Wypicie 1 bidonu wody z sodem.",
+     "text": "Wypicie 1 bidonu wody z sodem."
+    },
+    {
+     "kind": "task",
+     "src": "Przebranie się w ubranie wyjściowe.",
+     "text": "Przebranie się w ubranie wyjściowe."
+    }
+   ]
+  },
+  {
+   "id": "slot.2015",
+   "from": "20:15",
+   "to": "20:35",
+   "domain": "diet",
+   "title_src": "Powrót do domu",
+   "badges_src": [
+    "230 kcal"
+   ],
+   "desc_src": "· Posiłek potreningowy (20:15)",
+   "role": "meal",
+   "key": "post",
+   "items": [
+    {
+     "kind": "meal",
+     "src": "Posiłek potreningowy (20:15)",
+     "text": "Posiłek potreningowy (20:15)",
+     "meal": "post",
+     "time": "20:15"
+    }
+   ]
+  },
+  {
+   "id": "slot.2035",
+   "from": "20:35",
+   "to": "20:45",
+   "domain": "regen",
+   "title_src": "Wieczorne mycie głowy i suszenie",
+   "badges_src": [
+    "Higiena"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.2045",
+   "from": "20:45",
+   "to": "21:00",
+   "domain": "prep",
+   "title_src": "Przygotowywanie kolacji i zmywanie",
+   "badges_src": [
+    "Zmywanie",
+    "Meal Prep"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": []
+  },
+  {
+   "id": "slot.2100",
+   "from": "21:00",
+   "to": "21:45",
+   "domain": "diet",
+   "title_src": "Relaks",
+   "badges_src": [
+    "Regeneracja",
+    "438 kcal"
+   ],
+   "desc_src": "· Kolacja (21:00) · Siarczan chondroityny",
+   "role": "meal",
+   "key": "supper",
+   "items": [
+    {
+     "kind": "meal",
+     "src": "Kolacja (21:00)",
+     "text": "Kolacja (21:00)",
+     "meal": "supper",
+     "time": "21:00"
+    },
+    {
+     "kind": "supp",
+     "src": "Siarczan chondroityny",
+     "text": "Siarczan chondroityny",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    }
+   ]
+  },
+  {
+   "id": "slot.2145",
+   "from": "21:45",
+   "to": "22:00",
+   "domain": "prep",
+   "title_src": "Przygotowywanie posiłków, melisy i wieczorna pielęgnacja",
+   "badges_src": [
+    "Meal Prep"
+   ],
+   "desc_src": "1. Przygotowanie melisy 2. Wieczorna pielęgnacja 3. Rozmrażanie & overnight oats",
+   "role": "static",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "1. Przygotowanie melisy",
+     "text": "Przygotowanie melisy"
+    },
+    {
+     "kind": "task",
+     "src": "2. Wieczorna pielęgnacja",
+     "text": "Wieczorna pielęgnacja"
+    },
+    {
+     "kind": "task",
+     "src": "3. Rozmrażanie & overnight oats",
+     "text": "Rozmrażanie i overnight oats"
+    }
+   ]
+  },
+  {
+   "id": "slot.2200",
+   "from": "22:00",
+   "to": "22:53",
+   "domain": "regen",
+   "title_src": "CFA Active Recall",
+   "badges_src": [
+    "RECALL"
+   ],
+   "desc_src": "22:00 Melisa i suplementy: Glicyna Magnez glicynian Melatonina (W piątki i soboty: brak sesji recall — wieczór wolny).",
+   "role": "recall",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "22:00 Melisa",
+     "text": "Melisa (22:00)"
+    },
+    {
+     "kind": "supp",
+     "src": "i suplementy: Glicyna Magnez glicynian Melatonina",
+     "text": "i suplementy: Glicyna Magnez glicynian Melatonina",
+     "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
+    },
+    {
+     "kind": "derived",
+     "src": "(W piątki i soboty: brak sesji recall — wieczór wolny).",
+     "text": "(W piątki i soboty: brak sesji recall — wieczór wolny).",
+     "hidden_reason": "wyliczane przez resolver"
+    }
+   ]
+  },
+  {
+   "id": "slot.2253",
+   "from": "22:53",
+   "to": "23:00",
+   "domain": "regen",
+   "title_src": "Wieczorna toaleta",
+   "badges_src": [
+    "Pielęgnacja"
+   ],
+   "desc_src": "Mycie zębów, przewietrzenie sypialni, całkowite zaciemnienie okien, odłożenie telefonu z dala od łóżka.",
+   "role": "static",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "Mycie zębów, przewietrzenie sypialni, całkowite zaciemnienie okien, odłożenie telefonu z dala od łóżka.",
+     "text": "Mycie zębów, przewietrzenie sypialni, całkowite zaciemnienie okien, odłożenie telefonu z dala od łóżka."
+    }
+   ]
+  },
+  {
+   "id": "slot.2300",
+   "from": "23:00",
+   "to": "07:00",
+   "domain": "regen",
+   "title_src": "Sen (8 h)",
+   "badges_src": [
+    "8h Snu"
+   ],
+   "desc_src": "Stabilna pora spoczynku (23:00 ± 30 min, także w weekendy).",
+   "role": "static",
+   "key": null,
+   "items": [
+    {
+     "kind": "task",
+     "src": "Stabilna pora spoczynku (23:00 ± 30 min, także w weekendy).",
+     "text": "Stabilna pora spoczynku (23:00 ± 30 min, także w weekendy)."
+    }
+   ]
+  }
+ ],
+ "note": "Pola *_src to tekst źródłowy. Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."
+}

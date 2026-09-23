@@ -1,0 +1,665 @@
+{
+ "schema": 1,
+ "generated_from": "MEAL_PREP.html + D-013/D-020/D-022/D-001/I-3/D-035",
+ "phases": [
+  {
+   "title": "Wieczór poprzedniego dnia",
+   "cards": [
+    "k1",
+    "k2"
+   ]
+  },
+  {
+   "title": "Poranek",
+   "cards": [
+    "k3",
+    "k4",
+    "k5",
+    "k6",
+    "k7",
+    "k8",
+    "k9"
+   ]
+  },
+  {
+   "title": "Popołudnie",
+   "cards": [
+    "k10"
+   ]
+  },
+  {
+   "title": "Wieczór",
+   "cards": [
+    "k11"
+   ]
+  },
+  {
+   "title": "Organizacja sprzętu i pojemników",
+   "cards": [
+    null
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "k1",
+   "icon": "🌿",
+   "title": "1 · Melisa z glicyną",
+   "time": "21:45",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Odmierz na wadze VITAFIT 2 g suszonej melisy (1 łyżka stołowa) do zaparzacza.",
+      "Ustaw czajnik na 95 °C i zalej 200 ml w kubku lub szklance.",
+      "Przykryj naczynie talerzykiem i parz 8–10 minut.",
+      "Wyjmij zaparzacz.",
+      "Gdy napar ostygnie do ok. 60 °C, wmieszaj 3 g glicyny.",
+      "Wypij. W tym samym momencie: melatonina 1 mg i magnez 266 mg."
+     ]
+    }
+   ],
+   "why": "#d-melisa"
+  },
+  {
+   "id": "k2",
+   "icon": "🌙",
+   "title": "2 · Rozmrażanie i overnight oats",
+   "time": "ok. 21:55",
+   "blocks": [
+    {
+     "type": "check",
+     "items": [
+      "Kurczak {kurczak} — z zamrażalnika do lodówki w pojemniku szklanym 800 ml, na dolną półkę.",
+      "Szpinak mrożony {szpinak_mrozony} — do lodówki w pojemniku szklanym 520 ml.",
+      "3 wkłady chłodzące (4 przy upale) — do zamrażalnika (jeśli wychodzę następnego dnia)."
+     ]
+    },
+    {
+     "type": "steps",
+     "items": [
+      "Do pojemnika szklanego 800 ml wsyp wszystko naraz: płatki owsiane {platki_owsiane}, pestki dyni {pestki_dyni}, słonecznik {slonecznik}, nasiona chia {chia}.",
+      "Zalej wodą o temperaturze pokojowej i wymieszaj łyżką.",
+      "Zamknij i od razu wstaw do lodówki."
+     ]
+    }
+   ],
+   "why": "#d-oats"
+  },
+  {
+   "id": "k3",
+   "icon": "⚡",
+   "title": "3 · Start i przygotowanie naczyń",
+   "time": null,
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Rockland Comet — lunch. Zalej wrzątkiem pod brzeg, zakręć, odstaw.",
+      "Contigo West Loop #1 — herbata. Zalej wrzątkiem, zakręć, odstaw.",
+      "Contigo West Loop #2 — kawa. Wypełnij zimną wodą z 4 kostkami lodu, zakręć.",
+      "Kubek termiczny 350 ml — koktajl. Wypełnij zimną wodą z lodem, zakręć.",
+      "Pojemnik szklany 320 ml — skyr. Wstaw do lodówki, by był zimny przy pakowaniu.",
+      "Torba chłodząca 6 l — włóż 3 zamrożone wkłady (4 przy temperaturze powyżej 25 °C).",
+      "Przeciśnij 3–5 g czosnku (1–2 ząbki) przez praskę i odstaw na 10 minut.",
+      "Nastaw wodę na makaron w garnku 2 l. Napełnij czajnik."
+     ]
+    },
+    {
+     "type": "safe",
+     "text": "Kurczaka obsługujesz jako ostatnią czynność poranka — po zamknięciu wszystkich pojemników i termosów."
+    }
+   ],
+   "why": "#d-kolejnosc"
+  },
+  {
+   "id": "k4",
+   "icon": "🍝",
+   "title": "4 · Lunch do termosu",
+   "time": null,
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Ugotuj makaron penne {penne} al dente.",
+      "Szpinak {szpinak_mrozony}: odciśnij mocno, przełóż na cedzak, przelej wrzątkiem, odciśnij powtórnie.",
+      "Rozgrzej 5 g oliwy na patelni.",
+      "Pomidory suszone 40 g odsącz z zalewy i wrzuć na patelnię.",
+      "Dodaj odstany czosnek, smaż 30–45 sekund. Nie przypalaj.",
+      "Dorzuć szpinak, smaż ok. minuty.",
+      "Dodaj gorący makaron, połącz. Dopraw oregano i czarnym pieprzem.",
+      "Doprowadź do intensywnego parowania.",
+      "Wylej wrzątek z termosu, natychmiast przełóż danie, zakręć.",
+      "Skyr {skyr} — do schłodzonego pojemnika szklanego 320 ml. Wmieszaj 100 mg askorbinianu sodu, zamknij.",
+      "Włóż pojemnik ze skyrem i śniadanie do torby chłodzącej z 3 wkładami. Wkłady na wierzchu i z boku, nie pod spodem.",
+      "Przy posiłku: otwórz termos, dodaj chłodny skyr z askorbinianem, wymieszaj."
+     ]
+    },
+    {
+     "type": "crit",
+     "text": "Danie trafia do termosu prosto z patelni. Mierzony termometrem DOQAUS, nie oceniany na oko. Askorbinian nigdy nie trafia do gorącego termosu — sześć godzin powyżej 63 °C rozłożyłoby większość dawki."
+    }
+   ],
+   "why": "#d-termos"
+  },
+  {
+   "id": "k5",
+   "icon": "🥣",
+   "title": "5 · Dokończenie śniadania",
+   "time": "spożycie 09:00",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Wyjmij owsiankę z lodówki.",
+      "Dodaj skyr 100 g, borówki {borowki}, cynamon 3 g i orzechy włoskie 15 g.",
+      "Dodaj askorbinian sodu 100 mg.",
+      "Wymieszaj, zamknij."
+     ]
+    },
+    {
+     "type": "safe",
+     "text": "Do 2 godzin poza lodówką od dodania skyru."
+    }
+   ],
+   "why": null
+  },
+  {
+   "id": "k6",
+   "icon": "🥤",
+   "title": "6 · Koktajl kefirowy",
+   "time": "spożycie 11:15",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Zmiel 10 g siemienia lnianego i 5 g ostropestu plamistego w młynku Bosch — bezpośrednio przed użyciem.",
+      "Do kielicha blendera Silvercrest wlej kefir {kefir}.",
+      "Dodaj zmielony len i ostropest, kakao 5 g, cynamon 2 g.",
+      "Blenduj 30–45 sekund.",
+      "Dodaj 5 kropli ekstraktu z wanilii, zamieszaj łyżką.",
+      "Wylej lód z kubka termicznego 350 ml, przelej koktajl, zamknij. Włóż do torby chłodzącej."
+     ]
+    }
+   ],
+   "why": "#d-koktajl"
+  },
+  {
+   "id": "k7",
+   "icon": "☕",
+   "title": "7 · Kawa mrożona",
+   "time": "10:30 i 12:20",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Odmierz 200 ml zimnego mleka 0,5 % w dzbanku do spieniania mleka.",
+      "Zaparz 2 espresso (intensywność 2/3, rozmiar 1/3).",
+      "Wylej wodę z kubka termicznego Contigo, wrzuć 6 kostek lodu z foremki, wlej kawę z mlekiem, zakręć.",
+      "Uzupełnij wodę w foremce do lodu i wstaw ją do zamrażalnika."
+     ]
+    },
+    {
+     "type": "safe",
+     "text": "Jeśli o 12:20 napój nie jest wyraźnie zimny — nie pij go. Mleko musi pozostać poniżej 5 °C."
+    }
+   ],
+   "why": "#d-kawa"
+  },
+  {
+   "id": "k8",
+   "icon": "🍵",
+   "title": "8 · Zielona herbata",
+   "time": "spożycie 15:00",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Do karafki z korkiem 500 ml wrzuć 2–3 cienkie plastry imbiru.",
+      "Zagotuj wodę w czajniku i ustaw 80 °C. Zalej imbir 400 ml wody i przykryj korkiem.",
+      "Po 3–4 minutach włóż zaparzacz z 5–6 g liści zielonej herbaty (1,5 łyżki stołowej) odważonymi na wadze VITAFIT.",
+      "Przykryj i parz dokładnie 3 minuty.",
+      "Wyjmij zaparzacz i wyłów imbir.",
+      "Wmieszaj sok z cytryny.",
+      "Dodaj miód 6 g (1 łyżeczka), zamieszaj.",
+      "Wylej wrzątek z kubka termicznego Contigo, przelej herbatę i zakręć."
+     ]
+    },
+    {
+     "type": "safe",
+     "text": "Nie parz bezpośrednio w termosie"
+    }
+   ],
+   "why": "#d-herbata"
+  },
+  {
+   "id": "k9",
+   "icon": "🍗",
+   "title": "9 · Kurczak — marynata",
+   "time": null,
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Wyjmij kurczaka 150 g, osusz ręcznikiem papierowym, spryskaj atomizerem oliwą.",
+      "Natrzyj przyprawami: sól jodowana i pieprz · czosnek granulowany i papryka wędzona · kurkuma i curry · zioła prowansalskie.",
+      "Przełóż do umytego pojemnika szklanego 800 ml, zamknij i włóż do lodówki."
+     ]
+    },
+    {
+     "type": "safe",
+     "text": "Trzy zasady bezwzględne: 1. Pojemnik po rozmrażaniu myj szczotką do surowego mięsa — nie gąbką do naczyń. 2. Umyj ręce mydłem przez 20 sekund. 3. Umyj deskę, nóż i blat przed powrotem do innych czynności."
+    }
+   ],
+   "why": "#d-drob"
+  },
+  {
+   "id": "k10",
+   "icon": "🍚",
+   "title": "10 · Obiad",
+   "time": "15:25",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Ryż parboiled {ryz_parboiled}: wypłucz, gotuj w parowarze IntelliSteam w nadmiarze wody 6:1 (ok. 500 ml), odlej przez cedzak.",
+      "Kurczak {kurczak}: parowar IntelliSteam: 15–20 min lub Air Fryer: 185 °C, 15–18 min, obrót po połowie. Zmierz termometrem: ≥ 74 °C w najgrubszym miejscu.",
+      "Brokuły {brokuly}: na parze, al dente, w tym samym parowarze.",
+      "Mieszanka warzyw {mieszanka_warzyw}: na parze, w tym samym parowarze.",
+      "Buraczki {buraczki} i marchew {marchew} starta na tarce: bez obróbki cieplnej.",
+      "Ogórek kiszony 60 g."
+     ]
+    }
+   ],
+   "why": "#d-obiad"
+  },
+  {
+   "id": "k11",
+   "icon": "🥗",
+   "title": "11 · Kolacja — kremowa misa twarogowa",
+   "time": "20:45",
+   "blocks": [
+    {
+     "type": "steps",
+     "items": [
+      "Jaja 3 szt. (150 g): wyjmij z lodówki, nakłuj szerszy biegun, jajowar Philips na soft. Po sygnale przelej zimną wodą 30–45 s, obierz.",
+      "Pomidorki koktajlowe {pomidorki_kokt}: umyj, przekrój, dodaj szczypiorek 5 g (1 łyżka) i sól jodowaną 0.5 g, rozgnieć widelcem. Odstaw na 5 minut.",
+      "Twaróg {twarog}: wmieszaj w zmacerowane pomidorki do kremowej konsystencji.",
+      "Papryka {papryka}: pokrój w słupki. Surowa.",
+      "Chleb żytni {chleb_zytni}: podpiecz krótko i jasno w tosterze — najniższy lub średni stopień.",
+      "Ułóż jaja na masie, rozetnij bezpośrednio przed jedzeniem, posyp solą jodowaną 0.5 g. Podaj z papryką i pieczywem."
+     ]
+    }
+   ],
+   "why": "#d-kolacja"
+  },
+  {
+   "id": null,
+   "icon": "🧰",
+   "title": "Przypisanie naczyń",
+   "time": null,
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Oba testy wykonujesz raz. Wynik dodatni zamyka temat na stałe."
+    }
+   ],
+   "why": null
+  }
+ ],
+ "tables": [
+  {
+   "head": [
+    "Naczynie",
+    "Przeznaczenie stałe"
+   ],
+   "rows": [
+    [
+     "Rockland Comet 0,75 l #1",
+     "Lunch — gorąca baza makaronowa. Wygrzewany wrzątkiem"
+    ],
+    [
+     "Rockland Comet 0,75 l #2",
+     "Obiad, gdy jedzony poza domem. Wygrzewany wrzątkiem"
+    ],
+    [
+     "Contigo West Loop #1",
+     "Zielona herbata. Wygrzewany wrzątkiem"
+    ],
+    [
+     "Contigo West Loop #2",
+     "Kawa mrożona. Schładzany lodem"
+    ],
+    [
+     "Esbit Majoris 680 ml",
+     "Woda w ciągu dnia — butelka o wąskim wlewie"
+    ],
+    [
+     "Esbit Majoris 1380 ml",
+     "Woda na dni z treningiem i sauną, gdy potrzeba większej objętości"
+    ],
+    [
+     "Kubek termiczny 350 ml",
+     "Koktajl kefirowy. Schładzany lodem"
+    ],
+    [
+     "Pojemnik szklany 320 ml",
+     "Skyr do lunchu z askorbinianem"
+    ],
+    [
+     "Pojemnik szklany 520 ml",
+     "Rozmrażanie szpinaku"
+    ],
+    [
+     "Pojemnik szklany 800 ml #1",
+     "Overnight oats — przygotowanie, przechowanie i transport"
+    ],
+    [
+     "Pojemnik szklany 800 ml #2",
+     "Rozmrażanie i marynowanie kurczaka"
+    ],
+    [
+     "3 × pojemnik szklany 1200 ml",
+     "Batch: ugotowany ryż, porcjowane mięso, przygotowane warzywa"
+    ],
+    [
+     "Karafka z korkiem 500 ml",
+     "Zaparzanie zielonej herbaty"
+    ],
+    [
+     "Torba chłodząca 6 l #1",
+     "Śniadanie (do 09:00), skyr (do 13:20), kubek z koktajlem. 3 wkłady, 4 przy upale"
+    ],
+    [
+     "Torba chłodząca 6 l #2",
+     "Pozostałe termosy i pojemniki"
+    ]
+   ]
+  },
+  {
+   "head": [
+    "Urządzenie",
+    "Zastosowanie w tej diecie"
+   ],
+   "rows": [
+    [
+     "Parowar IntelliSteam",
+     "Kurczak (metoda podstawowa) · brokuły · warzywa · łosoś i dorsz z listy opcjonalnej. Wielopoziomowy — kurczak i brokuły równolegle"
+    ],
+    [
+     "Air fryer AeroChef",
+     "Kurczak (rezerwa, 185 °C) · ziemniaki i bataty z rotacji skrobi · łosoś i dorsz, gdy parowar zajęty"
+    ],
+    [
+     "Mikrofala",
+     "Odgrzewanie obiadu — szybsze i bez wysuszania, lepsze do tego niż air fryer · podgrzewanie warzyw z minimalną ilością wody"
+    ],
+    [
+     "Toster",
+     "Kromka chleba żytniego do kolacji — najniższy lub średni stopień"
+    ],
+    [
+     "Czajnik z regulacją",
+     "Krytyczny dla herbaty — nastaw na 80 °C · melisa 95 °C · wygrzewanie termosów · wrzątek na szpinak"
+    ],
+    [
+     "Jajowar Philips",
+     "Jaja na miękko do kolacji — program soft"
+    ],
+    [
+     "Młynek Bosch",
+     "Mielenie siemienia lnianego codziennie przed koktajlem"
+    ],
+    [
+     "Blender Silvercrest",
+     "Koktajl kefirowy — 30–45 s"
+    ],
+    [
+     "Termometr DOQAUS",
+     "Trzy zastosowania: kontrola > 63 °C w termosie przed jedzeniem · ≥74 °C w kurczaku · testy kalibracyjnych termosu i torby"
+    ],
+    [
+     "Waga 1 g (Łucznik)",
+     "Produkty podstawowe — makaron, ryż, mięso, nabiał, warzywa"
+    ],
+    [
+     "Waga 0,01 g (VITAFIT)",
+     "Liście herbaty, melisa, miód, suplementy sypkie, przyprawy"
+    ],
+    [
+     "Praska do czosnku",
+     "Czosnek do lunchu — maksymalne rozdrobnienie przed 10-minutowym odstaniem"
+    ],
+    [
+     "Foremka do lodu",
+     "6 kostek dziennie do kawy mrożonej"
+    ],
+    [
+     "Zgrzewarka próżniowa",
+     "Porcjowanie piersi kurczaka po 150 g przed zamrożeniem · porcjowanie ryb"
+    ],
+    [
+     "Shaker",
+     "Białko WPC po treningu"
+    ],
+    [
+     "Zestaw zaparzaczy",
+     "#1 — zielona herbata rano · #2 — melisa wieczorem"
+    ],
+    [
+     "Pitcher 350 ml",
+     "Odmierzanie 200 ml mleka do kawy"
+    ],
+    [
+     "Atomizer do oliwy",
+     "Równomierne natłuszczenie kurczaka i ryb przed przyprawieniem"
+    ],
+    [
+     "Garnek 2 l · patelnie 20 cm · cedzak · tarka",
+     "Makaron i ryż · baza lunchu · odsączanie szpinaku i ryżu · marchew i buraczki"
+    ]
+   ]
+  },
+  {
+   "head": [
+    "Test",
+    "Procedura",
+    "Próg",
+    "Jeśli wynik gorszy"
+   ],
+   "rows": [
+    [
+     "Termos z lunchem",
+     "W zwykły dzień roboczy zmierz temperaturę o 13:20, przed dodaniem skyru",
+     "> 63 °C",
+     "Skrócenie do 4 h albo termos o wąskim otworze wypełniany do pełna"
+    ],
+    [
+     "Torba chłodząca",
+     "Zmierz temperaturę skyru o 13:20, otwierając torbę po raz pierwszy",
+     "≤ 5 °C",
+     "Czwarty wkład albo mniejsza torba — nadmiar powietrza jest większym obciążeniem niż sama zawartość"
+    ]
+   ]
+  },
+  {
+   "head": [
+    "Wkłady",
+    "Zdolność",
+    "Zapas nad obciążeniem ~204 kJ",
+    "Ocena"
+   ],
+   "rows": [
+    [
+     "2",
+     "189 kJ",
+     "−15 kJ",
+     "Niewystarczające"
+    ],
+    [
+     "3",
+     "283 kJ",
+     "+79 kJ",
+     "Wystarczające z zapasem"
+    ],
+    [
+     "4",
+     "377 kJ",
+     "+173 kJ",
+     "Zapas na upał lub słabszą torbę"
+    ]
+   ]
+  }
+ ],
+ "why": [
+  {
+   "id": "d-oats",
+   "title": "Krok 1 Overnight oats: woda pokojowa i natychmiastowa lodówka",
+   "body": [
+    "Temperatura wody nie ma już znaczenia enzymatycznego. Fitaza owsa jest zniszczona przez kilning — hydrotermiczną stabilizację ziarna, która zapobiega jełczeniu tłuszczów. Fitaza żytnia została usunięta wraz z mąką. Nasiona zachowują własną fitazę, ale są całe, więc enzym słabo przechodzi do otoczenia i działa głównie na fitynian własny.",
+    "Hydratacja jest pełna po 8–10 godzinach niezależnie od temperatury startowej, więc ciepła woda niczego nie przyspiesza w skali całej nocy.",
+    "Beta-glukany — argument, który działa w drugą stronę. Ciepło zwiększa ich rozpuszczalność, ale zakres 40–55 °C jest też optimum endogennej beta-glukanazy, która skraca łańcuchy i obniża lepkość. A to właśnie lepkość odpowiada za efekt fizjologiczny beta-glukanów. Efekt netto ciepłego moczenia jest niepewny, możliwe że ujemny.",
+    "Bezpieczeństwo rozstrzyga sprawę. Mieszanina o temperaturze 55 °C schładza się w lodówce przez ok. 195 minut w zakresie 5–45 °C, w tym ok. 60 minut powyżej 20 °C. Start z temperatury pokojowej daje ok. 150 minut w tym zakresie i zero minut powyżej 20 °C. Do tego 325 g o temperaturze 55 °C wnosi ok. 7 kJ ciepła do lodówki, w której rozmraża się surowy drób.",
+    "Bez mąki żytniej — surowa mąka jest udokumentowanym nośnikiem E. coli O157:H7 i Salmonella, a owsianka nigdy nie jest podgrzewana. {private:1}",
+    "Bez soku z cytryny — 5 ml w mieszaninie o masie ~325 g, buforowanej przez ~15 g białka i ~600 mg fosforu, daje pH ok. 5,5–6,2. To powyżej minimum wzrostu Bacillus cereus (~4,9), więc bariery mikrobiologicznej nie tworzy. Bez fitazy zbożowej nie ma też czego optymalizować pH."
+   ]
+  },
+  {
+   "id": "d-melisa",
+   "title": "Krok 2 Melisa i glicyna",
+   "body": [
+    "Przykrycie jest kluczowe. Substancje czynne melisy — cytral, cytronelal, geraniol — to lotne olejki. Bez przykrycia uchodzą z parą i w naparze zostaje głównie garbnik.",
+    "Glicyna po ostudzeniu: jest termostabilna, rozkłada się dopiero powyżej 200 °C, więc gorący napar jej nie niszczy. Dodanie w 60 °C to kwestia palatalności.",
+    "Godzina 22:00 odpowiada protokołowi z badań nad glicyną a snem, w których 3 g podawano ok. godziny przed położeniem się."
+   ]
+  },
+  {
+   "id": "d-kolejnosc",
+   "title": "Krok 3 Kolejność pracy i czosnek",
+   "body": [
+    "Surowy drób na końcu. Obsługa kurczaka w środku przygotowań przenosiłaby Campylobacter i Salmonella na jedzenie gotowe do spożycia oraz na danie zamykane na sześć godzin. Wykonana jako ostatnia, nie ma już czego skazić.",
+    "Czosnek — dziesięć minut odstania. Allicyna nie występuje w nienaruszonym ząbku; powstaje dopiero z alliiny pod działaniem alliinazy uwalnianej przy rozerwaniu komórek. Alliinaza jest termolabilna i ulega inaktywacji w ciągu ok. 60 sekund ogrzewania. Wrzucenie świeżo rozgniecionego czosnku prosto na patelnię niszczy enzym, zanim zdąży zadziałać. Song i Milner ( J Nutr 2001) wykazali, że odczekanie ok. 10 minut po rozdrobnieniu, przed obróbką cieplną, zachowuje aktywność biologiczną.",
+    "Praska, nie nóż. Maksymalne rozerwanie komórek daje najpełniejszy kontakt substratu z enzymem. Ilość 3–5 g (1–2 ząbki) jest kulinarnie odpowiednia dla jednej porcji i kalorycznie pomijalna (~6 kcal)."
+   ]
+  },
+  {
+   "id": "d-termos",
+   "title": "Krok 4 Termos i rozdzielenie skyru",
+   "body": [
+    "Dlaczego skyr nie wchodzi do termosu. 100 g produktu chłodzonego obniża temperaturę ~300 g bazy o kilkanaście stopni. Skyr dodany rano obniżyłby temperaturę dania, które przez kilka godzin musi utrzymać się powyżej progu bezpiecznego przechowywania na gorąco (63 °C). Sześć godzin w zakresie 40–55 °C to warunki, w których Bacillus cereus wytwarza cereulid — toksynę termostabilną, której nie da się już usunąć.",
+    "Rozdzielenie rozwiązuje problem u źródła i daje lepszy sos, bez ryzyka zwarzenia białka przy podgrzewaniu.",
+    "Trzy wkłady chłodzące, nie dwa. Wkład o wymiarach 15 × 8 × 2 cm to ok. 240 g żelu, czyli 94 kJ zdolności chłodniczej przy przejściu z −18 °C do +5 °C. Napływ ciepła do torby 6 l przez sześć godzin przy typowej izolacji wynosi ok. 190 kJ, do czego dochodzi ok. 14 kJ na schłodzenie pojemników i trzykrotne otwarcie torby.",
+    "Wkłady Zdolność Zapas nad obciążeniem ~204 kJ Ocena 2 189 kJ −15 kJ Niewystarczające 3 283 kJ +79 kJ Wystarczające z zapasem 4 377 kJ +173 kJ Zapas na upał lub słabszą torbę",
+    "Trzy wkłady to standard, cztery przy temperaturze otoczenia powyżej 25 °C albo gdy torba okaże się słabiej izolowana — przy izolacji poniżej przeciętnej obciążenie rośnie do ok. 264 kJ i trzy wkłady stają się graniczne.",
+    "Umiejscowienie ma znaczenie. Zimne powietrze opada, więc wkłady kładziesz na wierzchu i z boku, nie pod spodem. Kubek termiczny z koktajlem nie jest obciążeniem — to naczynie próżniowe — ale wypełnia objętość, a puste powietrze jest większym obciążeniem niż sama zawartość. Po zabraniu śniadania o 09:00 warto dosunąć pozostałe pojemniki do siebie."
+   ]
+  },
+  {
+   "id": "d-askorbinian",
+   "title": "Krok 4 Askorbinian do lunchu — dlaczego do skyru, nigdy do termosu",
+   "body": [
+    "Witamina C rozkłada się w gorącym termosie. Degradacja kwasu askorbinowego przyspiesza wyraźnie powyżej 60 °C, a tlen jest w tym zakresie temperatur nieodzownym partnerem reakcji. Sześć godzin powyżej 63 °C rozłożyłoby większość dawki — w zamkniętym termosie rozkład zwolniłby po wyczerpaniu tlenu z przestrzeni nad daniem, ale strata i tak byłaby znaczna. Chłodny skyr w osobnym pojemniku to jedyne sensowne miejsce.",
+    "Co ta dawka realnie daje. Trzy dawki po 100 mg plus 150–250 mg z żywności to 450–550 mg dziennie, przy UL 2000 mg — bezpiecznie. Ale osocze wysyca się przy podaży ok. 200–400 mg/d ; powyżej tego progu wchłanianie frakcyjne spada, a nadmiar odchodzi z moczem. Trzecia dawka trafia więc w obszar, w którym organizm nie zwiększa już puli ustrojowej.",
+    "Rozkład witaminy C po dodaniu trzeciej dawki: śniadanie 106 mg · lunch 125 mg · obiad 150 mg (z żywności) · kolacja 95 mg (surowa papryka) · kolagen o 17:15 100 mg. Cel równomiernego pokrycia większych posiłków zostaje osiągnięty.",
+    "Uczciwie o kosztach. Dwa drobne, oba poniżej progu istotności. Askorbinian metabolizuje się do szczawianu — przy 300 mg suplementu efekt pozostaje mały, bo próg istotności to zwykle 500–1000 mg. {private:2}"
+   ]
+  },
+  {
+   "id": "d-koktajl",
+   "title": "Krok 6 Koktajl kefirowy",
+   "body": [
+    "Mielenie lnu jest obowiązkowe. Całe nasiona przechodzą przez przewód pokarmowy w większości nienaruszone — ALA i lignany pozostają niedostępne. Blendowanie w kefirze nie rozdrabnia ich wystarczająco, potrzebny jest młynek.",
+    "Mielenie bezpośrednio przed użyciem ogranicza utlenianie ALA, które w zmielonym lnie przy dostępie powietrza postępuje szybko.",
+    "Krótkie blendowanie i wanilia na końcu — dłuższe miksowanie napowietrza koktajl i przyspiesza utlenianie tłuszczów, a związki lotne wanilii uchodzą."
+   ]
+  },
+  {
+   "id": "d-kawa",
+   "title": "Krok 7 Kawa mrożona",
+   "body": [
+    "Espresso od razu do zimnego mleka — schłodzenie zatrzymuje degradację termiczną i rozwój goryczy.",
+    "Termos schładzany, nie wygrzewany — odwrotnie niż przy lunchu i herbacie. Mleko przechowywane przez ok. 5 godzin musi pozostać poniżej 5 °C, a naczynie próżniowe utrzymuje temperaturę początkową, nie tworzy jej."
+   ]
+  },
+  {
+   "id": "d-herbata",
+   "title": "Krok 8 Zielona herbata — cztery parametry, które mają znaczenie",
+   "body": [
+    "80 °C, nie wrzątek. Woda o temperaturze 100 °C degraduje o ok. 35 % więcej EGCG niż 80 °C przy identycznym, trzyminutowym parzeniu. Okres półtrwania EGCG w 80 °C wynosi 60–120 minut, w temperaturze pokojowej 8–12 godzin.",
+    "Cytryna po parzeniu, nie przed. To najważniejszy szczegół kolejności. Zakwaszenie wody przed zalaniem liści obniża wydajność ekstrakcji fenoli o ok. 22 %, bo utrudnia ich uwalnianie z suchego liścia. Dodana po usunięciu liści działa natomiast ochronnie: badania nad przechowywaniem naparów wykazały retencję EGCG na poziomie ok. 95 % po godzinie w 80 °C przy zakwaszeniu, wobec ok. 38 % bez niego.",
+    "Woda niskozmineralizowana. W tym samym badaniu retencja EGCG po godzinie w 80 °C spadała z 38,4 % w wodzie destylowanej do 1,4 % w wodzie mineralnej. Jony wapnia i wodorowęglany podnoszą pH i katalizują utlenianie katechin. Gdybyś kiedykolwiek wprowadził wodę wysokozmineralizowaną do diety, do herbaty nadal używaj filtrowanej.",
+    "Imbir wcześniej niż liście, usuwany razem z nimi. Gingerole ekstrahują się wolniej niż katechiny, więc imbir dostaje 6–7 minut, a herbata dokładnie 3. Pozostawienie imbiru w termosie na 7–8 godzin oznaczałoby postępującą konwersję gingeroli do shogaoli, przyspieszaną przez ciepło i niskie pH — napar stawałby się z godziny na godzinę ostrzejszy. Ilość z 2–3 plastrów jest zbyt mała, by ta dodatkowa ekstrakcja miała wartość odżywczą.",
+    "Dlaczego nie w termosie. Parzenie bezpośrednio w termosie uniemożliwia kontrolę temperatury (naczynie próżniowe utrzymuje ciepło zamiast pozwolić mu opaść), a przede wszystkim uniemożliwia usunięcie liści. Przez 7–8 godzin dałoby to nadmierną ekstrakcję garbników, gorycz i przyspieszone utlenianie katechin w kontakcie z liściem. Parzenie w naczyniu zewnętrznym pozwala też dodać cytrynę we właściwym momencie.",
+    "Naczynie i przykrycie. Szkło jest obojętne chemicznie i nie przejmuje zapachów. Zwykły mały talerzyk jest wystarczającym przykryciem — jego rolą jest utrzymanie temperatury przez 3 minuty i ograniczenie ucieczki związków lotnych, nie hermetyczność. Pokrywki pojemnika nie zakręcaj na gorącym naparze.",
+    "Przeliczenie na łyżeczki jest niewiarygodne. Gęstość nasypowa zielonej herbaty różni się kilkukrotnie: zwinięty gunpowder waży ok. 2,5 g na łyżeczkę, luźny liść ok. 1 g. Te same 5 g to od dwóch do pięciu łyżeczek. Dlatego gramatura pozostaje wartością referencyjną — zważ swoją herbatę raz na wadze precyzyjnej i zapamiętaj odpowiadającą jej liczbę łyżeczek."
+   ]
+  },
+  {
+   "id": "d-drob",
+   "title": "Krok 9 Higiena przy surowym drobiu",
+   "body": [
+    "Gąbka kuchenna jest najbardziej skażonym przedmiotem w domowej kuchni. Przetarcie nią pojemnika po wycieku z drobiu przenosi patogeny na wszystko, czego gąbka dotknie przez kolejne dni. Szczotka przeznaczona wyłącznie do surowego mięsa albo zmywarka rozwiązują ten problem."
+   ]
+  },
+  {
+   "id": "d-obiad",
+   "title": "Krok 10 Obiad — ryż, kurczak, brokuły",
+   "body": [
+    "Ryż w nadmiarze wody z odlaniem usuwa ok. 60 % arsenu nieorganicznego z ryżu parboiled. Koszt zerowy, a ryż jest w diecie codziennie.",
+    "Kurczak na parze zamiast innych metod. Parowanie utrzymuje temperaturę powierzchni na poziomie ok. 100 °C, więc nie tworzy warunków do powstawania amin heterocyklicznych ani węglowodorów aromatycznych, które pojawiają się przy grillowaniu i smażeniu w wysokiej temperaturze. Nie wymaga też dodatku tłuszczu i daje wilgotniejsze mięso. Air fryer przy 185 °C jest metodą pośrednią — wyraźnie łagodniejszą niż grill, ale nie tak czystą jak para.",
+    "74 °C jest jedynym wiążącym kryterium. Czas zależy od grubości piersi i mocy urządzenia, więc podane 15–20 minut jest orientacyjne. Temperatura wewnętrzna 74 °C to próg niezawodnej redukcji Salmonella i Campylobacter w drobiu.",
+    "Brokuły na parze, nie w wodzie. Gotowanie zachowuje ok. 44 % folianów, parowanie nie powoduje istotnych strat. Mechanizmem jest wypłukiwanie do wody, nie degradacja termiczna — para go omija."
+   ]
+  },
+  {
+   "id": "d-kolacja",
+   "title": "Krok 11 Kolacja — co ta technika daje i czego nie daje",
+   "body": [
+    "Jaja na miękko — uczciwa ocena ryzyka. Płynne żółtko oznacza, że nie osiągnęło temperatury niszczącej Salmonella (71 °C jednorazowo albo 63 °C przez 3 minuty). Żadna technika gotowania na miękko tego nie zmienia — to nieodłączna cecha dania, nie usterka wykonania. Dla zdrowego dorosłego ryzyko jest niskie, a prewalencja Salmonella w stadach niosek w Unii istotnie spadła pod programami zwalczania. Warunki akceptowalności: jaja z lodówki, w terminie przydatności, przygotowane bezpośrednio przed posiłkiem. Dlatego ten krok nie należy do porannego meal-prepu — obrane jaja na miękko trzymane od 07:30 do 21:00 byłyby realnym problemem.",
+    "Awidyna: bez problemu. Białko ścina się w 62–65 °C, co wystarcza do jej denaturacji. Płynne jest wyłącznie żółtko, w którym awidyny nie ma — jest za to biotyna. Wiązanie nie zachodzi.",
+    "Utlenianie cholesterolu: najniższe z możliwych, ale nie zerowe. Gotowanie w skorupce to obróbka wilgotna, w umiarkowanej temperaturze i praktycznie bez dostępu tlenu. Produktów utleniania powstaje wyraźnie mniej niż przy smażeniu czy jajecznicy, ale twierdzenie o zerowym utlenianiu byłoby nieprawdziwe.",
+    "Likopen: to kompromis, nie wygrana. Surowe pomidorki mają niższą biodostępność likopenu niż gotowane — uwalnia go dopiero obróbka termiczna z tłuszczem. Rekompensuje to częściowo tłuszcz z żółtka, który istotnie zwiększa wchłanianie karotenoidów z posiłku. Netto mniej likopenu niż z sosu, ale za to pełna witamina C.",
+    "Surowa papryka: 70 g dostarcza ok. 90 mg witaminy C. Każda obróbka termiczna obniżyłaby tę wartość. Pozostawienie jej surowej to najlepsza decyzja w tym daniu.",
+    "Maceracja z solą otwiera strukturę pomidorków i uwalnia sok, który staje się częścią sosu — składniki rozpuszczalne zostają w potrawie, nie są odlewane.",
+    "Chleb na zakwasie: fermentacja zakwasowa rozkłada 30–70 % fitynianów. Podpiekaj jasno — ciemne przypieczenie zwiększa zawartość akryloamidu."
+   ]
+  }
+ ],
+ "params": [
+  "borowki",
+  "brokuly",
+  "buraczki",
+  "chia",
+  "chleb_zytni",
+  "kefir",
+  "kurczak",
+  "marchew",
+  "mieszanka_warzyw",
+  "papryka",
+  "penne",
+  "pestki_dyni",
+  "platki_owsiane",
+  "pomidorki_kokt",
+  "ryz_parboiled",
+  "skyr",
+  "slonecznik",
+  "szpinak_mrozony",
+  "twarog"
+ ],
+ "decisions": {
+  "Próg pakowania: ≥ 85 °C.": "D-013",
+  "próg 85 °C przy pakowaniu lunchu": "D-013",
+  "w 63–85 °C": "D-013",
+  "≥ 63 °C": "D-013",
+  "Przy bazie 85 °C danie po wymieszaniu trafiałoby w okolice graniczne, a przy niższych temperaturach spadało natychmiast poniżej progu bezpiecznego przechowywania na gorąco (63 °C).": "D-013",
+  "melatonina 0,5–1 mg": "D-001",
+  "Odżywka białkowa po treningu": "D-020",
+  "Skyr do lunchu z askorbinianem · wieczorem: rozmrażanie szpinaku": "I-3",
+  "Pomidorki cherry 85 g": "D-022",
+  "Kawa mrożona. Schładzany lodem": "I-3",
+  "Zielona herbata. Wygrzewany wrzątkiem": "I-3",
+  "@@SWAP@@": "I-3"
+ },
+ "private_fragments": 2,
+ "private_marker": "{private:N}"
+}

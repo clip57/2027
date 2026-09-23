@@ -1,0 +1,345 @@
+{
+ "schema": 1,
+ "source": "free-exercise-db (github.com/yuhonas/free-exercise-db)",
+ "license": "Unlicense (domena publiczna)",
+ "exercises": {
+  "Wyciskanie sztangi leżąc": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "shoulders",
+    "triceps"
+   ],
+   "src": "Barbell_Bench_Press_-_Medium_Grip",
+   "src_name": "Barbell Bench Press - Medium Grip",
+   "match": "exact"
+  },
+  "Wiosłowanie siedząc (V-grip)": {
+   "primary": [
+    "middle back"
+   ],
+   "secondary": [
+    "biceps",
+    "lats",
+    "shoulders"
+   ],
+   "src": "Seated_Cable_Rows",
+   "src_name": "Seated Cable Rows",
+   "match": "exact"
+  },
+  "Wyciskanie hantli nad głowę": {
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "triceps"
+   ],
+   "src": "Dumbbell_Shoulder_Press",
+   "src_name": "Dumbbell Shoulder Press",
+   "match": "exact"
+  },
+  "Ściąganie drążka": {
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "middle back",
+    "shoulders"
+   ],
+   "src": "Wide-Grip_Lat_Pulldown",
+   "src_name": "Wide-Grip Lat Pulldown",
+   "match": "exact"
+  },
+  "Face pull": {
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "middle back"
+   ],
+   "src": "Face_Pull",
+   "src_name": "Face Pull",
+   "match": "exact"
+  },
+  "Rozpiętki bramka": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "shoulders"
+   ],
+   "src": "Cable_Crossover",
+   "src_name": "Cable Crossover",
+   "match": "exact"
+  },
+  "Wznosy bokiem": {
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [],
+   "src": "Side_Lateral_Raise",
+   "src_name": "Side Lateral Raise",
+   "match": "exact"
+  },
+  "Triceps na linkach": {
+   "primary": [
+    "triceps"
+   ],
+   "secondary": [],
+   "src": "Triceps_Pushdown",
+   "src_name": "Triceps Pushdown",
+   "match": "exact"
+  },
+  "Uginanie EZ": {
+   "primary": [
+    "biceps"
+   ],
+   "secondary": [],
+   "src": "EZ-Bar_Curl",
+   "src_name": "EZ-Bar Curl",
+   "match": "exact"
+  },
+  "Wyciskanie sztangi na skosie": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "shoulders",
+    "triceps"
+   ],
+   "src": "Barbell_Incline_Bench_Press_-_Medium_Grip",
+   "src_name": "Barbell Incline Bench Press - Medium Grip",
+   "match": "exact"
+  },
+  "Wiosłowanie sztangą": {
+   "primary": [
+    "middle back"
+   ],
+   "secondary": [
+    "biceps",
+    "lats",
+    "shoulders"
+   ],
+   "src": "Bent_Over_Barbell_Row",
+   "src_name": "Bent Over Barbell Row",
+   "match": "exact"
+  },
+  "Wyciskanie nad głowę (OHP)": {
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "triceps"
+   ],
+   "src": "Standing_Military_Press",
+   "src_name": "Standing Military Press",
+   "match": "exact"
+  },
+  "Podciąganie z asystą": {
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "middle back"
+   ],
+   "src": "Pullups",
+   "src_name": "Pullups",
+   "match": "closest"
+  },
+  "Odwodzenie w opadzie (wyciąg)": {
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [],
+   "src": "Cable_Rear_Delt_Fly",
+   "src_name": "Cable Rear Delt Fly",
+   "match": "exact"
+  },
+  "Wyciskanie francuskie leżąc": {
+   "primary": [
+    "triceps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "src": "EZ-Bar_Skullcrusher",
+   "src_name": "EZ-Bar Skullcrusher",
+   "match": "exact"
+  },
+  "Uginanie hantlami": {
+   "primary": [
+    "biceps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "src": "Dumbbell_Bicep_Curl",
+   "src_name": "Dumbbell Bicep Curl",
+   "match": "exact"
+  },
+  "Reverse crunch": {
+   "primary": [
+    "abdominals"
+   ],
+   "secondary": [],
+   "src": "Reverse_Crunch",
+   "src_name": "Reverse Crunch",
+   "match": "exact"
+  },
+  "Levitation crunch": {
+   "primary": [
+    "abdominals"
+   ],
+   "secondary": [],
+   "src": "Crunches",
+   "src_name": "Crunches",
+   "match": "closest"
+  },
+  "Plank": {
+   "primary": [
+    "abdominals"
+   ],
+   "secondary": [],
+   "src": "Plank",
+   "src_name": "Plank",
+   "match": "exact"
+  },
+  "Side plank": {
+   "primary": [
+    "abdominals"
+   ],
+   "secondary": [
+    "shoulders"
+   ],
+   "src": "Side_Bridge",
+   "src_name": "Side Bridge",
+   "match": "exact"
+  },
+  "Suwnica (leg press)": {
+   "primary": [
+    "quadriceps"
+   ],
+   "secondary": [
+    "calves",
+    "glutes",
+    "hamstrings"
+   ],
+   "src": "Leg_Press",
+   "src_name": "Leg Press",
+   "match": "exact"
+  },
+  "Martwy ciąg rumuński": {
+   "primary": [
+    "hamstrings"
+   ],
+   "secondary": [
+    "calves",
+    "glutes",
+    "lower back"
+   ],
+   "src": "Romanian_Deadlift",
+   "src_name": "Romanian Deadlift",
+   "match": "exact"
+  },
+  "Prostowanie nóg": {
+   "primary": [
+    "quadriceps"
+   ],
+   "secondary": [],
+   "src": "Leg_Extensions",
+   "src_name": "Leg Extensions",
+   "match": "exact"
+  },
+  "Spanish squat / wall-sit": {
+   "primary": [
+    "quadriceps"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "src": "Bodyweight_Squat",
+   "src_name": "Bodyweight Squat",
+   "match": "closest"
+  },
+  "Łydki stojąc": {
+   "primary": [
+    "calves"
+   ],
+   "secondary": [],
+   "src": "Standing_Calf_Raises",
+   "src_name": "Standing Calf Raises",
+   "match": "exact"
+  },
+  "Hip thrust": {
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "calves",
+    "hamstrings"
+   ],
+   "src": "Barbell_Hip_Thrust",
+   "src_name": "Barbell Hip Thrust",
+   "match": "exact"
+  },
+  "Uginanie nóg": {
+   "primary": [
+    "hamstrings"
+   ],
+   "secondary": [],
+   "src": "Lying_Leg_Curls",
+   "src_name": "Lying Leg Curls",
+   "match": "exact"
+  },
+  "Step-up / bułgarski": {
+   "primary": [
+    "quadriceps"
+   ],
+   "secondary": [
+    "calves",
+    "glutes",
+    "hamstrings"
+   ],
+   "src": "Dumbbell_Step_Ups",
+   "src_name": "Dumbbell Step Ups",
+   "match": "exact"
+  },
+  "Suwnica (stopy wyżej)": {
+   "primary": [
+    "quadriceps"
+   ],
+   "secondary": [
+    "calves",
+    "glutes",
+    "hamstrings"
+   ],
+   "src": "Leg_Press",
+   "src_name": "Leg Press",
+   "match": "closest"
+  },
+  "Odwodzenie biodra": {
+   "primary": [
+    "abductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "src": "Thigh_Abductor",
+   "src_name": "Thigh Abductor",
+   "match": "exact"
+  },
+  "Łydki siedząc": {
+   "primary": [
+    "calves"
+   ],
+   "secondary": [],
+   "src": "Seated_Calf_Raise",
+   "src_name": "Seated Calf Raise",
+   "match": "exact"
+  }
+ }
+}

@@ -1,0 +1,1381 @@
+{
+ "schema": 1,
+ "generated_from": "Bezpieczne_przechowywanie_żywności.html v3 + B1–B2, Q1 (D-049), E-1",
+ "intro": [
+  {
+   "type": "p",
+   "text": "Wersja po audycie red-team. Każde zalecenie z poprzedniej wersji potraktowałem jako hipotezę i sprawdziłem, czy ma realne oparcie w źródle — czy tylko powtarza wcześniejsze założenie. Dziesięć twierdzeń zostało usuniętych, zmienionych albo złagodzonych."
+  },
+  {
+   "type": "p",
+   "text": "Wersja 3 · zastępuje wszystkie poprzednie · gospodarstwo domowe w Polsce · zdrowy dorosły"
+  },
+  {
+   "type": "p",
+   "text": "Ten dokument jest uzasadnieniem, nie ściągą. Wszystkie limity produktowe w jednym miejscu — do powieszenia w kuchni i wydruku na A4 poziomo — znajdziesz w pliku zakładce „Tabela” tego modułu. Tutaj jest wyjaśnienie, skąd te liczby się wzięły i które z nich są słabo umocowane."
+  }
+ ],
+ "sections": [
+  {
+   "title": "Jak czytać ten dokument",
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Status zalecenia — cztery różne rzeczy"
+    },
+    {
+     "type": "p",
+     "text": "Poprzednia wersja mieszała je ze sobą i w kilku miejscach nazywała „obowiązkiem\" coś, co obowiązkiem nie jest. Od teraz każdy istotny próg jest oznaczony:"
+    },
+    {
+     "type": "p",
+     "text": "Wiążący przepis obowiązujący w Polsce. Występuje tu rzadziej, niż mogłoby się wydawać."
+    },
+    {
+     "type": "p",
+     "text": "Zalecenie agencji bezpieczeństwa żywności. Nie jest prawem w Polsce, ale ma za sobą ocenę ryzyka."
+    },
+    {
+     "type": "p",
+     "text": "Konserwatywny parametr operacyjny — liczba z marginesem, nie zmierzona granica zepsucia."
+    },
+    {
+     "type": "p",
+     "text": "Moja rekomendacja dla Twojego procesu, wyprowadzona z powyższych. Możesz ją odrzucić świadomie."
+    },
+    {
+     "type": "h3",
+     "text": "Siła dowodów"
+    },
+    {
+     "type": "p",
+     "text": "WYSOKA badanie lub wytyczna dotycząca dokładnie tego produktu i tej formy UMIARK. wytyczna dla kategorii, rozsądnie stosowalna NISKA źródła rozbieżne lub słabe PROXY analogia lub ekstrapolacja — brak danych wprost"
+    }
+   ]
+  },
+  {
+   "title": "1 · Co zmienił audyt red-team",
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Poniżej wyłącznie rzeczy, które się zmieniły. Czego tu nie ma — zostaje bez zmian po ponownym sprawdzeniu."
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "1. „63 °C to legalny próg gorącego przechowywania\" — błędne dla Polski"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: „63 °C to legalny próg gorącego przechowywania (FSA), nie 60 °C\"."
+      },
+      {
+       "type": "p",
+       "text": "Rozporządzenie (WE) 852/2004, które obowiązuje w Polsce, nie ustala żadnej liczbowej temperatury gorącego przechowywania. Załącznik II rozdz. IX wymaga jedynie, by żywności nie przechowywać w temperaturach mogących powodować zagrożenie zdrowia, i zostawia liczby praktyce krajowej. 63 °C to figura brytyjska, zapisana w tamtejszych przepisach higienicznych — w Polsce nie jest prawem."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: 63 °C zostaje jako PARAMETR, bo ma za sobą sensowną ocenę ryzyka i jest wygodną liczbą. Ale nie jest „legalnym progiem\" i nie będę go tak nazywał."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "2. Orzechy, pestki i nasiona w lodówce — zalecenie bez pokrycia"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: orzechy włoskie 6 mies. w lodówce, pestki i słonecznik 6 mies. w lodówce, mielone siemię 3 mies. w lodówce, mielony ostropest 2 mies. w lodówce."
+      },
+      {
+       "type": "p",
+       "text": "To był najsłabszy fragment całego dokumentu. Po ponownym przeszukaniu źródeł: nie istnieje wiarygodny, instytucjonalny limit przechowywania orzechów łuskanych w warunkach domowych. Dostępne źródła podają dla orzechów włoskich w temperaturze pokojowej wszystko od dwóch tygodni do sześciu miesięcy — a taki rozrzut sam w sobie dowodzi, że nikt tego rzetelnie nie ustalił. Moje „6 miesięcy w lodówce\" było proxy podanym jak fakt."
+      },
+      {
+       "type": "p",
+       "text": "Co jest rozstrzygające: Twoje tempo zużycia. Zjadasz 15 g orzechów włoskich dziennie, 15 g pestek dyni, 15 g słonecznika, 10 g chia, 10 g siemienia, 5 g ostropestu i jeden orzech brazylijski. Opakowanie 200 g starcza Ci na około dwa tygodnie. W tej skali czasu jełczenie w szczelnym, nieprzezroczystym słoiku w szafce nie jest problemem — ani zdrowotnym, ani nawet smakowym."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: lodówka niepotrzebna dla wszystkich orzechów, pestek i nasion przy Twoim tempie zużycia. Szafka, szczelny nieprzezroczysty pojemnik. Lodówka i zamrażarka wchodzą do gry dopiero przy zakupach hurtowych — od mniej więcej kilograma w górę."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "3. Mielone siemię w lodówce — sprzeczne z własnym źródłem"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: „mielone siemię — lodówka, 3 miesiące\"."
+      },
+      {
+       "type": "p",
+       "text": "To było wewnętrznie niespójne. W tym samym dokumencie cytowałem badanie Malcolmson, Przybylski i Daun ( JAOCS 2000), które wykazało brak istotnego wzrostu liczby nadtlenkowej przez 128 dni w temperaturze pokojowej — i mimo to zalecałem chłodzenie. Jeżeli źródło mówi „temperatura pokojowa przez cztery miesiące\", nie ma podstaw, żeby wymagać lodówki."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: mielone siemię i mielony ostropest — szafka, szczelny nieprzezroczysty słoik, do trzech miesięcy. Lodówka jest opcją, nie wymogiem, i kupujesz nią wyłącznie nieco dłuższą świeżość aromatu."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "4. „NIGDY nie pakuj próżniowo czosnku\" — zbyt kategoryczne"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: „Świeży czosnek — NIGDY \"."
+      },
+      {
+       "type": "p",
+       "text": "Zagrożeniem nie jest sama próżnia, tylko kombinacja: środowisko beztlenowe + produkt niskokwasowy + temperatura powyżej zamarzania. Czosnek zapakowany próżniowo i natychmiast zamrożony nie stwarza tego problemu — w −18 °C C. botulinum nie rośnie."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: nie pakuj próżniowo świeżego czosnku przeznaczonego do szafki ani do lodówki. Do zamrażarki — można. Zasada dotyczy warunków, nie samego worka."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "5. „Zakaz próżni dla ugotowanego ryżu\" — nieuzasadnione jako zakaz"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: ugotowany ryż w lodówce — „ nie \", w kategorii bezpieczeństwa."
+      },
+      {
+       "type": "p",
+       "text": "Nie znalazłem udokumentowanego zagrożenia. Moje rozumowanie dotyczyło utraty sygnałów ostrzegawczych — co jest prawdą, ale nie czyni z tego zakazu. B. cereus jest fakultatywnym beztlenowcem i próżnia mu ani nie pomaga, ani nie przeszkadza."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: próżnia dla ugotowanych skrobi w lodówce jest bez korzyści — nie wydłuża limitu i odbiera sygnał zepsucia. Nie warto, ale to nie jest zakaz."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "6. „Bezwzględna zasada: rozetnij worek przed rozmrażaniem ryby\" — zalecenie prawdziwe, ranga zawyżona"
+      },
+      {
+       "type": "p",
+       "text": "Zalecenie jest realne i wydawane przez agencje oraz producentów zgrzewarek. Podstawą jest C. botulinum typu nieproteolitycznego, rosnący już od około 3 °C w warunkach beztlenowych. Ale ryzyko bezwzględne przy kilkunastogodzinnym rozmrażaniu w lodówce ≤ 4 °C jest bardzo niskie, a ostrzeżenie projektowano głównie z myślą o rozmrażaniu w temperaturze pokojowej."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: nadal to zalecam — czynność kosztuje trzy sekundy, więc nie ma powodu z niej rezygnować. Ale nie nazywam tego zasadą bezwzględną, bo dowody na ryzyko przy krótkim rozmrażaniu w zimnej lodówce są słabe."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "7. Ziemniaki w folii — pominięty warunek"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: „nie zostawiaj ziemniaków w folii\"."
+      },
+      {
+       "type": "p",
+       "text": "Udokumentowane ognisko botulizmu (El Paso 1994) dotyczyło ziemniaków pieczonych w folii i przetrzymywanych w temperaturze pokojowej przez wiele godzin. Sama folia nie jest niebezpieczna — niebezpieczne jest utrzymywanie beztlenowego, wilgotnego, niskokwasowego środowiska w cieple."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: zdejmij folię po pieczeniu i schłódź w ciągu dwóch godzin. Ziemniak w folii zjedzony od razu nie stwarza problemu."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "8. Limity nabiałowe — rozdzielam gwarancję producenta od rekomendacji"
+      },
+      {
+       "type": "old",
+       "text": "Poprzednio: FINALNY LIMIT = wartość z etykiety (12 h / 12 h / 24 h / 48 h), bez alternatywy."
+      },
+      {
+       "type": "p",
+       "text": "Etykieta jest obowiązkową daną szczegółową (art. 25 ust. 2 rozp. 1169/2011) — ale obowiązkowe jest to, że producent ją poda, a nie to, że Twój skyr staje się niebezpieczny o trzynastej godzinie. To jest okno gwarancji producenta, ustawione tak, żeby wytrzymało również użytkownika trzymającego kubek w drzwiach lodówki o temperaturze 8 °C i sięgającego do niego używaną łyżką. Dla produktu fermentowanego o pH około 4,3 dwanaście godzin nie ma uzasadnienia w mikrobiologii tego produktu."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: podaję obie liczby osobno i wyraźnie oznaczone. Wybór należy do Ciebie i masz teraz podstawę, żeby go dokonać świadomie. Szczegóły w sekcji 4."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "9. „3–4 dni dla dań gotowych\" — margines, nie granica"
+      },
+      {
+       "type": "p",
+       "text": "Cztery dni pochodzą z konsumenckich wytycznych USDA i mają wbudowany duży margines. Dla porównania FDA Food Code dopuszcza siedem dni dla żywności gotowej do spożycia przechowywanej w ≤ 5 °C. Rozbieżność wynika z adresata: Food Code pisano dla zakładów z kontrolą temperatury, wytyczne konsumenckie — dla przeciętnej domowej lodówki."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: zostaje 4 dni jako PARAMETR, ale z zaznaczeniem, że to margines. Danie w piątym dniu nie jest automatycznie niebezpieczne — jest poza oknem, które przyjąłem."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "10. 74 °C dla drobiu — jedna z dwóch równoważnych opcji"
+      },
+      {
+       "type": "p",
+       "text": "74 °C to figura amerykańska (165 °F, natychmiastowo). FSA podaje równoważne kombinacje: 70 °C przez 2 minuty albo 75 °C przez 30 sekund. To nie są konkurencyjne zalecenia, tylko ten sam poziom redukcji wyrażony inaczej."
+      },
+      {
+       "type": "p",
+       "text": "Nowa wersja: obie są poprawne. Trzymaj się 74 °C, bo tak masz w protokole i jest prostsze przy pomiarze punktowym — ale to nie jest magiczna liczba."
+      }
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Czego audyt nie zmienił"
+    },
+    {
+     "type": "p",
+     "text": "Próbę obalenia przetrwały i zostają bez zmian: limity dla surowego mięsa i ryb, terminy dla dań gotowanych, zasady rozmrażania i ponownego zamrażania, mechanizm B. cereus przy ryżu i makaronie, rozdzielenie domowych i komercyjnych produktów w oleju, status azotynów w szpinaku, zasady dla jaj w UE oraz cała ocena Twojego protokołu poza punktem o termosie."
+    }
+   ]
+  },
+  {
+   "title": "2 · Co naprawdę musi być w lodówce",
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Dwa zdania, które poprzednia wersja myliła. „Dłużej zachowuje świeżość w lodówce\" i „musi być w lodówce\" to nie jest to samo. Prawie wszystko trzyma się dłużej w chłodzie — to nie jest powód, żeby oddawać mu półkę. Poniższa klasyfikacja bierze pod uwagę Twoje tempo zużycia, bo ono rozstrzyga sprawę częściej niż jakakolwiek tabela."
+    },
+    {
+     "type": "h3",
+     "text": "Lodówka wymagana — bezpieczeństwo mikrobiologiczne"
+    },
+    {
+     "type": "p",
+     "text": "Skyr, kefir, twaróg i mleko UHT po otwarciu · surowe mięso, drób i ryby · jaja (w polskiej praktyce domowej) · wszystkie dania ugotowane i przygotowane · overnight oats · buraczki ze słoika po otwarciu · kiszonki po otwarciu · komercyjne pomidory w oleju po otwarciu · rozmrożone warzywa · przekrojone awokado · gotowe napoje z mlekiem i białkiem WPC."
+    },
+    {
+     "type": "small",
+     "text": "To jest cała lista. Wszystko poza nią to kwestia jakości albo wygody."
+    },
+    {
+     "type": "h3",
+     "text": "Lodówka zalecana, ale opcjonalna — jakość i trwałość"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Bez lodówki",
+      "W lodówce",
+      "Co kupujesz chłodzeniem"
+     ],
+     "rows": [
+      [
+       "Borówki",
+       "2–3 dni",
+       "7 dni",
+       "Realną różnicę — pleśnie rozwijają się szybko. Tu lodówka ma sens."
+      ],
+      [
+       "Papryka, brokuły, marchew",
+       "kilka dni",
+       "1–3 tyg.",
+       "Turgor i wygląd. Brak ryzyka mikrobiologicznego w obu wariantach."
+      ],
+      [
+       "Natka, szczypiorek",
+       "1–2 dni",
+       "7 dni",
+       "Dużo — zioła więdną bardzo szybko."
+      ],
+      [
+       "Imbir",
+       "1–2 tyg.",
+       "3 tyg.",
+       "Niewiele. Zamrażarka jest tu lepsza niż lodówka."
+      ],
+      [
+       "Awokado dojrzałe, całe",
+       "1–2 dni",
+       "4 dni",
+       "Zatrzymanie dojrzewania. Niedojrzałego nie chłodź."
+      ]
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Lodówka niepotrzebna — szafka jest właściwym miejscem"
+    },
+    {
+     "type": "p",
+     "text": "Wszystkie orzechy, pestki i nasiona (włoskie, dyni, słonecznik, brazylijski, chia, siemię całe i mielone, ostropest cały i mielony) · kakao · kawa · herbata i melisa · wszystkie przyprawy i zioła suszone · białko WPC w proszku · miód · oliwa · sól · ekstrakt waniliowy · chleb · banany · pomidorki koktajlowe całe · czosnek · ziemniaki i bataty surowe · ryż, makaron, kasza i płatki w stanie suchym."
+    },
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "p",
+       "text": "Cztery produkty, którym lodówka wręcz szkodzi: kawa (porowata struktura chłonie wilgoć i obce zapachy), białko WPC i kakao (kondensacja przy każdym wyjęciu podnosi lokalnie aktywność wody i zbryla proszek), chleb (retrogradacja skrobi osiąga maksimum w 0–4 °C, więc w lodówce czerstwieje szybciej niż na blacie), miód (przyspieszona krystalizacja)."
+      }
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Zamrażarka — kiedy ma większy sens niż lodówka"
+    },
+    {
+     "type": "p",
+     "text": "Mięso i ryby na zapas · chleb w kromkach · imbir w całości (ścierasz zamrożony, bez obierania) · posiekana natka i szczypiorek · orzechy i nasiona tylko przy zakupie hurtowym · plastry banana do shake'ów. We wszystkich tych przypadkach zamrażarka daje wielokrotnie więcej niż lodówka przy tym samym zajętym miejscu."
+    }
+   ]
+  },
+  {
+   "title": "3 · Audyt szczegółowy: suche składniki",
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Kolumna „Lodówka?\" odpowiada na pytanie, czy jest konieczna — nie czy pomaga."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Zużycie / opakowanie",
+      "Lodówka?",
+      "Korzyść z chłodzenia dotyczy",
+      "Właściwe miejsce i opakowanie",
+      "Zamrażarka",
+      "Próżnia",
+      "Limit i dowód"
+     ],
+     "rows": [
+      [
+       "Orzechy włoskie łuskane",
+       "15 g/dzień → 200 g na ~13 dni",
+       "niepotrzebna",
+       "wyłącznie jakości — jełczenie ALA",
+       "szafka, szczelny nieprzezroczysty słoik, z dala od kuchenki",
+       "tylko przy zakupie ≥ 1 kg",
+       "tylko do zamrażarki",
+       "brak wiarygodnego limitu instytucjonalnego NISKA ; przy Twoim tempie nieistotny"
+      ],
+      [
+       "Pestki dyni",
+       "15 g/dzień → 200 g na ~13 dni",
+       "niepotrzebna",
+       "jakości",
+       "szafka, szczelny słoik",
+       "przy zakupie hurtowym",
+       "bez korzyści przy tym tempie",
+       "brak limitu źródłowego NISKA"
+      ],
+      [
+       "Słonecznik łuskany",
+       "15 g/dzień → 200 g na ~13 dni",
+       "niepotrzebna",
+       "jakości",
+       "szafka, szczelny słoik",
+       "przy zakupie hurtowym",
+       "bez korzyści",
+       "brak limitu źródłowego NISKA"
+      ],
+      [
+       "Orzech brazylijski",
+       "4 g/dzień → 100 g na ~25 dni",
+       "niepotrzebna",
+       "jakości ; osobno wilgoć → pleśnie",
+       "szafka, szczelnie, sucho — wilgoć jest tu jedynym realnym ryzykiem",
+       "przy zakupie hurtowym",
+       "bez korzyści",
+       "ryzyko mykotoksyn zależy od surowca u źródła, nie od Twojej półki UMIARK."
+      ],
+      [
+       "Chia suche",
+       "10 g/dzień → 200 g na 20 dni",
+       "niepotrzebna",
+       "praktycznie żadnej — naturalne przeciwutleniacze",
+       "szafka, szczelny pojemnik",
+       "zbędna",
+       "zbędna",
+       "stabilne 1–2 lata UMIARK."
+      ],
+      [
+       "Siemię lniane całe",
+       "10 g/dzień → 200 g na 20 dni",
+       "niepotrzebna",
+       "żadnej istotnej — okrywa chroni tłuszcz",
+       "szafka, szczelny pojemnik",
+       "zbędna",
+       "zbędna",
+       "ponad rok UMIARK."
+      ],
+      [
+       "Siemię lniane mielone",
+       "10 g/dzień",
+       "niepotrzebna",
+       "jakości, i to mniej, niż się powszechnie sądzi",
+       "szafka, szczelny nieprzezroczysty słoik",
+       "przy mieleniu na wiele miesięcy",
+       "przy dużym zapasie",
+       "128 dni w temp. pokojowej bez istotnego wzrostu liczby nadtlenkowej (Malcolmson 2000) WYSOKA"
+      ],
+      [
+       "Ostropest cały",
+       "5 g/dzień",
+       "niepotrzebna",
+       "żadnej istotnej",
+       "szafka, ciemny słoik",
+       "zbędna",
+       "zbędna",
+       "ok. rok PROXY — analogia do siemienia"
+      ],
+      [
+       "Ostropest mielony",
+       "5 g/dzień",
+       "niepotrzebna",
+       "jakości",
+       "szafka, ciemny szczelny słoik",
+       "przy dużym zapasie",
+       "przy dużym zapasie",
+       "2–3 mies. PROXY — brak badań dla tego nasienia"
+      ],
+      [
+       "Kakao",
+       "5 g/dzień",
+       "niepotrzebna — szkodzi",
+       "żadnej; kondensacja zbryla proszek",
+       "szafka, szczelna puszka, sucha łyżeczka",
+       "nie",
+       "bez korzyści",
+       "2 lata jakościowo UMIARK."
+      ],
+      [
+       "Kawa ziarnista",
+       "2 espresso dziennie",
+       "niepotrzebna — szkodzi",
+       "żadnej; kawa chłonie wilgoć i obce zapachy",
+       "szafka, opakowanie z zaworem odgazowującym",
+       "tylko duży zapas, w szczelnych porcjach",
+       "ma sens dla zapasu, nie dla bieżącej paczki",
+       "ok. 4 tyg. po otwarciu, jakościowo UMIARK."
+      ],
+      [
+       "Zielona herbata, melisa",
+       "liście, kilka g dziennie",
+       "niepotrzebna",
+       "jakości — katechiny i olejki lotne",
+       "szafka, nieprzezroczysta puszka, z dala od przypraw",
+       "tylko duży zapas",
+       "ma sens dla zapasu rocznego",
+       "ok. 12 mies. jakościowo UMIARK."
+      ],
+      [
+       "Przyprawy mielone i zioła suszone",
+       "gramy dziennie",
+       "niepotrzebna",
+       "żadnej; kondensacja przyspiesza zbrylanie",
+       "ciemna szafka, szczelne słoiki, nie dozować nad garnkiem",
+       "nie",
+       "bez korzyści",
+       "mielone ok. 2 lata, liściaste ok. rok — jakościowo UMIARK."
+      ],
+      [
+       "Białko WPC w proszku",
+       "30 g/dzień",
+       "niepotrzebna — szkodzi",
+       "żadnej; kondensacja podnosi aktywność wody",
+       "szafka, oryginalne opakowanie ze struną, sucha miarka",
+       "nie",
+       "bez korzyści",
+       "ok. 12 mies. po otwarciu UMIARK."
+      ],
+      [
+       "Ryż, makaron, kasza, płatki — suche",
+       "—",
+       "niepotrzebna",
+       "żadnej",
+       "szafka, szczelne pojemniki (ochrona przed molami)",
+       "nie",
+       "bez korzyści",
+       "do daty; brak limitu mikrobiologicznego WYSOKA"
+      ],
+      [
+       "Miód",
+       "6 g/dzień",
+       "niepotrzebna — szkodzi",
+       "żadnej; chłód przyspiesza krystalizację",
+       "szafka, szczelny słoik, sucha łyżeczka",
+       "nie",
+       "bez korzyści",
+       "praktycznie bezterminowo WYSOKA"
+      ],
+      [
+       "Oliwa extra virgin",
+       "5 g/dzień",
+       "niepotrzebna",
+       "jakości ; w lodówce mętnieje i wykrapla wodę",
+       "ciemna szafka, 14–20 °C, z dala od kuchenki",
+       "nie",
+       "nie",
+       "ok. 6 mies. po otwarciu, jakościowo UMIARK."
+      ],
+      [
+       "Sól jodowana, ekstrakt waniliowy",
+       "—",
+       "niepotrzebna",
+       "żadnej",
+       "szafka, szczelnie",
+       "nie",
+       "nie",
+       "bezterminowo; jod ubywa z czasem WYSOKA"
+      ]
+     ]
+    },
+    {
+     "type": "h4",
+     "text": "Co z tego wynika praktycznie"
+    },
+    {
+     "type": "p",
+     "text": "Po tej zmianie z lodówki znika: cztery słoiki z orzechami i pestkami, mielone siemię, mielony ostropest, kakao i wszystko, co ewentualnie trafiło tam „na wszelki wypadek\". Zwalnia się realnie półka. Zostaje to, co musi: nabiał, mięso, jaja, gotowe dania, świeże warzywa i otwarte przetwory."
+    },
+    {
+     "type": "p",
+     "text": "Jedyne, czego pilnuj w szafce: szczelność i brak światła. Nie chodzi o temperaturę, tylko o tlen i promieniowanie. Przezroczysty słoik na parapecie zniszczy orzechy szybciej niż jakakolwiek temperatura pokojowa."
+    }
+   ]
+  },
+  {
+   "title": "4 · Nabiał — gwarancja producenta a rekomendacja",
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Co jest na Twoich etykietach"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Opakowanie",
+      "Temperatura z etykiety",
+      "Rodzaj daty",
+      "Instrukcja po otwarciu"
+     ],
+     "rows": [
+      [
+       "Skyr",
+       "kubek 400 g",
+       "+2 °C do +6 °C",
+       "Należy spożyć do",
+       "12 godzin"
+      ],
+      [
+       "Kefir naturalny",
+       "butelka 400 g",
+       "+2 °C do +8 °C",
+       "Należy spożyć do",
+       "12 godzin"
+      ],
+      [
+       "Delikate Twaróg Klinek chudy",
+       "kostka 250 g",
+       "+1 °C do +8 °C",
+       "Należy spożyć do",
+       "24 godziny"
+      ],
+      [
+       "Mleczna Dolina mleko UHT 0,5 %",
+       "karton 1 l",
+       "< 25 °C przed otwarciem",
+       "Najlepiej spożyć przed",
+       "48 godzin"
+      ]
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Co ta liczba znaczy, a czego nie znaczy"
+    },
+    {
+     "type": "p",
+     "text": "PRAWO Art. 25 ust. 2 rozporządzenia (UE) 1169/2011 nakłada na producenta obowiązek podania warunków przechowywania i czasu na spożycie po otwarciu. Obowiązkowe jest podanie tej informacji — nie to, że produkt staje się niebezpieczny w podanym momencie. Liczbę ustala producent, nie organ nadzoru, i nie podlega ona weryfikacji mikrobiologicznej przez żadną instytucję."
+    },
+    {
+     "type": "p",
+     "text": "Dla produktu fermentowanego o pH około 4,3 dwanaście godzin nie ma uzasadnienia w mikrobiologii tego produktu. Ma uzasadnienie w czymś innym: producent nie kontroluje ani Twojej łyżki, ani temperatury Twojej lodówki, a jego własna górna granica na etykiecie to +6 °C albo nawet +8 °C. Termin jest ustawiony tak, żeby wytrzymał najgorszy realistyczny scenariusz użytkowania."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Gwarancja producenta",
+      "Moja rekomendacja dla Twojego procesu",
+      "Warunek"
+     ],
+     "rows": [
+      [
+       "Skyr",
+       "12 h",
+       "2 dni",
+       "porcja odłożona czystą, suchą łyżką w chwili otwarcia; lodówka ≤ 4 °C"
+      ],
+      [
+       "Kefir",
+       "12 h",
+       "2 dni",
+       "jak wyżej; nalewać, nie pić z butelki"
+      ],
+      [
+       "Twaróg chudy",
+       "24 h",
+       "2 dni",
+       "przełożony do szczelnego szkła w chwili otwarcia"
+      ],
+      [
+       "Mleko UHT",
+       "48 h",
+       "4 dni",
+       "przelane do czystej butelki, nigdy pite z kartonu UMIARK. — literatura wskazuje 6–7 dni"
+      ]
+     ]
+    },
+    {
+     "type": "small",
+     "text": "Kolumna „moja rekomendacja\" jest odstępstwem od instrukcji producenta i tak ją traktuj. Opiera się na tym, że Twoja lodówka trzyma ≤ 4 °C (niżej, niż dopuszcza etykieta), że porcjujesz aseptycznie i że jesteś zdrowym dorosłym. Jeśli którykolwiek warunek przestanie obowiązywać — wracasz do etykiety. Przy jakiejkolwiek zmianie zapachu, gazowaniu albo wodzie na powierzchni wyrzucasz niezależnie od obu kolumn."
+    },
+    {
+     "type": "h4",
+     "text": "Najprostsze rozwiązanie, które omija cały problem"
+    },
+    {
+     "type": "p",
+     "text": "Kefir 400 g = dokładnie dwie porcje po 200 g. Twaróg 250 g = dwie porcje po 125 g. Skyr 400 g = dwie porcje dzienne. Kupuj tak, żeby opakowanie odpowiadało jednemu lub dwóm dniom, i porcjuj od razu przy otwieraniu — wtedy obie kolumny przestają się różnić. Dla mleka najlepszym wyjściem jest karton 0,5 l: dwa dni po 200 ml, dokładnie w oknie gwarancji."
+    },
+    {
+     "type": "h4",
+     "text": "Czego z tym nabiałem nie robić"
+    },
+    {
+     "type": "list",
+     "ordered": false,
+     "items": [
+      "Nie zamrażaj skyru, kefiru ani mleka odtłuszczonego — rozwarstwiają się. Twaróg można, ale po rozmrożeniu nadaje się tylko do obróbki termicznej.",
+      "Nie pakuj próżniowo — nie zmienia żadnego limitu, a twaróg zgniata.",
+      "Nie trzymaj w drzwiach — skyr ma górną granicę +6 °C, a drzwi to najcieplejsze miejsce w lodówce.",
+      "Skyr do gorącego makaronu dodawaj poza źródłem ciepła, tuż przed jedzeniem — tak, jak już robisz."
+     ]
+    }
+   ]
+  },
+  {
+   "title": "5 · Audyt Twojego procesu — krok po kroku",
+   "blocks": [
+    {
+     "type": "card",
+     "kind": "day",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "Wieczór — rozmrażanie i overnight oats, ok. 21:55"
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Kurczak i szpinak z zamrażalnika do lodówki, dolna półka, zamknięte pojemniki szklane. Do obróbki o 15:25 następnego dnia mija ok. 17,5 h — mieści się w oknie dwóch dni dla drobiu rozmrożonego w lodówce. Dolna półka eliminuje ryzyko kapania na produkty gotowe."
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Baza owsianki: płatki, pestki, słonecznik, orzechy, chia, woda pokojowa, natychmiast do lodówki. Twój bilans czasu w strefie zagrożenia jest policzony poprawnie, a wniosek o wodzie pokojowej zamiast ciepłej jest słuszny."
+      },
+      {
+       "type": "p",
+       "text": "⚠️ drobiazg jakościowy Orzechy włoskie namoczone przez noc tracą chrupkość i oddają gorycz do bazy. Jeśli Ci to przeszkadza — przenieś je do porannej dosypki. Chia i płatki zostają na noc, bo mają się uwodnić. Bezpieczeństwo bez zmian."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "day",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "Poranek — kolejność pracy"
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Kurczak jako ostatnia czynność. Uzasadnienie w Twoim dokumencie jest poprawne — po obsłudze surowego drobiu nie ma już czego skazić. Szczotka wyłącznie do surowego mięsa zamiast gąbki: również prawidłowe, gąbka kuchenna jest rezerwuarem, który roznosi patogeny przez kolejne dni."
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Czosnek przez praskę, 10 minut odstania. To decyzja o biodostępności allicyny, nie o bezpieczeństwie — i jest prawidłowo uzasadniona."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "day",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "Lunch do termosu"
+      },
+      {
+       "type": "list",
+       "ordered": true,
+       "items": [
+        "Pakuj najgoręcej, jak potrafisz. Danie prosto z patelni, przy intensywnym parowaniu. Termos wygrzany wrzątkiem przez kilka minut, woda wylana tuż przed przełożeniem, napełnienie pod sam brzeg — przestrzeń powietrzna to największa pojedyncza strata.",
+        "Zmierz o 13:20, przed dodaniem skyru. To jest jedyny dowód, jaki masz.",
+        "Próg: powyżej 63 °C podczas jedzenia PARAMETR — nie przepis obowiązujący w Polsce, tylko sensowna wartość operacyjna. Zapas do 65–70 °C jest lepszy, bo wahania nie zbijają Cię wtedy poniżej linii.",
+        "Jeśli nie wychodzi — przejdź na zimny łańcuch: ugotuj, schłódź szybko, przewieź w torbie chłodzącej, odgrzej na miejscu. To nie jest gorsze rozwiązanie, tylko inne. Sześć godzin w 40–55 °C to warunki, w których B. cereus wytwarza cereulid, a tej toksyny odgrzewanie nie usuwa."
+       ]
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Skyr w osobnym, schłodzonym pojemniku. Twoja analiza jest trafna i to najlepsza pojedyncza decyzja w całym protokole."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "day",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "Torba chłodząca"
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Trzy wkłady, bilans energetyczny, wkłady na wierzchu i z boku, test ≤ 5 °C o 13:20. Zrobione lepiej niż w większości poradników."
+      },
+      {
+       "type": "p",
+       "text": "⚠️ korekta sformułowania „Do 2 godzin poza lodówką od dodania skyru\" — jeśli torba przechodzi test ≤ 5 °C, to śniadanie nie jest poza chłodzeniem i zegar dwóch godzin w ogóle nie startuje. Właściwe brzmienie: „poza torbą maks. 2 godziny łącznie\"."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "day",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "Koktajl kefirowy i kawa mrożona"
+      },
+      {
+       "type": "p",
+       "text": "✅ Koktajl przygotowany rano, wypity o 11:15 — mieści się nawet w dwunastogodzinnym oknie z etykiety kefiru. Blender i kubek muszą być czyste i suche."
+      },
+      {
+       "type": "p",
+       "text": "⚠️ korekta „Jeśli o 12:20 napój nie jest wyraźnie zimny, nie pij\" — masz termometr i używasz go do trzech innych rzeczy. Zmierz ten napój raz. Próg ≤ 5 °C. Kubek otwarty o 10:30 wpuszcza ciepłe powietrze i topi część lodu, więc sytuacja o 12:20 jest inna. Jeśli nie przechodzi — sześć kostek zamiast czterech."
+      }
+     ]
+    },
+    {
+     "type": "card",
+     "kind": "day",
+     "blocks": [
+      {
+       "type": "h4",
+       "text": "Obiad i kolacja"
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Ryż w nadmiarze wody z odlaniem, kurczak na parze do 74 °C mierzone w rdzeniu, brokuły na parze."
+      },
+      {
+       "type": "p",
+       "text": "✅ bez zmian Jaja na miękko. Twoja ocena ryzyka jest rzetelna — płynne żółtko nie osiąga progu i żadna technika tego nie zmieni, a warunki, które wymieniasz (jaja z lodówki, w terminie, przygotowane bezpośrednio przed posiłkiem), utrzymują ryzyko na niskim poziomie. Słusznie nie włączasz ich do meal-prepu. Uzupełnienie: przy antybiotykoterapii, chorobie przewodu pokarmowego albo obniżonej odporności przejdź na ten czas na jaja na twardo."
+      }
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Co można przygotować z wyprzedzeniem"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Element",
+      "Z wyprzedzeniem?",
+      "Ile dni",
+      "Osobno",
+      "Kiedy połączyć"
+     ],
+     "rows": [
+      [
+       "Baza owsianki (płatki, chia, nasiona, woda)",
+       "✅",
+       "3 dni PROXY",
+       "skyr, borówki, orzechy",
+       "rano"
+      ],
+      [
+       "Owsianka z skyrem i owocami",
+       "❌",
+       "tego dnia",
+       "—",
+       "tuż przed wyjściem"
+      ],
+      [
+       "Lunch — baza makaronowa",
+       "❌",
+       "składana rano na gorąco",
+       "skyr zawsze osobno",
+       "przy posiłku"
+      ],
+      [
+       "Ryż, kurczak, warzywa gotowane",
+       "✅",
+       "4 dni / warzywa 3 dni",
+       "buraczki, ogórek, natka",
+       "przy pakowaniu"
+      ],
+      [
+       "Sucha mieszanka do koktajlu (kakao, cynamon)",
+       "✅",
+       "tygodnie",
+       "kefir",
+       "rano w blenderze"
+      ],
+      [
+       "Zmielone siemię i ostropest",
+       "✅",
+       "do 3 mies. w szafce",
+       "—",
+       "dowolnie"
+      ],
+      [
+       "Jaja na twardo",
+       "✅",
+       "7 dni",
+       "w skorupkach",
+       "obierać na bieżąco"
+      ],
+      [
+       "Shake z białkiem WPC + banan",
+       "❌",
+       "natychmiast",
+       "proszek i banan",
+       "miksować i pić"
+      ],
+      [
+       "Kolacja — twaróg, pomidorki, papryka",
+       "❌",
+       "na bieżąco",
+       "wszystko",
+       "na miejscu"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "title": "6 · Mrożenie, rozmrażanie, ponowne zamrażanie",
+   "blocks": [
+    {
+     "type": "p",
+     "text": "W −18 °C bezpieczeństwo jest nieograniczone ORGAN. Produkt trzymany stale w −18 °C pozostaje bezpieczny bezterminowo. Wszystkie poniższe terminy to okna najlepszej jakości — po ich przekroczeniu produkt jest zdatny, tylko gorszy."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Porcjowanie",
+      "Próżnia",
+      "Kolejność",
+      "Jakość w −18 °C",
+      "Rozmrażanie",
+      "Ponowne zamrożenie"
+     ],
+     "rows": [
+      [
+       "Kurczak, indyk — pierś surowa",
+       "150 g, płasko, pojedynczo",
+       "duża korzyść",
+       "zimny z lodówki → worek → zamrażarka",
+       "6 mies.",
+       "lodówka 12–18 h",
+       "tak, jeśli rozmrożony w lodówce i w oknie 2 dni; strata soczystości"
+      ],
+      [
+       "Wołowina mielona surowa",
+       "130 g, rozpłaszczone do 1,5 cm",
+       "duża korzyść",
+       "mrozić w dniu zakupu",
+       "3 mies.",
+       "lodówka 8–12 h",
+       "możliwe, ale mielone traci najwięcej"
+      ],
+      [
+       "Łosoś surowy",
+       "100 g, pojedynczo",
+       "duża korzyść",
+       "mrozić w dniu zakupu",
+       "3 mies.",
+       "rozciąć worek, potem lodówka",
+       "odradzam — tekstura"
+      ],
+      [
+       "Dorsz surowy",
+       "100 g, pojedynczo",
+       "duża korzyść",
+       "mrozić w dniu zakupu",
+       "6 mies.",
+       "rozciąć worek, potem lodówka",
+       "odradzam"
+      ],
+      [
+       "Mięso i ryby po obróbce",
+       "porcje na jeden posiłek",
+       "korzyść",
+       "najpierw schłodzić do ≤ 5 °C, potem pakować",
+       "4 mies.",
+       "lodówka lub prosto do odgrzania",
+       "nie"
+      ],
+      [
+       "Chleb żytni w kromkach",
+       "po 2–3 kromki",
+       "korzyść",
+       "ostudzony",
+       "3 mies.",
+       "prosto do tostera",
+       "nie"
+      ],
+      [
+       "Imbir w całości",
+       "całe kłącze",
+       "opcjonalnie",
+       "—",
+       "6 mies.",
+       "ścierać zamrożony",
+       "nie dotyczy"
+      ]
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Cztery zasady"
+    },
+    {
+     "type": "list",
+     "ordered": true,
+     "items": [
+      "Surowe pakuj przed zamrożeniem, gotowane dopiero po schłodzeniu do ≤ 5 °C. Ciepłe mięso w worku próżniowym to kilkadziesiąt minut w środowisku beztlenowym w temperaturze wzrostu.",
+      "Mroź w dniu zakupu. Zamrażarka utrwala stan, w jakim produkt do niej trafia.",
+      "Płasko i pojedynczo. Warstwa 1,5–2 cm zamraża się kilkukrotnie szybciej — mniejsze kryształy, mniejszy wyciek, i możliwość wyjęcia jednej porcji.",
+      "Data na worku. Bez niej wszystkie okna powyżej są bezużyteczne."
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Ponowne zamrażanie — bezpieczeństwo czy jakość"
+    },
+    {
+     "type": "p",
+     "text": "Bezpieczeństwo jest zagrożone tylko wtedy, gdy produkt rozmroził się poza lodówką. Wtedy: ugotuj natychmiast albo wyrzuć."
+    },
+    {
+     "type": "p",
+     "text": "Jakość jest jedynym kosztem, gdy produkt rozmroził się w lodówce, pozostał zimny i mieści się w swoim oknie chłodniczym. USDA dopuszcza ponowne zamrożenie takiego produktu wprost ORGAN."
+    },
+    {
+     "type": "h3",
+     "text": "Rozmrażanie"
+    },
+    {
+     "type": "list",
+     "ordered": false,
+     "items": [
+      "W lodówce — jedyna metoda do planowanego meal-prepu.",
+      "W zimnej wodzie lub mikrofalówce — tylko gdy gotujesz natychmiast.",
+      "Nie na blacie.",
+      "Rybę wyjmij z worka próżniowego przed rozmrażaniem MOJA REK. Podstawą jest C. botulinum typu nieproteolitycznego, rosnący od ok. 3 °C w warunkach beztlenowych. Ryzyko przy krótkim rozmrażaniu w zimnej lodówce jest niskie, ale czynność kosztuje trzy sekundy."
+     ]
+    }
+   ]
+  },
+  {
+   "title": "7 · Pakowanie próżniowe",
+   "blocks": [
+    {
+     "type": "card",
+     "kind": "rt",
+     "blocks": [
+      {
+       "type": "p",
+       "text": "Próżnia nie zabija niczego. Usuwa tlen, więc hamuje bakterie tlenowe, pleśnie i drożdże — czyli te organizmy, które normalnie ostrzegają zapachem i śluzem. Nie hamuje beztlenowców. Efekt netto w lodówce: produkt dłużej wygląda dobrze, niekoniecznie dłużej nim jest."
+      },
+      {
+       "type": "p",
+       "text": "Dlatego próżnia nie wydłuża żadnego limitu chłodniczego w tym dokumencie. Wydłuża okna jakości w zamrażarce — i w Twoim przypadku to praktycznie jedyne jej zastosowanie."
+      }
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Warto — niemal wyłącznie do zamrażarki"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Standardowo",
+      "Z próżnią",
+      "Realna korzyść"
+     ],
+     "rows": [
+      [
+       "Surowe mięso i drób do zamrażarki",
+       "worek strunowy — oparzelina po 2–3 mies.",
+       "worek zgrzewany, płasko",
+       "Największa pojedyncza korzyść w całej kuchni. Eliminacja oparzeliny plus porcjowanie po 150 g."
+      ],
+      [
+       "Surowe ryby do zamrażarki",
+       "folia — łosoś jełczeje",
+       "worek zgrzewany, pojedynczo",
+       "Odcięcie tlenu zatrzymuje peroksydację EPA i DHA, która postępuje nawet w −18 °C."
+      ],
+      [
+       "Gotowane mięso i ryby do zamrażarki",
+       "pojemnik — wysycha",
+       "worek, po schłodzeniu",
+       "Brak przesuszenia i posmaku odgrzewanego tłuszczu."
+      ],
+      [
+       "Chleb w kromkach",
+       "worek strunowy",
+       "worek próżniowy",
+       "Mniej lodu na powierzchni, lepsza tekstura po tostowaniu."
+      ],
+      [
+       "Orzechy i nasiona przy zakupie hurtowym",
+       "słoik",
+       "porcjowane worki do zamrażarki",
+       "Ma sens od kilograma w górę. Przy paczce 200 g zjadanej w dwa tygodnie — żadna."
+      ]
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Bez korzyści — zwykły szczelny pojemnik wystarcza"
+    },
+    {
+     "type": "p",
+     "text": "Ryż, makaron, kasza, płatki, chia i siemię całe, kakao, przyprawy, zioła suszone, białko WPC, warzywa mrożone w oryginalnym opakowaniu, marchew, papryka. Ograniczeniem jest tu wilgoć i światło, nie tlen — szczelny słoik w ciemnej szafce robi praktycznie to samo przy zerowym nakładzie."
+    },
+    {
+     "type": "h3",
+     "text": "Nie warto albo zwiększa ryzyko"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Produkt",
+      "Dlaczego",
+      "Kategoria"
+     ],
+     "rows": [
+      [
+       "Świeży czosnek do szafki lub lodówki",
+       "Niskokwasowy, wilgotny, z przetrwalnikami glebowymi. Beztlenowy worek w temperaturze powyżej zamarzania to podręcznikowe warunki dla C. botulinum. Do zamrażarki można — w −18 °C nic nie rośnie.",
+       "bezpieczeństwo"
+      ],
+      [
+       "Ryba rozmrażana w worku",
+       "Rozetnij worek przed rozmrażaniem. Zalecenie ostrożnościowe, koszt zerowy.",
+       "bezpieczeństwo"
+      ],
+      [
+       "Ugotowane skrobie w lodówce",
+       "Nie wydłuża limitu i odbiera sygnał zepsucia. Brak udokumentowanego zagrożenia, ale i brak korzyści.",
+       "bez korzyści"
+      ],
+      [
+       "Świeże warzywa i zioła do lodówki",
+       "Żywa tkanka oddycha; w próżni przechodzi na metabolizm beztlenowy i gnije od środka. Potrzebuje perforacji, nie próżni.",
+       "oba"
+      ],
+      [
+       "Borówki, pomidorki, banany, twaróg",
+       "Zgniecenie struktury.",
+       "jakość"
+      ],
+      [
+       "Cokolwiek niskokwasowego do szafki",
+       "Próżnia nigdy nie zastępuje lodówki ani pasteryzacji.",
+       "bezpieczeństwo"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "title": "8 · Odgrzewanie",
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Cel: 70 °C przez 2 minuty albo 75 °C przez 30 sekund w najzimniejszym punkcie ORGAN. Amerykańskie 74 °C jest jednorazowym odpowiednikiem tych kombinacji, nie osobnym wymogiem."
+    },
+    {
+     "type": "p",
+     "text": "Goręcej nie znaczy bezpieczniej. Podgrzanie brzegów do 95 °C nie pomaga, jeśli środek ma 50 °C. Znaczenie ma najzimniejszy punkt i szybkość przejścia przez strefę 5–63 °C."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Kryterium",
+      "Mikrofalówka",
+      "Air fryer",
+      "Patelnia",
+      "Piekarnik",
+      "Parowar"
+     ],
+     "rows": [
+      [
+       "Czas w strefie zagrożenia",
+       "najkrótszy, 2–4 min",
+       "8–15 min",
+       "4–8 min",
+       "15–25 min, najdłuższy",
+       "10–15 min"
+      ],
+      [
+       "Równomierność",
+       "najsłabsza — zimne punkty",
+       "średnia",
+       "bardzo dobra przy mieszaniu",
+       "dobra, brzegi wyprzedzają",
+       "dobra"
+      ],
+      [
+       "Ryż",
+       "najlepszy, z łyżką wody",
+       "zły — wysusza",
+       "dobry z wodą",
+       "zły",
+       "dobry, wolny"
+      ],
+      [
+       "Makaron",
+       "dobry",
+       "zły",
+       "najlepszy",
+       "zły",
+       "średni"
+      ],
+      [
+       "Kurczak, indyk",
+       "dobry przy 50–70 % mocy",
+       "dobry, ale wysusza pierś",
+       "dobry w plastrach",
+       "wysusza",
+       "dobry, wolny"
+      ],
+      [
+       "Warzywa",
+       "najlepsze — najmniej strat wit. C",
+       "dobre dla ziemniaków",
+       "dobre",
+       "przesusza",
+       "dobre"
+      ],
+      [
+       "Prostota",
+       "najlepsza",
+       "grzanie wstępne",
+       "zmywanie",
+       "najgorsza",
+       "średnia"
+      ]
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Rekomendacja dla Twoich posiłków"
+    },
+    {
+     "type": "list",
+     "ordered": false,
+     "items": [
+      "Obiad (ryż + kurczak + warzywa): mikrofalówka. Najkrótsze przejście przez strefę zagrożenia, brak wysuszenia, jeden pojemnik. Twoja obecna decyzja jest prawidłowa.",
+      "Makaron ze szpinakiem: patelnia pod przykryciem z dwiema łyżkami wody.",
+      "Sam kurczak: mikrofalówka 50–70 % mocy, przykryte, z łyżką płynu. Pełna moc na chudej piersi ścina białko.",
+      "Ziemniaki i bataty: air fryer 180 °C przez 6–8 minut — jedyny przypadek, gdzie tekstura wygrywa z szybkością.",
+      "Ryba: mikrofalówka 50 % mocy, przykryte, krótkie interwały."
+     ]
+    },
+    {
+     "type": "h3",
+     "text": "Procedura mikrofalowa"
+    },
+    {
+     "type": "list",
+     "ordered": true,
+     "items": [
+      "Szklany pojemnik, przykrycie obowiązkowe — talerzyk na wierzchu wystarczy, pokrywki nie zakręcaj. Para pod przykryciem przewodzi ciepło do środka i wyrównuje rozkład.",
+      "1–2 łyżki wody do ryżu. Wilgoć jest nośnikiem ciepła.",
+      "Rozłóż płasko, nie w kopiec. Kopiec w środku to najczęstsze źródło zimnego punktu.",
+      "Moc 700–800 W dla porcji do 400 g; przy gęstych porcjach 50–70 % i dłużej.",
+      "Mieszaj w połowie. Pojedynczo najskuteczniejsza czynność w całej procedurze.",
+      "Odczekaj 2 minuty po sygnale. Wyrównanie zachodzi po wyłączeniu magnetronu — to część procesu, nie strata czasu.",
+      "Zmierz w 2–3 miejscach, w tym w środku najgrubszego kawałka mięsa.",
+      "Jeśli nie dociąga — 60 s więcej, przemieszać, odczekać minutę, zmierzyć ponownie."
+     ]
+    },
+    {
+     "type": "small",
+     "text": "Odgrzewaj tylko porcję do zjedzenia teraz. Raz odgrzanej porcji nie schładza się ponownie."
+    }
+   ]
+  },
+  {
+   "title": "9 · Zagrożenia — co jest realne, a co przereklamowane",
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Realne w Twojej diecie"
+    },
+    {
+     "type": "p",
+     "text": "Bacillus cereus w ryżu, makaronie i kaszy bezpieczeństwo WYSOKA — przetrwalniki przeżywają gotowanie, kiełkują przy wolnym stygnięciu i wytwarzają cereulid odporny na ciepło. Krytyczny jest czas schłodzenia, nie liczba dni w lodówce. Twój termos jest w tej diecie pojedynczym punktem o najwyższej wadze."
+    },
+    {
+     "type": "p",
+     "text": "Salmonella i Campylobacter w drobiu bezpieczeństwo WYSOKA — nie myj surowego drobiu, mierz temperaturę w najgrubszym miejscu, separuj deski i narzędzia."
+    },
+    {
+     "type": "p",
+     "text": "Listeria w nabiale i daniach gotowych bezpieczeństwo WYSOKA — rośnie powoli także w chłodzie, co uzasadnia krótkie terminy i cel 4 °C zamiast 8 °C."
+    },
+    {
+     "type": "p",
+     "text": "C. botulinum w domowych produktach w oleju bezpieczeństwo WYSOKA — toksyna nie ma zapachu ani smaku, więc reguła obowiązuje „na ślepo\". Produkt komercyjny jest zakwaszony i po otwarciu wymaga tylko lodówki i 14 dni. Domowy czosnek lub zioła w oliwie: maks. 4 dni w lodówce albo zamrozić."
+    },
+    {
+     "type": "p",
+     "text": "Histamina w rybach bezpieczeństwo WYSOKA — powstaje przy złym chłodzeniu, odporna na gotowanie i mrożenie, nie da się jej usunąć. Rybę kupuje się na dziś albo mrozi tego samego dnia."
+    },
+    {
+     "type": "h3",
+     "text": "Przereklamowane — kwestia jakości, nie zagrożenie"
+    },
+    {
+     "type": "p",
+     "text": "Jełczenie orzechów i mielonego siemienia jakość — zjełczały orzech smakuje jak farba olejna i traci wartość odżywczą, ale nie powoduje zatrucia. Przy Twoim tempie zużycia zjawisko nie zdąży wystąpić w stopniu wyczuwalnym."
+    },
+    {
+     "type": "p",
+     "text": "Odgrzewanie szpinaku dla dorosłego — nie jest zagrożeniem WYSOKA — BfR stwierdza wprost, że ostre zagrożenie zdrowia dorosłych azotynem w szpinaku jest praktycznie wykluczone; ryzyko methemoglobinemii dotyczy niemowląt. Mechanizm, który realnie działa, to redukcja azotanów w produkcie stojącym w cieple, a nie samo podgrzanie."
+    },
+    {
+     "type": "p",
+     "text": "Banan w lodówce jakość — skórka czernieje, miąższ pozostaje zdatny."
+    },
+    {
+     "type": "p",
+     "text": "Anisakis w Twojej diecie — przy pieczeniu, parowaniu i smażeniu do ≥ 60 °C w rdzeniu problem nie występuje. Mrożenie przed spożyciem jest wymagane tylko dla ryb jedzonych na surowo, czego w Twojej diecie nie ma."
+    },
+    {
+     "type": "p",
+     "text": "Miód i botulizm — dotyczy wyłącznie niemowląt poniżej 12 miesiąca życia."
+    },
+    {
+     "type": "h3",
+     "text": "Jaja w Polsce"
+    },
+    {
+     "type": "p",
+     "text": "PRAWO WYSOKA Jaja klasy A nie są myte ani chłodzone w obrocie (rozp. WE 589/2008) — mycie usuwa kutykulę, a chłodzenie w sklepie powodowałoby kondensację po wyjęciu. Kupujesz je „ciepłe\", ale w domu trzymasz w lodówce na stałej półce i już ich stamtąd nie wyjmujesz na długo. Cykl zimno–ciepło–zimno jest gorszy niż konsekwentne chłodzenie. Termin: 28 dni od zniesienia. Nie myj przed schowaniem."
+    },
+    {
+     "type": "h3",
+     "text": "Temperatura lodówki"
+    },
+    {
+     "type": "p",
+     "text": "PARAMETR Rozporządzenie 852/2004 nie podaje liczby dla lodówek domowych. FSA zaleca ustawienie na 5 °C lub niżej ORGAN. W Twoim przypadku decyduje etykieta skyru wymagająca +2 do +6 °C oraz to, że badanie polskich gospodarstw domowych (Stefanou i in., IJERPH 2023, n = 77) wykazało średnią 5,1 °C przy niemal połowie odczytów powyżej 5 °C. Cel 4 °C pokrywa wymagania wszystkich Twoich produktów naraz z zapasem. Zmierz raz termometrem."
+    }
+   ]
+  },
+  {
+   "title": "10 · Źródła",
+   "blocks": [
+    {
+     "type": "list",
+     "ordered": true,
+     "items": [
+      "Etykiety produktów użytkownika — skyr 400 g; kefir naturalny 400 g; Delikate Twaróg Klinek chudy 250 g; Mleczna Dolina mleko UHT 0,5 % 1 l. Źródło nadrzędne dla gwarancji producenta po otwarciu.",
+      "Rozporządzenie (UE) 1169/2011, art. 24 i art. 25 ust. 2 (brzmienie po sprostowaniu z 7.10.2021). Obowiązek podania czasu na spożycie po otwarciu; rozróżnienie „należy spożyć do\" i „najlepiej spożyć przed\".",
+      "Rozporządzenie (WE) 852/2004, załącznik II rozdz. IX. Brak liczbowych progów temperaturowych dla gorącego przechowywania w prawie UE — podstawa korekty nr 1.",
+      "Food Standards Agency (UK) — wytyczne temperaturowe: chłodzenie ≤ 5 °C, gorące przechowywanie ≥ 63 °C, obróbka i odgrzewanie 70 °C/2 min lub 75 °C/30 s. Źródło parametrów operacyjnych, nie prawa obowiązującego w Polsce.",
+      "USDA FSIS — Leftovers and Food Safety ; Freezing and Food Safety ; Chicken from Farm to Table ; Cold Storage Chart. Limity dla dań gotowanych i surowców, okna jakości w zamrażarce, zasady rozmrażania i ponownego zamrażania.",
+      "USDA FSIS — Cooking with Microwave Ovens. Przykrywanie, mieszanie, czas odpoczynku, pomiar w kilku punktach.",
+      "FDA Food Code — schładzanie dwustopniowe i limit 7 dni dla żywności gotowej do spożycia w ≤ 5 °C. Punkt odniesienia dla korekty nr 10.",
+      "Oregon State University Extension SP 50-603, Should I Vacuum Package Food at Home? oraz Iowa State University Extension. Próżnia nie jest sterylizacją i nie zastępuje chłodzenia.",
+      "FSA — The safety and shelf-life of vacuum and modified atmosphere packed chilled foods with respect to non-proteolytic Clostridium botulinum. Podstawa zaleceń dotyczących opakowań próżniowych.",
+      "Morse DL i in. (1990), Garlic-in-oil associated botulism, Am J Public Health 80(11):1372–1373, doi:10.2105/ajph.80.11.1372.",
+      "Malcolmson LJ, Przybylski R, Daun JK (2000), Storage stability of milled flaxseed, JAOCS 77:235–238, doi:10.1007/s11746-000-0038-0. 128 dni w temperaturze pokojowej — podstawa korekt nr 3 i 4.",
+      "Stefanou C-R, Szosland-Fałtyn A, Bartodziejska B (2023), IJERPH 20(4):2924, doi:10.3390/ijerph20042924. Średnia 5,1 °C w polskich lodówkach.",
+      "BfR — Nitrit in Spinat und in anderen Lebensmitteln, Stellungnahme Nr. 007/2010.",
+      "Rozporządzenia : (WE) 589/2008 — jaja; (WE) 2073/2005 — kryteria mikrobiologiczne, Listeria i histamina; (WE) 1276/2011 — mrożenie ryb; (UE) 2023/915 — mykotoksyny."
+     ]
+    },
+    {
+     "type": "small",
+     "text": "Gdzie ten dokument milczy. Nie istnieje wiarygodny limit źródłowy dla: orzechów i pestek łuskanych w przechowywaniu domowym, namoczonej chia, overnight oats, naparów herbacianych i mielonego ostropestu. Podane tam liczby są ekstrapolacją i są tak oznaczone. Nie udaję precyzji, której nie mam."
+    },
+    {
+     "type": "small",
+     "text": "Dokument dotyczy zdrowego dorosłego. W ciąży, po 65. roku życia, przy obniżonej odporności i w czasie antybiotykoterapii: dolne granice wszystkich zakresów, powrót do limitów z etykiet nabiałowych, rezygnacja z jaj na miękko, dania gotowe do 3 dni."
+    }
+   ]
+  }
+ ]
+}

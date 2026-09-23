@@ -1,0 +1,420 @@
+{
+ "schema": 1,
+ "generated_from": "SUPLEMENTACJA_2027 (D-001)",
+ "supplements": {
+  "chondroityna": {
+   "name": "Chondroityna",
+   "form": "Siarczan chondroityny 500 mg",
+   "unit": "kaps.",
+   "new": true
+  },
+  "cynk": {
+   "name": "Cynk",
+   "form": "Cynk pikolinian 15 mg",
+   "unit": "kaps.",
+   "new": true
+  },
+  "boswellia": {
+   "name": "Boswellia Serrata",
+   "form": "Boswellia Serrata, kwasy bosweliowe (65%) 650 mg",
+   "unit": "kaps.",
+   "new": true
+  },
+  "d3_k2": {
+   "name": "D3 + K2",
+   "form": "2 kaps. = 4000 IU D3 + 100 µg K2",
+   "unit": "kaps."
+  },
+  "omega3": {
+   "name": "Omega-3",
+   "form": "Omega 3 Extreme Ostrovit; 2 kaps. = 1000 mg EPA + 500 mg DHA",
+   "unit": "kaps."
+  },
+  "witamina_c": {
+   "name": "Witamina C",
+   "form": "L-askorbinian sodu 100 mg",
+   "unit": "g"
+  },
+  "l_teanina": {
+   "name": "L-teanina",
+   "form": "L-teanina 200 mg",
+   "unit": "kaps."
+  },
+  "glukozamina": {
+   "name": "Glukozamina",
+   "form": "Siarczan glukozaminy 2 KCL 1400 mg",
+   "unit": "kaps.",
+   "new": true
+  },
+  "kolagen": {
+   "name": "Kolagen",
+   "form": "Hydrolizat kolagenu Fortigel 5000 mg",
+   "unit": "g"
+  },
+  "tauryna": {
+   "name": "Tauryna",
+   "form": "L-tauryna 2000 mg",
+   "unit": "g"
+  },
+  "kreatyna": {
+   "name": "Kreatyna",
+   "form": "Kreatyna monohydrat 5000 mg, w tym kreatyna 4400 mg",
+   "unit": "g"
+  },
+  "glicyna": {
+   "name": "Glicyna",
+   "form": "Glicyna 3000 mg",
+   "unit": "g"
+  },
+  "magnez_glicynian": {
+   "name": "Magnez",
+   "form": "Glicynian magnezu (2 kaps.) = 266 mg magnezu",
+   "unit": "kaps."
+  },
+  "melatonina": {
+   "name": "Melatonina",
+   "form": "Melatonina 1 mg (1 kaps.)",
+   "unit": "kaps."
+  }
+ },
+ "doses": [
+  {
+   "time": "07:00",
+   "situation_src": "Pobudka — woda z solą (500 ml, 40°C, 0,5 g soli)",
+   "supp": "chondroityna",
+   "qty": 1,
+   "label": "1 kaps.",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:07:00/chondroityna",
+   "note": "na czczo",
+   "validity": {
+    "until": "2027-03-21",
+    "decision": "D-015"
+   }
+  },
+  {
+   "time": "07:00",
+   "situation_src": "Pobudka — woda z solą (500 ml, 40°C, 0,5 g soli)",
+   "supp": "cynk",
+   "qty": 1,
+   "label": "1 kaps.",
+   "weekdays": [
+    4,
+    7
+   ],
+   "src": "SUPL:07:00/cynk",
+   "note": "na czczo"
+  },
+  {
+   "time": "09:00",
+   "situation_src": "Śniadanie",
+   "supp": "boswellia",
+   "qty": 1,
+   "label": "1 kaps.",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:09:00/boswellia",
+   "validity": {
+    "until": "2027-03-21",
+    "decision": "D-015"
+   }
+  },
+  {
+   "time": "09:00",
+   "situation_src": "Śniadanie",
+   "supp": "d3_k2",
+   "qty": 2,
+   "label": "2 kaps.",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:09:00/d3_k2"
+  },
+  {
+   "time": "09:00",
+   "situation_src": "Śniadanie",
+   "supp": "omega3",
+   "qty": 2,
+   "label": "2 kaps.",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:09:00/omega3"
+  },
+  {
+   "time": "09:00",
+   "situation_src": "Śniadanie",
+   "supp": "witamina_c",
+   "qty": 0.1,
+   "label": "100 mg",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:09:00/witamina_c"
+  },
+  {
+   "time": "10:30",
+   "situation_src": "Kawa — espresso + 100 ml mleka 0,5%",
+   "supp": "l_teanina",
+   "qty": 1,
+   "label": "1 kaps. (200 mg)",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:10:30/l_teanina"
+  },
+  {
+   "time": "13:20",
+   "situation_src": "Lunch",
+   "supp": "glukozamina",
+   "qty": 1,
+   "label": "1 kaps.",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:13:20/glukozamina",
+   "validity": {
+    "until": "2027-03-21",
+    "decision": "D-015"
+   }
+  },
+  {
+   "time": "13:20",
+   "situation_src": "Lunch",
+   "supp": "witamina_c",
+   "qty": 0.1,
+   "label": "100 mg",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:13:20/witamina_c"
+  },
+  {
+   "time": "17:15",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "kolagen",
+   "qty": 5,
+   "label": "5 g",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:17:15/kolagen"
+  },
+  {
+   "time": "17:15",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "witamina_c",
+   "qty": 0.1,
+   "label": "100 mg",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:17:15/witamina_c"
+  },
+  {
+   "time": "17:15",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "tauryna",
+   "qty": 2,
+   "label": "2 g",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:17:15/tauryna"
+  },
+  {
+   "time": "20:15",
+   "situation_src": "Posiłek potreningowy — banan + białko",
+   "supp": "kreatyna",
+   "qty": 5,
+   "label": "5 g",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:20:15/kreatyna",
+   "note": "z węglowodanami z banana — lepsza retencja",
+   "thursday": {
+    "decision": "D-030",
+    "note": "w czwartek bez banana (dieta NT)"
+   }
+  },
+  {
+   "time": "21:00",
+   "situation_src": "Kolacja",
+   "supp": "chondroityna",
+   "qty": 1,
+   "label": "1 kaps.",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:21:00/chondroityna",
+   "validity": {
+    "until": "2027-03-21",
+    "decision": "D-015"
+   }
+  },
+  {
+   "time": "22:00",
+   "situation_src": "Melisa 200 ml",
+   "supp": "glicyna",
+   "qty": 3,
+   "label": "3 g",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:22:00/glicyna"
+  },
+  {
+   "time": "22:00",
+   "situation_src": "Melisa 200 ml",
+   "supp": "magnez_glicynian",
+   "qty": 2,
+   "label": "2 kaps. (266 mg Mg)",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:22:00/magnez_glicynian"
+  },
+  {
+   "time": "22:00",
+   "situation_src": "Melisa 200 ml",
+   "supp": "melatonina",
+   "qty": 1,
+   "label": "1 kaps. (1 mg)",
+   "weekdays": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "src": "SUPL:22:00/melatonina"
+  }
+ ],
+ "other_rows": [
+  {
+   "time": "11:15",
+   "text": "Przekąska — kefir 1,5% + siemię + ostropest + kakao + orzech brazylijski"
+  },
+  {
+   "time": "12:20",
+   "text": "Kawa — espresso + 100 ml mleka 0,5%"
+  },
+  {
+   "time": "15:00",
+   "text": "Zielona herbata 400 ml z cytryną, imbirem i miodem"
+  },
+  {
+   "time": "16:20",
+   "text": "Obiad — ryż paraboiled, kurczak, warzywa, brokuły, buraczki, ogórek kiszony"
+  },
+  {
+   "time": "18:15",
+   "text": "Trening (FBW/Cardio/Sauna) — W trakcie treningu: woda + elektrolity (sól)"
+  },
+  {
+   "time": "23:00",
+   "text": "Sen (do 07:00 = 8 h w łóżku)"
+  }
+ ],
+ "decisions": {
+  "D-014": "tauryna codziennie, także w czwartek",
+  "D-015": "chondroityna, boswellia, glukozamina do 21.03.2027 (I-9)",
+  "D-016": "cynk kontynuowany; stan nieśledzony"
+ }
+}

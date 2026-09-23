@@ -1,0 +1,2703 @@
+{
+ "schema": 1,
+ "generated_from": "TRENING.html (EX, EX_ROM)",
+ "days": {
+  "pon": [
+   {
+    "id": "ex.pon.1.wyciskanie_sztangi_lezac",
+    "name": "Wyciskanie sztangi leżąc",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2–3 min",
+    "note_html": "Start ~45 kg",
+    "src": "TRENING:EX.pon[0]"
+   },
+   {
+    "id": "ex.pon.2.wioslowanie_siedzac_v_grip",
+    "name": "Wiosłowanie siedząc (V-grip)",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": "Start ~45 kg",
+    "src": "TRENING:EX.pon[1]"
+   },
+   {
+    "id": "ex.pon.3.wyciskanie_hantli_nad_glowe",
+    "name": "Wyciskanie hantli nad głowę",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": "Start ~10 kg/rękę",
+    "src": "TRENING:EX.pon[2]"
+   },
+   {
+    "id": "ex.pon.4.sciaganie_drazka",
+    "name": "Ściąganie drążka",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": "Start ~40 kg",
+    "src": "TRENING:EX.pon[3]"
+   },
+   {
+    "id": "ex.pon.5.face_pull",
+    "name": "Face pull",
+    "tag": "nowe",
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pon[4]"
+   },
+   {
+    "id": "ex.pon.6.rozpietki_bramka",
+    "name": "Rozpiętki bramka",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "10–15",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pon[5]"
+   },
+   {
+    "id": "ex.pon.7.wznosy_bokiem",
+    "name": "Wznosy bokiem",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.pon[6]"
+   },
+   {
+    "id": "ex.pon.8.triceps_na_linkach",
+    "name": "Triceps na linkach",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "10–15",
+    "rir": "1",
+    "rest": "60 s",
+    "note_html": "<b>Tułów nieruchomy</b> — bez bujania",
+    "src": "TRENING:EX.pon[7]"
+   },
+   {
+    "id": "ex.pon.9.uginanie_ez",
+    "name": "Uginanie EZ",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": "Start ~20 kg",
+    "src": "TRENING:EX.pon[8]"
+   }
+  ],
+  "pt": [
+   {
+    "id": "ex.pt.1.wyciskanie_sztangi_na_skosie",
+    "name": "Wyciskanie sztangi na skosie",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2–3 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[0]"
+   },
+   {
+    "id": "ex.pt.2.wioslowanie_sztanga",
+    "name": "Wiosłowanie sztangą",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[1]"
+   },
+   {
+    "id": "ex.pt.3.wyciskanie_nad_glowe_ohp",
+    "name": "Wyciskanie nad głowę (OHP)",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[2]"
+   },
+   {
+    "id": "ex.pt.4.podciaganie_z_asysta",
+    "name": "Podciąganie z asystą",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "6–10",
+    "rir": "2",
+    "rest": "2 min",
+    "note_html": null,
+    "src": "TRENING:EX.pt[3]"
+   },
+   {
+    "id": "ex.pt.5.odwodzenie_w_opadzie_wyciag",
+    "name": "Odwodzenie w opadzie (wyciąg)",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[4]"
+   },
+   {
+    "id": "ex.pt.6.wznosy_bokiem",
+    "name": "Wznosy bokiem",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[5]"
+   },
+   {
+    "id": "ex.pt.7.wyciskanie_francuskie_lezac",
+    "name": "Wyciskanie francuskie leżąc",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "8–12",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[6]"
+   },
+   {
+    "id": "ex.pt.8.uginanie_hantlami",
+    "name": "Uginanie hantlami",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "10–12",
+    "rir": "1",
+    "rest": "90 s",
+    "note_html": null,
+    "src": "TRENING:EX.pt[7]"
+   }
+  ],
+  "sr": [
+   {
+    "id": "ex.sr.1.reverse_crunch",
+    "name": "Reverse crunch",
+    "tag": null,
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "reps": "12–15",
+    "rir": "1–2",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.sr[0]"
+   },
+   {
+    "id": "ex.sr.2.levitation_crunch",
+    "name": "Levitation crunch",
+    "tag": "nowe",
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "10–12",
+    "rir": "1–2",
+    "rest": "60 s",
+    "note_html": "Pauza 1–2 s w górze",
+    "src": "TRENING:EX.sr[1]"
+   },
+   {
+    "id": "ex.sr.3.plank",
+    "name": "Plank",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "30–45 s",
+    "rir": "—",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.sr[2]"
+   },
+   {
+    "id": "ex.sr.4.side_plank",
+    "name": "Side plank",
+    "tag": null,
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 2
+    },
+    "reps": "20–30 s/str.",
+    "rir": "—",
+    "rest": "60 s",
+    "note_html": null,
+    "src": "TRENING:EX.sr[3]"
+   }
+  ],
+  "wt": [
+   {
+    "id": "ex.wt.1.suwnica_leg_press",
+    "name": "Suwnica (leg press)",
+    "raw": [
+     "Suwnica (leg press)",
+     [
+      2,
+      2,
+      3
+     ],
+     "10–12",
+     "2–3",
+     "2 min",
+     "zgięcie ~60°",
+     "+10–15°/1–2 tyg. do pełnego"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[0]"
+   },
+   {
+    "id": "ex.wt.2.martwy_ciag_rumunski",
+    "name": "Martwy ciąg rumuński",
+    "raw": [
+     "Martwy ciąg rumuński",
+     [
+      0,
+      2,
+      3
+     ],
+     "10–12*",
+     "3–4*",
+     "2 min",
+     "pełny",
+     "*po 4 tyg. → 8–10 / RIR 2–3. Kolano prawie proste"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[1]"
+   },
+   {
+    "id": "ex.wt.3.prostowanie_nog",
+    "name": "Prostowanie nóg",
+    "raw": [
+     "Prostowanie nóg",
+     [
+      0,
+      2,
+      3
+     ],
+     "12–15",
+     "1–2",
+     "90 s",
+     "90°→~45°",
+     "Obciążenie rzepki największe blisko wyprostu"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[2]"
+   },
+   {
+    "id": "ex.wt.4.spanish_squat_wall_sit",
+    "name": "Spanish squat / wall-sit",
+    "raw": [
+     "Spanish squat / wall-sit",
+     [
+      2,
+      2,
+      3
+     ],
+     "30–45 s",
+     "—",
+     "90 s",
+     "~60°",
+     "Opcja niskoprogowa na dni z objawami"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[3]"
+   },
+   {
+    "id": "ex.wt.5.lydki_stojac",
+    "name": "Łydki stojąc",
+    "raw": [
+     "Łydki stojąc",
+     [
+      0,
+      2,
+      3
+     ],
+     "12–15",
+     "1–2",
+     "60 s",
+     "pełny",
+     ""
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.wt[4]"
+   }
+  ],
+  "sob": [
+   {
+    "id": "ex.sob.1.hip_thrust",
+    "name": "Hip thrust",
+    "raw": [
+     "Hip thrust",
+     [
+      2,
+      2,
+      3
+     ],
+     "10–12",
+     "2",
+     "2 min",
+     "pełny",
+     "Znikome obciążenie rzepki"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[0]"
+   },
+   {
+    "id": "ex.sob.2.uginanie_nog",
+    "name": "Uginanie nóg",
+    "raw": [
+     "Uginanie nóg",
+     [
+      0,
+      2,
+      4
+     ],
+     "10–12",
+     "2",
+     "90 s",
+     "pełny",
+     "Bezpieczne od dnia 1"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 4
+    },
+    "src": "TRENING:EX_ROM.sob[1]"
+   },
+   {
+    "id": "ex.sob.3.step_up_bulgarski",
+    "name": "Step-up / bułgarski",
+    "raw": [
+     "Step-up / bułgarski",
+     [
+      0,
+      2,
+      3
+     ],
+     "8–10/nogę",
+     "2–3",
+     "2 min",
+     "niski stopień",
+     "Od Fazy 1. Wyższy stopień = większe zgięcie"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[2]"
+   },
+   {
+    "id": "ex.sob.4.suwnica_stopy_wyzej",
+    "name": "Suwnica (stopy wyżej)",
+    "raw": [
+     "Suwnica (stopy wyżej)",
+     [
+      0,
+      2,
+      3
+     ],
+     "10–12",
+     "2",
+     "2 min",
+     "~60°",
+     "Akcent pośladek + dwugłowy"
+    ],
+    "series": {
+     "0": 0,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[3]"
+   },
+   {
+    "id": "ex.sob.5.odwodzenie_biodra",
+    "name": "Odwodzenie biodra",
+    "raw": [
+     "Odwodzenie biodra",
+     [
+      2,
+      2,
+      3
+     ],
+     "15",
+     "1",
+     "60 s",
+     "pełny",
+     "Poprawia mechanikę rzepki"
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[4]"
+   },
+   {
+    "id": "ex.sob.6.lydki_siedzac",
+    "name": "Łydki siedząc",
+    "raw": [
+     "Łydki siedząc",
+     [
+      2,
+      2,
+      3
+     ],
+     "12–15",
+     "1–2",
+     "60 s",
+     "pełny",
+     ""
+    ],
+    "series": {
+     "0": 2,
+     "1": 2,
+     "2": 3
+    },
+    "src": "TRENING:EX_ROM.sob[5]"
+   }
+  ]
+ },
+ "note": "Technika (info), wizualizacje (viz), rozgrzewka i schłodzenie oraz arkusze przeniesione w Etapie 5.",
+ "info": {
+  "Wyciskanie sztangi leżąc": {
+   "en": "Barbell Bench Press",
+   "p": "push poziomy",
+   "v": "push-h",
+   "ft": "klatka → wyprost ramion",
+   "s": "Leżenie na ławce, oczy pod sztangą. Łopatki ściągnięte i opuszczone, lekki łuk, stopy mocno w podłodze. Chwyt ~1,5× szerokość barków.",
+   "c": [
+    "Nadgarstki proste, sztanga nad łokciami",
+    "Łokcie ok. 45–70° od tułowia, nie 90°",
+    "Opuszczaj pod kontrolą do dolnej części mostka",
+    "Wypychaj lekkim skosem w stronę barków",
+    "Pośladki i łopatki cały czas na ławce"
+   ],
+   "r": "Pełny: sztanga dotyka klatki → prawie pełny wyprost łokci.",
+   "e": [
+    "Odbijanie sztangi od klatki",
+    "Łokcie rozstawione na 90° (przeciążenie barku)",
+    "Utrata napięcia łopatek w trakcie serii"
+   ],
+   "m": "Sztanga zjeżdża do dolnej części klatki i wraca lekkim skosem nad barki.",
+   "vid": [
+    [
+     "vcBig73ojpE",
+     "Jeff Nippard",
+     "How To Get A Huge Bench Press with PERFECT Technique"
+    ]
+   ]
+  },
+  "Wiosłowanie siedząc (V-grip)": {
+   "en": "Seated Cable Row, V-Grip",
+   "p": "pull poziomy",
+   "v": "pull-h",
+   "ft": "ręce wyprostowane → uchwyt do brzucha",
+   "s": "Siad, stopy na podestach, kolana lekko ugięte. Uchwyt V w dłoniach, tułów pionowo, klatka wysoko.",
+   "c": [
+    "Zacznij od ściągnięcia łopatek do tyłu",
+    "Łokcie blisko tułowia, ciągnij do pępka",
+    "Tułów stabilny – maks. lekkie wychylenie",
+    "W powrocie pozwól łopatkom się rozsunąć"
+   ],
+   "r": "Pełny: ramiona wyprostowane z wysunięciem łopatek → uchwyt przy brzuchu.",
+   "e": [
+    "Bujanie tułowiem zamiast pracy pleców",
+    "Unoszenie barków do uszu",
+    "Szarpanie ciężaru"
+   ],
+   "m": "Uchwyt jedzie poziomo do brzucha, łokcie przesuwają się wzdłuż tułowia do tyłu.",
+   "vid": [
+    [
+     "7o2oolbmzeI",
+     "ScottHermanFitness",
+     "How To: Seated Cable Low-Row || PERFECT FORM"
+    ]
+   ]
+  },
+  "Wyciskanie hantli nad głowę": {
+   "en": "Dumbbell Shoulder Press",
+   "p": "push pionowy",
+   "v": "push-v",
+   "ft": "barki → nad głowę",
+   "s": "Siad na ławce z oparciem ~80–90° (lub stojąc). Hantle na wysokości barków, przedramiona pionowo, łokcie lekko przed tułowiem.",
+   "c": [
+    "Brzuch napięty, żebra w dół – bez wyginania lędźwi",
+    "Wypychaj w górę, hantle lekko zbliżają się nad głową",
+    "Przedramiona pionowo przez cały ruch",
+    "Opuszczaj pod kontrolą do wysokości barków"
+   ],
+   "r": "Pełny: hantle przy barkach → wyprost nad głową.",
+   "e": [
+    "Przeprost w odcinku lędźwiowym",
+    "Skrócony zakres (opuszczanie tylko do czoła)",
+    "Łokcie mocno za linią tułowia"
+   ],
+   "m": "Hantle jadą pionowo z wysokości barków nad głowę i wracają tą samą drogą.",
+   "vid": [
+    [
+     "fuQpuu--bMI",
+     "",
+     "Seated Dumbbell Shoulder Press Guide | Form, Tips, and Mistakes!"
+    ]
+   ]
+  },
+  "Ściąganie drążka": {
+   "en": "Lat Pulldown",
+   "p": "pull pionowy",
+   "v": "pull-v",
+   "ft": "nad głową → górna klatka",
+   "s": "Siad, uda zablokowane pod wałkami. Chwyt nachwytem nieco szerzej niż barki, tułów lekko odchylony.",
+   "c": [
+    "Zacznij od opuszczenia łopatek",
+    "Prowadź łokcie w dół, do boków żeber",
+    "Drążek do górnej części klatki",
+    "W górze pełny wyprost i rozciągnięcie najszerszych"
+   ],
+   "r": "Pełny: ręce wyprostowane nad głową → drążek na wysokości górnej klatki.",
+   "e": [
+    "Ściąganie za głowę",
+    "Mocne bujanie tułowiem",
+    "Ciągnięcie samymi bicepsami"
+   ],
+   "m": "Drążek opada pionowo przed twarzą do klatki, łokcie idą w dół do boków.",
+   "vid": [
+    [
+     "CAwf7n6Luuc",
+     "ScottHermanFitness",
+     "How To: Lat Pulldown | 3 GOLDEN RULES"
+    ]
+   ]
+  },
+  "Face pull": {
+   "en": "Cable Rope Face Pull",
+   "p": "pull poziomy + rotacja zewn.",
+   "v": "pull-h",
+   "ft": "ręce przed sobą → dłonie przy uszach",
+   "s": "Wyciąg na wysokości oczu, lina w dłoniach. Krok w tył, tułów pionowo, ramiona wyprostowane.",
+   "c": [
+    "Ciągnij linę w stronę oczu/czoła",
+    "Rozciągaj końce liny na boki",
+    "Na końcu rotacja zewnętrzna – dłonie za uszami",
+    "Łokcie na wysokości barków lub wyżej",
+    "Pauza 1 s, powolny powrót"
+   ],
+   "r": "Pełny: ramiona wyprostowane przed sobą → dłonie przy uszach, łokcie z tyłu.",
+   "e": [
+    "Za duży ciężar i odchylanie się do tyłu",
+    "Łokcie opadają – ruch zamienia się w wiosłowanie",
+    "Brak rotacji zewnętrznej na końcu"
+   ],
+   "m": "Lina jedzie poziomo do twarzy, dłonie rozchodzą się i obracają na zewnątrz.",
+   "vid": [
+    [
+     "eTCBSFlCJ_s",
+     "NASM",
+     "How to do a Face Pull | Proper Form & Technique"
+    ]
+   ]
+  },
+  "Rozpiętki bramka": {
+   "en": "Standing Cable Fly",
+   "p": "przywodzenie poziome (izolacja)",
+   "v": "fly",
+   "ft": "ramiona rozłożone → dłonie przed klatką",
+   "s": "Środek bramki, krok wykroczny, lekkie pochylenie. Uchwyty na wysokości barków lub nieco wyżej, łokcie lekko ugięte.",
+   "c": [
+    "Stały kąt w łokciach – bez zginania i prostowania",
+    "Ruch łukiem jak obejmowanie beczki",
+    "Dłonie spotykają się przed klatką",
+    "Barki w dół i do tyłu, klatka wysoko"
+   ],
+   "r": "Od rąk z boku na linii klatki (komfortowe rozciągnięcie) → dłonie razem przed tułowiem.",
+   "e": [
+    "Zamiana ruchu w wyciskanie",
+    "Za głębokie rozciągnięcie z przeciążeniem barku",
+    "Wysuwanie barków do przodu na końcu"
+   ],
+   "m": "Ramiona zataczają łuk z boków do środka przed klatką.",
+   "vid": [
+    [
+     "XNf6TBErGys",
+     "NASM",
+     "How to do a Two-Arm Standing Cable Fly | Proper Form & Technique"
+    ]
+   ]
+  },
+  "Wznosy bokiem": {
+   "en": "Dumbbell Lateral Raise",
+   "p": "odwodzenie ramienia",
+   "v": "raise",
+   "ft": "przy udach → wysokość barków",
+   "s": "Stanie, hantle przy udach, tułów minimalnie pochylony, łokcie lekko ugięte.",
+   "c": [
+    "Prowadź ruch łokciem, nie dłonią",
+    "Unoś lekko przed linią tułowia",
+    "Stop na wysokości barków",
+    "Powolny powrót 2–3 s"
+   ],
+   "r": "Od rąk przy udach do ramion ~równolegle do podłogi.",
+   "e": [
+    "Bujanie tułowiem",
+    "Unoszenie barków do uszu",
+    "Za ciężkie hantle i skrócony ruch"
+   ],
+   "m": "Ramiona zataczają łuk od ud w bok do wysokości barków.",
+   "vid": [
+    [
+     "XPPfnSEATJA",
+     "NASM",
+     "How to do a Dumbbell Lateral Raise"
+    ]
+   ]
+  },
+  "Triceps na linkach": {
+   "en": "Cable Triceps Pushdown",
+   "p": "wyprost łokcia (izolacja)",
+   "v": "ext",
+   "ft": "łokieć ~90° → pełny wyprost",
+   "s": "Przodem do wyciągu, lina/drążek z górnego bloczka. Łokcie przy bokach, tułów lekko pochylony.",
+   "c": [
+    "Łokcie przyklejone do tułowia",
+    "Pełny wyprost w dole, końce liny lekko na boki",
+    "Wracaj do ~90° w łokciu",
+    "Tułów nieruchomy – bez bujania"
+   ],
+   "r": "Pełny: łokieć ~90° → pełny wyprost.",
+   "e": [
+    "Wysuwanie łokci do przodu w powrocie",
+    "Dociskanie ciężaru tułowiem",
+    "Za krótki wyprost w dole"
+   ],
+   "m": "Przedramiona obracają się w dół wokół nieruchomych łokci.",
+   "vid": [
+    [
+     "odbyvJm7d8s",
+     "",
+     "Master the Cable Tricep Pushdown: Tips for Perfect Form"
+    ]
+   ]
+  },
+  "Uginanie EZ": {
+   "en": "EZ-Bar Curl",
+   "p": "zgięcie łokcia (izolacja)",
+   "v": "curl",
+   "ft": "ramiona proste → gryf przy barkach",
+   "s": "Stanie, gryf EZ w podchwycie na szerokość barków, ramiona wyprostowane, łokcie przy bokach.",
+   "c": [
+    "Łokcie nieruchomo przy tułowiu",
+    "Uginaj do pełnego skurczu",
+    "Opuszczaj do pełnego wyprostu",
+    "Tułów stabilny, bez zamachu"
+   ],
+   "r": "Pełny: ramiona proste → gryf na wysokości barków.",
+   "e": [
+    "Bujanie biodrami",
+    "Połówki powtórzeń bez wyprostu",
+    "Łokcie wędrują do przodu"
+   ],
+   "m": "Gryf zatacza łuk wokół łokci od ud do barków.",
+   "vid": [
+    [
+     "6LrOTcr595A",
+     "Kaged Muscle",
+     "EZ Bar Curls How To Perform Them Correctly"
+    ]
+   ]
+  },
+  "Wyciskanie sztangi na skosie": {
+   "en": "Incline Barbell Bench Press",
+   "p": "push skośny",
+   "v": "push-d",
+   "ft": "górna klatka → wyprost ramion",
+   "s": "Ławka 30–45°, oczy pod sztangą, łopatki ściągnięte, stopy w podłodze.",
+   "c": [
+    "Opuszczaj do górnej części klatki, pod obojczyki",
+    "Łokcie ~45–60° od tułowia",
+    "Nadgarstki proste",
+    "Wypychaj pionowo nad barki"
+   ],
+   "r": "Pełny: sztanga dotyka górnej klatki → prawie pełny wyprost.",
+   "e": [
+    "Za stroma ławka (ćwiczenie przechodzi na barki)",
+    "Odbijanie od klatki",
+    "Unoszenie pośladków z ławki"
+   ],
+   "m": "Sztanga porusza się niemal pionowo nad górną częścią klatki.",
+   "vid": [
+    [
+     "SrqOu55lrYU",
+     "ScottHermanFitness",
+     "How To: Incline Barbell Bench Press | 3 GOLDEN RULES!"
+    ]
+   ]
+  },
+  "Wiosłowanie sztangą": {
+   "en": "Barbell Bent-Over Row",
+   "p": "pull poziomy (w opadzie)",
+   "v": "row-bent",
+   "ft": "ręce proste → sztanga do brzucha",
+   "s": "Nachwyt nieco szerzej niż barki. Zawias w biodrach – tułów pochylony ~30–45° nad poziomem, plecy neutralne, kolana lekko ugięte.",
+   "c": [
+    "Kręgosłup neutralny, brzuch mocno napięty",
+    "Ciągnij do dolnej części klatki/pępka",
+    "Łokcie ~45° od tułowia",
+    "Kąt tułowia stały przez całą serię"
+   ],
+   "r": "Pełny: ramiona wyprostowane → sztanga dotyka brzucha.",
+   "e": [
+    "Prostowanie tułowia w trakcie serii",
+    "Zaokrąglone plecy",
+    "Szarpanie biodrami"
+   ],
+   "m": "Sztanga jedzie w górę wzdłuż ud do brzucha, tułów pozostaje pochylony.",
+   "vid": [
+    [
+     "ML1L5ytxLMY",
+     "",
+     "Barbell Row — Form, Mistakes, and Variations"
+    ]
+   ]
+  },
+  "Wyciskanie nad głowę (OHP)": {
+   "en": "Standing Barbell Overhead Press",
+   "p": "push pionowy",
+   "v": "push-v",
+   "ft": "obojczyki → nad głowę",
+   "s": "Stanie, stopy na szerokość bioder. Sztanga na przedniej części barków, chwyt tuż szerzej niż barki, przedramiona pionowo.",
+   "c": [
+    "Napnij pośladki i brzuch – bez odchylania",
+    "Cofnij głowę, by sztanga szła prosto",
+    "Po minięciu czoła 'wsuń się' pod sztangę",
+    "W górze sztanga nad środkiem stopy"
+   ],
+   "r": "Pełny: obojczyki → pełny wyprost nad głową.",
+   "e": [
+    "Mocny przeprost lędźwi",
+    "Tor sztangi łukiem przed twarzą",
+    "Pomaganie sobie nogami"
+   ],
+   "m": "Sztanga jedzie pionowo z barków nad głowę, tułów przesuwa się lekko pod nią.",
+   "vid": [
+    [
+     "eNFXEEdfQp4",
+     "Alan Thrall",
+     "How To Press (Overhead…)"
+    ]
+   ]
+  },
+  "Podciąganie z asystą": {
+   "en": "Assisted Pull-Up",
+   "p": "pull pionowy",
+   "v": "chin",
+   "ft": "zwis → broda nad drążkiem",
+   "s": "Kolana/stopy na platformie asysty, nachwyt nieco szerzej niż barki, pełny zwis. Większy ciężar asysty = łatwiej.",
+   "c": [
+    "Zacznij od ściągnięcia łopatek w dół",
+    "Łokcie w dół do żeber",
+    "Broda nad drążek, klatka do drążka",
+    "Powolne opuszczanie do pełnego zwisu"
+   ],
+   "r": "Pełny: zwis na prostych rękach → broda nad drążkiem.",
+   "e": [
+    "Za duża asysta – brak wysiłku przy docelowym RIR",
+    "Kiwanie się i wymachy",
+    "Skrócony zakres u dołu"
+   ],
+   "m": "Ciało wznosi się pionowo do drążka, łokcie ciągną w dół.",
+   "vid": [
+    [
+     "fnHeovkmkkk",
+     "",
+     "How to Use the Assisted Pull-Up Machine | Proper Form, Setup & Safety Tips"
+    ]
+   ]
+  },
+  "Odwodzenie w opadzie (wyciąg)": {
+   "en": "Bent-Over Cable Rear Delt Fly",
+   "p": "odwodzenie poziome (tylny bark)",
+   "v": "rfly",
+   "ft": "dłoń pod barkiem → ramię w bok",
+   "s": "Dolny wyciąg, uchwyt ręką przeciwną (linka przed tułowiem). Tułów pochylony prawie równolegle do podłogi, plecy neutralne.",
+   "c": [
+    "Łokieć lekko ugięty i stały",
+    "Unoś ramię w bok, prowadź łokciem",
+    "Stop na linii tułowia",
+    "Bez rotacji tułowia"
+   ],
+   "r": "Pełny: ręka pod barkiem/przed tułowiem → ramię w bok do linii pleców.",
+   "e": [
+    "Ściąganie łopatki (robi się wiosłowanie)",
+    "Obracanie tułowiem",
+    "Za duży ciężar"
+   ],
+   "m": "Ramię zatacza łuk od środka ciała w bok do wysokości pleców.",
+   "vid": [
+    [
+     "sapuLkXjAEs",
+     "",
+     "Rear Delt Fly - Bent Over - Single Arm - Cable"
+    ]
+   ]
+  },
+  "Wyciskanie francuskie leżąc": {
+   "en": "Lying Triceps Extension (Skull Crusher)",
+   "p": "wyprost łokcia (izolacja)",
+   "v": "skull",
+   "ft": "gryf przy czole → ręce pionowo",
+   "s": "Leżenie na ławce, gryf EZ/sztanga nad barkami na wyprostowanych rękach, chwyt wąski.",
+   "c": [
+    "Ramiona lekko skośnie w tył, nad czołem",
+    "Zginaj tylko w łokciach",
+    "Opuszczaj do czoła lub tuż za głowę",
+    "Łokcie nie rozchodzą się na boki"
+   ],
+   "r": "Pełny: gryf przy czole/za głową → pełny wyprost.",
+   "e": [
+    "Łokcie uciekają na zewnątrz",
+    "Ruch w barkach zamiast w łokciach",
+    "Zbyt szybkie opuszczanie"
+   ],
+   "m": "Przedramiona obracają się wokół łokci: od czoła do pionu.",
+   "vid": [
+    [
+     "NIWKqcmpBug",
+     "Men's Health",
+     "Get Bigger Triceps with Skull Crushers | Form Check"
+    ]
+   ]
+  },
+  "Uginanie hantlami": {
+   "en": "Dumbbell Biceps Curl",
+   "p": "zgięcie łokcia (izolacja)",
+   "v": "curl",
+   "ft": "ręce proste → hantle przy barkach",
+   "s": "Stanie, hantle przy udach, łokcie przy tułowiu.",
+   "c": [
+    "Obracaj dłoń na zewnątrz w trakcie uginania",
+    "Łokcie nieruchomo",
+    "Pełny wyprost w dole",
+    "Bez zamachu tułowiem"
+   ],
+   "r": "Pełny: ręce proste → pełny skurcz przy barkach.",
+   "e": [
+    "Bujanie tułowiem",
+    "Wysuwanie łokci do przodu",
+    "Brak pełnego wyprostu"
+   ],
+   "m": "Hantel zatacza łuk wokół łokcia od uda do barku.",
+   "vid": [
+    [
+     "hwidQWYkiRU",
+     "Men's Health",
+     "3 Tweaks for Bigger Biceps | Form Check"
+    ]
+   ]
+  },
+  "Reverse crunch": {
+   "en": "Lying Reverse Crunch",
+   "p": "zgięcie tułowia (od miednicy)",
+   "v": "rcrunch",
+   "ft": "uda pionowo → kolana do klatki",
+   "s": "Leżenie na plecach, dłonie przy bokach lub trzymają podporę za głową. Biodra i kolana zgięte ~90°.",
+   "c": [
+    "Zwijaj miednicę – unoś pośladki z podłogi",
+    "Kolana kieruj do klatki",
+    "Wolno, bez zamachu nogami",
+    "Opuszczaj kręg po kręgu"
+   ],
+   "r": "Od ud pionowo do uniesionej miednicy i kolan przy klatce.",
+   "e": [
+    "Wymachiwanie nogami zamiast zwijania miednicy",
+    "Odbijanie się od podłogi",
+    "Za szybki powrót"
+   ],
+   "m": "Kolana wędrują łukiem do klatki, miednica odrywa się od ziemi.",
+   "vid": [
+    [
+     "yH-oSzE5_g0",
+     "Well+Good",
+     "How to do a Reverse Crunch | The Right Way"
+    ]
+   ]
+  },
+  "Levitation crunch": {
+   "en": "Levitation Crunch",
+   "p": "zgięcie tułowia",
+   "v": "crunch",
+   "ft": "łopatki na ziemi → uniesione + pauza",
+   "s": "Leżenie na plecach, lędźwie przy podłodze, brzuch napięty. Ustawienie rąk i nóg jak na wideo.",
+   "c": [
+    "Zwijaj tułów – żebra w stronę miednicy",
+    "Unieś łopatki z podłogi",
+    "Pauza 1–2 s w górze (wg planu)",
+    "Powolny powrót z utrzymanym napięciem"
+   ],
+   "r": "Od łopatek na podłodze do pełnego zwinięcia górnej części tułowia.",
+   "e": [
+    "Ciągnięcie głową i szyją",
+    "Odrywanie lędźwi (praca zginaczy bioder)",
+    "Brak pauzy w górze"
+   ],
+   "m": "Górna część tułowia zwija się nad podłogą i 'zawisa' na 1–2 s.",
+   "vid": [
+    [
+     "RE89hfdlk_E",
+     "",
+     "How To Perform Levitation Crunch - Exercise Tutorial"
+    ]
+   ]
+  },
+  "Plank": {
+   "en": "Forearm Plank",
+   "p": "core: anty-wyprost (izometria)",
+   "v": "iso",
+   "ft": "trzymaj linię głowa–pięty",
+   "s": "Podpór na przedramionach, łokcie pod barkami, ciało w linii głowa–pięty.",
+   "c": [
+    "Napnij pośladki i brzuch",
+    "Lekko podwiń miednicę, żebra w dół",
+    "Odpychaj podłogę przedramionami",
+    "Oddychaj spokojnie"
+   ],
+   "r": "Izometria – pozycja neutralna przez cały czas serii.",
+   "e": [
+    "Opadające biodra",
+    "Biodra za wysoko",
+    "Wstrzymywanie oddechu"
+   ],
+   "m": "Bez ruchu – utrzymujesz prostą linię ciała.",
+   "vid": [
+    [
+     "mwlp75MS6Rg",
+     "NASM",
+     "How to do a Plank | Proper Form & Technique"
+    ]
+   ]
+  },
+  "Side plank": {
+   "en": "Side Plank",
+   "p": "core: anty-zgięcie boczne (izometria)",
+   "v": "iso-side",
+   "ft": "trzymaj biodra w linii",
+   "s": "Leżenie bokiem, łokieć pod barkiem, stopy jedna na drugiej lub jedna przed drugą.",
+   "c": [
+    "Unieś biodra do linii prostej",
+    "Bark daleko od ucha",
+    "Biodra lekko do przodu, nie do tyłu",
+    "Oddychaj spokojnie"
+   ],
+   "r": "Izometria na każdą stronę.",
+   "e": [
+    "Opadające biodro",
+    "Rotacja tułowia do podłogi",
+    "'Wiszenie' na barku"
+   ],
+   "m": "Bez ruchu – ciało w jednej linii, bokiem do podłogi.",
+   "vid": [
+    [
+     "44ND4bOB-T0",
+     "NASM",
+     "How to do a Side Plank | Proper Form & Technique"
+    ]
+   ]
+  },
+  "Suwnica (leg press)": {
+   "en": "Leg Press",
+   "p": "knee-dominant",
+   "v": "lpress",
+   "ft": "kolana zgięte → prawie wyprost",
+   "s": "Plecy i pośladki na oparciu, stopy na szerokość bioder na środku platformy, palce lekko na zewnątrz.",
+   "c": [
+    "Kolana podążają za palcami",
+    "Schodź tylko do zgięcia z planu",
+    "Cała stopa na platformie",
+    "Nie blokuj kolan na górze"
+   ],
+   "r": "Tylko w bezbólowym zakresie (🦵 zielone).",
+   "e": [
+    "Zejście głębiej niż przewiduje plan",
+    "Odrywanie pośladków / podwijanie miednicy",
+    "Kolana uciekają do środka"
+   ],
+   "m": "Platforma jedzie skosem od zgiętych kolan do prawie pełnego wyprostu.",
+   "vid": [
+    [
+     "cDGOn-yfKJA",
+     "NASM",
+     "How to do a Leg Press | Proper Form & Technique"
+    ]
+   ]
+  },
+  "Martwy ciąg rumuński": {
+   "en": "Romanian Deadlift (RDL)",
+   "p": "hinge",
+   "v": "hinge",
+   "ft": "biodra w tył → wyprost bioder",
+   "s": "Stanie, sztanga nachwytem przy udach, stopy na szerokość bioder, kolana lekko ugięte (prawie proste).",
+   "c": [
+    "Biodra w tył – 'zamykaj drzwi pośladkami'",
+    "Sztanga ślizga się blisko ud",
+    "Plecy neutralne, łopatki ściągnięte",
+    "Schodź do mocnego rozciągnięcia tyłu uda",
+    "Wracaj, wypychając biodra do przodu"
+   ],
+   "r": "Zwykle do okolic kolan / połowy piszczeli – do granicy neutralnych pleców.",
+   "e": [
+    "Zaokrąglanie pleców",
+    "Zginanie kolan jak w przysiadzie",
+    "Sztanga odjeżdża od nóg"
+   ],
+   "m": "Tułów pochyla się z bioder w dół i wraca; kolana prawie nieruchome.",
+   "vid": [
+    [
+     "uhghy9pFIPY",
+     "E3 Rehab",
+     "How To Perform PERFECT Romanian Deadlifts | RDLs"
+    ]
+   ]
+  },
+  "Prostowanie nóg": {
+   "en": "Leg Extension (partial ROM)",
+   "p": "wyprost kolana (izolacja)",
+   "v": "kext",
+   "ft": "kolano 90° → ~45°",
+   "s": "Oparcie ustawione tak, by kolano było na osi maszyny, wałek tuż nad kostką.",
+   "c": [
+    "Pracuj w zakresie z planu – bez pełnego wyprostu",
+    "Kontroluj opuszczanie 2–3 s",
+    "Trzymaj uchwyty, pośladki na siedzisku",
+    "Ruch płynny, bez szarpania"
+   ],
+   "r": "Zatrzymuj ruch przed wyprostem – tam obciążenie rzepki jest największe.",
+   "e": [
+    "Dociąganie do pełnego wyprostu",
+    "Wymachy i odbijanie",
+    "Oś kolana poza osią maszyny"
+   ],
+   "m": "Podudzie podnosi się łukiem tylko do połowy drogi do wyprostu.",
+   "vid": [
+    [
+     "PQRY75OY2TY",
+     "E3 Rehab",
+     "Leg Extensions Are SAFE For Your Knees"
+    ]
+   ]
+  },
+  "Spanish squat / wall-sit": {
+   "en": "Spanish Squat / Wall Sit",
+   "p": "knee-dominant (izometria)",
+   "v": "iso-knee",
+   "ft": "zejdź do ~60° i trzymaj",
+   "s": "Spanish squat: taśma za kolanami przypięta do stałego punktu przed tobą, piszczele pionowo. Wall-sit: plecy oparte o ścianę.",
+   "c": [
+    "Zejdź do kąta z planu",
+    "Piszczele pionowo, ciężar na piętach",
+    "Tułów pionowo, 'siedź w taśmę'",
+    "Trzymaj pozycję i spokojnie oddychaj"
+   ],
+   "r": "Ból >3/10 → zmniejsz głębokość.",
+   "e": [
+    "Za głęboki przysiad",
+    "Za luźna taśma – kolana wychodzą przed palce",
+    "Wstrzymywanie oddechu"
+   ],
+   "m": "Izometria – schodzisz do zadanego kąta i utrzymujesz pozycję.",
+   "vid": [
+    [
+     "s_OM7BUJnvI",
+     "Dr. Ian Nay (MEND)",
+     "Spanish Squat for Knee Pain"
+    ]
+   ]
+  },
+  "Łydki stojąc": {
+   "en": "Standing Calf Raise",
+   "p": "zgięcie podeszwowe",
+   "v": "plantar",
+   "ft": "pięty nisko → na palcach",
+   "s": "Barki pod poduszkami, przednia część stóp na krawędzi stopnia, kolana proste (nie zablokowane).",
+   "c": [
+    "Pełne opuszczenie pięt w rozciągnięcie",
+    "Pauza ~1 s w dole",
+    "Maksymalnie w górę na palce",
+    "Bez sprężynowania"
+   ],
+   "r": "Pełny: pięty poniżej stopnia → pełne wspięcie.",
+   "e": [
+    "Sprężynowanie w dole",
+    "Zginanie kolan",
+    "Skrócony zakres"
+   ],
+   "m": "Pięty opadają poniżej stopnia i unoszą się do pełnego wspięcia.",
+   "vid": [
+    [
+     "SVtg-1loH4c",
+     "Colossus Fitness",
+     "How to PROPERLY Standing Calf Raise | Tips & Common Mistakes"
+    ]
+   ]
+  },
+  "Hip thrust": {
+   "en": "Barbell Hip Thrust",
+   "p": "hip-dominant (wyprost biodra)",
+   "v": "hipup",
+   "ft": "biodra nisko → linia barki–kolana",
+   "s": "Dolna część łopatek na ławce, sztanga z podkładką na biodrach, stopy na szerokość bioder.",
+   "c": [
+    "Broda lekko do klatki, wzrok do przodu",
+    "Wypychaj biodra przez pięty",
+    "W górze mocno spięte pośladki, żebra w dół",
+    "W górze piszczele ~pionowo"
+   ],
+   "r": "Pełny: biodra nisko → linia barki–biodra–kolana.",
+   "e": [
+    "Przeprost lędźwi zamiast wyprostu bioder",
+    "Stopy za blisko lub za daleko",
+    "Odbijanie od podłogi"
+   ],
+   "m": "Biodra unoszą się pionowo z dołu do linii tułowia.",
+   "vid": [
+    [
+     "LM8XHLYJoYs",
+     "Bret Contreras",
+     "Proper Hip Thrust Form"
+    ]
+   ]
+  },
+  "Uginanie nóg": {
+   "en": "Machine Leg Curl",
+   "p": "zgięcie kolana (izolacja)",
+   "v": "kflex",
+   "ft": "nogi proste → pełne zgięcie",
+   "s": "Maszyna siedząc lub leżąc: kolano na osi obrotu, wałek nad piętą/ścięgnem Achillesa.",
+   "c": [
+    "Biodra dociśnięte do siedziska/ławki",
+    "Uginaj do pełnego zgięcia",
+    "Powolny powrót do prawie pełnego wyprostu",
+    "Stopy lekko zadarte"
+   ],
+   "r": "Pełny: prawie wyprost → pełne zgięcie.",
+   "e": [
+    "Unoszenie bioder",
+    "Zbyt szybkie opuszczanie",
+    "Kolano poza osią maszyny"
+   ],
+   "m": "Podudzie zatacza łuk od wyprostu pod siedzisko.",
+   "vid": [
+    [
+     "G5iP_YcDQdE",
+     "NASM",
+     "How to do a Seated Leg Curl | Proper Form & Technique"
+    ]
+   ]
+  },
+  "Step-up / bułgarski": {
+   "en": "Step-Up / Bulgarian Split Squat",
+   "p": "knee-dominant, jednonóż",
+   "v": "step",
+   "ft": "stopa na stopniu → wejście",
+   "s": "Step-up: cała stopa na niskim stopniu. Bułgarski: tylna stopa na ławce, przednia ok. kroku przed nią.",
+   "c": [
+    "Pracuje noga przednia – wypychaj piętą",
+    "Kolano w linii ze stopą, nie do środka",
+    "Tułów lekko pochylony",
+    "Kontrolowane zejście"
+   ],
+   "r": "Wyższy stopień = większe zgięcie kolana – podnoś stopniowo.",
+   "e": [
+    "Odbijanie się tylną nogą",
+    "Kolano zapada się do środka",
+    "Za wysoki stopień zbyt wcześnie"
+   ],
+   "m": "Ciało przenosi się w górę na stopień i kontrolowanie wraca.",
+   "vid": [
+    [
+     "otjVTHFMbcM",
+     "Tim Keeley | Physio REHAB",
+     "How to Correct Your Box Step Ups"
+    ],
+    [
+     "kZapDhWEhNQ",
+     "The MSK Physio",
+     "Modified bulgarian split squat exercise"
+    ]
+   ]
+  },
+  "Suwnica (stopy wyżej)": {
+   "en": "Leg Press, High Foot Placement",
+   "p": "knee + hip (akcent biodro)",
+   "v": "lpress",
+   "ft": "kolana zgięte → prawie wyprost",
+   "s": "Jak na zwykłej suwnicy, ale stopy wyżej na platformie i nieco szerzej.",
+   "c": [
+    "Pięty mocno na platformie",
+    "Schodź tylko do zgięcia z planu",
+    "Pośladki i lędźwie przy oparciu",
+    "Wypychaj piętami"
+   ],
+   "r": "Tylko w bezbólowym zakresie (🦵).",
+   "e": [
+    "Odrywanie pięt",
+    "Podwijanie miednicy w dole",
+    "Zejście głębiej niż plan"
+   ],
+   "m": "Platforma jedzie skosem; wyżej ustawione stopy = więcej pracy bioder.",
+   "vid": [
+    [
+     "vWAGshgQJ2c",
+     "",
+     "Technique on Leg Press to Work Glutes And Hamstrings"
+    ]
+   ]
+  },
+  "Odwodzenie biodra": {
+   "en": "Seated Hip Abduction",
+   "p": "odwodzenie biodra",
+   "v": "abd",
+   "ft": "kolana razem → na zewnątrz",
+   "s": "Maszyna: plecy przy oparciu, poduszki po zewnętrznej stronie kolan (alternatywnie guma nad kolanami).",
+   "c": [
+    "Rozsuwaj kolana na zewnątrz, pauza 1 s",
+    "Powrót pod kontrolą, bez stukania ciężarów",
+    "Tułów stabilny",
+    "Czuj boczną część pośladka"
+   ],
+   "r": "Pełny: kolana razem → maksymalne odwiedzenie.",
+   "e": [
+    "Szarpanie ciężarem",
+    "Bujanie tułowiem",
+    "Skrócony zakres"
+   ],
+   "m": "Kolana rozchodzą się na boki i wracają do środka.",
+   "vid": [
+    [
+     "5O_Y9l__iao",
+     "",
+     "Seated Hip Abduction Machine: How To"
+    ]
+   ]
+  },
+  "Łydki siedząc": {
+   "en": "Seated Calf Raise",
+   "p": "zgięcie podeszwowe",
+   "v": "plantar",
+   "ft": "pięty nisko → na palcach",
+   "s": "Siad, kolana ~90° pod poduszką, przednia część stóp na podeście.",
+   "c": [
+    "Pełne opuszczenie pięt",
+    "Pauza w rozciągnięciu",
+    "Maksymalnie w górę na palce",
+    "Tempo kontrolowane"
+   ],
+   "r": "Pełny: pięty nisko → pełne wspięcie.",
+   "e": [
+    "Sprężynowanie",
+    "Skrócony zakres",
+    "Za ciężko – brak pełnego ruchu"
+   ],
+   "m": "Pięty opadają i unoszą się, kolana nieruchome (akcent na mięsień płaszczkowaty).",
+   "vid": [
+    [
+     "6O5hh1rBtx8",
+     "Colossus Fitness",
+     "How to PROPERLY Calf Raise (SEATED CALF RAISE TIPS)"
+    ]
+   ]
+  }
+ },
+ "viz": {
+  "push-h": {
+   "ref": "<circle cx=\"12\" cy=\"10\" r=\"4\" class=\"vr\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"42\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      19,
+      25
+     ],
+     [
+      58,
+      25
+     ]
+    ]
+   ]
+  },
+  "pull-h": {
+   "ref": "<circle cx=\"12\" cy=\"10\" r=\"4\" class=\"vr\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"42\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      58,
+      25
+     ],
+     [
+      19,
+      25
+     ]
+    ]
+   ]
+  },
+  "push-v": {
+   "ref": "<circle cx=\"12\" cy=\"10\" r=\"4\" class=\"vr\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"42\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      26,
+      27
+     ],
+     [
+      26,
+      3
+     ]
+    ]
+   ]
+  },
+  "pull-v": {
+   "ref": "<circle cx=\"12\" cy=\"10\" r=\"4\" class=\"vr\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"42\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      26,
+      3
+     ],
+     [
+      26,
+      27
+     ]
+    ]
+   ]
+  },
+  "push-d": {
+   "ref": "<polyline points=\"4,41 10,41 18,14\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      22,
+      32
+     ],
+     [
+      56,
+      7
+     ]
+    ]
+   ]
+  },
+  "row-bent": {
+   "ref": "<line x1=\"10\" y1=\"22\" x2=\"42\" y2=\"14\" class=\"vr b\"/><circle cx=\"48\" cy=\"12\" r=\"4\" class=\"vr\"/><line x1=\"10\" y1=\"22\" x2=\"12\" y2=\"42\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      36,
+      40
+     ],
+     [
+      34,
+      20
+     ]
+    ]
+   ]
+  },
+  "chin": {
+   "ref": "<line x1=\"6\" y1=\"4\" x2=\"58\" y2=\"4\" class=\"vr b\"/><line x1=\"22\" y1=\"4\" x2=\"26\" y2=\"12\" class=\"vr d\"/><line x1=\"42\" y1=\"4\" x2=\"38\" y2=\"12\" class=\"vr d\"/>",
+   "mv": [
+    [
+     [
+      32,
+      41
+     ],
+     [
+      32,
+      12
+     ]
+    ]
+   ]
+  },
+  "fly": {
+   "ref": "<ellipse cx=\"32\" cy=\"37\" rx=\"12\" ry=\"5\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      6,
+      32
+     ],
+     [
+      6.1090718830587925,
+      29.62095791475154
+     ],
+     [
+      6.43537240333718,
+      27.26187633720418
+     ],
+     [
+      6.976163852205168,
+      24.942548303508076
+     ],
+     [
+      7.726908911072755,
+      22.682433311822187
+     ],
+     [
+      8.681308720150106,
+      20.50049405430596
+     ],
+     [
+      9.8313557267936,
+      18.415037317385334
+     ],
+     [
+      11.167400870032424,
+      16.44356038516287
+     ],
+     [
+      12.678234537587748,
+      14.602604234669684
+     ],
+     [
+      14.351180616143516,
+      12.907614754672174
+     ],
+     [
+      16.172202845773256,
+      11.372813152427891
+     ],
+     [
+      18.126022586194104,
+      10.011076635696693
+     ],
+     [
+      20.19624700677178,
+      8.833830371102437
+     ],
+     [
+      22.365506624744267,
+      7.850951625329966
+     ],
+     [
+      24.615601037698013,
+      7.070686893426981
+     ],
+     [
+      26.927651627580655,
+      6.499582709516012
+     ],
+     [
+      29.282259955041013,
+      6.1424307204248905
+     ]
+    ],
+    [
+     [
+      58,
+      31.999999999999993
+     ],
+     [
+      57.89092811694121,
+      29.620957914751543
+     ],
+     [
+      57.56462759666282,
+      27.261876337204157
+     ],
+     [
+      57.023836147794825,
+      24.94254830350807
+     ],
+     [
+      56.27309108892724,
+      22.68243331182218
+     ],
+     [
+      55.318691279849894,
+      20.500494054305964
+     ],
+     [
+      54.1686442732064,
+      18.415037317385334
+     ],
+     [
+      52.832599129967576,
+      16.443560385162858
+     ],
+     [
+      51.32176546241225,
+      14.602604234669688
+     ],
+     [
+      49.64881938385648,
+      12.90761475467217
+     ],
+     [
+      47.82779715422674,
+      11.372813152427884
+     ],
+     [
+      45.8739774138059,
+      10.0110766356967
+     ],
+     [
+      43.803752993228215,
+      8.833830371102433
+     ],
+     [
+      41.634493375255744,
+      7.850951625329973
+     ],
+     [
+      39.38439896230198,
+      7.070686893426977
+     ],
+     [
+      37.072348372419334,
+      6.499582709516009
+     ],
+     [
+      34.71774004495898,
+      6.1424307204248905
+     ]
+    ]
+   ]
+  },
+  "rfly": {
+   "ref": "<ellipse cx=\"32\" cy=\"37\" rx=\"12\" ry=\"5\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      29.282259955041013,
+      6.1424307204248905
+     ],
+     [
+      27.038966120209817,
+      6.477693230360739
+     ],
+     [
+      24.83342874875803,
+      7.007195905603709
+     ],
+     [
+      22.68243331182218,
+      7.7269089110727585
+     ],
+     [
+      20.602350183483978,
+      8.631354796221665
+     ],
+     [
+      18.609010052338583,
+      9.713650181745084
+     ],
+     [
+      16.717583440395696,
+      10.965558146251368
+     ],
+     [
+      14.942465246246798,
+      12.377550914207937
+     ],
+     [
+      13.29716519119507,
+      13.938882368066068
+     ],
+     [
+      11.794205002118758,
+      15.637669832704223
+     ],
+     [
+      10.445023113568912,
+      17.460984509760586
+     ],
+     [
+      9.259887614375707,
+      19.394949873595237
+     ],
+     [
+      8.24781810129237,
+      21.424847280029205
+     ],
+     [
+      7.416517034417765,
+      23.535227984113924
+     ],
+     [
+      6.772311116824088,
+      25.710030714408646
+     ],
+     [
+      6.320103144526417,
+      27.932703908954
+     ],
+     [
+      6.063334693244567,
+      30.186331682652753
+     ]
+    ],
+    [
+     [
+      34.71774004495898,
+      6.1424307204248905
+     ],
+     [
+      36.96103387979015,
+      6.477693230360735
+     ],
+     [
+      39.16657125124198,
+      7.007195905603712
+     ],
+     [
+      41.31756668817779,
+      7.726908911072748
+     ],
+     [
+      43.39764981651601,
+      8.631354796221657
+     ],
+     [
+      45.39098994766141,
+      9.71365018174508
+     ],
+     [
+      47.2824165596043,
+      10.965558146251364
+     ],
+     [
+      49.05753475375319,
+      12.377550914207923
+     ],
+     [
+      50.70283480880492,
+      13.938882368066064
+     ],
+     [
+      52.205794997881235,
+      15.637669832704216
+     ],
+     [
+      53.55497688643108,
+      17.46098450976057
+     ],
+     [
+      54.74011238562429,
+      19.39494987359524
+     ],
+     [
+      55.752181898707626,
+      21.424847280029198
+     ],
+     [
+      56.58348296558223,
+      23.535227984113902
+     ],
+     [
+      57.22768888317591,
+      25.710030714408635
+     ],
+     [
+      57.67989685547358,
+      27.93270390895399
+     ],
+     [
+      57.93666530675543,
+      30.186331682652757
+     ]
+    ]
+   ]
+  },
+  "raise": {
+   "ref": "<circle cx=\"32\" cy=\"9\" r=\"4\" class=\"vr\"/><line x1=\"32\" y1=\"14\" x2=\"32\" y2=\"42\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      24.179740091327535,
+      37.66577056626858
+     ],
+     [
+      22.305981007744542,
+      37.2503681783595
+     ],
+     [
+      20.47555684683529,
+      36.67323765728999
+     ],
+     [
+      18.702398241704614,
+      35.9387713148063
+     ],
+     [
+      17.000000000000007,
+      35.05255888325765
+     ],
+     [
+      15.381318400276992,
+      34.021344974357824
+     ],
+     [
+      13.858672586896134,
+      32.85297774861752
+     ],
+     [
+      12.443650813895957,
+      31.556349186104047
+     ],
+     [
+      11.147022251382488,
+      30.141327413103866
+     ],
+     [
+      9.978655025642187,
+      28.61868159972302
+     ],
+     [
+      8.947441116742347,
+      27
+     ],
+     [
+      8.0612286851937,
+      25.29760175829539
+     ],
+     [
+      7.3267623427100155,
+      23.524443153164714
+     ],
+     [
+      6.749631821640499,
+      21.69401899225546
+     ],
+     [
+      6.334229433731423,
+      19.820259908672465
+     ],
+     [
+      6.083716641981599,
+      17.91742634044849
+     ],
+     [
+      6,
+      16.000000000000004
+     ]
+    ],
+    [
+     [
+      39.82025990867247,
+      37.66577056626858
+     ],
+     [
+      41.69401899225546,
+      37.2503681783595
+     ],
+     [
+      43.52444315316471,
+      36.67323765728999
+     ],
+     [
+      45.297601758295386,
+      35.9387713148063
+     ],
+     [
+      47,
+      35.052558883257646
+     ],
+     [
+      48.61868159972301,
+      34.02134497435782
+     ],
+     [
+      50.141327413103866,
+      32.85297774861752
+     ],
+     [
+      51.55634918610404,
+      31.556349186104043
+     ],
+     [
+      52.85297774861752,
+      30.141327413103863
+     ],
+     [
+      54.02134497435782,
+      28.61868159972301
+     ],
+     [
+      55.05255888325765,
+      27
+     ],
+     [
+      55.9387713148063,
+      25.297601758295386
+     ],
+     [
+      56.67323765728999,
+      23.52444315316471
+     ],
+     [
+      57.2503681783595,
+      21.694018992255458
+     ],
+     [
+      57.66577056626858,
+      19.82025990867247
+     ],
+     [
+      57.916283358018404,
+      17.91742634044848
+     ],
+     [
+      58,
+      16
+     ]
+    ]
+   ]
+  },
+  "curl": {
+   "ref": "<line x1=\"22\" y1=\"3\" x2=\"22\" y2=\"26\" class=\"vr b\"/><circle cx=\"22\" cy=\"26\" r=\"2.2\" class=\"vr f\"/>",
+   "mv": [
+    [
+     [
+      22,
+      42
+     ],
+     [
+      24.261331165177083,
+      41.839393339436924
+     ],
+     [
+      26.477264224495872,
+      41.36079767017486
+     ],
+     [
+      28.603312476870315,
+      40.57382119873881
+     ],
+     [
+      30.596793733549184,
+      39.49426313300617
+     ],
+     [
+      32.41768719859118,
+      38.14379649995459
+     ],
+     [
+      34.02943691966364,
+      36.5495330416011
+     ],
+     [
+      35.39968567922092,
+      34.743478924208695
+     ],
+     [
+      36.5009245925864,
+      32.76189218785119
+     ],
+     [
+      37.31104537171534,
+      30.644554836071396
+     ],
+     [
+      37.81378416748417,
+      28.433974179038668
+     ],
+     [
+      37.999048080002396,
+      26.174529463906918
+     ],
+     [
+      37.86311778198097,
+      23.911580924479175
+     ],
+     [
+      37.4087221873242,
+      21.690559136748384
+     ],
+     [
+      36.644983665911155,
+      19.556052962260203
+     ],
+     [
+      35.58723490442526,
+      17.550914389594112
+     ],
+     [
+      34.256711089903646,
+      15.715398245015372
+     ]
+    ]
+   ]
+  },
+  "ext": {
+   "ref": "<line x1=\"22\" y1=\"3\" x2=\"22\" y2=\"22\" class=\"vr b\"/><circle cx=\"22\" cy=\"22\" r=\"2.2\" class=\"vr f\"/>",
+   "mv": [
+    [
+     [
+      40.352590699492296,
+      17.082438143052105
+     ],
+     [
+      40.78822675843301,
+      19.171124733449414
+     ],
+     [
+      40.986933886503564,
+      21.29548485499399
+     ],
+     [
+      40.94620628749361,
+      23.428729264674658
+     ],
+     [
+      40.66655755678468,
+      25.543956684165956
+     ],
+     [
+      40.15151420465571,
+      27.61449303839466
+     ],
+     [
+      39.407571185225585,
+      29.614227828959677
+     ],
+     [
+      38.444109991835234,
+      31.517943400568463
+     ],
+     [
+      37.27328035172713,
+      33.30163294827548
+     ],
+     [
+      35.909847011911666,
+      34.942803255292574
+     ],
+     [
+      34.37100354832703,
+      36.42075834369608
+     ],
+     [
+      32.676155546252325,
+      37.716860461053464
+     ],
+     [
+      30.846675886177117,
+      38.8147651117978
+     ],
+     [
+      28.905635221095086,
+      39.70062716948671
+     ],
+     [
+      26.877511044037707,
+      40.36327547076747
+     ],
+     [
+      24.787879014651875,
+      40.79435368933084
+     ],
+     [
+      22.66309043734752,
+      40.988425713362815
+     ]
+    ]
+   ]
+  },
+  "skull": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><line x1=\"40\" y1=\"38\" x2=\"40\" y2=\"22\" class=\"vr b\"/><circle cx=\"40\" cy=\"22\" r=\"2.2\" class=\"vr f\"/><circle cx=\"17\" cy=\"36\" r=\"3.5\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      23.57926095308584,
+      26.39992376674286
+     ],
+     [
+      23.189481321402038,
+      24.531098922703155
+     ],
+     [
+      23.011690733128393,
+      22.630355656058008
+     ],
+     [
+      23.04813121645309,
+      20.721663289501624
+     ],
+     [
+      23.298343238666334,
+      18.82909138785151
+     ],
+     [
+      23.759171501097526,
+      16.976506228804777
+     ],
+     [
+      24.424804729008684,
+      15.18726983724661
+     ],
+     [
+      25.286848954673744,
+      13.483945378438738
+     ],
+     [
+      26.33443336950731,
+      11.888012625227194
+     ],
+     [
+      27.554347410394822,
+      10.419597087369803
+     ],
+     [
+      28.931207351496866,
+      9.097216218798248
+     ],
+     [
+      30.4476503007216,
+      7.937545903267955
+     ],
+     [
+      32.0845531544731,
+      6.9552101631282905
+     ],
+     [
+      33.8212737495465,
+      6.162596743090841
+     ],
+     [
+      35.635911171124164,
+      5.569700894576474
+     ],
+     [
+      37.505581934258856,
+      5.1839993305987235
+     ],
+     [
+      39.406708556057474,
+      5.010355940675375
+     ]
+    ]
+   ]
+  },
+  "rcrunch": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><line x1=\"4\" y1=\"37\" x2=\"30\" y2=\"37\" class=\"vr b\"/><circle cx=\"6\" cy=\"33\" r=\"3\" class=\"vr\"/>",
+   "mv": [
+    [
+     [
+      47.72653955421974,
+      30.874332801995255
+     ],
+     [
+      47.33481246073973,
+      29.151879028841932
+     ],
+     [
+      46.77614164709037,
+      27.47611531089337
+     ],
+     [
+      46.05590741860766,
+      25.863180168819046
+     ],
+     [
+      45.18104602463194,
+      24.32860704975717
+     ],
+     [
+      44.159982858635104,
+      22.887174731727313
+     ],
+     [
+      43.0025513170756,
+      21.552764995919155
+     ],
+     [
+      41.71989809841509,
+      20.338228937551087
+     ],
+     [
+      40.32437585431883,
+      19.255263202798147
+     ],
+     [
+      38.829424226867545,
+      18.314297343695294
+     ],
+     [
+      37.24944041745727,
+      17.524393375849954
+     ],
+     [
+      35.59964053387964,
+      16.8931585062779
+     ],
+     [
+      33.89591305088585,
+      16.4266718718412
+     ],
+     [
+      32.15466579548932,
+      16.12942599383701
+     ],
+     [
+      30.3926679306221,
+      16.004283512561635
+     ],
+     [
+      28.62688845892886,
+      16.0524496185196
+     ],
+     [
+      26.874332801995255,
+      16.273460445780255
+     ]
+    ]
+   ]
+  },
+  "crunch": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><polyline points=\"40,37 50,25 58,38\" class=\"vr b\"/>",
+   "mv": [
+    [
+     [
+      16.014620151541703,
+      36.162412079139976
+     ],
+     [
+      16.062172207903554,
+      35.27361632423874
+     ],
+     [
+      16.14264788266433,
+      34.38719500355285
+     ],
+     [
+      16.25593649116086,
+      33.50436728356461
+     ],
+     [
+      16.40188221846509,
+      32.62634738818847
+     ],
+     [
+      16.58028433368889,
+      31.75434292875125
+     ],
+     [
+      16.790897466065363,
+      30.88955324306734
+     ],
+     [
+      17.033431942426986,
+      30.03316774589291
+     ],
+     [
+      17.307554185616397,
+      29.186364293028237
+     ],
+     [
+      17.612887173281862,
+      28.350307561318022
+     ],
+     [
+      17.949010956426434,
+      27.526147446777596
+     ],
+     [
+      18.31546323699755,
+      26.715017483048634
+     ],
+     [
+      18.711740003722674,
+      25.91803328235919
+     ],
+     [
+      19.137296225316554,
+      25.136291001132527
+     ],
+     [
+      19.59154660010649,
+      24.37086583235513
+     ],
+     [
+      20.073866361044825,
+      23.622810526777346
+     ],
+     [
+      20.58359213500126,
+      22.893153944980646
+     ]
+    ]
+   ]
+  },
+  "iso": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><line x1=\"12\" y1=\"26\" x2=\"58\" y2=\"37\" class=\"vr b\"/><polyline points=\"15,27 15,39 25,39\" class=\"vr\"/><circle cx=\"8\" cy=\"24\" r=\"3.5\" class=\"vr\"/>",
+   "hold": 1
+  },
+  "iso-side": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><line x1=\"13\" y1=\"17\" x2=\"58\" y2=\"39\" class=\"vr b\"/><line x1=\"14\" y1=\"18\" x2=\"14\" y2=\"39\" class=\"vr\"/><circle cx=\"9\" cy=\"12\" r=\"3.5\" class=\"vr\"/>",
+   "hold": 1
+  },
+  "iso-knee": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><circle cx=\"21\" cy=\"6\" r=\"3.5\" class=\"vr\"/><line x1=\"21\" y1=\"11\" x2=\"22\" y2=\"24\" class=\"vr b\"/><line x1=\"22\" y1=\"24\" x2=\"40\" y2=\"28\" class=\"vr b\"/><line x1=\"40\" y1=\"28\" x2=\"40\" y2=\"40\" class=\"vr b\"/><line x1=\"40\" y1=\"27\" x2=\"62\" y2=\"27\" class=\"vr d\"/>",
+   "hold": 1
+  },
+  "lpress": {
+   "ref": "<polyline points=\"4,41 11,41 18,15\" class=\"vr\"/><line x1=\"45\" y1=\"1\" x2=\"61\" y2=\"19\" class=\"vr b\"/>",
+   "mv": [
+    [
+     [
+      22,
+      32
+     ],
+     [
+      51,
+      11
+     ]
+    ]
+   ]
+  },
+  "hinge": {
+   "ref": "<line x1=\"22\" y1=\"32\" x2=\"24\" y2=\"43\" class=\"vr b\"/><circle cx=\"22\" cy=\"32\" r=\"2.2\" class=\"vr f\"/>",
+   "mv": [
+    [
+     [
+      45.47554241761134,
+      27.010119420373776
+     ],
+     [
+      44.98171265931555,
+      25.083289564781857
+     ],
+     [
+      44.33002163156859,
+      23.203970558616867
+     ],
+     [
+      43.52494579678452,
+      21.38507143474397
+     ],
+     [
+      42.572015216850694,
+      19.6390862021587
+     ],
+     [
+      41.47777556716029,
+      17.978008024701573
+     ],
+     [
+      40.24974317440074,
+      16.413246840075594
+     ],
+     [
+      38.89635338694324,
+      14.955550985041153
+     ],
+     [
+      37.426902632476946,
+      13.614933365144527
+     ],
+     [
+      35.85148456089361,
+      12.400602676119707
+     ],
+     [
+      34.1809207110569,
+      11.320900149403382
+     ],
+     [
+      32.42668617770601,
+      10.38324225625789
+     ],
+     [
+      30.600830789087208,
+      9.594069764067157
+     ],
+     [
+      28.71589633674381,
+      8.958803494737712
+     ],
+     [
+      26.78483042601274,
+      8.48180708910009
+     ],
+     [
+      24.820897538988106,
+      8.16635703308177
+     ],
+     [
+      22.837587920860027,
+      8.014620151541703
+     ]
+    ]
+   ]
+  },
+  "kext": {
+   "ref": "<line x1=\"2\" y1=\"14\" x2=\"20\" y2=\"14\" class=\"vr b\"/><circle cx=\"20\" cy=\"14\" r=\"2.2\" class=\"vr f\"/><line x1=\"20\" y1=\"14\" x2=\"47\" y2=\"14\" class=\"vr d\"/>",
+   "mv": [
+    [
+     [
+      20,
+      40
+     ],
+     [
+      21.275759532512872,
+      39.96868186133448
+     ],
+     [
+      22.548445648568574,
+      39.874802893477124
+     ],
+     [
+      23.814992335839406,
+      39.71858925908431
+     ],
+     [
+      25.072348372419338,
+      39.500417290483995
+     ],
+     [
+      26.317484677484863,
+      39.22081258305815
+     ],
+     [
+      27.54740160861602,
+      38.88044872903743
+     ],
+     [
+      28.759136188197722,
+      38.48014569475854
+     ],
+     [
+      29.949769241492334,
+      38.02086784529345
+     ],
+     [
+      31.116432429187338,
+      37.50372162120952
+     ],
+     [
+      32.25631515747594,
+      36.92995287305723
+     ],
+     [
+      33.36667134902377,
+      36.300943860007074
+     ],
+     [
+      34.44482605850966,
+      35.618209919866175
+     ],
+     [
+      35.48818191680327,
+      34.883395818496766
+     ],
+     [
+      36.49422538825479,
+      34.09827178743116
+     ],
+     [
+      37.46053282602248,
+      33.26472925922893
+     ],
+     [
+      38.38477631085024,
+      32.384776310850235
+     ]
+    ]
+   ]
+  },
+  "kflex": {
+   "ref": "<line x1=\"2\" y1=\"14\" x2=\"20\" y2=\"14\" class=\"vr b\"/><circle cx=\"20\" cy=\"14\" r=\"2.2\" class=\"vr f\"/>",
+   "mv": [
+    [
+     [
+      44.75670171853926,
+      17.479327524001636
+     ],
+     [
+      44.2036910094527,
+      20.259500101361034
+     ],
+     [
+      43.339510662430044,
+      22.95919873863251
+     ],
+     [
+      42.17527082945554,
+      25.54371533087585
+     ],
+     [
+      40.72593931387604,
+      27.979822586768673
+     ],
+     [
+      39.01014914000078,
+      30.23620120825459
+     ],
+     [
+      37.04995900156246,
+      32.28384254047926
+     ],
+     [
+      34.87056966878353,
+      34.096421515430436
+     ],
+     [
+      32.5,
+      35.65063509461096
+     ],
+     [
+      29.968726723131155,
+      36.926501859628104
+     ],
+     [
+      27.30929261806842,
+      37.907618899075885
+     ],
+     [
+      24.555888137303686,
+      38.58137268909887
+     ],
+     [
+      21.743911843603136,
+      38.939101256495604
+     ],
+     [
+      18.909515315866603,
+      38.97620553954644
+     ],
+     [
+      16.089138373994224,
+      38.692208514878445
+     ],
+     [
+      13.319040598043578,
+      38.09076133021557
+     ],
+     [
+      10.634835164602197,
+      37.17959636416968
+     ]
+    ]
+   ]
+  },
+  "plantar": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><line x1=\"18\" y1=\"38\" x2=\"46\" y2=\"38\" class=\"vr b\"/><circle cx=\"46\" cy=\"38\" r=\"2.2\" class=\"vr f\"/>",
+   "mv": [
+    [
+     [
+      21,
+      35
+     ],
+     [
+      21,
+      10
+     ]
+    ]
+   ]
+  },
+  "hipup": {
+   "ref": "<line x1=\"3\" y1=\"41\" x2=\"61\" y2=\"41\" class=\"vr\"/><rect x=\"3\" y=\"20\" width=\"10\" height=\"21\" rx=\"1.5\" class=\"vr\"/><line x1=\"47\" y1=\"41\" x2=\"50\" y2=\"27\" class=\"vr\"/><line x1=\"13\" y1=\"19\" x2=\"51\" y2=\"22\" class=\"vr d\"/>",
+   "mv": [
+    [
+     [
+      31,
+      38
+     ],
+     [
+      31,
+      21
+     ]
+    ]
+   ]
+  },
+  "step": {
+   "ref": "<line x1=\"2\" y1=\"41\" x2=\"62\" y2=\"41\" class=\"vr\"/><rect x=\"36\" y=\"27\" width=\"24\" height=\"14\" rx=\"1.5\" class=\"vr b\"/>",
+   "mv": [
+    [
+     [
+      11,
+      39
+     ],
+     [
+      13,
+      26
+     ],
+     [
+      21,
+      16
+     ],
+     [
+      33,
+      12
+     ],
+     [
+      47,
+      12
+     ]
+    ]
+   ]
+  },
+  "abd": {
+   "ref": "<rect x=\"23\" y=\"30\" width=\"18\" height=\"10\" rx=\"2\" class=\"vr\"/><circle cx=\"29\" cy=\"22\" r=\"2.2\" class=\"vr f\"/><circle cx=\"35\" cy=\"22\" r=\"2.2\" class=\"vr f\"/>",
+   "mv": [
+    [
+     [
+      26,
+      22
+     ],
+     [
+      6,
+      22
+     ]
+    ],
+    [
+     [
+      38,
+      22
+     ],
+     [
+      58,
+      22
+     ]
+    ]
+   ]
+  }
+ },
+ "fig": "<circle cx=\"12\" cy=\"10\" r=\"4\" class=\"vr\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"42\" class=\"vr\"/>",
+ "warmup": {
+  "pon": "Rozgrzewka 10 min ▾ 1 Rower stacjonarny, lekki opór (Stationary Bike, Light Resistance) 5 min 2 Krążenia ramion + band pull-apart (Arm Circles + Band Pull-Apart) 15 powt. każde ~1,5′ 3 Wyciskanie leżąc — seria rozgrzewkowa (Bench Press Warm-up Set) 50% ciężaru × 8 ~1,5′ 4 Wyciskanie leżąc — seria rozgrzewkowa (Bench Press Warm-up Set) 70% ciężaru × 3–5 ~2′ Trening",
+  "wt": "Rozgrzewka 10 min ▾ 1 Rower, siodełko wysoko, lekki–umiark. (Stationary Bike, High Saddle) 5 min 2 Odwodzenie biodra w leżeniu bokiem (Side-Lying Hip Abduction) 12 powt./stronę ~1,5′ 3 Przysiady bez obciążenia (Bodyweight Squat) w dzisiejszym tolerowanym zakresie · 10 powt. ~1,5′ 4 Suwnica — seria rozgrzewkowa (Leg Press Warm-up Set) bardzo lekki ciężar × 10 ~2′ Trening",
+  "sr": null,
+  "pt": "Rozgrzewka 10 min ▾ 1 Rower stacjonarny, lekki opór (Stationary Bike, Light Resistance) 5 min 2 Krążenia ramion + band pull-apart (Arm Circles + Band Pull-Apart) 15 powt. każde ~1,5′ 3 Wyciskanie na skosie — seria rozgrz. (Incline Bench Press Warm-up Set) 50% ciężaru × 8 ~1,5′ 4 Wyciskanie na skosie — seria rozgrz. (Incline Bench Press Warm-up Set) 70% ciężaru × 3–5 ~2′ Trening",
+  "sob": "Rozgrzewka 10 min ▾ 1 Rower, siodełko wysoko, lekki opór (Stationary Bike, High Saddle) 5 min 2 Glute bridge bez obciążenia (Bodyweight Glute Bridge) 12 powt. ~1,5′ 3 Odwodzenie biodra z taśmą (Banded Hip Abduction) 12 powt./stronę ~1,5′ 4 Hip thrust — seria rozgrzewkowa (Hip Thrust Warm-up Set) lekki ciężar × 10 ~2′ Trening"
+ },
+ "cooldown": {
+  "pon": "Schłodzenie 10 min ▾ 1 Rower, bardzo lekki opór, swobodnie (Easy Bike Cool-down) 5 min 2 Rozciąganie klatki w futrynie (Doorway Chest Stretch) 2×30″/str. 3 Rozciąganie tricepsa nad głową (Overhead Triceps Stretch) 2×20″/r. 4 Rozciąganie górnej części pleców (Upper Back Stretch) 1×30″ LOWER 1 18:05–19:35 · akcent kolanowy Przed pierwszą serią: zapisz wyjściowy ból kolana 0–10. Sprawdzaj światła (🦵 u góry) po każdym ćwiczeniu.",
+  "wt": "Schłodzenie 10 min ▾ 1 Rower, siodełko wysoko, b. lekki opór (Easy Bike Cool-down, High Saddle) 5 min 2 Rozciąganie łydki przy ścianie (Wall Calf Stretch) 2×30″/n. 3 Rozciąganie hamstringu, kolano proste (Straight-Leg Hamstring Stretch) 2×30″/n. 4 Rozciąganie czworogłowego (Quadriceps Stretch) tylko przy 🟢 zielonym — inaczej pomiń 2×20″/n. Rower + ABS 55 min rower · sauna po Rower stacjonarny (Stationary Bike) Rozgrzewka 5 min Niski opór, dochodzenie do strefy Właściwa część 45 min 65–70% HRmax (~125–135 bpm), siodełko wyżej niż intuicyjnie Schłodzenie 5 min Redukcja oporu ABS",
+  "sr": "Rozciąganie 5 min ▾ 1 Pozycja „kobra\" (Cobra Pose) 2×20″ 2 Rotacja kręgosłupa w leżeniu (Supine Spinal Twist) 2×20″/str. 3 Pozycja dziecka (Child's Pose) 1×30″ 4 Rozciąganie zginaczy biodra (Hip Flexor Stretch) 1×20″/str. 😌 Dzień wolny od treningu 2 sesje sauny po 20 min, jedna wizyta, dwie rundy z wychłodzeniem między nimi. Szczegóły protokołu: przycisk ♨️ u góry. Kolagen i witamina C — dowolna pora. Tauryna odpada. UPPER 2 18:05–19:35",
+  "pt": "Schłodzenie 10 min ▾ 1 Rower, bardzo lekki opór, swobodnie (Easy Bike Cool-down) 5 min 2 Rozciąganie klatki w futrynie (Doorway Chest Stretch) 2×30″/str. 3 Rozciąganie najszerszego grzbietu (Lat Stretch) 2×20″/str. 4 Rozciąganie tricepsa nad głową (Overhead Triceps Stretch) 1×20″/r. LOWER 2 18:05–19:35 · biodro/tylny łańcuch · sauna po Mniejsza dominacja kolanowa niż LOWER 1 — jeśli wtorek sprawił trudność, sobota zwykle nadal będzie tolerowana. Sprawdzaj światła (🦵).",
+  "sob": null
+ },
+ "sheets": [
+  "🦵 System kolana ✕ 🟢 Zielone 🟡 Żółte 🔴 Czerwone Ból w trakcie 0–3/10, stabilny 3–5/10 &gt;5/10 lub rośnie Ból po (24 h) wraca do wyjścia podwyższony, mija do wieczora trwa &gt;24 h Obrzęk brak minimalny wyraźny / nawrotowy „Luz\" / niestabilność brak rzadkie, bez uginania epizod uginania Trend tygodniowy stabilny / lepszy plateau gorszy 🟢 Progresuj normalnie — zakres i obciążenie wg planu dnia. 🟡 Zatrzymaj obciążenie i zakres. Powtórz sesję identycznie, bez progresji. 🔴 −30–50% obciążenia lub mniejszy zakres. Utrzymuje się &gt;2 sesje → fizjoterapeuta. Konsultacja natychmiast, bez czekania Obrzęk stawu · zablokowanie · rzeczywisty epizod uginania · ból nocny. Rozgrzewka LOWER: zapisz ból wyjściowy 0–10 przed 1. serią roboczą. To punkt odniesienia na dziś.",
+  "♨️ Sauna ✕ Kiedy 5×/tydz. Pon·Śr·Cz×2·Sob. Zawsze po treningu, nigdy przed Czas 20 min Stała długość, nie zakres Temperatura 80–100°C Ta, którą ma obiekt — bez znaczenia dokładna wartość Koniec −1,5 h Najpóźniej tyle przed snem 30 min przed 250–500 ml wody. Nie tuż po obfitym posiłku Prysznic przed — z mydłem, całe ciało Woda ciepła. Potem wytrzyj się do sucha Przed wejściem Zdejmij metal i biżuterię. Ręcznik do siedzenia W kabinie — 20 min Niższa ławka, jeśli za intensywnie Wyjście awaryjne Zawroty głowy / nudności / kołatanie serca → wyjdź od razu Wychłodzenie — 10–15 min Chłodne miejsce, spoczynek, 250–500 ml wody. Nie od razu pod prysznic Prysznic po — bez mydła Woda letnia do chłodnej Po prysznicu 500–750 ml wody. Balsam teraz, nie wcześniej Pon / Śr / Sob — dni treningowe Wychładzaj się chłodnym powietrzem i letnim prysznicem . Bez zimnej kąpieli / morsowania — tłumi hipertrofię w tym oknie czasowym. W czwartek (dzień wolny) kontrast jest bez problemu. Czwartek, 2 rundy: prysznic z mydłem → 20′ → wychłodzenie 10–15′ + 250–500 ml → 20′ → wychłodzenie 10–15′ → prysznic bez mydła → 500–750 ml. Razem ~70–80 min. Po każdej sesji: uzupełnij płyny i sód. Nie mierz BIA po saunie ani treningu.",
+  "✕"
+ ]
+}

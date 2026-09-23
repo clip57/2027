@@ -1,0 +1,4271 @@
+{
+ "schema": 1,
+ "generated_from": "PLAN_REKOMPOZYCJI.html + zmiany zaakceptowane 23.09.2026 (D-049, D-050)",
+ "sections": [
+  {
+   "id": "s1",
+   "num": "1",
+   "title": "Punkt startowy",
+   "private": true,
+   "blocks": []
+  },
+  {
+   "id": "s2",
+   "num": "2",
+   "title": "Strategia energetyczna",
+   "private": false,
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Rozdzielam cztery rzeczy, które łatwo pomylić:"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Wielkość",
+      "Wartość",
+      "Czym jest"
+     ],
+     "rows": [
+      [
+       "BMR / RMR",
+       "~2000–2100 kcal zakres 1950–2150",
+       "Estymacja z równań. Preferuję równania oparte na masie (Mifflin 1928, Harris-Benedict/Roza 2027), bo masa jest zmierzona wiarygodnie, a równania oparte na FFM dziedziczą błąd BIA (SEE ~3 kg)"
+      ],
+      [
+       "TDEE Faza 0",
+       "2500 / 2750 / 3000",
+       "Model. Dolny / prawdopodobny / górny"
+      ],
+      [
+       "TDEE Faza 1",
+       "2700 / 2950 / 3200",
+       "Model"
+      ],
+      [
+       "TDEE Faza 2",
+       "2850 / 3100 / 3400",
+       "Model"
+      ],
+      [
+       "Kaloryczność startowa",
+       "2587 kcal śr. tyg.",
+       "Decyzja praktyczna, nie wynik obliczeń"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Decyzja: niewielki deficyt, nie maintenance"
+    },
+    {
+     "type": "p",
+     "text": "Wybór pada na niewielki deficyt energetyczny, nie na utrzymanie masy ciała . Decydują o tym dane z 18.09.2026, najnowszego pomiaru:"
+    },
+    {
+     "type": "p",
+     "text": "Powody:"
+    },
+    {
+     "type": "list",
+     "ordered": false,
+     "items": [
+      "Kierunek zmian jest niekorzystny od trzech miesięcy , a nie epizodycznie. To trend, nie fluktuacja.",
+      "{private:1}",
+      "Przy ~20% tkanki tłuszczowej reguła Forbesa działa na Twoją korzyść: im większy zapas tłuszczu, tym większy jego udział w utracie masy i tym lepsza ochrona masy beztłuszczowej w deficycie.",
+      "Rekompozycja w deficycie działa najlepiej dokładnie u osób zdetrenowanych z nadmiarem tkanki tłuszczowej. Longland i wsp. {private:2} Deficyt nie zablokuje odpowiedzi „newbie\"."
+     ]
+    },
+    {
+     "type": "p",
+     "text": "Nie wybieram deficytu umiarkowanego ani agresywnego, bo priorytetem pozostaje jakość treningu, regeneracja i wydajność poznawcza w okresie egzaminów."
+    },
+    {
+     "type": "box",
+     "kind": "go",
+     "label": "Wdrożyć",
+     "text": "Kaloryczność startowa (Faza 0): 2629 kcal w dni treningowe i cardio, 2332 kcal w dzień nietreningowy, średnia 2587 kcal/tydz. To o 179 kcal mniej niż punkt wyjścia. W Fazie 1 i 2 rośnie zgodnie z tabelą w sekcji 3. Oczekiwane tempo: −0,3 do −0,5% masy tygodniowo = −0,27 do −0,45 kg/tydz. Po 12 tygodniach: 84–86 kg. Po 24: 78–83 kg. Przy udanej rekompozycji spadek na wadze będzie mniejszy niż te liczby, a talia będzie spadać szybciej — i to jest scenariusz pożądany."
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Kalorie rosną wraz z fazą — z założenia, nie z konieczności korekty",
+     "text": "Dieta ma wbudowaną progresję: średnia tygodniowa rośnie z 2587 kcal w Fazie 0 do 2742 kcal w Fazie 1 i 2923 kcal w Fazie 2. Różnica między fazami pochodzi wyłącznie ze zwiększenia porcji węglowodanów — owsa, makaronu i ryżu — dokładnie zgodnie z zasadą „węglowodany są regulatorem\" (sekcja 3). Białko i tłuszcz pozostają praktycznie stałe. Efekt: deficyt nie eskaluje z czasem, tylko oscyluje w wąskim paśmie ~6% (Faza 0) → ~7% (Faza 1) → ~6% (Faza 2) względem prawdopodobnego TDEE każdej fazy (2750 / 2950 / 3100 kcal). Gdyby dieta zostawała płaska przy rosnącej objętości treningowej, deficyt wspinałby się do kilkunastu procent w Fazie 2 — poziomu niepotrzebnie agresywnego przy priorytecie jakości treningu i regeneracji w okresie egzaminów. Ta progresja zapobiega temu z góry, bez czekania na korektę w tygodniu 4 czy 8. TDEE pozostaje modelem, nie wartością zmierzoną (zakres niepewności ±300–400 kcal) — dlatego mimo zaplanowanej progresji kalorii algorytm z sekcji 3 nadal obowiązuje jako zabezpieczenie na wypadek, gdyby rzeczywisty TDEE odbiegał od modelu. Empirycznego TDEE nie da się wyznaczyć wprost, bo nie ma danych o rzeczywistej dotychczasowej podaży energii; z trendu masy można oszacować wyłącznie nadwyżkę (~410–440 kcal/d w ostatnich 3 miesiącach). Nie stosuję uproszczenia 7700 kcal/kg jako dokładnego modelu."
+    }
+   ]
+  },
+  {
+   "id": "s3",
+   "num": "3",
+   "title": "Kalorie i makroskładniki",
+   "private": false,
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Trzy tabele poniżej odpowiadają trzem fazom treningowym z sekcji 8. Kaloryczność rośnie z fazą — mechanizm i uzasadnienie w sekcji 2."
+    },
+    {
+     "type": "h3",
+     "text": "Faza 0 (tygodnie 1–3)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Parametr",
+      "Dzień treningowy / cardio",
+      "Dzień nietreningowy",
+      "Średnia tygodniowa"
+     ],
+     "rows": [
+      [
+       "Energia",
+       "2629 kcal",
+       "2332 kcal",
+       "2587 kcal"
+      ],
+      [
+       "Białko",
+       "190,5 g · 2,18 g/kg",
+       "177,8 g · 2,03 g/kg",
+       "188,7 g · 2,16 g/kg"
+      ],
+      [
+       "Węglowodany",
+       "267,9 g · 3,07 g/kg",
+       "227,4 g · 2,60 g/kg",
+       "262,1 g · 3,00 g/kg"
+      ],
+      [
+       "Tłuszcz",
+       "78,0 g · 0,89 g/kg",
+       "68,7 g · 0,79 g/kg",
+       "76,7 g · 0,88 g/kg"
+      ],
+      [
+       "Błonnik",
+       "~53 g",
+       "~43 g",
+       "~52 g"
+      ],
+      [
+       "Rozkład energii",
+       "B 29% · W 41% · T 27%"
+      ],
+      [
+       "Tygodniowa podaż",
+       "18106 kcal"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Faza 1 (tygodnie 4–8)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Parametr",
+      "Dzień treningowy / cardio",
+      "Dzień nietreningowy",
+      "Średnia tygodniowa"
+     ],
+     "rows": [
+      [
+       "Energia",
+       "2784 kcal",
+       "2487 kcal",
+       "2742 kcal"
+      ],
+      [
+       "Białko",
+       "196,3 g · 2,25 g/kg",
+       "183,6 g · 2,10 g/kg",
+       "194,5 g · 2,23 g/kg"
+      ],
+      [
+       "Węglowodany",
+       "295,8 g · 3,38 g/kg",
+       "255,3 g · 2,92 g/kg",
+       "290,0 g · 3,32 g/kg"
+      ],
+      [
+       "Tłuszcz",
+       "79,4 g · 0,91 g/kg",
+       "70,1 g · 0,80 g/kg",
+       "78,1 g · 0,89 g/kg"
+      ],
+      [
+       "Błonnik",
+       "~55 g",
+       "~45 g",
+       "~54 g"
+      ],
+      [
+       "Rozkład energii",
+       "B 28% · W 42% · T 26%"
+      ],
+      [
+       "Tygodniowa podaż",
+       "19191 kcal"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Faza 2 (tygodnie 9+)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Parametr",
+      "Dzień treningowy / cardio",
+      "Dzień nietreningowy",
+      "Średnia tygodniowa"
+     ],
+     "rows": [
+      [
+       "Energia",
+       "2965 kcal",
+       "2668 kcal",
+       "2923 kcal"
+      ],
+      [
+       "Białko",
+       "202,4 g · 2,32 g/kg",
+       "189,7 g · 2,17 g/kg",
+       "200,6 g · 2,30 g/kg"
+      ],
+      [
+       "Węglowodany",
+       "330,1 g · 3,78 g/kg",
+       "289,6 g · 3,31 g/kg",
+       "324,3 g · 3,71 g/kg"
+      ],
+      [
+       "Tłuszcz",
+       "80,6 g · 0,92 g/kg",
+       "71,3 g · 0,82 g/kg",
+       "79,3 g · 0,91 g/kg"
+      ],
+      [
+       "Błonnik",
+       "~58 g",
+       "~48 g",
+       "~57 g"
+      ],
+      [
+       "Rozkład energii",
+       "B 27% · W 44% · T 24%"
+      ],
+      [
+       "Tygodniowa podaż",
+       "20458 kcal"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "Dzień treningowy i cardio pozostają identyczne — cyklowanie kalorii ma słabe dowody poza całkowitą energią tygodniową, a jeden jadłospis na sześć dni realnie pomaga adherencji."
+    },
+    {
+     "type": "p",
+     "text": "Białko 2,16 g/kg jest powyżej progu 1,62 g/kg z meta-analizy Mortona (2018) i w środku zakresu docelowego 2,0–2,2 g/kg. W miarę spadku masy wskaźnik będzie samoczynnie rósł — przy 85 kg wyniesie 2,22 g/kg. Kolagen (5 g dziennie) dokłada ~4,5 g białka, ale nie liczymy go do tego celu — jest niekompletny aminokwasowo (brak tryptofanu, DIAAS bliski zeru) i nie wspiera syntezy białek mięśniowych. Tłuszcz 0,86 g/kg (27% energii) jest w środku zakresu AMDR i wyraźnie powyżej progu 20% energii, poniżej którego pojawiają się dane o obniżeniu testosteronu. Węglowodany są regulatorem — wszystkie korekty kaloryczne robimy na nich, nie na białku ani tłuszczu. Ta sama zasada rządzi progresją między fazami: owies, makaron i ryż rosną z fazą, białko i tłuszcz pozostają praktycznie niezmienne."
+    },
+    {
+     "type": "p",
+     "text": "Błonnik ~52 g pozostaje bez zmian i nie jest problemem. To decyzja świadoma: nie redukuję go profilaktycznie u osoby bez objawów żołądkowo-jelitowych. Redukcja następuje wyłącznie reaktywnie (sekcja 20)."
+    },
+    {
+     "type": "h4",
+     "text": "Algorytm korekty kalorii"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Warunek (na podstawie 7-dniowych średnich, min. 3 tygodnie)",
+      "Działanie"
+     ],
+     "rows": [
+      [
+       "Tempo w oknie −0,27 do −0,45 kg/tydz.",
+       "Nie zmieniaj nic"
+      ],
+      [
+       "Masa stabilna, talia spada",
+       "Nie zmieniaj nic — to rekompozycja"
+      ],
+      [
+       "Masa i talia rosną przez 3 tyg.",
+       "−200 kcal (węglowodany)"
+      ],
+      [
+       "Masa i talia stoją przez 4 tyg.",
+       "−150 kcal lub +1500 kroków"
+      ],
+      [
+       "Masa spada >0,6%/tydz. przez 2 tyg. — niezależnie od siły",
+       "+150–200 kcal (węglowodany okołotreningowe)"
+      ],
+      [
+       "Tempo w normie, ale spada siła na ≥2 bojach przez 2 sesje przy dobrym śnie",
+       "+150 kcal (węglowodany okołotreningowe)"
+      ],
+      [
+       "Wzrost objętości treningowej (Faza 1, Faza 2)",
+       "Sprawdź tempo. Jeśli przekracza −0,5%/tydz. → +150–250 kcal"
+      ]
+     ],
+     "caption": null
+    }
+   ]
+  },
+  {
+   "id": "s4",
+   "num": "4",
+   "title": "Finalna dieta",
+   "private": false,
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Dieta ma trzy warianty, po jednym na fazę treningową (sekcja 8). Struktura posiłków, godziny i większość produktów są identyczne we wszystkich trzech — zmieniają się wyłącznie gramatury czterech źródeł węglowodanów (owies, makaron, ryż, chleb w kolacji Fazy 2), rosnąc wraz z objętością treningową. Mechanizm i uzasadnienie deficytu w każdej fazie — sekcja 2."
+    },
+    {
+     "type": "h3",
+     "text": "Faza 0 (tygodnie 1–3) wdrożyć"
+    },
+    {
+     "type": "h4",
+     "text": "Dzień treningowy i cardio"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Godz.",
+      "Produkt",
+      "Ilość",
+      "Stan",
+      "kcal",
+      "B",
+      "W",
+      "T",
+      "Bł."
+     ],
+     "rows": [
+      [
+       "09:00 Śniadanie",
+       "Słonecznik łuskany",
+       "15 g",
+       "—",
+       "65",
+       "3,1",
+       "2,0",
+       "5,0",
+       "1,3"
+      ],
+      [
+       "Nasiona chia",
+       "10 g",
+       "—",
+       "43",
+       "2,1",
+       "0,5",
+       "2,9",
+       "3,4"
+      ],
+      [
+       "Płatki owsiane",
+       "70 g",
+       "sucho",
+       "249",
+       "8,8",
+       "39,4",
+       "4,4",
+       "6,3"
+      ],
+      [
+       "Pestki dyni",
+       "15 g",
+       "—",
+       "62,5",
+       "2,7",
+       "1,4",
+       "5,2",
+       "0,9"
+      ],
+      [
+       "Orzechy włoskie",
+       "15 g",
+       "—",
+       "100",
+       "2,7",
+       "1,7",
+       "9,0",
+       "1,0"
+      ],
+      [
+       "Cynamon mielony",
+       "3 g",
+       "—",
+       "7,5",
+       "0,1",
+       "1,7",
+       "0",
+       "1,6"
+      ],
+      [
+       "Borówki",
+       "60 g",
+       "—",
+       "35",
+       "0,6",
+       "8,4",
+       "0",
+       "1,4"
+      ],
+      [
+       "Skyr naturalny",
+       "100 g",
+       "—",
+       "67",
+       "12,0",
+       "3,8",
+       "0",
+       "0"
+      ],
+      [
+       "Razem śniadanie",
+       "629",
+       "32,1",
+       "58,9",
+       "26,5",
+       "15,9"
+      ],
+      [
+       "11:15 Przekąska",
+       "Kefir 1,5%",
+       "200 g",
+       "—",
+       "88",
+       "6,4",
+       "9,0",
+       "3,0",
+       "0"
+      ],
+      [
+       "Siemię lniane mielone",
+       "10 g",
+       "—",
+       "50",
+       "2,9",
+       "1,7",
+       "3,1",
+       "2,7"
+      ],
+      [
+       "Ostropest mielony",
+       "5 g",
+       "—",
+       "15",
+       "0,6",
+       "0,3",
+       "1,7",
+       "1,7"
+      ],
+      [
+       "Kakao",
+       "5 g",
+       "—",
+       "23",
+       "0,9",
+       "2,2",
+       "1,1",
+       "1,7"
+      ],
+      [
+       "Cynamon",
+       "2 g",
+       "—",
+       "5",
+       "0,7",
+       "1,1",
+       "0",
+       "1,1"
+      ],
+      [
+       "Orzech brazylijski",
+       "1 szt. / 4 g",
+       "—",
+       "29",
+       "0,7",
+       "0,1",
+       "2,8",
+       "0,3"
+      ],
+      [
+       "Razem przekąska",
+       "210",
+       "12,2",
+       "14,4",
+       "11,7",
+       "7,5"
+      ],
+      [
+       "13:20 Lunch",
+       "Makaron penne",
+       "70 g",
+       "sucho",
+       "230",
+       "12,6",
+       "35,7",
+       "2,0",
+       "2,1"
+      ],
+      [
+       "Skyr naturalny",
+       "100 g",
+       "—",
+       "67",
+       "12,0",
+       "3,8",
+       "0",
+       "0"
+      ],
+      [
+       "Pomidory suszone",
+       "40 g",
+       "—",
+       "77",
+       "1,3",
+       "4,4",
+       "5,6",
+       "4,8"
+      ],
+      [
+       "Szpinak mrożony",
+       "100 g",
+       "odciśnięty, wrzątek",
+       "33",
+       "4,2",
+       "0,9",
+       "0,6",
+       "2,2"
+      ],
+      [
+       "Oliwa z oliwek",
+       "5 g",
+       "—",
+       "50",
+       "0",
+       "0",
+       "5,0",
+       "0"
+      ],
+      [
+       "Czosnek",
+       "1 ząbek (5 g)",
+       "—",
+       "8",
+       "0,4",
+       "1,6",
+       "0",
+       "0"
+      ],
+      [
+       "Razem lunch",
+       "465",
+       "30,5",
+       "46,4",
+       "13,2",
+       "9,1"
+      ],
+      [
+       "16:20 Obiad (przedtreningowy)",
+       "Ryż biały parboiled",
+       "70 g",
+       "sucho",
+       "245",
+       "5,5",
+       "54,5",
+       "0,5",
+       "1,1"
+      ],
+      [
+       "Pierś z kurczaka",
+       "150 g",
+       "surowa",
+       "150",
+       "30,0",
+       "1,0",
+       "2,7",
+       "0"
+      ],
+      [
+       "Mieszanka warzyw po hiszpańsku",
+       "130 g",
+       "krótko duszona",
+       "69",
+       "2,4",
+       "9,2",
+       "1,5",
+       "3,3"
+      ],
+      [
+       "Brokuły",
+       "130 g",
+       "na parze",
+       "26",
+       "2,3",
+       "2,3",
+       "0,7",
+       "3,4"
+      ],
+      [
+       "Buraczki tarte",
+       "100 g",
+       "gotowe, bez obróbki",
+       "50",
+       "1,3",
+       "9,7",
+       "0,5",
+       "2,8"
+      ],
+      [
+       "Marchew",
+       "50 g",
+       "surowa",
+       "16",
+       "0,5",
+       "2,5",
+       "0,1",
+       "1,4"
+      ],
+      [
+       "Ogórek kiszony",
+       "60 g",
+       "—",
+       "7",
+       "0,6",
+       "0,8",
+       "0,1",
+       "0,7"
+      ],
+      [
+       "Razem obiad",
+       "563",
+       "42,6",
+       "80,0",
+       "6,1",
+       "12,7"
+      ],
+      [
+       "20:15 Po treningu",
+       "Białko WPC",
+       "30 g",
+       "—",
+       "114",
+       "21,5",
+       "2,4",
+       "2,4",
+       "0"
+      ],
+      [
+       "Banan",
+       "120 g",
+       "—",
+       "116",
+       "1,2",
+       "26,2",
+       "0,4",
+       "3,1"
+      ],
+      [
+       "Razem po treningu",
+       "230",
+       "22,7",
+       "28,6",
+       "2,8",
+       "3,1"
+      ],
+      [
+       "21:00 Kolacja",
+       "Jajka rozmiar M",
+       "3 szt.",
+       "na miękko",
+       "214",
+       "19,0",
+       "0,9",
+       "15,0",
+       "0"
+      ],
+      [
+       "Twaróg chudy",
+       "125 g",
+       "—",
+       "105",
+       "21,3",
+       "3,7",
+       "0,6",
+       "0"
+      ],
+      [
+       "Chleb żytni na zakwasie",
+       "35 g",
+       "jasno podpieczony",
+       "79",
+       "2,2",
+       "15,0",
+       "0,6",
+       "2,5"
+      ],
+      [
+       "Szczypiorek",
+       "5 g",
+       "—",
+       "2",
+       "0,2",
+       "0,1",
+       "0",
+       "0,1"
+      ],
+      [
+       "Pomidorki koktajlowe",
+       "80 g",
+       "surowe, macerowane",
+       "16",
+       "0,8",
+       "2,5",
+       "0,2",
+       "1,0"
+      ],
+      [
+       "Papryka + sól jodowana 1 g",
+       "70 g",
+       "surowa",
+       "22",
+       "0,9",
+       "3,2",
+       "0,3",
+       "1,2"
+      ],
+      [
+       "Razem kolacja",
+       "438",
+       "44,4",
+       "25,4",
+       "16,7",
+       "4,8"
+      ],
+      [
+       "cały dzień Napoje",
+       "Mleko 0,5%",
+       "200 ml",
+       "2 × 100 ml",
+       "70",
+       "6,0",
+       "9,4",
+       "1,0",
+       "0"
+      ],
+      [
+       "Kawa espresso",
+       "2 × 30 ml",
+       "—",
+       "5",
+       "0",
+       "0",
+       "0",
+       "0"
+      ],
+      [
+       "Miód",
+       "6 g",
+       "—",
+       "19",
+       "0",
+       "4,8",
+       "0",
+       "0"
+      ],
+      [
+       "Razem napoje + woda 3–4 l, zielona herbata 400 ml (15:00), melisa 200 ml, sok z cytryny, sól jodowana 1,5 g",
+       "94",
+       "6,0",
+       "14,2",
+       "1,0",
+       "0"
+      ],
+      [
+       "RAZEM DZIEŃ TRENINGOWY / CARDIO",
+       "2629",
+       "190,5",
+       "267,9",
+       "78,0",
+       "53,1"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Dzień nietreningowy (czwartek)"
+    },
+    {
+     "type": "p",
+     "text": "Identyczny jak wyżej, z dwiema różnicami :"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Posiłek",
+      "Zmiana",
+      "kcal",
+      "B",
+      "W",
+      "T",
+      "Bł."
+     ],
+     "rows": [
+      [
+       "11:15 Przekąska",
+       "Orzech brazylijski 4 g zamiast kefiru, siemienia, ostropestu, kakao i cynamonu",
+       "29",
+       "0,7",
+       "0,1",
+       "2,8",
+       "0,3"
+      ],
+      [
+       "20:15 Po saunie",
+       "Białko WPC 30 g zamiast pominięcia — dzień bez treningu, ale z sauną",
+       "114",
+       "21,5",
+       "2,4",
+       "2,4",
+       "0"
+      ],
+      [
+       "RAZEM DZIEŃ NIETRENINGOWY",
+       "2332",
+       "177,8",
+       "227,4",
+       "68,7",
+       "42,8"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Faza 1 (tygodnie 4–8)"
+    },
+    {
+     "type": "p",
+     "text": "Owies, makaron i ryż rosną o 15 g wobec Fazy 0. Reszta jadłospisu — bez zmian."
+    },
+    {
+     "type": "h4",
+     "text": "Dzień treningowy i cardio"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Godz.",
+      "Produkt",
+      "Ilość",
+      "Stan",
+      "kcal",
+      "B",
+      "W",
+      "T",
+      "Bł."
+     ],
+     "rows": [
+      [
+       "09:00 Śniadanie",
+       "Słonecznik łuskany",
+       "15 g",
+       "—",
+       "65",
+       "3,1",
+       "2,0",
+       "5,0",
+       "1,3"
+      ],
+      [
+       "Nasiona chia",
+       "10 g",
+       "—",
+       "43",
+       "2,1",
+       "0,5",
+       "2,9",
+       "3,4"
+      ],
+      [
+       "Płatki owsiane",
+       "85 g",
+       "sucho",
+       "302",
+       "10,7",
+       "47,9",
+       "5,3",
+       "7,7"
+      ],
+      [
+       "Pestki dyni",
+       "15 g",
+       "—",
+       "62,5",
+       "2,7",
+       "1,4",
+       "5,2",
+       "0,9"
+      ],
+      [
+       "Orzechy włoskie",
+       "15 g",
+       "—",
+       "100",
+       "2,7",
+       "1,7",
+       "9,0",
+       "1,0"
+      ],
+      [
+       "Cynamon mielony",
+       "3 g",
+       "—",
+       "7,5",
+       "0,1",
+       "1,7",
+       "0",
+       "1,6"
+      ],
+      [
+       "Borówki",
+       "60 g",
+       "—",
+       "35",
+       "0,6",
+       "8,4",
+       "0",
+       "1,4"
+      ],
+      [
+       "Skyr naturalny",
+       "100 g",
+       "—",
+       "67",
+       "12,0",
+       "3,8",
+       "0",
+       "0"
+      ],
+      [
+       "Razem śniadanie",
+       "682",
+       "34,0",
+       "67,4",
+       "27,4",
+       "17,3"
+      ],
+      [
+       "11:15 Przekąska",
+       "Kefir 1,5%",
+       "200 g",
+       "—",
+       "88",
+       "6,4",
+       "9,0",
+       "3,0",
+       "0"
+      ],
+      [
+       "Siemię lniane mielone",
+       "10 g",
+       "—",
+       "50",
+       "2,9",
+       "1,7",
+       "3,1",
+       "2,7"
+      ],
+      [
+       "Ostropest mielony",
+       "5 g",
+       "—",
+       "15",
+       "0,6",
+       "0,3",
+       "1,7",
+       "1,7"
+      ],
+      [
+       "Kakao",
+       "5 g",
+       "—",
+       "23",
+       "0,9",
+       "2,2",
+       "1,1",
+       "1,7"
+      ],
+      [
+       "Cynamon",
+       "2 g",
+       "—",
+       "5",
+       "0,7",
+       "1,1",
+       "0",
+       "1,1"
+      ],
+      [
+       "Orzech brazylijski",
+       "1 szt. / 4 g",
+       "—",
+       "29",
+       "0,7",
+       "0,1",
+       "2,8",
+       "0,3"
+      ],
+      [
+       "Razem przekąska",
+       "210",
+       "12,2",
+       "14,4",
+       "11,7",
+       "7,5"
+      ],
+      [
+       "13:20 Lunch",
+       "Makaron penne",
+       "85 g",
+       "sucho",
+       "279",
+       "15,3",
+       "43,4",
+       "2,4",
+       "2,6"
+      ],
+      [
+       "Skyr naturalny",
+       "100 g",
+       "—",
+       "67",
+       "12,0",
+       "3,8",
+       "0",
+       "0"
+      ],
+      [
+       "Pomidory suszone",
+       "40 g",
+       "—",
+       "77",
+       "1,3",
+       "4,4",
+       "5,6",
+       "4,8"
+      ],
+      [
+       "Szpinak mrożony",
+       "100 g",
+       "odciśnięty, wrzątek",
+       "33",
+       "4,2",
+       "0,9",
+       "0,6",
+       "2,2"
+      ],
+      [
+       "Oliwa z oliwek",
+       "5 g",
+       "—",
+       "50",
+       "0",
+       "0",
+       "5,0",
+       "0"
+      ],
+      [
+       "Czosnek",
+       "1 ząbek (5 g)",
+       "—",
+       "8",
+       "0,4",
+       "1,6",
+       "0",
+       "0"
+      ],
+      [
+       "Razem lunch",
+       "514",
+       "33,2",
+       "54,1",
+       "13,6",
+       "9,6"
+      ],
+      [
+       "16:20 Obiad (przedtreningowy)",
+       "Ryż biały parboiled",
+       "85 g",
+       "sucho",
+       "298",
+       "6,7",
+       "66,2",
+       "0,6",
+       "1,3"
+      ],
+      [
+       "Pierś z kurczaka",
+       "150 g",
+       "surowa",
+       "150",
+       "30,0",
+       "1,0",
+       "2,7",
+       "0"
+      ],
+      [
+       "Mieszanka warzyw po hiszpańsku",
+       "130 g",
+       "krótko duszona",
+       "69",
+       "2,4",
+       "9,2",
+       "1,5",
+       "3,3"
+      ],
+      [
+       "Brokuły",
+       "130 g",
+       "na parze",
+       "26",
+       "2,3",
+       "2,3",
+       "0,7",
+       "3,4"
+      ],
+      [
+       "Buraczki tarte",
+       "100 g",
+       "gotowe, bez obróbki",
+       "50",
+       "1,3",
+       "9,7",
+       "0,5",
+       "2,8"
+      ],
+      [
+       "Marchew",
+       "50 g",
+       "surowa",
+       "16",
+       "0,5",
+       "2,5",
+       "0,1",
+       "1,4"
+      ],
+      [
+       "Ogórek kiszony",
+       "60 g",
+       "—",
+       "7",
+       "0,6",
+       "0,8",
+       "0,1",
+       "0,7"
+      ],
+      [
+       "Razem obiad",
+       "616",
+       "43,8",
+       "91,7",
+       "6,2",
+       "12,9"
+      ],
+      [
+       "20:15 Po treningu",
+       "Białko WPC",
+       "30 g",
+       "—",
+       "114",
+       "21,5",
+       "2,4",
+       "2,4",
+       "0"
+      ],
+      [
+       "Banan",
+       "120 g",
+       "—",
+       "116",
+       "1,2",
+       "26,2",
+       "0,4",
+       "3,1"
+      ],
+      [
+       "Razem po treningu",
+       "230",
+       "22,7",
+       "28,6",
+       "2,8",
+       "3,1"
+      ],
+      [
+       "21:00 Kolacja",
+       "Jajka rozmiar M",
+       "3 szt.",
+       "na miękko",
+       "214",
+       "19,0",
+       "0,9",
+       "15,0",
+       "0"
+      ],
+      [
+       "Twaróg chudy",
+       "125 g",
+       "—",
+       "105",
+       "21,3",
+       "3,7",
+       "0,6",
+       "0"
+      ],
+      [
+       "Chleb żytni na zakwasie",
+       "35 g",
+       "jasno podpieczony",
+       "79",
+       "2,2",
+       "15,0",
+       "0,6",
+       "2,5"
+      ],
+      [
+       "Szczypiorek",
+       "5 g",
+       "—",
+       "2",
+       "0,2",
+       "0,1",
+       "0",
+       "0,1"
+      ],
+      [
+       "Pomidorki koktajlowe",
+       "80 g",
+       "surowe, macerowane",
+       "16",
+       "0,8",
+       "2,5",
+       "0,2",
+       "1,0"
+      ],
+      [
+       "Papryka + sól jodowana 1 g",
+       "70 g",
+       "surowa",
+       "22",
+       "0,9",
+       "3,2",
+       "0,3",
+       "1,2"
+      ],
+      [
+       "Razem kolacja",
+       "438",
+       "44,4",
+       "25,4",
+       "16,7",
+       "4,8"
+      ],
+      [
+       "cały dzień Napoje",
+       "Mleko 0,5%",
+       "200 ml",
+       "2 × 100 ml",
+       "70",
+       "6,0",
+       "9,4",
+       "1,0",
+       "0"
+      ],
+      [
+       "Kawa espresso",
+       "2 × 30 ml",
+       "—",
+       "5",
+       "0",
+       "0",
+       "0",
+       "0"
+      ],
+      [
+       "Miód",
+       "6 g",
+       "—",
+       "19",
+       "0",
+       "4,8",
+       "0",
+       "0"
+      ],
+      [
+       "Razem napoje + woda 3–4 l, zielona herbata 400 ml (15:00), melisa 200 ml, sok z cytryny, sól jodowana 1,5 g",
+       "94",
+       "6,0",
+       "14,2",
+       "1,0",
+       "0"
+      ],
+      [
+       "RAZEM DZIEŃ TRENINGOWY / CARDIO",
+       "2784",
+       "196,3",
+       "295,8",
+       "79,4",
+       "55,2"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Dzień nietreningowy (czwartek)"
+    },
+    {
+     "type": "p",
+     "text": "Identyczne różnice jak w Fazie 0, przy zwiększonych śniadaniu/lunchu/obiedzie:"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Posiłek",
+      "Zmiana",
+      "kcal",
+      "B",
+      "W",
+      "T",
+      "Bł."
+     ],
+     "rows": [
+      [
+       "11:15 Przekąska",
+       "Orzech brazylijski 4 g zamiast kefiru, siemienia, ostropestu, kakao i cynamonu",
+       "29",
+       "0,7",
+       "0,1",
+       "2,8",
+       "0,3"
+      ],
+      [
+       "20:15 Po saunie",
+       "Białko WPC 30 g zamiast pominięcia — dzień bez treningu, ale z sauną",
+       "114",
+       "21,5",
+       "2,4",
+       "2,4",
+       "0"
+      ],
+      [
+       "RAZEM DZIEŃ NIETRENINGOWY",
+       "2487",
+       "183,6",
+       "255,3",
+       "70,1",
+       "44,9"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Faza 2 (tygodnie 9+)"
+    },
+    {
+     "type": "p",
+     "text": "Ryż i makaron rosną do 100 g, chleb w kolacji podwaja się do dwóch kromek. Reszta jadłospisu — bez zmian względem Fazy 0."
+    },
+    {
+     "type": "h4",
+     "text": "Dzień treningowy i cardio"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Godz.",
+      "Produkt",
+      "Ilość",
+      "Stan",
+      "kcal",
+      "B",
+      "W",
+      "T",
+      "Bł."
+     ],
+     "rows": [
+      [
+       "09:00 Śniadanie",
+       "Słonecznik łuskany",
+       "15 g",
+       "—",
+       "65",
+       "3,1",
+       "2,0",
+       "5,0",
+       "1,3"
+      ],
+      [
+       "Nasiona chia",
+       "10 g",
+       "—",
+       "43",
+       "2,1",
+       "0,5",
+       "2,9",
+       "3,4"
+      ],
+      [
+       "Płatki owsiane",
+       "85 g",
+       "sucho",
+       "302",
+       "10,7",
+       "47,9",
+       "5,3",
+       "7,7"
+      ],
+      [
+       "Pestki dyni",
+       "15 g",
+       "—",
+       "62,5",
+       "2,7",
+       "1,4",
+       "5,2",
+       "0,9"
+      ],
+      [
+       "Orzechy włoskie",
+       "15 g",
+       "—",
+       "100",
+       "2,7",
+       "1,7",
+       "9,0",
+       "1,0"
+      ],
+      [
+       "Cynamon mielony",
+       "3 g",
+       "—",
+       "7,5",
+       "0,1",
+       "1,7",
+       "0",
+       "1,6"
+      ],
+      [
+       "Borówki",
+       "60 g",
+       "—",
+       "35",
+       "0,6",
+       "8,4",
+       "0",
+       "1,4"
+      ],
+      [
+       "Skyr naturalny",
+       "100 g",
+       "—",
+       "67",
+       "12,0",
+       "3,8",
+       "0",
+       "0"
+      ],
+      [
+       "Razem śniadanie",
+       "682",
+       "34,0",
+       "67,4",
+       "27,4",
+       "17,3"
+      ],
+      [
+       "11:15 Przekąska",
+       "Kefir 1,5%",
+       "200 g",
+       "—",
+       "88",
+       "6,4",
+       "9,0",
+       "3,0",
+       "0"
+      ],
+      [
+       "Siemię lniane mielone",
+       "10 g",
+       "—",
+       "50",
+       "2,9",
+       "1,7",
+       "3,1",
+       "2,7"
+      ],
+      [
+       "Ostropest mielony",
+       "5 g",
+       "—",
+       "15",
+       "0,6",
+       "0,3",
+       "1,7",
+       "1,7"
+      ],
+      [
+       "Kakao",
+       "5 g",
+       "—",
+       "23",
+       "0,9",
+       "2,2",
+       "1,1",
+       "1,7"
+      ],
+      [
+       "Cynamon",
+       "2 g",
+       "—",
+       "5",
+       "0,7",
+       "1,1",
+       "0",
+       "1,1"
+      ],
+      [
+       "Orzech brazylijski",
+       "1 szt. / 4 g",
+       "—",
+       "29",
+       "0,7",
+       "0,1",
+       "2,8",
+       "0,3"
+      ],
+      [
+       "Razem przekąska",
+       "210",
+       "12,2",
+       "14,4",
+       "11,7",
+       "7,5"
+      ],
+      [
+       "13:20 Lunch",
+       "Makaron penne",
+       "100 g",
+       "sucho",
+       "329",
+       "18,0",
+       "51,0",
+       "2,9",
+       "3,0"
+      ],
+      [
+       "Skyr naturalny",
+       "100 g",
+       "—",
+       "67",
+       "12,0",
+       "3,8",
+       "0",
+       "0"
+      ],
+      [
+       "Pomidory suszone",
+       "40 g",
+       "—",
+       "77",
+       "1,3",
+       "4,4",
+       "5,6",
+       "4,8"
+      ],
+      [
+       "Szpinak mrożony",
+       "100 g",
+       "odciśnięty, wrzątek",
+       "33",
+       "4,2",
+       "0,9",
+       "0,6",
+       "2,2"
+      ],
+      [
+       "Oliwa z oliwek",
+       "5 g",
+       "—",
+       "50",
+       "0",
+       "0",
+       "5,0",
+       "0"
+      ],
+      [
+       "Czosnek",
+       "1 ząbek (5 g)",
+       "—",
+       "8",
+       "0,4",
+       "1,6",
+       "0",
+       "0"
+      ],
+      [
+       "Razem lunch",
+       "564",
+       "35,9",
+       "61,7",
+       "14,1",
+       "10,0"
+      ],
+      [
+       "16:20 Obiad (przedtreningowy)",
+       "Ryż biały parboiled",
+       "100 g",
+       "sucho",
+       "350",
+       "7,9",
+       "77,9",
+       "0,7",
+       "1,6"
+      ],
+      [
+       "Pierś z kurczaka",
+       "150 g",
+       "surowa",
+       "150",
+       "30,0",
+       "1,0",
+       "2,7",
+       "0"
+      ],
+      [
+       "Mieszanka warzyw po hiszpańsku",
+       "130 g",
+       "krótko duszona",
+       "69",
+       "2,4",
+       "9,2",
+       "1,5",
+       "3,3"
+      ],
+      [
+       "Brokuły",
+       "130 g",
+       "na parze",
+       "26",
+       "2,3",
+       "2,3",
+       "0,7",
+       "3,4"
+      ],
+      [
+       "Buraczki tarte",
+       "100 g",
+       "gotowe, bez obróbki",
+       "50",
+       "1,3",
+       "9,7",
+       "0,5",
+       "2,8"
+      ],
+      [
+       "Marchew",
+       "50 g",
+       "surowa",
+       "16",
+       "0,5",
+       "2,5",
+       "0,1",
+       "1,4"
+      ],
+      [
+       "Ogórek kiszony",
+       "60 g",
+       "—",
+       "7",
+       "0,6",
+       "0,8",
+       "0,1",
+       "0,7"
+      ],
+      [
+       "Razem obiad",
+       "668",
+       "45,0",
+       "103,4",
+       "6,3",
+       "13,2"
+      ],
+      [
+       "20:15 Po treningu",
+       "Białko WPC",
+       "30 g",
+       "—",
+       "114",
+       "21,5",
+       "2,4",
+       "2,4",
+       "0"
+      ],
+      [
+       "Banan",
+       "120 g",
+       "—",
+       "116",
+       "1,2",
+       "26,2",
+       "0,4",
+       "3,1"
+      ],
+      [
+       "Razem po treningu",
+       "230",
+       "22,7",
+       "28,6",
+       "2,8",
+       "3,1"
+      ],
+      [
+       "21:00 Kolacja",
+       "Jajka rozmiar M",
+       "3 szt.",
+       "na miękko",
+       "214",
+       "19,0",
+       "0,9",
+       "15,0",
+       "0"
+      ],
+      [
+       "Twaróg chudy",
+       "125 g",
+       "—",
+       "105",
+       "21,3",
+       "3,7",
+       "0,6",
+       "0"
+      ],
+      [
+       "Chleb żytni na zakwasie",
+       "70 g (2 kromki)",
+       "jasno podpieczony",
+       "158",
+       "4,4",
+       "30,0",
+       "1,2",
+       "5,0"
+      ],
+      [
+       "Szczypiorek",
+       "5 g",
+       "—",
+       "2",
+       "0,2",
+       "0,1",
+       "0",
+       "0,1"
+      ],
+      [
+       "Pomidorki koktajlowe",
+       "80 g",
+       "surowe, macerowane",
+       "16",
+       "0,8",
+       "2,5",
+       "0,2",
+       "1,0"
+      ],
+      [
+       "Papryka + sól jodowana 1 g",
+       "70 g",
+       "surowa",
+       "22",
+       "0,9",
+       "3,2",
+       "0,3",
+       "1,2"
+      ],
+      [
+       "Razem kolacja",
+       "517",
+       "46,6",
+       "40,4",
+       "17,3",
+       "7,3"
+      ],
+      [
+       "cały dzień Napoje",
+       "Mleko 0,5%",
+       "200 ml",
+       "2 × 100 ml",
+       "70",
+       "6,0",
+       "9,4",
+       "1,0",
+       "0"
+      ],
+      [
+       "Kawa espresso",
+       "2 × 30 ml",
+       "—",
+       "5",
+       "0",
+       "0",
+       "0",
+       "0"
+      ],
+      [
+       "Miód",
+       "6 g",
+       "—",
+       "19",
+       "0",
+       "4,8",
+       "0",
+       "0"
+      ],
+      [
+       "Razem napoje + woda 3–4 l, zielona herbata 400 ml (15:00), melisa 200 ml, sok z cytryny, sól jodowana 1,5 g",
+       "94",
+       "6,0",
+       "14,2",
+       "1,0",
+       "0"
+      ],
+      [
+       "RAZEM DZIEŃ TRENINGOWY / CARDIO",
+       "2965",
+       "202,4",
+       "330,1",
+       "80,6",
+       "58,4"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Dzień nietreningowy (czwartek)"
+    },
+    {
+     "type": "p",
+     "text": "Identyczne różnice jak w Fazie 0, przy zwiększonych porcjach:"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Posiłek",
+      "Zmiana",
+      "kcal",
+      "B",
+      "W",
+      "T",
+      "Bł."
+     ],
+     "rows": [
+      [
+       "11:15 Przekąska",
+       "Orzech brazylijski 4 g zamiast kefiru, siemienia, ostropestu, kakao i cynamonu",
+       "29",
+       "0,7",
+       "0,1",
+       "2,8",
+       "0,3"
+      ],
+      [
+       "20:15 Po saunie",
+       "Białko WPC 30 g zamiast pominięcia — dzień bez treningu, ale z sauną",
+       "114",
+       "21,5",
+       "2,4",
+       "2,4",
+       "0"
+      ],
+      [
+       "RAZEM DZIEŃ NIETRENINGOWY",
+       "2668",
+       "189,7",
+       "289,6",
+       "71,3",
+       "48,1"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Rotacja źródeł skrobi"
+    },
+    {
+     "type": "p",
+     "text": "Zamienniki równoważne dla ryżu w obiedzie, do stosowania 2–3 razy w tygodniu (obniża ekspozycję na arsen i podnosi różnorodność):"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Zamiennik",
+      "Ilość",
+      "Stan",
+      "≈ kcal",
+      "Uwaga"
+     ],
+     "rows": [
+      [
+       "Ziemniaki",
+       "310 g",
+       "surowe",
+       "245",
+       "Zero arsenu, potas, witamina C"
+      ],
+      [
+       "Bataty",
+       "285 g",
+       "surowe",
+       "245",
+       "Beta-karoten"
+      ],
+      [
+       "Kasza gryczana",
+       "70 g",
+       "sucho",
+       "249",
+       "Odzyskuje magnez (~160 mg) i rutynę"
+      ],
+      [
+       "Makaron pełnoziarnisty",
+       "75 g",
+       "sucho",
+       "236",
+       "Wyższy błonnik"
+      ]
+     ],
+     "caption": null
+    }
+   ]
+  },
+  {
+   "id": "s5",
+   "num": "5",
+   "title": "Preparacja żywności",
+   "private": false,
+   "blocks": [
+    {
+     "type": "table",
+     "head": [
+      "Czynność",
+      "Jak",
+      "Po co",
+      "Status"
+     ],
+     "rows": [
+      [
+       "Gotowanie ryżu",
+       "Wypłucz, gotuj w nadmiarze wody (6:1) , odlej wodę na końcu",
+       "Redukuje arsen nieorganiczny o ~60% w ryżu parboiled (Gray i wsp. 2015). Koszt: zerowy",
+       "wdrożyć"
+      ],
+      [
+       "Rotacja skrobi",
+       "Ryż 4× w tygodniu, ziemniaki / bataty / kasza gryczana 2–3×",
+       "Obniża ekspozycję na arsen, odzyskuje magnez i foliany, podnosi różnorodność",
+       "wdrożyć"
+      ],
+      [
+       "Chłodzenie węglowodanów",
+       "Obiad gotowany codziennie (D-022)",
+       "Retrogradacja zwiększa skrobię oporną. Wygodne przy meal prepie",
+       "wdrożyć"
+      ],
+      [
+       "Overnight oats",
+       "Wieczorem wszystko naraz — owies, pestki dyni, słonecznik, orzechy i chia — zalane 200 ml wody o temperaturze pokojowej , wymieszane i od razu do lodówki . Bez czekania na blacie",
+       "Hydratacja jest pełna po 8–10 h niezależnie od temperatury startowej, a fitaza owsa nie istnieje (niszczy ją kilning). Ciepła woda nie ma więc przewagi — zakres 40–55 °C jest za to optimum beta-glukanazy , która skraca łańcuchy i obniża lepkość odpowiadającą za efekt fizjologiczny beta-glukanów. Start zimny skraca też czas w strefie 5–45 °C ze 195 do 150 min i daje zero minut powyżej 20 °C , a 325 g o temp. 55 °C wnosiło ~7 kJ ciepła do lodówki, w której rozmraża się surowy drób. Bez mąki żytniej — surowa mąka jest nośnikiem E. {private:3} Bez soku z cytryny — 5 ml w mieszaninie ~325 g daje pH 5,5–6,2, powyżej minimum wzrostu bakterii, więc nie tworzy bariery",
+       "wdrożyć"
+      ],
+      [
+       "Termos z gorącym lunchem",
+       "Skyr nie wchodzi do termosu. Do termosu trafia wyłącznie gorąca baza (makaron, szpinak, pomidory, oliwa, przyprawy), prosto z patelni . 100 g skyru pakujesz osobno, w chłodzie , i wmieszujesz dopiero przy posiłku",
+       "Dodanie 100 g produktu chłodzonego obniżało temperaturę ~300 g bazy o kilkanaście stopni — dodanie skyru rano zbijało temperaturę dania poniżej progu bezpiecznego przechowywania na gorąco (63 °C). Sześć godzin w zakresie 40–55 °C to warunki produkcji cereulidu, toksyny termostabilnej . Rozdzielenie usuwa problem u źródła i daje lepszy sos, bez ryzyka zwarzenia białka. Skyr musi pozostać w chłodzie — pojemnik z nabiałem w temperaturze pokojowej przez 6 h byłby gorszy niż stan wyjściowy",
+       "wdrożyć"
+      ],
+      [
+       "Szpinak",
+       "Po rozmrożeniu odciśnij płyn , dopiero potem przelej wrzątkiem na sitku i dociśnij ponownie",
+       "Płyn wyciekający po rozmrożeniu jest nasycony rozpuszczalnymi szczawianami — odciśnięcie go przed wrzątkiem podnosi redukcję z ~40–50% do ~55–60%. Wapń ze skyru w tym samym posiłku wiąże resztę w jelicie",
+       "wdrożyć"
+      ],
+      [
+       "Test kalibracyjny termosu",
+       "Jednorazowo. Spakuj lunch jak zwykle, zanotuj temperaturę i godzinę. O 13:20 zmierz temperaturę przed dodaniem skyru",
+       "Próg krytyczny: temperatura powyżej 63 °C podczas jedzenia. Wynik powyżej 63 °C — protokół potwierdzony dla tego termosu, testu nie trzeba powtarzać. Wynik 63 °C lub niższy — termos nie utrzymuje temperatury przez 6 h; kolejno: termos wąskootworowy wypełniany do pełna, skrócenie do 4 h, albo pakowanie na zimno z odgrzaniem. Rozrzut między termosami jest zbyt duży, by przewidzieć wynik. Dlatego test jest w planie",
+       "wdrożyć"
+      ],
+      [
+       "Zielona herbata",
+       "Imbir (2–3 plastry) zalać 400 ml wody 80 °C w szklanym pojemniku 800 ml , przykryć talerzykiem. Po 3–4 min dodać zaparzacz z 5 g liści , parzyć 3 min . Wyjąć liście i imbir , dopiero potem sok z cytryny, na końcu miód 6 g. Przelać do wygrzanego termosu. Woda filtrowana lub niskozmineralizowana",
+       "Wrzątek degraduje o ~35% więcej EGCG niż 80 °C przy tym samym czasie. Kolejność jest kluczowa : zakwaszenie przed zalaniem liści obniża wydajność ekstrakcji fenoli o ~22%, ale dodane po parzeniu utrzymuje retencję EGCG na ~95% po godzinie w 80 °C wobec 38% bez zakwaszenia. Nigdy wodą wysokozmineralizowaną — retencja EGCG spada wtedy do 1,4%. Wapń i wodorowęglany podnoszą pH i katalizują utlenianie katechin",
+       "wdrożyć"
+      ],
+      [
+       "Koktajl kefirowy",
+       "Zmiel siemię lniane w młynku bezpośrednio przed użyciem. Blenduj 30–45 s, wanilię dodaj na końcu bez blendowania. Trzymaj w chłodzie do spożycia",
+       "Całe nasiona lnu przechodzą przez przewód pokarmowy w większości nienaruszone — ALA i lignany pozostają niedostępne, a blendowanie w kefirze nie rozdrabnia ich wystarczająco. Mielenie tuż przed użyciem ogranicza utlenianie ALA. Krótkie blendowanie mniej napowietrza koktajl Produkt mleczny przechowywany ~4 h wymaga lodówki lub wkładu chłodzącego",
+       "wdrożyć"
+      ],
+      [
+       "Kawa mrożona",
+       "Espresso wlać od razu do zimnego mleka , następnie do wcześniej schłodzonego termosu z 4–6 kostkami lodu",
+       "Termos na kawę musi być schłodzony, nie wygrzany — odwrotnie niż ten na lunch. Mleko przechowywane ~5 h musi pozostać poniżej 5 °C . Jeśli o 12:20 napój nie jest wyraźnie zimny — nie pij go",
+       "wdrożyć"
+      ],
+      [
+       "Jaja na miękko (kolacja)",
+       "Przygotowywane świeżo przed posiłkiem , nie w porannym meal-prepie. Białko całkowicie ścięte, żółtko płynne. Po ugotowaniu przelać zimną wodą 30–45 s",
+       "Płynne żółtko nie osiąga temperatury niszczącej Salmonella (71 °C lub 63 °C przez 3 min) — to cecha dania, nie usterka. Dla zdrowego dorosłego ryzyko jest niskie przy jajach z lodówki, w terminie i ze sprawdzonego źródła. Obrane jaja na miękko trzymane od rana do 21:00 byłyby realnym problemem. Ścięte białko oznacza denaturację awidyny — wiązanie biotyny nie zachodzi. Gotowanie w skorupce daje najmniej produktów utleniania cholesterolu ze wszystkich metod, choć nie zero",
+       "wdrożyć"
+      ],
+      [
+       "Melisa z glicyną",
+       "2 g suszonej melisy, 200 ml wody 90–95 °C, pod przykryciem 8–10 min . Usunąć liście, ostudzić do ~60 °C, wmieszać 3 g glicyny",
+       "Substancje czynne melisy — cytral, cytronelal, geraniol — są lotnymi olejkami i bez przykrycia uchodzą z parą. Glicyna jest termostabilna; dodanie w 60 °C to kwestia palatalności",
+       "wdrożyć"
+      ],
+      [
+       "Czosnek do lunchu",
+       "3–5 g (1–2 ząbki) przeciśnięte przez praskę na początku przygotowań i odstawione na 10 minut przed dodaniem na patelnię. Smażyć 30–45 s , nie przypalać",
+       "Allicyna nie występuje w nienaruszonym ząbku — powstaje z alliiny pod działaniem alliinazy uwalnianej przy rozerwaniu komórek. Alliinaza jest termolabilna i ulega inaktywacji w ok. 60 s ogrzewania , więc świeżo rozgnieciony czosnek wrzucony prosto na patelnię traci enzym, zanim ten zadziała. Song i Milner ( J Nutr 2001) wykazali, że odczekanie ok. 10 min przed obróbką zachowuje aktywność biologiczną. Praska, nie nóż — maksymalne rozerwanie komórek daje najpełniejszy kontakt substratu z enzymem. Kalorycznie pomijalne (~6 kcal)",
+       "wdrożyć"
+      ],
+      [
+       "Kurczak",
+       "Parowar (metoda podstawowa): 15–20 min. Air fryer (rezerwa): 185 °C, 15–18 min, obrót po połowie. Kryterium wiążące: temperatura wewnętrzna ≥ 74 °C mierzona termometrem w najgrubszym miejscu — czas jest orientacyjny",
+       "Parowanie utrzymuje temperaturę powierzchni na poziomie ~100 °C, więc nie tworzy warunków do powstawania amin heterocyklicznych ani WWA, pojawiających się przy grillowaniu i smażeniu w wysokiej temperaturze. Nie wymaga dodatku tłuszczu i daje wilgotniejsze mięso. Air fryer przy 185 °C jest metodą pośrednią — łagodniejszą niż grill, ale nie tak czystą jak para. 74 °C to próg niezawodnej redukcji Salmonella i Campylobacter w drobiu",
+       "wdrożyć"
+      ],
+      [
+       "Chłodzenie w transporcie",
+       "Torba 6 l z 3 wkładami (15 × 8 × 2 cm), 4 przy temperaturze otoczenia powyżej 25 °C. Wkłady na wierzchu i z boku , nie pod spodem. Zawartość: śniadanie (do 09:00), skyr z askorbinianem (do 13:20), kubek termiczny z koktajlem",
+       "Wkład 15 × 8 × 2 cm to ok. 240 g żelu = 94 kJ zdolności chłodniczej. Napływ ciepła do torby 6 l przez 6 h przy typowej izolacji to ok. 190 kJ plus ok. 14 kJ na schłodzenie pojemników i otwarcia. Dwa wkłady (189 kJ) są niewystarczające, trzy (283 kJ) dają zapas +79 kJ. Zimne powietrze opada, stąd wkłady na wierzchu. Puste powietrze jest większym obciążeniem niż zawartość — po zabraniu śniadania dosuń pojemniki do siebie",
+       "wdrożyć"
+      ],
+      [
+       "Obsługa surowego drobiu",
+       "Kurczak jako ostatnia czynność — po zamknięciu śniadania i zakręceniu termosu. Pojemnik po rozmrażaniu myj szczotką do surowego mięsa lub w zmywarce, nie gąbką . Ręce mydłem 20 s bezpośrednio po",
+       "Gąbka kuchenna jest najbardziej skażonym przedmiotem w domowej kuchni — przetarcie nią wycieku z drobiu przenosi Campylobacter i Salmonella na wszystko, czego dotknie przez kolejne dni. Obsługa drobiu na końcu sprawia, że ewentualne skażenie nie ma już czego dosięgnąć",
+       "wdrożyć"
+      ],
+      [
+       "Przygotowanie dzień wcześniej",
+       "Sucha mieszanka śniadaniowa w słoikach na cały tydzień; obiad gotowany codziennie",
+       "Adherencja. To jest ważniejsze niż jakikolwiek rytuał optymalizacyjny",
+       "wdrożyć"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Zasada",
+     "text": "Wszystkie ziarna, kasze i makarony ważymy NA SUCHO. Mięso na surowo. To jest jedyna zasada ważenia, o której nie wolno zapomnieć — pomyłka tutaj przesuwa bilans o setki kalorii. Owies, makaron i ryż mają teraz tę samą gramaturę: 70 g. To celowe uproszczenie — jedna liczba zamiast trzech eliminuje najczęstsze źródło pomyłek przy odmierzaniu."
+    }
+   ]
+  },
+  {
+   "id": "s6",
+   "num": "6",
+   "title": "Suplementacja",
+   "private": false,
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Stack podstawowy"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Preparat",
+      "Dawka",
+      "Pora",
+      "Z posiłkiem?",
+      "Cel"
+     ],
+     "rows": [
+      [
+       "Witamina D3",
+       "4000 IU",
+       "09:00",
+       "Tak — śniadanie ma 26,5 g tłuszczu",
+       "{private:4} {private:5} Przez 1–3 miesiące, kontrola po 10–12 tyg."
+      ],
+      [
+       "Witamina K2 MK-7",
+       "100 µg",
+       "09:00",
+       "Tak",
+       "Partner D3. Dowody mechanistyczne, słabe. Bezpieczna — zostaje, ale nie jest uzasadniona mocno"
+      ],
+      [
+       "Kreatyna monohydrat",
+       "5 g",
+       "20:15, z posiłkiem potreningowym",
+       "Tak — posiłek potreningowy",
+       "Najlepiej udokumentowany suplement. Działa przez wysycenie — timing w ciągu dnia nie ma znaczenia . Przyjmowana codziennie o 20:15 (SUPLEMENTACJA). Uwaga do badań: kreatyna podnosi stężenie kreatyniny we krwi — uwzględnij to przy interpretacji wyniku"
+      ],
+      [
+       "Omega-3",
+       "1000 mg EPA + 500 mg DHA",
+       "09:00, ze śniadaniem",
+       "Tak — wchłanianie",
+       "Dieta zawiera dużo ALA, ale zero EPA/DHA (brak ryb). Konwersja ALA→DHA wynosi 0–4%"
+      ],
+      [
+       "Askorbinian sodu",
+       "2 × 100 mg",
+       "09:00 do śniadania · 13:20 wmieszany w chłodny skyr , nigdy do gorącego termosu",
+       "Tak",
+       "Dawka dodatkowa, niezależna od askorbinianu towarzyszącego kolagenowi. Śniadanie zawiera najwięcej żelaza niehemowego ze wszystkich posiłków (6,83 mg) i 56% dobowych fitynianów. {private:6} Druga dawka o 13:20 wyrównuje rozkład (śniadanie 106 mg, lunch 125 mg, obiad 150 mg, kolacja 95 mg, kolagen 100 mg), ale osocze wysyca się przy ok. 200–400 mg/d, więc trafia w obszar, w którym pula ustrojowa już nie rośnie. Łącznie 450–550 mg/d wobec UL 2000 mg. Witamina C rozkłada się powyżej 60 °C — do termosu nie trafia nigdy"
+      ],
+      [
+       "Magnez glicynian",
+       "266 mg elem.",
+       "22:00",
+       "Obojętne",
+       "Uzasadniony przy obecnej diecie. Ryż biały zamiast brązowego i brak kaszy gryczanej w jadłospisie oznaczają podaż z diety na poziomie ~330–420 mg wobec RDA 400–420 mg — suplement domyka tę pulę, nie dubluje jej"
+      ],
+      [
+       "Hydrolizat kolagenu + witamina C",
+       "5 g + 100 mg",
+       "17:15 codziennie",
+       "Nie wymaga",
+       "Jedyny preparat w stacku z badaniami w populacji zbliżonej do Twojej — młodzi aktywni z bólem kolana związanym z obciążeniem. Jakość dowodów: niska–umiarkowana , małe próby, część finansowana przez producenta"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Kolagen — codzienne dawkowanie",
+     "text": "Mechanistyczne uzasadnienie protokołu (Shaw/Baar) dotyczy przyjęcia kolagenu 30–60 min przed obciążeniem , tak by aminokwasy były dostępne w trakcie bodźca mechanicznego. W dni bez treningu ta przesłanka nie działa — codzienne dawkowanie nie ma mocniejszych dowodów niż dawkowanie tylko przed sesjami . Jest natomiast nieszkodliwe, tanie i prostsze do utrzymania, a stała pora sprzyja nawykowi. Traktuj to jako decyzję o adherencji, nie o skuteczności. Kolagen dokłada ~18–20 kcal i ~4,5 g białka dziennie, ale nie liczy się do celu 2,0–2,2 g/kg — jest niekompletny aminokwasowo (brak tryptofanu)."
+    },
+    {
+     "type": "h3",
+     "text": "Warunkowe"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Preparat",
+      "Dawka",
+      "Kiedy",
+      "Warunek"
+     ],
+     "rows": [
+      [
+       "Melatonina",
+       "1 mg",
+       "22:00",
+       "1 mg codziennie o 22:00 (SUPLEMENTACJA). Uczciwie o mechanizmie: przy podaniu godzinę przed snem melatonina działa przede wszystkim nasennie , a nie chronobiotycznie — przesunięcie fazy wymaga podania 3–5 h przed zwyczajowym zaśnięciem, co kolidowałoby z treningiem. Właściwym narzędziem fazującym w tym planie jest światło poranne (sekcja 18); melatonina jest wobec niego dodatkiem wspomagającym zasypianie w okresie stabilizacji rytmu"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Opcjonalne"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Preparat",
+      "Dawka",
+      "Pora",
+      "Uwaga"
+     ],
+     "rows": [
+      [
+       "Cynk pikolinian",
+       "15 mg",
+       "07:00, na czczo, czwartek i niedziela",
+       "Średnia tygodniowa podaży cynku wynosi wtedy 23,4 mg/d wobec UL EFSA 25 mg — bezpiecznie. {private:7} Przyjmowany o 07:00, na czczo (SUPLEMENTACJA) — uzasadnienie pierwotne pod tabelą."
+      ],
+      [
+       "L-tauryna",
+       "2 g",
+       "17:15, codziennie (także w czwartek)",
+       "Dowody w kontekście hipertrofii i wydolności są słabe, ale preparat jest bezpieczny i dobrze tolerowany — nie ma podstaw, by go wykluczać, choć nie ma też podstaw, by oczekiwać od niego wyraźnego efektu"
+      ],
+      [
+       "L-teanina",
+       "200 mg",
+       "z pierwszą kawą, 10:30",
+       "Efekt subtelny, dowody umiarkowane"
+      ],
+      [
+       "Glicyna",
+       "3 g",
+       "22:00, z magnezem",
+       "Dowody niskie (sen). Bezpieczna"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "original",
+     "text": "Cynk pikolinian: Z posiłkiem, nie na czczo — na czczo pikolinian wchłania się w 40–60%, co silniej indukuje metalotioneinę i obniża wchłanianie miedzi"
+    },
+    {
+     "type": "h3",
+     "text": "Usunięte"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Preparat",
+      "Powód usunięcia"
+     ],
+     "rows": [
+      [
+       "Glukozamina · chondroityna · Boswellia — do wyczerpania zapasu (ostatni dzień 21.03.2027), potem niekontynuowane",
+       "{private:8} To decyzja praktyczna, nie orzeczenie o nieskuteczności: przy nieznanej skuteczności i realnym koszcie domyślnym wyborem jest niestosowanie. Zachowanie ich byłoby obronne, ale nieuzasadnione"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "decision",
+     "text": "Plan dzienny: 17 dawek w 8 porach według SUPLEMENTACJI_2027. Cynk: czwartek i niedziela. Glukozamina, chondroityna, Boswellia: do 21.03.2027."
+    },
+    {
+     "type": "original",
+     "text": "Stack finalny: 7 preparatów podstawowych (D3, K2, kreatyna, omega-3, askorbinian, magnez, kolagen+wit. C), 1 warunkowy (melatonina, na 4–8 tygodni) i 4 opcjonalne (cynk 2×/tydz., tauryna, teanina, glicyna). Odstawione: glukozamina, chondroityna, Boswellia."
+    },
+    {
+     "type": "p",
+     "text": "Sól: 0,5 g do porannej wody, elektrolity w trakcie treningu i sauny, 1 g w kolacji, 1,5 g w napojach. Bez zmian — uzasadnione przy poceniu."
+    }
+   ]
+  },
+  {
+   "id": "s7",
+   "num": "7",
+   "title": "Tygodniowy harmonogram",
+   "private": false,
+   "blocks": [
+    {
+     "type": "table",
+     "head": [
+      "Dzień",
+      "Trening",
+      "Cardio / basen",
+      "Sauna",
+      "Dieta",
+      "Kroki"
+     ],
+     "rows": [
+      [
+       "Poniedziałek",
+       "UPPER 1",
+       "—",
+       "✓ 20 min po treningu",
+       "2629",
+       "8–10 tys."
+      ],
+      [
+       "Wtorek",
+       "LOWER 1",
+       "—",
+       "—",
+       "2629",
+       "8–10 tys."
+      ],
+      [
+       "Środa",
+       "ABS",
+       "Rower 55 min",
+       "✓ 20 min po sesji",
+       "2629",
+       "8–10 tys."
+      ],
+      [
+       "Czwartek",
+       "wolne",
+       "—",
+       "✓ 2 × 20 min jedna wizyta, dwie rundy",
+       "2332",
+       "8–10 tys."
+      ],
+      [
+       "Piątek",
+       "UPPER 2",
+       "—",
+       "—",
+       "2629",
+       "8–10 tys."
+      ],
+      [
+       "Sobota",
+       "LOWER 2",
+       "—",
+       "✓ 20 min po treningu",
+       "2629",
+       "8–10 tys."
+      ],
+      [
+       "Niedziela",
+       "—",
+       "Basen 55 min",
+       "—",
+       "2629",
+       "8–10 tys."
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "Czwartek pozostaje dniem bez treningu , ale zawiera dwie sesje sauny po 20 minut — w ramach jednej wizyty, jako dwie rundy z wychłodzeniem między nimi , nie dwa osobne wyjścia. Dzień wolny jest dla sauny miejscem optymalnym: nie koliduje z treningiem i to wtedy jest czas. Łącznie 5 sesji tygodniowo . Odstępy 48 h między sesjami tej samej partii mięśniowej pozostają zachowane."
+    }
+   ]
+  },
+  {
+   "id": "s8",
+   "num": "8",
+   "title": "Fazowanie",
+   "private": false,
+   "blocks": [
+    {
+     "type": "p",
+     "text": "Model 34 → 64 → 94 serii został odrzucony . Powód: cel 94 serii nie ma uzasadnienia w danych dose-response (malejące zwroty powyżej ~20 serii na grupę tygodniowo), a skoki objętości były zbyt gwałtowne wobec historii ~1–2 sesji tygodniowo. Nowy model ma niższy sufit i osobny zegar dla góry i dołu ."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Faza",
+      "Tygodnie",
+      "Serie / tydz.",
+      "Główny cel",
+      "Warunek przejścia dalej"
+     ],
+     "rows": [
+      [
+       "Faza 0 wejściowa",
+       "1–3",
+       "~34 góra 20 · dół 10 · core 4",
+       "Góra: przypomnienie wzorców, znalezienie obciążeń. Dół: nauka ruchu i ustalenie tolerancji kolana. Sukces = ukończenie 3 tygodni bez objawów, nie ciężar na sztandze",
+       "Ukończone 3 tygodnie · ≥80% sesji zrealizowanych · kolano zielone przez cały czas · brak DOMS utrzymującego się >72 h"
+      ],
+      [
+       "Faza 1 adaptacji",
+       "4–8",
+       "~64 góra 34 · dół 22 · core 8",
+       "Góra: progresja obciążeniem, wykorzystanie muscle memory. Dół: poszerzanie zakresu ruchu, potem obciążenia. Wprowadzenie pełnego zestawu ćwiczeń",
+       "Ukończone 5 tygodni · kolano zielone · progresja siły na ≥3 bojach · sen i energia stabilne"
+      ],
+      [
+       "Faza 2 docelowa",
+       "9+",
+       "~93 góra 50 · dół 34 · core 9",
+       "Konsolidacja. To jest sufit, nie obowiązek — utrzymuj tylko taką objętość, jaką realnie regenerujesz",
+       "—"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "go",
+     "label": "Wdrożyć — jak wygląda Faza 1",
+     "text": "Tabele ćwiczeń w sekcjach 9–12 i 14 podają kolumny F0 i F2 . Faza 1 wyprowadza się z nich jedną regułą, bez osobnych tabel: Wykonujesz PEŁNY zestaw ćwiczeń z Fazy 2, ale po 2 serie w każdym. To daje UPPER 1 = 18 serii, UPPER 2 = 16, LOWER 1 = 10, LOWER 2 = 12, ABS = 8. Razem 64. Powtórzenia, RIR, tempo, przerwy i zakres ruchu pozostają takie jak w kolumnie Fazy 2. Zmienia się wyłącznie liczba serii. Wejście w Fazę 2 to dołożenie kolejnej serii tam, gdzie tabela ją przewiduje — przy uginaniu nóg dwóch, do czterech serii."
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Do kalibracji empirycznej",
+     "text": "Fazy zmieniają się według kalendarza: Faza 1 od 12.10.2026, Faza 2 od 16.11.2026 (D-017). Kryteria poniżej są listą kontrolną: jeśli kolano nie jest stabilnie zielone albo regeneracja siada w szczycie sesji egzaminacyjnej, zmiana dat faz wymaga Twojej decyzji."
+    }
+   ]
+  },
+  {
+   "id": "s9",
+   "num": "9",
+   "title": "UPPER 1",
+   "private": false,
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Rozgrzewka (10 min: 18:05–18:15)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas / serie",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, lekki opór",
+       "5 min",
+       "Podnosi temperaturę ciała bez obciążania górnej części ciała"
+      ],
+      [
+       "2",
+       "Krążenia ramion + band pull-apart",
+       "15 powt. każde ~1,5 min",
+       "Rozgrzewa obręcz barkową — istotne przed wiosłowaniem i face pull"
+      ],
+      [
+       "3",
+       "Seria rozgrzewkowa: wyciskanie sztangi leżąc",
+       "50% ciężaru roboczego × 8 ~1,5 min z przerwą",
+       "—"
+      ],
+      [
+       "4",
+       "Seria rozgrzewkowa: wyciskanie sztangi leżąc",
+       "70% ciężaru roboczego × 3–5 ~2 min z przerwą",
+       "Ostatni krok przed serią roboczą"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Trening"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Ćwiczenie",
+      "Serie F0",
+      "Serie F1",
+      "Serie F2",
+      "Powt.",
+      "RIR",
+      "Przerwa",
+      "Uwagi"
+     ],
+     "rows": [
+      [
+       "1",
+       "Wyciskanie sztangi leżąc",
+       "2",
+       "2",
+       "3",
+       "6–10",
+       "2",
+       "2–3 min",
+       "Punkt startowy: ~45 kg (ostatnia sesja 50×5)"
+      ],
+      [
+       "2",
+       "Wiosłowanie siedząc (V-grip)",
+       "2",
+       "2",
+       "3",
+       "8–12",
+       "2",
+       "2 min",
+       "Start ~45 kg"
+      ],
+      [
+       "3",
+       "Wyciskanie hantli nad głowę",
+       "2",
+       "2",
+       "3",
+       "6–10",
+       "2",
+       "2 min",
+       "Start ~10 kg/rękę"
+      ],
+      [
+       "4",
+       "Ściąganie drążka",
+       "2",
+       "2",
+       "3",
+       "8–12",
+       "2",
+       "2 min",
+       "Start ~40 kg"
+      ],
+      [
+       "5",
+       "Face pull nowe",
+       "2",
+       "2",
+       "3",
+       "12–15",
+       "1",
+       "90 s",
+       "Naprawia brak tylnego aktonu barku w tym dniu"
+      ],
+      [
+       "6",
+       "Rozpiętki bramka",
+       "0",
+       "2",
+       "2",
+       "10–15",
+       "1",
+       "90 s",
+       "Zredukowane z 4 serii — redundancja po wyciskaniu"
+      ],
+      [
+       "7",
+       "Wznosy bokiem",
+       "0",
+       "2",
+       "3",
+       "12–15",
+       "1",
+       "60 s",
+       "Ruch praktycznie nowy — naucz się techniki lekko, zanim dołożysz obciążenie"
+      ],
+      [
+       "8",
+       "Wyciskanie triceps na linkach",
+       "0",
+       "2",
+       "3",
+       "10–15",
+       "1",
+       "60 s",
+       "Tułów nieruchomy. Bujanie („rocking\") obniża bodziec i obciąża kręgosłup"
+      ],
+      [
+       "9",
+       "Uginanie ramion sztangą EZ",
+       "0",
+       "2",
+       "3",
+       "8–12",
+       "1",
+       "90 s",
+       "Start ~20 kg"
+      ],
+      [
+       "Razem",
+       "10",
+       "18",
+       "26",
+       ""
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "{private:9} Regresja: spadek powtórzeń >20% w dwóch sesjach przy dobrym śnie i jedzeniu → deload (−40–50% objętości na tydzień). Deload uruchamiamy objawowo, nie kalendarzowo ."
+    },
+    {
+     "type": "h3",
+     "text": "Schłodzenie (10 min: 19:25–19:35)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, bardzo lekki opór, tempo swobodne",
+       "5 min",
+       "Aktywne obniżenie tętna zaraz po ostatniej serii, zanim przejdziesz do rozciągania"
+      ],
+      [
+       "2",
+       "Rozciąganie klatki piersiowej w futrynie drzwi",
+       "2×30 s / stronę",
+       "Ramię na wysokości barku, delikatny obrót tułowia od ramienia"
+      ],
+      [
+       "3",
+       "Rozciąganie tricepsa nad głową",
+       "2×20 s / ramię",
+       "—"
+      ],
+      [
+       "4",
+       "Rozciąganie górnej części pleców (objęcie kolan lub futryny)",
+       "1×30 s",
+       "Kontra dla pozycji wyciskania"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Serie robocze kończysz ok. 19:25, schłodzenie do 19:35. Dalej: prysznic bez zmian godzin (harmonogram w sekcji 18)."
+    }
+   ]
+  },
+  {
+   "id": "s10",
+   "num": "10",
+   "title": "UPPER 2",
+   "private": false,
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Rozgrzewka (10 min: 18:05–18:15)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas / serie",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, lekki opór",
+       "5 min",
+       "—"
+      ],
+      [
+       "2",
+       "Krążenia ramion + band pull-apart",
+       "15 powt. każde ~1,5 min",
+       "Rozgrzewa obręcz barkową przed OHP i podciąganiem"
+      ],
+      [
+       "3",
+       "Seria rozgrzewkowa: wyciskanie sztangi na skosie",
+       "50% ciężaru roboczego × 8 ~1,5 min z przerwą",
+       "—"
+      ],
+      [
+       "4",
+       "Seria rozgrzewkowa: wyciskanie sztangi na skosie",
+       "70% ciężaru roboczego × 3–5 ~2 min z przerwą",
+       "Ostatni krok przed serią roboczą"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Trening"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Ćwiczenie",
+      "Serie F0",
+      "Serie F1",
+      "Serie F2",
+      "Powt.",
+      "RIR",
+      "Przerwa"
+     ],
+     "rows": [
+      [
+       "1",
+       "Wyciskanie sztangi na skosie",
+       "2",
+       "2",
+       "3",
+       "6–10",
+       "2",
+       "2–3 min"
+      ],
+      [
+       "2",
+       "Wiosłowanie sztangą",
+       "2",
+       "2",
+       "3",
+       "8–12",
+       "2",
+       "2 min"
+      ],
+      [
+       "3",
+       "Wyciskanie sztangi nad głowę (OHP)",
+       "2",
+       "2",
+       "3",
+       "6–10",
+       "2",
+       "2 min"
+      ],
+      [
+       "4",
+       "Podciąganie z asystą",
+       "2",
+       "2",
+       "3",
+       "6–10",
+       "2",
+       "2 min"
+      ],
+      [
+       "5",
+       "Odwodzenie ramion w opadzie (wyciąg)",
+       "2",
+       "2",
+       "3",
+       "12–15",
+       "1",
+       "90 s"
+      ],
+      [
+       "6",
+       "Wznosy bokiem",
+       "0",
+       "2",
+       "3",
+       "12–15",
+       "1",
+       "60 s"
+      ],
+      [
+       "7",
+       "Wyciskanie francuskie leżąc",
+       "0",
+       "2",
+       "3",
+       "8–12",
+       "1",
+       "90 s"
+      ],
+      [
+       "8",
+       "Uginanie ramion hantlami",
+       "0",
+       "2",
+       "3",
+       "10–12",
+       "1",
+       "90 s"
+      ],
+      [
+       "Razem",
+       "10",
+       "16",
+       "24",
+       ""
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Co mówi Twój log treningowy",
+     "text": "Szczyt formy to wrzesień 2024: wyciskanie 60 kg × 9 (szacowany 1RM ~76–78 kg). Obecnie 50 kg × 5 (~58–60 kg), czyli spadek ~23–25% . Spadki następowały po przerwach 127 i 341 dni, nie z powodu złego programu — najlepszy blok (Q3 2024, 11 sesji) dał realną progresję. Realistyczny powrót do 60 kg × 9: 8–16 tygodni przy dwóch sesjach górnych tygodniowo, prawdopodobnie bliżej dolnej granicy dzięki muscle memory. To jest odbudowa, nie budowa od zera. Kolumna RPE była pusta we wszystkich 786 wierszach, więc nie da się rozstrzygnąć, czy dawna stagnacja wynikała ze zbyt niskiej intensywności czy z częstotliwości. Nie zwiększam objętości „na zapas\" dla grup historycznie słabszych — brak danych nie jest dowodem niedotrenowania."
+    },
+    {
+     "type": "h3",
+     "text": "Schłodzenie (10 min: 19:25–19:35)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, bardzo lekki opór, tempo swobodne",
+       "5 min",
+       "Aktywne obniżenie tętna zaraz po ostatniej serii"
+      ],
+      [
+       "2",
+       "Rozciąganie klatki piersiowej w futrynie drzwi",
+       "2×30 s / stronę",
+       "—"
+      ],
+      [
+       "3",
+       "Rozciąganie najszerszego grzbietu (boczne pochylenie z uniesioną ręką)",
+       "2×20 s / stronę",
+       "Delikatnie, bez odbijania"
+      ],
+      [
+       "4",
+       "Rozciąganie tricepsa nad głową",
+       "1×20 s / ramię",
+       "—"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Dalej: prysznic, potem sauna, jeśli dzień ją przewiduje (harmonogram w sekcji 18)."
+    }
+   ]
+  },
+  {
+   "id": "s11",
+   "num": "11",
+   "title": "LOWER 1 — akcent kolanowy",
+   "private": false,
+   "blocks": [
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Zasada nadrzędna dla obu sesji LOWER",
+     "text": "{private:10} Każda tkanka — chrząstka, kość podchrzęstna, ścięgno, mięsień, kontrola nerwowo-mięśniowa — wymaga stopniowego wprowadzania bodźca niezależnie od stanu strukturalnego. Żaden kąt nie jest bezpieczny absolutnie ani zakazany absolutnie. Zakres poszerzamy aktywnie o ~10–15° co 1–2 tygodnie przy braku objawów, dążąc do pełnego. Utrzymywanie ograniczenia dłużej niż 6–8 tygodni u osoby bez objawów jest szkodliwe — utrwala wzorzec unikania, który jest sednem problemu. Status tej reguły: tempo „+10–15° co 1–2 tygodnie\" to heurystyka praktyczna, nie wartość wyprowadzona z badań . {private:11} Liczba służy temu, by progresja miała w ogóle jakieś tempo i nie odbywała się skokowo — kryterium nadrzędnym pozostaje tolerancja objawowa (sekcja 13), a nie kalendarz. Jeśli kolano toleruje szybsze poszerzanie, wolniejsze staje się zbędnym ograniczeniem; jeśli reaguje — zatrzymujesz się niezależnie od tego, ile czasu minęło."
+    },
+    {
+     "type": "h3",
+     "text": "Rozgrzewka (10 min: 18:05–18:15)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas / serie",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, siodełko wysoko , lekki–umiarkowany opór",
+       "5 min",
+       "Wysokie siodełko ogranicza zgięcie kolana (ta sama zasada co w sekcji 14) — podnosi temperaturę stawu bez pełnego zakresu ruchu"
+      ],
+      [
+       "2",
+       "Odwodzenie biodra w leżeniu bokiem",
+       "12 powt. / stronę ~1,5 min",
+       "Aktywacja pośladka średniego przed obciążeniem"
+      ],
+      [
+       "3",
+       "Przysiady bez obciążenia w aktualnym tolerowanym zakresie",
+       "10 powt., tempo wolne ~1,5 min",
+       "Zakres = dzisiejszy cel ROM z tabeli poniżej. Nie pogłębiaj na siłę"
+      ],
+      [
+       "4",
+       "Seria rozgrzewkowa: suwnica, bardzo lekki ciężar",
+       "10 powt. w docelowym zakresie ~2 min",
+       "Ostatni krok przed serią roboczą"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Przed pierwszą serią roboczą zanotuj wyjściowy poziom kolana (0–10) — punkt odniesienia dla systemu trzech świateł w trakcie sesji (sekcja 13)."
+    },
+    {
+     "type": "h3",
+     "text": "Trening"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Ćwiczenie",
+      "Serie F0",
+      "Serie F1",
+      "Serie F2",
+      "Powt.",
+      "RIR",
+      "Przerwa",
+      "ROM startowy",
+      "Zwiększanie ROM"
+     ],
+     "rows": [
+      [
+       "Suwnica (leg press)",
+       "2",
+       "2",
+       "3",
+       "10–12",
+       "2–3",
+       "2 min",
+       "zgięcie ~60°",
+       "+10–15° co 1–2 tyg. do pełnego"
+      ],
+      [
+       "Martwy ciąg rumuński",
+       "0",
+       "2",
+       "3",
+       "10–12 po 4 tyg. → 8–10",
+       "3–4 po 4 tyg. → 2–3",
+       "2 min",
+       "pełny od początku",
+       "Pierwsze 4 tygodnie ekspozycji: wyższe powtórzenia, większy zapas. Hip hinge to wzorzec bez ani jednej serii w Twoim logu, a ruch obciąża odcinek lędźwiowy — pozycja przed obciążeniem Kolano prawie wyprostowane, obciążenie rzepki minimalne"
+      ],
+      [
+       "Prostowanie nóg",
+       "0",
+       "2",
+       "3",
+       "12–15",
+       "1–2",
+       "90 s",
+       "90° → ~45°",
+       "Rozszerzać ku wyprostowi wg tolerancji W łańcuchu otwartym obciążenie rzepki jest największe blisko wyprostu — odwrotnie niż w suwnicy"
+      ],
+      [
+       "Spanish squat / wall-sit",
+       "2",
+       "2",
+       "3",
+       "30–45 s",
+       "—",
+       "90 s",
+       "~60°",
+       "Wydłużać czas, potem dokładać opór Opcja niskoprogowa na dni z objawami"
+      ],
+      [
+       "Łydki stojąc",
+       "0",
+       "2",
+       "3",
+       "12–15",
+       "1–2",
+       "60 s",
+       "pełny",
+       "—"
+      ],
+      [
+       "Razem",
+       "4",
+       "10",
+       "15",
+       ""
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "Obciążenie startowe w Fazie 0: najlżejsze dostępne. Nie ustalam konkretnych kilogramów, bo nie ma żadnych danych o Twojej obciążalności dolnej. Celem pierwszych sesji nie jest bodziec, tylko informacja."
+    },
+    {
+     "type": "p",
+     "text": "{private:12} Kolejność progresji na dole: technika → zakres ruchu → dopiero obciążenie. Warunek regresji: kolano żółte lub czerwone (sekcja 13)."
+    },
+    {
+     "type": "h3",
+     "text": "Schłodzenie (10 min: 19:25–19:35)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas",
+      "Warunek"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, siodełko wysoko , bardzo lekki opór",
+       "5 min",
+       "Zawsze — aktywne obniżenie tętna, ta sama zasada wysokiego siodełka co w rozgrzewce"
+      ],
+      [
+       "2",
+       "Rozciąganie łydki przy ścianie",
+       "2×30 s / noga",
+       "Zawsze"
+      ],
+      [
+       "3",
+       "Rozciąganie hamstringu (siedząc lub z taśmą, kolano prawie proste)",
+       "2×30 s / noga",
+       "Zawsze — pozycja nie obciąża zgięcia kolana pod napięciem"
+      ],
+      [
+       "4",
+       "Rozciąganie czworogłowego (stojąc, trzymając kostkę za sobą)",
+       "2×20 s / noga, delikatnie, bez odbijania",
+       "Tylko przy świetle zielonym. Przy żółtym lub czerwonym pomiń — Spanish squat z treningu już dał ekspozycję na zgięcie"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Dalej: prysznic, potem sauna, jeśli dzień ją przewiduje (harmonogram w sekcji 18)."
+    }
+   ]
+  },
+  {
+   "id": "s12",
+   "num": "12",
+   "title": "LOWER 2 — akcent biodrowy i tylny łańcuch",
+   "private": false,
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Rozgrzewka (10 min: 18:05–18:15)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas / serie",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, siodełko wysoko , lekki opór",
+       "5 min",
+       "Ta sama zasada co w LOWER 1 i sekcji 14"
+      ],
+      [
+       "2",
+       "Glute bridge bez obciążenia",
+       "12 powt. ~1,5 min",
+       "Aktywacja pośladka wielkiego przed hip thrustem"
+      ],
+      [
+       "3",
+       "Odwodzenie biodra z taśmą",
+       "12 powt. / stronę ~1,5 min",
+       "—"
+      ],
+      [
+       "4",
+       "Seria rozgrzewkowa: hip thrust, lekki ciężar",
+       "10 powt. ~2 min",
+       "Ostatni krok przed serią roboczą"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Trening"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Ćwiczenie",
+      "Serie F0",
+      "Serie F1",
+      "Serie F2",
+      "Powt.",
+      "RIR",
+      "Przerwa",
+      "ROM startowy",
+      "Uwagi"
+     ],
+     "rows": [
+      [
+       "Hip thrust",
+       "2",
+       "2",
+       "3",
+       "10–12",
+       "2",
+       "2 min",
+       "pełny",
+       "Znikome obciążenie rzepki, buduje pośladek wielki"
+      ],
+      [
+       "Uginanie nóg (leżąc lub siedząc)",
+       "0",
+       "2",
+       "4",
+       "10–12",
+       "2",
+       "90 s",
+       "pełny",
+       "Bezpieczne od pierwszego dnia. Czwarta seria równoważy stosunek czworogłowy : dwugłowy, a ruch nie obciąża rzepki"
+      ],
+      [
+       "Step-up lub przysiad bułgarski",
+       "0",
+       "2",
+       "3",
+       "8–10 / nogę",
+       "2–3",
+       "2 min",
+       "niski stopień",
+       "Wprowadzać dopiero w Fazie 1. Wyższy stopień = głębsze zgięcie = większe obciążenie rzepki"
+      ],
+      [
+       "Suwnica (stopy wyżej)",
+       "0",
+       "2",
+       "3",
+       "10–12",
+       "2",
+       "2 min",
+       "~60°",
+       "Akcent pośladek i dwugłowy uda"
+      ],
+      [
+       "Odwodzenie biodra",
+       "2",
+       "2",
+       "3",
+       "15",
+       "1",
+       "60 s",
+       "pełny",
+       "Pośladek średni. Poprawia mechanikę rzepki — kluczowe w bólu rzepkowo-udowym"
+      ],
+      [
+       "Łydki siedząc",
+       "2",
+       "2",
+       "3",
+       "12–15",
+       "1–2",
+       "60 s",
+       "pełny",
+       "Łydka 36,5 cm — realny deficyt"
+      ],
+      [
+       "Razem",
+       "6",
+       "12",
+       "19",
+       ""
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "LOWER 2 ma mniejszą dominację kolanową niż LOWER 1, ale ta sama progresja objawowa obowiązuje. Cztery z sześciu ćwiczeń mają znikome obciążenie stawu rzepkowo-udowego, więc ta sesja jest bezpieczniejszym punktem wejścia — jeśli LOWER 1 sprawia trudność, LOWER 2 zwykle nadal będzie tolerowane."
+    },
+    {
+     "type": "h3",
+     "text": "Schłodzenie (10 min: 19:25–19:35)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas",
+      "Warunek"
+     ],
+     "rows": [
+      [
+       "1",
+       "Rower stacjonarny, siodełko wysoko , bardzo lekki opór",
+       "5 min",
+       "Zawsze"
+      ],
+      [
+       "2",
+       "Rozciąganie zginaczy biodra (klęczący wykrok, delikatnie)",
+       "2×20 s / stronę",
+       "Zielone lub żółte. Przy czerwonym pomiń pozycję klęczącą"
+      ],
+      [
+       "3",
+       "Rozciąganie pośladka (figure-4, leżąc na plecach)",
+       "2×20 s / stronę",
+       "Zawsze — brak obciążenia osiowego kolana"
+      ],
+      [
+       "4",
+       "Rozciąganie łydki przy ścianie",
+       "2×20 s / noga",
+       "Zawsze"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Dalej: prysznic, potem sauna, jeśli dzień ją przewiduje (harmonogram w sekcji 18)."
+    }
+   ]
+  },
+  {
+   "id": "s13",
+   "num": "13",
+   "title": "System kolana",
+   "private": false,
+   "blocks": [
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Rozdzielenie, które decyduje o wszystkim",
+     "text": "{private:13} {private:14} ACL, PCL, więzadła poboczne, troczki rzepki, ciało Hoffy — bez zmian. Takie zmiany są bardzo częste u osób całkowicie bezobjawowych i korelacja obrazu z bólem jest słaba. Objawy, funkcja i tolerancja decydują o programowaniu. Aktualnie: sporadyczne uczucie „luzu\", dolegliwości bólowe wyraźnie mniejsze niż kilkanaście miesięcy temu. Zero danych o obciążalności, bo kolano nie było obciążane od 3,5 roku. To jest niewiadoma nieusuwalna analitycznie — rozstrzygnie ją pierwsze obciążenie."
+    },
+    {
+     "type": "h3",
+     "text": "Trzy światła"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Sygnał",
+      "Zielone",
+      "Żółte",
+      "Czerwone"
+     ],
+     "rows": [
+      [
+       "Ból w trakcie",
+       "0–3/10, stabilny",
+       "3–5/10",
+       ">5/10 lub narastający w serii"
+      ],
+      [
+       "Ból bezpośrednio po",
+       "0–3/10",
+       "do 5/10",
+       "ostry, kłujący"
+      ],
+      [
+       "Następny poranek (24 h)",
+       "powrót do stanu wyjściowego",
+       "podwyższony, ustępuje do wieczora",
+       "utrzymuje się >24 h"
+      ],
+      [
+       "Obrzęk / wysięk",
+       "brak",
+       "minimalny",
+       "wyraźny lub nawracający"
+      ],
+      [
+       "Sztywność poranna",
+       "brak",
+       "krótka",
+       "narastająca z tygodnia na tydzień"
+      ],
+      [
+       "Niestabilność / „luz\"",
+       "brak epizodów",
+       "rzadkie uczucie, bez uginania",
+       "epizod uginania lub zablokowania"
+      ],
+      [
+       "Trend tygodniowy",
+       "stabilny lub lepszy",
+       "plateau",
+       "pogorszenie"
+      ],
+      [
+       "DZIAŁANIE",
+       "Progresuj normalnie — zakres wg harmonogramu, obciążenie wg kryteriów",
+       "Zatrzymaj obciążenie i zakres. Powtórz sesję identycznie. Bez progresji",
+       "−30–50% obciążenia lub zmniejsz zakres. Jeśli utrzymuje się >2 sesje → fizjoterapeuta"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Status dowodowy progów bólu",
+     "text": "{private:15} Jest przeniesiony z modelu monitorowania bólu opracowanego i zwalidowanego dla tendinopatii ścięgna Achillesa (Silbernagel i wsp., Am J Sports Med 2007;35(6):897–906, RCT, n = 38), gdzie dopuszczano ból do ok. 5/10 pod warunkiem powrotu do stanu wyjściowego następnego ranka i braku narastania z tygodnia na tydzień. To jest ekstrapolacja — inna tkanka, inny mechanizm bólu, inna populacja. {private:16} Progi liczbowe traktuj więc jako ramę porządkującą, a nie granicę biologiczną. Dwa sygnały w tej tabeli są jednak niezależne od tej ekstrapolacji i ważniejsze od samej liczby: wysięk w stawie oraz epizod uginania kolana. Oba są objawami mechanicznymi, nie bólowymi, i oba oznaczają zatrzymanie progresji niezależnie od tego, ile wynosi ból."
+    },
+    {
+     "type": "box",
+     "kind": "stop",
+     "label": "Konsultacja natychmiastowa, bez czekania",
+     "text": "Obrzęk stawu · zablokowanie · rzeczywisty epizod uginania kolana · ból nocny. Objaw „luzu\" przy urazowym początku (marzec 2023, mecz piłki nożnej, nigdy nie zdiagnozowany) ma inną wagę niż przy początku podstępnym. Najbardziej prawdopodobne wyjaśnienie jest łagodne — osłabienie mięśnia czworogłowego po 3,5 roku nieużywania daje dokładnie takie odczucie przy strukturalnie sprawnym kolanie — ale to należy sprawdzić, a nie założyć . Konsultacja fizjoterapeutyczna w tygodniu 0–2 jest częścią planu, nie formalnością. Poproś o: ocenę siły mięśnia czworogłowego i pośladkowych, test step-down, wywiad o epizodzie z 2023 r. (czy było uciekanie kolana, obrzęk w ciągu godzin, niemożność obciążenia)."
+    },
+    {
+     "type": "p",
+     "text": "BFR (trening z ograniczeniem przepływu) nie występuje w tym planie. Jest opcją trzeciego rzutu, aktywowaną wyłącznie po spełnieniu łącznie trzech warunków: minimum 4 tygodnie udokumentowanej próby standardowego obciążenia, potwierdzona nietolerancja obciążeń dających bodziec, nadzór fizjoterapeuty z pomiarem ciśnienia okluzji. Wcześniej próbujemy: trening niskim obciążeniem z wysoką liczbą powtórzeń, potem izometrii."
+    }
+   ]
+  },
+  {
+   "id": "s14",
+   "num": "14",
+   "title": "Cardio",
+   "private": false,
+   "blocks": [
+    {
+     "type": "table",
+     "head": [
+      "Parametr",
+      "Ustalenie"
+     ],
+     "rows": [
+      [
+       "Modalność",
+       "Rower stacjonarny — nie bieganie. Interferencja z hipertrofią dotyczy głównie biegania (komponent ekscentryczny); rower jest praktycznie neutralny"
+      ],
+      [
+       "Czas",
+       "45 min"
+      ],
+      [
+       "Intensywność",
+       "65–70% HRmax (~125–135 bpm)"
+      ],
+      [
+       "Miejsce w tygodniu",
+       "Środa — dzień po LOWER 1 i dwa dni przed UPPER 2. Osobny dzień od siły, więc odstęp jest maksymalny"
+      ],
+      [
+       "Ustawienie a kolano",
+       "Siodełko wyżej niż intuicyjnie, opór niski–umiarkowany, wyższa kadencja. Wyższe siodełko zmniejsza zgięcie kolana i obciążenie rzepki"
+      ],
+      [
+       "Szacowany wydatek",
+       "~410 kcal netto"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "Nie zwiększam cardio, żeby „spalać więcej kalorii\". Deficyt reguluję dietą, bo jest precyzyjniejszy i nie kosztuje regeneracji. Cardio jest tu dla wydolności i zdrowia sercowo-naczyniowego, nie jako narzędzie redukcji."
+    },
+    {
+     "type": "h3",
+     "text": "Struktura sesji (55 min na rowerze)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Faza",
+      "Czas",
+      "Co"
+     ],
+     "rows": [
+      [
+       "Rozgrzewka",
+       "5 min",
+       "Niski opór, stopniowe dochodzenie do 65–70% HRmax. Osobne 5 minut, nie część docelowych 45"
+      ],
+      [
+       "Właściwa część",
+       "45 min",
+       "Docelowa strefa 65–70% HRmax przez cały czas (sekcja powyżej) — bez rampy na wejściu i wyjściu, to już zrobione w rozgrzewce i schłodzeniu"
+      ],
+      [
+       "Schłodzenie",
+       "5 min",
+       "Redukcja oporu, tętno spada przed zejściem z roweru. Osobne 5 minut"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Rower: 55 minut łącznie (5 + 45 + 5). Po zejściu z roweru: 1 min swobodnego oddechu, potem przejście do bloku ABS."
+    },
+    {
+     "type": "h3",
+     "text": "Część ABS (po rowerze, środa)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Ćwiczenie",
+      "Funkcja",
+      "F0",
+      "F1",
+      "F2",
+      "Powt. / czas",
+      "Przerwa"
+     ],
+     "rows": [
+      [
+       "1. Reverse crunch",
+       "fleksja — akcent dolna część prostego brzucha",
+       "0",
+       "2",
+       "3",
+       "12–15",
+       "60 s"
+      ],
+      [
+       "2. Levitation crunch nowe",
+       "fleksja — akcent górna część prostego brzucha",
+       "0",
+       "2",
+       "2",
+       "10–12 RIR 1–2, pauza 1–2 s w górze",
+       "60 s"
+      ],
+      [
+       "3. Plank (deska)",
+       "anty-ekstensja",
+       "2",
+       "2",
+       "2",
+       "30–45 s",
+       "60 s"
+      ],
+      [
+       "4. Side plank (deska bokiem)",
+       "anty-lateralna fleksja",
+       "2",
+       "2",
+       "2",
+       "20–30 s / stronę",
+       "60 s"
+      ],
+      [
+       "Razem serii",
+       "4",
+       "8",
+       "9",
+       ""
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "p",
+     "text": "Kolejność jest celowa: najpierw praca dynamiczna, potem izometryczna. Deski wykonane jako pierwsze zmęczyłyby mięśnie brzucha izometrycznie i pogorszyły jakość ruchów dynamicznych. Back extension nie wchodzi do bloku — ekstensja jest już mocno obciążona przez martwy ciąg rumuński w LOWER 1 i hip thrust w LOWER 2."
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Levitation crunch — ograniczenia definicji",
+     "text": "Jakość dowodów: bardzo niska. Nazwa nie ma standardowej definicji w literaturze. Dostępne źródła podają dwa wzajemnie sprzeczne opisy — jeden to jednoczesne unoszenie nóg i tułowia z chwytem za podłoże (wariant „V-up\"), drugi to ruch wyłącznie górnej części tułowia z pauzą w górze. Baza to media społecznościowe i bazy ćwiczeń aplikacji fitness; nie istnieją badania EMG ani próby kliniczne dla tej nazwy. Definicja obowiązująca w tym planie: leżenie tyłem, ramiona wyprostowane nad głową (długa dźwignia), oderwanie łopatek od podłoża ruchem „od góry\", pauza 1–2 s w skurczu , kontrolowane opuszczanie. Odcinek lędźwiowy pozostaje w kontakcie z podłożem, nogi nieruchome. Uzasadnienie funkcjonalne: reverse crunch obciąża głównie dolną część mięśnia prostego brzucha przez tylną rotację miednicy, a w pozostałych ćwiczeniach bloku nie ma ruchu z akcentem na część górną. Zróżnicowana aktywacja obszarów mięśnia prostego między crunchem a reverse crunchem jest w EMG nieźle udokumentowana, więc luka funkcjonalna jest realna — w odróżnieniu od zwykłego crunchu, pominiętego w bloku, bo dubluje reverse crunch. Dlaczego 2 serie, nie 3: to uzupełnienie luki, nie nowy priorytet. Blok liczy 9 serii, cały tydzień 93 — objętość marginalna wobec całości. Czego to nie zmieni: wyglądu brzucha. {private:17} Żadna objętość ABS tego nie obejdzie."
+    },
+    {
+     "type": "h3",
+     "text": "Rozciąganie brzucha i kręgosłupa (5 min)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "#",
+      "Co",
+      "Czas",
+      "Wskazówka"
+     ],
+     "rows": [
+      [
+       "1",
+       "Pozycja „kobra\" (leżenie na brzuchu, uniesienie tułowia na wyprostowanych ramionach)",
+       "2×20 s",
+       "Rozciąga mięsień prosty brzucha po pracy w zgięciu (reverse crunch, levitation crunch)"
+      ],
+      [
+       "2",
+       "Rotacja kręgosłupa w leżeniu (kolana zgięte, opad na bok)",
+       "2×20 s / stronę",
+       "Delikatnie, bez odbijania — kontra dla pozycji plank/side plank"
+      ],
+      [
+       "3",
+       "Pozycja dziecka (klęk podparty, biodra do pięt)",
+       "1×30 s",
+       "Rozciąga odcinek lędźwiowy po pracy izometrycznej"
+      ],
+      [
+       "4",
+       "Rozciąganie zginaczy biodra (stojąc, wykrok, delikatnie)",
+       "1×20 s / stronę",
+       "—"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Po ABS nie ma już nic zaplanowanego tego dnia — możesz wydłużyć dowolny z powyższych, jeśli jest komfortowo."
+    }
+   ]
+  },
+  {
+   "id": "s15",
+   "num": "15",
+   "title": "Basen",
+   "private": false,
+   "blocks": [
+    {
+     "type": "table",
+     "head": [
+      "Parametr",
+      "Ustalenie"
+     ],
+     "rows": [
+      [
+       "Czas",
+       "55 min (5 rozgrzewka + 45 właściwa część + 5 schłodzenie)"
+      ],
+      [
+       "Styl",
+       "Kraul lub grzbiet. Unikaj klasycznego (żabki) — ruch odwodzenia z rotacją obciąża przedział przyśrodkowy i staw rzepkowo-udowy bardziej niż pozostałe style"
+      ],
+      [
+       "Intensywność — parametr wiodący",
+       "RPE 3–4 w skali 0–10 (odpowiednik 11–13 w skali Borga 6–20). Utrzymuj się w tym przedziale przez 45 minut właściwej części (nie licząc rozgrzewki i schłodzenia)"
+      ],
+      [
+       "Jak to rozpoznać w wodzie",
+       "Trzy jednoczesne kryteria: • Oddech co 3. ruch ramion (obustronny), bez głodu powietrza • Przy ścianie potrafisz wypowiedzieć pełne zdanie bez łapania tchu • Ostatnie 10 minut płyniesz w tym samym tempie co pierwsze 10; przerwa przy ścianie ≤15 s"
+      ],
+      [
+       "Kiedy jest za wysoka",
+       "Którykolwiek z sygnałów: musisz oddychać co 2. ruch ramion · potrzebujesz ponad 30 s odpoczynku przy ścianie · tempo spada w drugiej połowie · pieczenie w barkach lub przedramionach"
+      ],
+      [
+       "Tętno (opcjonalnie)",
+       "~110–125 bpm , jeśli masz wodoszczelny monitor. To parametr pomocniczy, nie sterujący — w wodzie tętno reaguje z opóźnieniem względem tempa, więc możesz być głęboko w wysiłku, gdy zegarek pokazuje jeszcze wartości umiarkowane. Dodatkowo tętno maksymalne w pływaniu jest niższe niż na lądzie o ok. 5–15 uderzeń (pozycja pozioma, chłodzenie, odruch nurkowy), więc przenoszenie stref rowerowych do basenu jest błędem"
+      ],
+      [
+       "Miejsce w tygodniu",
+       "Niedziela — dzień po LOWER 2, przed poniedziałkowym UPPER 1"
+      ],
+      [
+       "Kolano",
+       "Zerowe obciążenie osiowe. Najbezpieczniejsza aktywność w całym planie"
+      ],
+      [
+       "Szacowany wydatek",
+       "~370 kcal netto"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Struktura sesji (55 min łącznie)"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Faza",
+      "Czas",
+      "RPE / co"
+     ],
+     "rows": [
+      [
+       "Rozgrzewka",
+       "5 min",
+       "RPE 2, stopniowe dochodzenie do docelowego tempa. Osobne 5 minut, nie część docelowych 45"
+      ],
+      [
+       "Właściwa część",
+       "45 min",
+       "RPE 3–4 przez cały czas (tabela powyżej)"
+      ],
+      [
+       "Schłodzenie",
+       "5 min",
+       "RPE 2, swobodne pływanie lub dryfowanie. Osobne 5 minut"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Basen: 55 minut łącznie (5 + 45 + 5). Po wyjściu z wody, opcjonalnie: rozciąganie barków (skrzyżowanie ramienia na klatce piersiowej) 2×20 s / stronę."
+    }
+   ]
+  },
+  {
+   "id": "s16",
+   "num": "16",
+   "title": "Kroki",
+   "private": false,
+   "blocks": [
+    {
+     "type": "p",
+     "text": "8000–10 000 kroków dziennie. Twoje wyjściowe 8000 to dobry cel — dane o korzyściach dla śmiertelności osiągają plateau w okolicach 7000–9000 kroków u osób poniżej 60. roku życia."
+    },
+    {
+     "type": "p",
+     "text": "Kroki pełnią tu rolę bazowej aktywności i NEAT, nie narzędzia redukcji . Kalorie i trening załatwiają deficyt. Kroki wchodzą jako dźwignia dopiero w jednym scenariuszu: gdy masa i talia stoją przez cztery tygodnie, wtedy +1500 kroków jest alternatywą dla cięcia kalorii (sekcja 20)."
+    },
+    {
+     "type": "small",
+     "text": "Szacowany wydatek: ~300 kcal netto przy 8000 kroków, ~370 przy 10 000."
+    }
+   ]
+  },
+  {
+   "id": "s17",
+   "num": "17",
+   "title": "Sauna, sód i nawodnienie",
+   "private": false,
+   "blocks": [
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "HSP i temperatura sauny",
+     "text": "Konkretna temperatura sauny nie jest warunkiem aktywacji białek szoku cieplnego. Ekspresja HSP zależy od wzrostu temperatury rdzenia ciała , a nie od temperatury powietrza w kabinie; dodatkowo przy powtarzanych ekspozycjach zachodzi habituacja, która tę odpowiedź osłabia. Fińskie badania kohortowe, na których opiera się większość danych o saunie i zdrowiu sercowo-naczyniowym, używały saun o temperaturze ~79–80°C — dążenie do konkretnej, wysokiej wartości nie ma więc podstaw. Długość sesji rzędu 20 minut ma za to pewne oparcie w danych — w tej samej kohorcie sesje dłuższe niż 19 minut wiązały się z niższym ryzykiem sercowo-naczyniowym niż sesje krótsze. To dowód obserwacyjny, nie przyczynowy, i dotyczy ryzyka zgonu, nie wprost białek szoku cieplnego. Sauna pozostaje w planie, bo jest przyjemna i prawdopodobnie korzystna dla zdrowia — nie jako warunek konieczny efektów treningowych."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Parametr",
+      "Ustalenie"
+     ],
+     "rows": [
+      [
+       "Liczba sesji",
+       "5 w tygodniu: poniedziałek 1 · środa 1 · czwartek 2 · sobota 1. Niedziela bez sauny. Czwartkowe dwie sesje wykonujesz w jednej wizycie, jako dwie rundy z wychłodzeniem między nimi . Mieści się to w przedziale 4–7 sesji tygodniowo, dla którego kohorta fińska notowała najkorzystniejsze skojarzenia sercowo-naczyniowe"
+      ],
+      [
+       "Temperatura",
+       "Ta, którą ma obiekt — 80–100°C jest obojętne. Nie szukaj konkretnej wartości"
+      ],
+      [
+       "Czas",
+       "Dokładnie 20 minut każda sesja. To nie jest zakres — to stała długość. W kohorcie KIHD sesje dłuższe niż 19 minut wiązały się ze skorygowanym HR 0,48 (95% CI 0,31–0,75) dla nagłego zgonu sercowego wobec sesji krótszych niż 11 minut Jedyny powód wcześniejszego wyjścia: zawroty głowy, nudności, kołatanie serca lub wyraźny dyskomfort. To reguła bezpieczeństwa, nie luz interpretacyjny — żaden odpowiedzialny protokół cieplny jej nie pomija"
+      ],
+      [
+       "Timing względem treningu",
+       "Po treningu, nigdy przed. Sauna po treningu oporowym nie tłumi hipertrofii — w przeciwieństwie do zanurzenia w zimnej wodzie, które udokumentowanie ją osłabia. Przed treningiem powoduje odwodnienie i zmęczenie termiczne"
+      ],
+      [
+       "Timing względem snu",
+       "Zakończ najpóźniej 1,5 h przed snem . Wychłodzenie po saunie sprzyja zasypianiu, ale bezpośrednio przed snem podwyższona temperatura rdzenia je utrudnia"
+      ],
+      [
+       "Nawodnienie i elektrolity",
+       "Uzupełnij płyny i sód po każdej sesji. Utrata rzędu 0,5–1 l na sesję, czyli 2,5–5 l tygodniowo przy pięciu sesjach — sól poranna, elektrolity treningowe i sól jodowana w diecie pokrywają to, ale w czwartek, w dniu bez treningu, pij dodatkowo między rundami"
+      ],
+      [
+       "Zakaz",
+       "Nie mierz BIA po saunie ani po treningu — wynik będzie zafałszowany"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Protokół pojedynczej sesji"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Etap",
+      "Działanie",
+      "Uzasadnienie"
+     ],
+     "rows": [
+      [
+       "30 min przed",
+       "Wypij 250–500 ml wody . Nie wchodź bezpośrednio po obfitym posiłku",
+       "Przepływ krwi musi zostać przekierowany do skóry; trawienie konkuruje o ten sam zasób"
+      ],
+      [
+       "Prysznic przed",
+       "Obowiązkowy, z mydłem, całe ciało. Woda ciepła, nie gorąca. Następnie wytrzyj się do sucha",
+       "Mydło usuwa pot, sebum, pozostałości antyperspirantu i kosmetyków, które tworzą barierę obniżającą wydajność pocenia i przenoszą się na drewno. Sucha skóra zaczyna się pocić szybciej — wilgoć na skórze chłodzi przez parowanie i opóźnia odpowiedź potową"
+      ],
+      [
+       "Przed wejściem",
+       "Zdejmij zegarek, biżuterię, wszelki metal . Żadnych balsamów, olejków ani dezodorantu. Weź ręcznik do siedzenia i drugi do wycierania",
+       "Metal nagrzewa się szybciej niż skóra i powoduje oparzenia. Kosmetyki na rozgrzanej skórze drażnią i wydzielają zapachy. Ręcznik pod ciałem to wymóg higieniczny"
+      ],
+      [
+       "W kabinie",
+       "20 minut. Niższa ławka, jeśli górna jest zbyt intensywna — różnica między poziomami sięga 10–15 °C",
+       "Czas ustalony w sekcji powyżej. Sauna nie jest próbą wytrzymałości"
+      ],
+      [
+       "Wyjście awaryjne",
+       "Wyjdź natychmiast przy zawrotach głowy, nudnościach, kołataniu serca lub wyraźnym dyskomforcie",
+       "Reguła bezpieczeństwa nadrzędna wobec czasu trwania"
+      ],
+      [
+       "Wychłodzenie po sesji",
+       "10–15 minut w chłodnym miejscu , w spoczynku. Wypij 250–500 ml . Nie idź od razu pod prysznic",
+       "Pocenie trwa jeszcze kilkanaście minut po wyjściu. Prysznic natychmiast po sesji oznacza, że po wytarciu nadal będziesz się pocić"
+      ],
+      [
+       "Prysznic po",
+       "Bez mydła lub z bardzo łagodnym, bezzapachowym. Woda letnia do chłodnej",
+       "Skóra po ekspozycji cieplnej ma naruszoną barierę lipidową; ponowne mycie mydłem ją zubaża. Do umycia doszło przed sesją"
+      ],
+      [
+       "Po prysznicu",
+       "Wypij 500–750 ml . Balsam, jeśli używasz — teraz , nie przed",
+       "Łącznie 1000–1750 ml na wizytę przy tempie pocenia 0,5–1,0 l/h. To moment, w którym skóra najlepiej przyjmuje nawilżenie"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "stop",
+     "label": "Wychładzanie w dni treningowe — rozstrzygnięcie istotne dla hipertrofii",
+     "text": "W poniedziałek, środę i sobotę sauna wypada 30–90 minut po treningu siłowym. To mieści się w oknie, w którym zanurzenie w zimnej wodzie udokumentowanie tłumi odpowiedź hipertroficzną . Dlatego w te dni: Wychładzaj się chłodnym powietrzem i letnim prysznicem. Bez morsowania, bez zimnej kąpieli, bez długiego stania pod zimnym strumieniem. Rozróżnienie jest konkretne, nie ostrożnościowe: badania wykazujące tłumienie hipertrofii stosowały zanurzenie na 10–15 minut w wodzie o temperaturze 10–15 °C . Krótkie schłodzenie skóry pod letnim prysznicem to inna interwencja i nie ma dowodów, by szkodziła. W czwartek — dzień bez treningu — chłodniejszy prysznic nie stanowi problemu dla adaptacji mięśniowych. Jeśli lubisz kontrast, to jest na niego właściwy dzień."
+    },
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Czwartek — dwie rundy w jednej wizycie",
+     "text": "Sekwencja: prysznic z mydłem → wytarcie do sucha → 20 min → wychłodzenie 10–15 min z piciem 250–500 ml → 20 min → wychłodzenie 10–15 min → prysznic bez mydła → 500–750 ml . Łączny czas wizyty: ok. 70–80 minut, z czego 40 minut w kabinie. Nawodnienie między rundami nie jest opcjonalne — w dniu bez treningu nie masz elektrolitów okołotreningowych, a straty sięgają 0,6–1,4 l."
+    },
+    {
+     "type": "h3",
+     "text": "Sód, elektrolity i nawodnienie"
+    },
+    {
+     "type": "p",
+     "text": "Podaż bazowa jest już wystarczająca i nie wymaga zwiększania. Zanim cokolwiek dodasz, warto znać punkt wyjścia:"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Źródło",
+      "Sód [mg]",
+      "Uwaga"
+     ],
+     "rows": [
+      [
+       "Sód wewnętrzny produktów",
+       "1390–1845",
+       "Największe pozycje: ogórek kiszony (480–720), jaja (180–190), chleb żytni (150–175)"
+      ],
+      [
+       "Sól jodowana dodawana — 3 g",
+       "1179",
+       "0,5 g woda poranna · 1 g kolacja · 1,5 g napoje"
+      ],
+      [
+       "Razem",
+       "2569–3024",
+       "Średnio ~2800 mg = 140% AI (2000 mg)"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Straty z potem — realne, nie teoretyczne"
+    },
+    {
+     "type": "p",
+     "text": "Stężenie sodu w pocie waha się indywidualnie od 460 do 1840 mg/l, typowo ~1000–1200 mg/l. Przy podaży bazowej ~2800 mg bilans w poszczególnych dniach wygląda następująco:"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Dzień",
+      "Pot [l]",
+      "Strata Na [mg]",
+      "Bilans"
+     ],
+     "rows": [
+      [
+       "Czwartek — 2 × sauna, bez treningu",
+       "0,6–1,4",
+       "600–1680",
+       "Zostaje 1120–2200 mg — pokryte"
+      ],
+      [
+       "Poniedziałek, sobota — trening + sauna",
+       "1,0–2,2",
+       "1000–2640",
+       "Zostaje 160–1800 mg — przy górnym krańcu strat napięte"
+      ],
+      [
+       "Wtorek, piątek — trening bez sauny",
+       "0,7–1,3",
+       "700–1560",
+       "Zostaje 1240–2100 mg — pokryte"
+      ],
+      [
+       "Środa — rower + sauna",
+       "0,9–2,0",
+       "900–2400",
+       "Zostaje 400–1900 mg — zwykle pokryte"
+      ],
+      [
+       "Niedziela — basen",
+       "0,3–0,7",
+       "300–840",
+       "Zostaje 1960–2500 mg — z zapasem"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "go",
+     "label": "Wdrożyć — zasady solenia",
+     "text": "Nie dodawaj soli ponad 3 g dziennie już obecne w planie. Podaż bazowa pokrywa potrzeby fizjologiczne (~1500 mg) plus straty potem we wszystkich scenariuszach poza górnym krańcem dni z treningiem i sauną jednocześnie. Rozkład 3 g w ciągu dnia: 0,5 g w porannej wodzie · 1 g w kolacji · 1,5 g w napojach i posiłkach w ciągu dnia. Ten rozkład realizuje też podaż jodu i nie należy go zmieniać z powodów sodowych. Poranna woda z solą jest opcjonalna, nie konieczna. 0,5 g to 200 mg sodu, czyli ok. 7% podaży dobowej. W dniu bez treningu i sauny zwykła woda jest równie dobra. Rytuał nie szkodzi i może zostać, ale nie jest elementem, bez którego plan przestaje działać. Kiedy dodatkowa sól ma sens: wyłącznie gdy w dniu z treningiem i sauną wystąpią objawy sugerujące duże straty — silne pragnienie utrzymujące się mimo picia, skurcze mięśni, wyraźnie słony osad na skórze po wysiłku. Wtedy 0,5 g soli (200 mg sodu) w posiłku potreningowym. Nie profilaktycznie. Kiedy sól w wodzie nie jest potrzebna: przy zwykłym piciu w ciągu dnia, przed treningiem, w trakcie treningu trwającego poniżej 90 minut, po basenie, w dniu bez sauny. Woda w butelce nie musi zawierać soli."
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Do kalibracji empirycznej — indywidualne tempo pocenia",
+     "text": "Populacyjny zakres 460–1840 mg sodu na litr potu jest zbyt szeroki, by na nim polegać. Twoje własne tempo pocenia ustalisz w trzy pomiary: 1. Zważ się nago bezpośrednio przed aktywnością. 2. Zanotuj objętość wypitych płynów w trakcie. 3. Zważ się nago po aktywności, po osuszeniu ręcznikiem. Utrata potu [l] = (masa przed − masa po) + wypite płyny [kg] Powtórz raz dla sesji siłowej, raz dla roweru i raz dla sauny. To wystarczy — nie ma powodu powtarzać tego regularnie. {private:18}"
+    },
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Pozostałe elektrolity — bez suplementów",
+     "text": "Potas ~4000–4800 mg wobec AI 3500 mg. Wysoka podaż z warzyw, owoców i nasion jest jednocześnie czynnikiem równoważącym wysoki sód — stosunek Na/K jest korzystny. Magnez ~330–420 mg z diety + 266 mg z suplementu = 596–686 mg. Powyżej RDA 400–420 mg. Bez potrzeby dodatkowej podaży. Wapń ~1180 mg wobec RDA 1000 mg. Adekwatnie, istotne w trakcie leczenia witaminą D. Żaden preparat elektrolitowy nie jest uzasadniony. Dieta pokrywa wszystkie cztery pierwiastki z zapasem, a napoje izotoniczne dodawałyby cukier i kalorie bez korzyści."
+    },
+    {
+     "type": "box",
+     "kind": "stop",
+     "label": "Ryzyko przeciwne — rozcieńczenie",
+     "text": "Przy 3–4 l płynów dziennie i podaży sodu ~2800 mg hiponatremia rozcieńczeniowa jest nieprawdopodobna. Ryzyko pojawia się dopiero przy spożyciu przekraczającym ~1 l/h przez wiele godzin przy jednoczesnej niskiej podaży sodu. Nie zwiększaj objętości płynów ponad obecne 3–4 l bez powodu — więcej wody nie jest lepiej."
+    }
+   ]
+  },
+  {
+   "id": "s18",
+   "num": "18",
+   "title": "Sen i regeneracja",
+   "private": false,
+   "blocks": [
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Priorytet numer jeden regeneracji",
+     "text": "Twoja długość snu jest dobra (~7,5 h w 90% dni). Regularność jest zła (zasypianie 23:00–04:00). Zmienność pór snu wiąże się z gorszą regeneracją niezależnie od długości. Ustabilizowanie pory zasypiania jest prawdopodobnie najwyżej-dźwigniowym pojedynczym działaniem w całym planie — ważniejszym niż dodanie jakiejkolwiek serii."
+    },
+    {
+     "type": "table",
+     "head": [
+      "Element",
+      "Ustalenie"
+     ],
+     "rows": [
+      [
+       "Docelowa pora snu",
+       "23:00 ± 30 min , także w weekendy"
+      ],
+      [
+       "Pobudka",
+       "07:00 ± 30 min"
+      ],
+      [
+       "Minimalny akceptowalny sen",
+       "6,5 h. Poniżej tego progu redukujesz objętość treningową dnia następnego o jedną serię na ćwiczenie"
+      ],
+      [
+       "Światło rano",
+       "10–15 min ekspozycji na światło dzienne w ciągu 30 min od pobudki. Najtańszy i najskuteczniejszy synchronizator rytmu. Przy nauce w domu — przy oknie lub krótki spacer"
+      ],
+      [
+       "Kofeina",
+       "Dwa espresso: 10:30 i 12:20. Zielona herbata 15:00 — ostatnia kofeina dnia (8 h przed snem). Przeliczone od konkretnego sprzętu i parametrów, nie generycznych założeń — zobacz rozbicie poniżej. Łącznie ~200–330 mg/d, najlepsze oszacowanie ~260 mg wobec 400 mg uznawanych przez EFSA za bezpieczne dla dorosłych. O 23:00 w krążeniu pozostaje ~65–80 mg . Kluczowy dla snu jest jednak nie sumaryczny rezyduum, lecz wielkość i pora ostatniej dawki . Tu jest to ~85 mg (zakres 55–120) na 8 godzin przed snem — więcej, niż wcześniej zakładałem, bo herbata parzona 3 min w 80°C ekstrahuje więcej kofeiny niż krótsze/chłodniejsze parzenie. W randomizowanym badaniu krzyżowym z polisomnografią (mężczyźni 25 ± 5 lat, zwyczajowe spożycie <300 mg/d) dawka 100 mg nawet 4 godziny przed snem nie dała istotnego wpływu na sen; efekty pojawiały się dopiero przy 400 mg. Przy 8 h odstępu — dwukrotnie dłuższym niż w tym badaniu — i porównywalnej dawce zapas jest węższy, niż wcześniej szacowałem, ale wciąż realny. Nie oznacza to gwarancji — okres półtrwania kofeiny waha się międzyosobniczo od 2 do 10 godzin, a dane o zawartości kofeiny w konkretnych blendach (w tym Crema e Gusto) pochodzą z serwisów konsumenckich, nie z badań laboratoryjnych, więc rzeczywista wartość może odbiegać w obie strony. Jeśli po dwóch tygodniach zasypianie pozostaje trudne mimo stałej pory: najpierw przesuń zieloną herbatę na 13:00–13:30, dopiero potem rozważ zamianę jednego popołudniowego espresso na herbatę"
+      ],
+      [
+       "Trening",
+       "18:15–19:35 (80 min): rozgrzewka 18:05–18:15 (10 min), serie robocze 18:15–19:25 (~70 min), schłodzenie 19:25–19:35 (10 min). Całość mieści się w tym samym oknie co wcześniej — prysznic zaczynasz o 19:35, bez zmian. Odstęp do snu ponad 3 h wystarcza"
+      ],
+      [
+       "Sauna",
+       "19:45–20:05 (20 min), po prysznicu bezpośrednio po treningu. Zakończ najpóźniej 1,5 h przed snem"
+      ],
+      [
+       "Melatonina",
+       "1 mg o 22:00 , w naparze z melisy razem z glicyną i magnezem, codziennie przez 4–8 tygodni , potem odstaw. Środek wspomagający zasypianie, nie narzędzie fazujące — fazę przesuwa światło poranne"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h4",
+     "text": "Bilans kofeiny — rozbicie źródeł"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Źródło",
+      "Parametry",
+      "Zakres",
+      "Najlepsze oszac.",
+      "Uwaga"
+     ],
+     "rows": [
+      [
+       "Espresso ×2",
+       "Philips EP1220/00, 8 g ziaren Lavazza Crema e Gusto / szot × 2 = 16 g łącznie",
+       "144–208 mg",
+       "~176 mg",
+       "Blend ma podwyższony udział robusty (typowo 2,2–2,7% kofeiny suchej masy wobec 1,2–1,5% dla arabiki) — stąd wyżej niż podręcznikowe ~63 mg dla pojedynczego standardowego espresso"
+      ],
+      [
+       "Zielona herbata",
+       "5 g suszu / 400 ml / 80°C / 3 min",
+       "55–120 mg",
+       "~85 mg",
+       "Kofeina ekstrahuje szybko i płytko zależy od temperatury (w odróżnieniu od katechin) — większość ekstrakcji zachodzi już w pierwszych minutach parzenia"
+      ],
+      [
+       "Razem",
+       "199–328 mg",
+       "~260 mg",
+       "Poniżej 400 mg (EFSA) nawet przy górnej granicy zakresu"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "small",
+     "text": "Zakresy szersze niż zwykle w tym dokumencie, bo opierają się częściowo na danych konsumenckich o zawartości kofeiny w konkretnym blendzie (Lavazza nie publikuje tego laboratoryjnie), nie na badaniach. Ogólna zawartość kofeiny w ziarnach kawy (Arabica/Robusta) i kinetyka ekstrakcji z liści herbaty są ugruntowane naukowo — niepewność dotyczy głównie proporcji Robusty w tym konkretnym blendzie i dokładnego procentu ekstrakcji przy 80°C/3 min."
+    },
+    {
+     "type": "p",
+     "text": "To musi być wykonalne przy nauce. Jeśli sesja egzaminacyjna wymusi późniejsze wieczory, priorytetem jest stała pora pobudki , nie stała pora zasypiania — pobudka jest silniejszym synchronizatorem rytmu. W okresie największego obciążenia poznawczego obniżasz objętość treningową, nie sen."
+    }
+   ]
+  },
+  {
+   "id": "s19",
+   "num": "19",
+   "title": "Monitoring",
+   "private": false,
+   "blocks": [
+    {
+     "type": "table",
+     "head": [
+      "Częstość",
+      "Co",
+      "Jak"
+     ],
+     "rows": [
+      [
+       "Codziennie",
+       "Masa ciała",
+       "Rano, na czczo, po toalecie. Liczy się wyłącznie średnia 7-dniowa — pojedynczy pomiar ignorujesz"
+      ],
+      [
+       "Sen",
+       "Godzina zaśnięcia i pobudki, jedna linijka"
+      ],
+      [
+       "Kolano",
+       "Ból 0–10 w trakcie i 24 h po sesji LOWER; obrzęk T/N; „luz\" T/N"
+      ],
+      [
+       "Trening",
+       "Każda seria: obciążenie × powtórzenia × RIR . Kolumna RIR była pusta w 786/786 wierszy Twojego dotychczasowego logu — to się zmienia"
+      ],
+      [
+       "Co tydzień",
+       "Średnia 7-dniowa masy",
+       "Wylicz i zapisz. To jest jedyna liczba, na której podejmujesz decyzje kaloryczne"
+      ],
+      [
+       "Talia i pas",
+       "Te same warunki, rano, na czczo, taśma na wysokości pępka"
+      ],
+      [
+       "Co 4 tygodnie",
+       "Wszystkie obwody",
+       "Talia, pas, biodra, klatka, biceps, udo, przedramię, łydka, szyja"
+      ],
+      [
+       "Zdjęcia sylwetki",
+       "To samo światło, ta sama pora, te same ujęcia"
+      ],
+      [
+       "Co 6–8 tyg.",
+       "BIA (Tanita DC-240)",
+       "Wyłącznie to jedno urządzenie. Pomiar rano, na czczo, po toalecie , przed śniadaniem, nawodniony, nigdy po saunie ani treningu . Pora poranna jest jedyną, w której warunek „na czczo\" nie wymaga pomijania posiłków. Pierwszy pomiar w tym protokole wyznacza nowy punkt odniesienia — nie porównuj go bezpośrednio z pomiarami popołudniowymi , wyłącznie z kolejnymi porannymi. Tylko trend"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "box",
+     "kind": "cal",
+     "label": "Opcjonalne — kalibracja skali RIR",
+     "text": "To narzędzie edukacyjne, nie element obowiązkowy programu. Nigdy nie rejestrowałeś RIR — 786 pustych wierszy na 786. Osoby bez doświadczenia ze skalą zwykle przeszacowują zapas, czyli kończą serię dalej od upadku, niż sądzą. Jeśli chcesz to skalibrować: raz w tygodniu 3 i raz w tygodniu 8 wykonaj jedną serię do rzeczywistego upadku — wyłącznie na izolacji górnej części ciała (wznosy bokiem albo uginanie EZ), nigdy na ruchu obciążającym kolano ani na sztandze . Policz, ile powtórzeń wyszło ponad Twoją prognozę RIR 1. Różnica mówi, o ile korygować kolejne sesje. Pominięcie tego testu nie unieważnia planu. RIR pozostaje wtedy wskaźnikiem orientacyjnym, a sterowanie progresją opiera się na powtórzeniach i obciążeniu z dziennika."
+    },
+    {
+     "type": "box",
+     "kind": "stop",
+     "label": "Zakaz",
+     "text": "Nie podejmuj żadnej decyzji na podstawie pojedynczego odczytu BF%. {private:19} W DC-240 przy niemal stałej impedancji podział na FFM i tłuszcz jest w dużej mierze pochodną masy z równania regresyjnego, a nie niezależnym pomiarem. Głównym kryterium sukcesu jest WHtR = talia / wzrost. {private:20} {private:21} Wskaźnik niezależny od impedancji, nawodnienia i modelu wagi."
+    }
+   ]
+  },
+  {
+   "id": "s20",
+   "num": "20",
+   "title": "Algorytm zmian",
+   "private": false,
+   "blocks": [
+    {
+     "type": "h3",
+     "text": "Kalorie i skład ciała"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Sytuacja (min. 3 tygodnie danych)",
+      "Działanie"
+     ],
+     "rows": [
+      [
+       "Masa ↓ (0,27–0,45 kg/tydz.) · talia ↓ · siła ↑",
+       "Nie zmieniaj nic. Plan działa dokładnie tak, jak zaprojektowany"
+      ],
+      [
+       "Masa ↔ · talia ↓",
+       "Nie zmieniaj nic. To jest rekompozycja — najlepszy możliwy scenariusz"
+      ],
+      [
+       "Masa ↑ · talia ↑",
+       "−200 kcal z węglowodanów (np. ryż 70 → 50 g)"
+      ],
+      [
+       "Masa ↔ · talia ↔ (przez 4 tyg.)",
+       "−150 kcal LUB +1500 kroków — wybierz jedno"
+      ],
+      [
+       "Masa ↓ >0,6%/tydz. przez 2 tyg. — niezależnie od siły",
+       "+150–200 kcal z węglowodanów okołotreningowych (banan po treningu → 180 g, +60 kcal; ryż 70 → 110 g, +140 kcal)"
+      ],
+      [
+       "Tempo w normie, ale siła ↓ na ≥2 bojach przez 2 sesje przy śnie ≥7 h",
+       "+150 kcal z węglowodanów okołotreningowych"
+      ],
+      [
+       "Wejście w Fazę 1 lub 2",
+       "Sprawdź tempo po 2 tyg. Jeśli przekracza −0,5%/tydz. → +150–250 kcal . Spodziewaj się tego"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Trening"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Sytuacja",
+      "Działanie"
+     ],
+     "rows": [
+      [
+       "Górny zakres powtórzeń przy docelowym RIR we wszystkich seriach, 2 sesje z rzędu",
+       "{private:22}"
+      ],
+      [
+       "Spadek powtórzeń >20% w 2 sesjach przy dobrym śnie i jedzeniu",
+       "Deload: −40–50% objętości na jeden tydzień"
+      ],
+      [
+       "Brak progresji przez 3 tygodnie mimo dobrej regeneracji",
+       "Dodaj serię do ćwiczenia priorytetowego lub zrób deload"
+      ],
+      [
+       "Sen <6,5 h poprzedniej nocy",
+       "Zdejmij jedną serię z każdego ćwiczenia w tej sesji"
+      ]
+     ],
+     "caption": null
+    },
+    {
+     "type": "h3",
+     "text": "Kolano"
+    },
+    {
+     "type": "table",
+     "head": [
+      "Sygnał",
+      "Działanie"
+     ],
+     "rows": [
+      [
+       "Zielone",
+       "Progresuj normalnie, ale z sufitem tempa : zakres +10–15° co 1–2 tygodnie (heurystyka praktyczna, nie wartość z badań), obciążenie wg podwójnej progresji. Brak bólu nie jest licencją na dowolny skok obciążenia — ścięgno i chrząstka adaptują się wolniej niż mięsień i siła, więc bezobjawowa sesja nie oznacza, że tkanka łączna nadążyła"
+      ],
+      [
+       "Żółte",
+       "Zatrzymaj obciążenie i zakres na obecnym poziomie. Powtórz sesję identycznie. Bez progresji do czasu powrotu do zielonego"
+      ],
+      [
+       "Czerwone",
+       "−30–50% obciążenia lub zmniejsz zakres o 15°. Zastąp ruchy kolanowe izometrią i pracą biodra. Jeśli utrzymuje się >2 sesje → fizjoterapeuta"
+      ]
+     ],
+     "caption": null
+    }
+   ]
+  },
+  {
+   "id": "s21",
+   "num": "21",
+   "title": "Badania kontrolne",
+   "private": true,
+   "blocks": []
+  },
+  {
+   "id": "s22",
+   "num": "22",
+   "title": "Jeden dzień w praktyce",
+   "private": false,
+   "blocks": [
+    {
+     "type": "small",
+     "text": "Poniedziałek — dzień treningowy z UPPER 1 i sauną."
+    },
+    {
+     "type": "p",
+     "text": "07:00 Pobudka · woda 500 ml z 0,5 g soli od razu Waga: na czczo, po toalecie. Zapisz do średniej 7-dniowej 07:15 10–15 min światła dziennego Najtańszy synchronizator rytmu — nie pomijaj 09:00 Śniadanie — 627 kcal + witamina D3 4000 IU · K2 100 µg · omega-3 · askorbinian sodu 100 mg wmieszany. W czwartek i niedzielę dodatkowo cynk 15 mg 10:30 Espresso 30 ml + 100 ml mleka Opcjonalnie L-teanina 200 mg. Nauka 11:15 Przekąska — 210 kcal 12:20 Espresso 30 ml + 100 ml mleka Ostatnia kawa dnia. 60 min przed lunchem — polifenole nie kolidują z żelazem niehemowym 13:20 Lunch — 463 kcal 15:00 Zielona herbata 400 ml Ostatnia kofeina dnia. 80 min przed obiadem 16:20 Obiad — 563 kcal Główny posiłek przedtreningowy, 1 h 55 min przed sesją 17:15 Kolagen 5 g + witamina C 100 mg Dokładnie 60 min przed sesją. Opcjonalnie tauryna 2 g 18:05 Rozgrzewka (10 min) 5 min rower stacjonarny, lekki opór + krążenia ramion/band pull-apart + 2 serie rozgrzewkowe pierwszego ćwiczenia (50% i 70% ciężaru roboczego). Pełny opis w sekcji 9 18:15 UPPER 1 Woda + elektrolity. Zapisuj obciążenie × powtórzenia × RIR dla każdej serii. Serie robocze do ok. 19:25 19:25 Schłodzenie (10 min) 5 min rower stacjonarny bardzo lekki opór, potem 5 min rozciąganie (klatka, triceps, górna część pleców). Pełny opis w sekcji 9 19:35 Prysznic, następnie sauna 20 min (ok. 19:45–20:05) Po treningu i schłodzeniu, nie przed. Uzupełnij płyny i sód 20:15 Posiłek potreningowy — 230 kcal + kreatyna 5 g. W dni z sauną może wypaść 20:20 — bez znaczenia, okno jest szerokie 21:00 Kolacja — 438 kcal 45 min po posiłku potreningowym 22:00 Melisa · glicyna · melatonina 1 mg · magnez 266 mg Wszystko w jednym momencie. Wyciszenie, przygaszone światło. Przygotuj owsiankę na jutro 23:00 Sen ± 30 min. Także w weekendy"
+    },
+    {
+     "type": "small",
+     "text": "Wtorek i sobota (LOWER 1 i LOWER 2) różnią się jedną rzeczą: wpisem o kolanie w dzienniku — ból 0–10 w trakcie i nazajutrz rano. Czwartek to 2332 kcal, bez posiłku potreningowego, przekąska to orzech brazylijski, białko WPC o 20:15 po saunie; kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni."
+    }
+   ]
+  },
+  {
+   "id": "s23",
+   "num": "23",
+   "title": "Dziesięć najważniejszych zasad",
+   "private": false,
+   "blocks": [
+    {
+     "type": "list",
+     "ordered": true,
+     "items": [
+      "Ustabilizuj porę snu. To pojedyncze działanie ma większą dźwignię niż jakakolwiek seria, suplement czy 100 kalorii. 23:00 ± 30 min, także w weekendy.",
+      "Zacznij nogi lekko i naprawdę je zacznij. Trzy i pół roku unikania jest problemem, nie rozwiązaniem. Sukces pierwszych trzech tygodni mierzy się ukończeniem ich bez objawów, a nie ciężarem na suwnicy.",
+      "Decyduj na średnich 7-dniowych, nigdy na pojedynczym pomiarze. Dotyczy masy, tkanki tłuszczowej i samopoczucia.",
+      "Talia jest ważniejsza niż waga. {private:23} Jeśli masa stoi, a talia spada — plan działa idealnie i nic nie zmieniasz.",
+      "{private:24} Zielone–żółte–czerwone. Obrzęk i epizod uginania to czerwona flaga i konsultacja, nie powód do przepchnięcia sesji.",
+      "Wszystkie ziarna ważysz na sucho, mięso na surowo. Jedyna zasada ważenia, przy której pomyłka kosztuje setki kalorii.",
+      "Zrób badania krwi przed kreatyną i treningiem nóg. Pięć dni bez wysiłku, na czczo. Bez tego kolejny wynik AST i CK będzie nieinterpretowalny.",
+      "Kalorie regulujesz węglowodanami. Białko i tłuszcz zostają. Spodziewaj się, że w tygodniu 4 lub 8 kalorie pójdą w górę, nie w dół.",
+      "Plan ma przetrwać pominiętą sesję. Minimum tygodniowe to dwie sesje górne i jedna dolna. W szczycie egzaminów obniżasz objętość, nie sen i nie białko.",
+      "Nie dodawaj nic nowego przez pierwsze 12 tygodni. Żadnych suplementów, ćwiczeń ani protokołów. Najpierw dane, potem optymalizacja."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "s24",
+   "num": "24",
+   "title": "Dlaczego ten plan jest właśnie tak zaprojektowany",
+   "private": false,
+   "blocks": [
+    {
+     "type": "h4",
+     "text": "Dlaczego takie kalorie"
+    },
+    {
+     "type": "p",
+     "text": "{private:25} Najnowszy pomiar (18. {private:26} Deficyt jest niewielki (~6% w Fazie 0), bo priorytetem pozostaje jakość treningu, regeneracja i wydajność poznawcza w okresie egzaminów, a nie tempo. Przy ~20% tkanki tłuszczowej reguła Forbesa działa na korzyść — im więcej zapasu tłuszczu, tym większy jego udział w utracie masy przy deficycie. Longland i wsp. wykazali przyrost masy beztłuszczowej nawet przy głębokim deficycie z wysokim białkiem, więc niewielki deficyt nie blokuje odpowiedzi „newbie\" w treningu nóg."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego taki rozkład makro"
+    },
+    {
+     "type": "p",
+     "text": "Białko 2,16 g/kg jest powyżej progu 1,62 g/kg z meta-analizy Mortona i w zakresie chroniącym masę beztłuszczową w deficycie — a wraz ze spadkiem masy wskaźnik będzie samoczynnie rósł. Tłuszcz 0,86 g/kg (27% energii) jest bezpiecznie powyżej progu 20%, poniżej którego pojawiają się dane o obniżeniu testosteronu, i wystarcza do wchłaniania witaminy D. Węglowodany są regulatorem, bo są jedynym makroskładnikiem, który można ciąć bez kosztu."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego taki trening"
+    },
+    {
+     "type": "p",
+     "text": "Bo Twój log pokazuje coś, co łatwo przeoczyć: nie jesteś początkującym . Wyciskanie 60 kg × 9 we wrześniu 2024 to udokumentowany szczyt, a obecne 50 kg × 5 to spadek o ~25% po 341 dniach przerwy. Górę programujemy więc jak zdetrenowanego średniozaawansowanego — dwie sesje tygodniowo, progresja obciążeniem, wykorzystanie muscle memory. Dół to zupełnie inna sytuacja: zero historii, nieznana tolerancja, konieczność nauki wzorca. Stąd osobny, wolniejszy zegar. Sufit 93 serii wynika z danych dose-response — powyżej ~20 serii na grupę tygodniowo zwroty gwałtownie maleją, a Twoja historyczna częstotliwość (mediana 9 dni między sesjami) każe budować plan odporny na pominięcia, nie zależny od perfekcji."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego takie LOWER"
+    },
+    {
+     "type": "p",
+     "text": "{private:27} Chrząstka, ścięgno, mięsień i kontrola nerwowo-mięśniowa mają obniżoną pojemność obciążeniową dlatego, że nie były obciążane, a nie dlatego, że są uszkodzone. {private:28} Ścięgna adaptują się wolniej niż mięśnie, więc siła urośnie szybciej, niż tkanka łączna nadąży — stąd zasada: technika, potem zakres, dopiero potem ciężar. LOWER 2 ma mniejszą dominację kolanową celowo, żeby istniała bezpieczniejsza ścieżka wejścia."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego taki poziom błonnika"
+    },
+    {
+     "type": "p",
+     "text": "Bo 53 g nie jest problemem u zdrowej osoby bez objawów, a redukcja profilaktyczna łamałaby zasadę, którą stosujemy przy kolanie: nie ograniczamy niczego, dopóki nie ma sygnału. W poprzednich wersjach planu zaleciłem cięcie błonnika i to zalecenie było błędne — kosztowało 178 mg magnezu za 6 g błonnika, czyli zła wymiana. Redukcja następuje wyłącznie reaktywnie."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego taki stack"
+    },
+    {
+     "type": "p",
+     "text": "Sześć preparatów podstawowych, jeden warunkowy, trzy opcjonalne. Witamina D bo jest udokumentowany deficyt i dawka jest zgodna z wytycznymi krajowymi dla tej sytuacji. Kreatyna bo ma najmocniejszą bazę dowodową ze wszystkiego, co można kupić. Omega-3 bo dieta ma dużo ALA i zero EPA/DHA, a konwersja wynosi 0–4%. Magnez bo podaż z diety siedzi na granicy RDA (~330–420 mg wobec 400–420 mg) — suplement domyka lukę, nie dubluje żywność. Kolagen bo jest jedynym preparatem w tym zestawie z badaniami w populacji zbliżonej do docelowej; codzienne dawkowanie zamiast wyłącznie przedtreningowego jest decyzją o adherencji, a nie o skuteczności."
+    },
+    {
+     "type": "decision",
+     "text": "Obowiązuje decyzja użytkownika (D-001, D-015, D-016): cynk kontynuowany 2×/tydz. (07:00, na czczo, czw. i nd.); glukozamina, chondroityna i Boswellia do wyczerpania zapasu (21.03.2027); tauryna codziennie o 17:15."
+    },
+    {
+     "type": "original",
+     "text": "Cynk odchodzi, bo podaż łączna przekraczała UL EFSA bez udokumentowanego niedoboru. {private:29} Tauryna zostaje jako opcjonalna: dowody są słabe, ale preparat jest bezpieczny, a „słabe dowody\" to nie to samo co „powód do zakazu\". Rozdzielam te dwie rzeczy konsekwentnie — tak samo jak przy suplementach na kolano, tylko w drugą stronę."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego tyle cardio i sauny"
+    },
+    {
+     "type": "p",
+     "text": "Rower zamiast biegania, bo interferencja z hipertrofią dotyczy głównie ruchów z komponentem ekscentrycznym, a rower jest w tym względzie praktycznie neutralny. Jedna sesja tygodniowo, bo deficyt regulujemy dietą — jest precyzyjniejsza i nie kosztuje regeneracji. Pięć sesji sauny tygodniowo, skoncentrowanych w czterech dniach, mieści się w zakresie 4–7 sesji tygodniowo, dla którego dane kohortowe wiążą się z najkorzystniejszymi wynikami sercowo-naczyniowymi — nie z aktywacją HSP, która nie wymaga konkretnej temperatury i nie jest jedynym uzasadnieniem tego harmonogramu."
+    },
+    {
+     "type": "h4",
+     "text": "Dlaczego taki monitoring"
+    },
+    {
+     "type": "p",
+     "text": "{private:30} Dlatego głównym kryterium jest taśma krawiecka, a nie analizator — WHtR jest niezależny od impedancji, nawodnienia i modelu wagi. Kolumna RIR wchodzi do dziennika, bo jej brak w 786 wierszach uniemożliwił rozstrzygnięcie, czy dawna stagnacja wynikała z intensywności czy z częstotliwości. Tego błędu nie powtarzamy."
+    },
+    {
+     "type": "box",
+     "kind": "key",
+     "label": "Największa niewiadoma tego planu",
+     "text": "Reakcja kolana na pierwsze obciążenie po 3,5 roku oraz tolerancja żołądkowo-jelitowa diety, której jeszcze nie stosujesz. Obie są nieusuwalne analitycznie — rozstrzygnie je pierwsze obciążenie i pierwszy tydzień, nie kolejna warstwa rozumowania. Plan tego nie ukrywa i dla obu przewiduje zdefiniowaną ścieżkę reakcji."
+    }
+   ]
+  }
+ ],
+ "private_fragments": 30,
+ "private_sections": [
+  "s1",
+  "s21"
+ ]
+}
