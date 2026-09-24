@@ -134,12 +134,13 @@ export class Store {
   }
 
   // Dołączenie wielu zdarzeń (import/synchronizacja) — atomowo, po kopii zapasowej.
-  async appendMany(list, reason) {
+  // `backup: false` — bez kopii (synchronizacja z chmurą robi ją najwyżej raz dziennie); domyślnie jak dotąd: z kopią.
+  async appendMany(list, reason, { backup = true } = {}) {
     if (!this.health.ok) throw new StorageError(this.health.error || 'Zapis wyłączony');
     for (const e of list) { const c = classifyEvent(e); if (c !== 'ok' && c !== 'future') throw new StorageError(`Odrzucono import: ${c} (${e?.id})`); }
     const fresh = list.filter(e => !this.events.has(e.id));
     if (!fresh.length) return 0;
-    await this.backup(reason);
+    if (backup) await this.backup(reason);
     await this.writeVerified(fresh);
     for (const e of fresh) { this.events.set(e.id, e); observe(e.hlc); }
     this.emit();

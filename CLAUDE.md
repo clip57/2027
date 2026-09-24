@@ -14,8 +14,12 @@ raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Pr
 Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
 (urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `4e68589` (Faza 5 kompletna).
 **Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
+**Nowy etap: synchronizacja przez chmurę (Supabase, D-078…D-080)** — Etap 1 (rdzeń bez interfejsu: `src/core/sync/crypto.js`,
+`cloud-api.js`, `cloud.js`, `tools/supabase/schema.sql`, testy na fałszywym serwerze) — wykonany, **nieużywany przez aplikację**.
+Projekt, audyt i etapy: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu
+projektu, kluczy, haseł ani `service_role`.
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-077).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-080).
 
 ---
 

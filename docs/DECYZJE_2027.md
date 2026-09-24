@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 24.09.2026 (D-036 – D-077; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 24.09.2026 (D-036 – D-080; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -79,6 +79,9 @@
 | D-074 | Meal Prep: „Składniki na jutro” — stan na koniec dziś porównany ze zużyciem jutra wg planu (tylko produkty użyte w kartach), oznaczenie kart z brakami, wyróżniona karta z następnym krokiem; tabele i „Dlaczego tak” zwinięte |
 | D-075 | Suplementacja: minione pory dnia przygaszone (tło, bez przezroczystości tekstu), następna pora wyróżniona; karta „Zapas suplementów” (status v31 < 10 / < 20 dni) z „Kupione +opakowanie” (`inv.move` purchase) pod osią dnia; pasek zapasu w tabeli preparatów |
 | D-076 | Bezpieczeństwo i Rekompozycja: nagłówki jak w pozostałych modułach, „Wyczyść filtry”; w Rekompozycji wyszukiwanie w treści planu (bez pakietu prywatnego) i „Rozwiń / Zwiń wszystko”. Zapasy → Bezpieczeństwo: link „Przechowywanie” wyłącznie przy identycznej nazwie pozycji w Tabeli bezpieczeństwa (15 z 55 — bez zgadywania powiązań, `product_links` nie zmieniane) |
+| D-078 | **Synchronizacja przez chmurę — kierunek zaakceptowany:** Supabase (plan Free, bez karty); IndexedDB pozostaje źródłem prawdy; ręczna synchronizacja `2027-sync.json` zostaje jako mechanizm awaryjny. **Zmienia D-033** (dotąd wyłącznie ręczna) i **D-034** (dopuszczony bezpłatny zewnętrzny backend; nadal zero płatnych usług). Synchronizowane są zdarzenia (nie stan), scalanie = suma po `id`, konflikty — `reduce()` bez zmian. Wdrażane etapami (`docs/SYNC_CHMURA.md`); automatyczne wyzwalanie dopiero po przetestowaniu rdzenia |
+| D-079 | Chmura: szyfrowanie po stronie urządzenia — PBKDF2-SHA256 (600 000 iteracji) → HKDF → AES-GCM-256 (treść) i HMAC-SHA256 (identyfikator `sid`); serwer nie zna treści, typów ani `id` zdarzeń (także pakietu prywatnego); brak odzyskiwania hasła szyfrowania (z założenia) |
+| D-080 | Chmura: logowanie e-mailem i hasłem konta (konto zakładane w panelu, rejestracja wyłączona) zamiast kodu z e-maila — wbudowana poczta Supabase wysyła 2 e-maile/godz. wyłącznie do członków zespołu; brak logowania przez Google/Apple (przekierowania w PWA na iOS) |
 | D-077 | Dane: synchronizacja (status niewysłanych zmian, ostatnie wysłanie/import, „Wyślij do iCloud”, „Pobierz z iCloud”) jako pierwsza sekcja; mechanizm, teksty rozróżniające kod/dane i format pliku bez zmian |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
