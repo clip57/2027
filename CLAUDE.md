@@ -9,9 +9,10 @@ Język interfejsu i dokumentacji: **polski**.
 Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
 24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
 następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
-Następny moduł: Dieta. Gałąź `redesign-faza4` nie jest jeszcze na `main`/Pages.
+Faza 5, moduły 3–4 (Dieta, Zapasy jako jeden system; kierunek „premium personal OS” — D-071…D-073) — zakończone,
+raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Następne: Meal Prep, Suplementacja. `main`/Pages = commit `3adcb36` (Trening + CFA).
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-070).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-073).
 
 ---
 
@@ -115,3 +116,5 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Funkcja zależna od „dziś” / godziny w teście | wynik zależny od dnia uruchomienia | zegar Playwright: `page.clock.install(time=…)` (`CLOCK` w `e2e.py`, `a11y.py`); przerwy — `clock.fast_forward` |
 | `--muted` na tle `--sunken` (jasny motyw) | 4,47:1 — poniżej AA | na `--sunken` używaj `--text-2` (para w `tokens.test.mjs`) |
 | `setInterval` sprawdzający `isConnected` przed wstawieniem elementu do DOM | licznik nigdy nie startuje | pierwsze wypełnienie bez warunku, zatrzymanie dopiero gdy element zniknie z DOM |
+| `<details>` przerysowywany po każdym zapisie | sekcja zamyka się po każdej korekcie | stan rozwinięcia w pamięci modułu (`keepOpen()` w `zapasy.js`) |
+| Przycisk z krótkim tekstem widocznym („+ 500 g”) | test szukający „+ opakowanie” go nie znajduje | pełna nazwa w `aria-label` (testy i czytniki ekranu używają nazwy dostępnej) |

@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 24.09.2026 (D-036 – D-070; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 24.09.2026 (D-036 – D-073; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -73,6 +73,9 @@
 | D-068 | Trening: licznik przerwy między seriami — uruchamiany odhaczeniem serii w dniu bieżącym, czas z planu (`2–3 min` → 2:00 do gotowości, 3:00 do końca), „+30 s” i „Pomiń”; stan wyłącznie interfejsu (pamięć karty), **nie jest zapisywany w dzienniku zdarzeń ani synchronizowany**; bez powiadomień systemowych i dźwięku |
 | D-069 | Trening: karta „Następna seria” (pierwsza nieodhaczona seria w kolejności planu, z planem powtórzeń/RIR/przerwy i ostatnim wynikiem) oraz podsumowanie ukończonej sesji (serie, objętość, powtórzenia, czas) — wyłącznie z planu i dziennika `train.set`/`train.session` |
 | D-070 | CFA: tempo względem harmonogramu v3 — „zaległe” = bloki z datą wcześniejszą niż dziś i nieodhaczone (bloki dnia bieżącego nie są zaległe); panel zaległych (5 najstarszych) w widoku dnia bieżącego, filtr „tylko zaległe” w harmonogramie, następny blok dnia; error log z filtrem rodzaju błędu i wyszukiwaniem (tylko widok). Bez prognoz i metryk spoza planu |
+| D-071 | Dieta: posiłki (karty i nawigacja) w kolejności godzin planu dnia (napoje na końcu; wartości PDF bez zmian), „Następny posiłek” wg godziny (tylko plan obowiązujący dziś), makroskładniki pozycji jako jedna linia, rzadkie sekcje (różnice faz, zamienniki, przyprawy) zwinięte; składniki planu z pilnym/średnim stanem w Zapasach — karta w kolumnie bocznej, przy produkcie tylko stan pilny. Bez odhaczania zjedzonych posiłków (wymagałoby nowego typu zdarzenia) |
+| D-072 | Zapasy: przegląd (pasek stanu magazynu z liczników statusów, najbliższy brak), siatka 7 akcji z ikonami (wszystkie funkcje D-046 zachowane), karta „Do kupienia” (5 najpilniejszych pozycji listy zakupów, „Kupione” = istniejące zdarzenie `inv.move` purchase na wyliczoną ilość), zwarte wiersze pozycji (status, wystarczy do, pasek zapasu z dniem zakupów, stan, „+ opakowanie”; porcje, tagi i usuwanie w „Więcej”), korekta dnia i operacje zbiorcze zwinięte; na komputerze lista + przyklejona kolumna zakupów |
+| D-073 | Nowy kierunek wizualny „premium personal OS” (inspiracja: zrzuty użytkownika; strona Figma niedostępna w środowisku) realizowany w ramach istniejącego systemu tokenów: bez glassmorphismu, gradientów i metryk bez danych; kierunek obowiązuje w dalszych modułach Fazy 5 |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
 ## Decyzje zastąpione

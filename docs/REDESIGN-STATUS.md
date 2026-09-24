@@ -1,4 +1,4 @@
-# REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0 i Fazie 5: Trening + CFA (24.09.2026)
+# REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0 i Fazie 5: Trening, CFA, Dieta, Zapasy (24.09.2026)
 
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).
 **Stan repozytorium i wdrożenia (sprawdzone 24.09.2026):** `origin/main` = `69d5d94` (Etap 6) i to ten commit jest ostatnią publikacją
@@ -18,6 +18,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | **Faza 4** | Dashboard „Dziś” | niżej |
 | **Faza 5.0** | Stabilizacja Faz 3–4 przed modułami (audyt w kodzie + poprawki + testy) | `docs/RAPORT_REDESIGN_F5_0.md` |
 | **Faza 5 (1–2)** | Trening i CFA: system projektowy + rozbudowa funkcji (D-068–D-070) | `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md` |
+| **Faza 5 (3–4)** | Dieta i Zapasy jako jeden system; kierunek „premium personal OS” (D-071–D-073) | `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md` |
 
 ## 2. Wykonane
 
@@ -71,6 +72,10 @@ promieni i rozmiarów pisma. Testy: dane syntetyczne (D-065 — 296 wcześniej p
 - Nagłówki `.hero-tr`/`.hero-cfa` bez dekoracyjnych gradientów (dotyczy też Meal Prep — ta sama klasa).
 - Bez nowych typów zdarzeń, bez zmian w synchronizacji i danych źródłowych.
 
+### Faza 5, moduły 3–4 — Dieta i Zapasy (24.09.2026)
+Zob. `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Strona Zapasów na 375 px: ok. 17 000 → 11 700 px wysokości (55 pozycji).
+Wszystkie funkcje D-046 (okna, historia, paragon, raport AI, kopia, cofanie, korekty dnia, operacje zbiorcze) zachowane.
+
 ## 3. Zmienione pliki w Fazach 3–4
 Nowe: `src/ui/tokens.css`, `src/ui/system.css`, `src/ui/icons.js`, `src/ui/prefs.js`, `tools/icons.mjs`,
 `public/fonts/inter-latin.woff2`, `public/fonts/inter-latin-ext.woff2`, `public/fonts/OFL-Inter.txt`, `tools/fonts/LICENSE-lucide.txt`,
@@ -92,8 +97,8 @@ mikro-odstępy < 3 px. Pozostałe moduły — wg tabeli:
 |---|---|---|---|---|
 | ✅ 1 | Trening | `trening.js`, `movement.js`, `figure.js`, `bodymap.js`, `charts.js` | „Etap 5: Trening…”, „Karty ćwiczeń” (8 promieni, 11 font), „Trening: schemat ruchu…”, „Pasek dni”, „Mapa mięśni” | zachować `.ex, .set, .set-toggle, .set-copy, .ex-tech, .ex-map, .hero-tr, .tm*, .opt-note, .hist-*`; kolejka zapisów serii |
 | ✅ 2 | CFA | `cfa.js` | „Etap 5: CFA” (4/6/10) | zachować `.cfa-row, .cal, .cal-d, .log-*, .topic, .form-grid, .filters, .hero-cfa` |
-| 3 | Dieta | `dieta.js` | „Kafel główny diety”, „Karty posiłków” | zachować `.hero, .meal`, atrybut `data-meal`; akcenty posiłków już na tokenach (5.0) |
-| 4 | Zapasy | `zapasy.js` | „Etap 4 (odsłona 2)” (3/18/17) | **zachować wszystkie funkcje D-046** i klasy `.dash, .actions, .counters, .pills, .inv, .inv-item`; okna → arkusz od dołu już działa globalnie |
+| ✅ 3 | Dieta | `dieta.js` | „Kafel główny diety”, „Karty posiłków” | zachować `.hero, .meal`, atrybut `data-meal`; akcenty posiłków już na tokenach (5.0) |
+| ✅ 4 | Zapasy | `zapasy.js` | „Etap 4 (odsłona 2)” (3/18/17) | **zachować wszystkie funkcje D-046** i klasy `.dash, .actions, .counters, .pills, .inv, .inv-item`; okna → arkusz od dołu już działa globalnie |
 | 5 | Meal Prep | `mealprep.js` | „Meal Prep — odświeżona szata”, „odsłona 2” (7/7/12) | zachować `.prep-card, .prep-list, .mp-ring, .mp-next` |
 | 6 | Suplementacja | `suplementy.js` | „Oś czasu suplementacji”, „Etap 3…” | zachować `.dose-list` |
 | 7 | Bezpieczeństwo | `bezpieczenstwo.js` | „Etap 6: Bezpieczeństwo (odsłona 2)” (9/11/18), „Poradnik” | zachować `.sf-card, .safety-table, .gd-rt`; plakietki `.tg-*` już na tokenach (5.0) |

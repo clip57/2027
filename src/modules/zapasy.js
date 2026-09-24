@@ -2,7 +2,8 @@
 // na nowej architekturze — stan liczony z inwentaryzacji i planu (D-003, D-027), zapis zdarzeniami,
 // bez dat zakodowanych na sztywno i bez wstawiania danych do innerHTML.
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
-import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
+import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway } from '../core/calc/inventory.js';
+import { icon } from '../ui/icons.js';
 import { reduce } from '../core/storage/store.js';
 import { exportBundle, preview, apply } from '../core/sync/bundle.js';
 import { consumptionForDay } from '../core/calc/consumption.js';
@@ -11,13 +12,16 @@ import { addDays, dayShort, longDate, shortDate, diffDays } from '../core/dates.
 import { resolveDay } from '../core/resolver.js';
 
 const CATS = ['Wszystko', 'Śniadanie', 'Lunch', 'Przekąska', 'Po treningu', 'Obiad', 'Kolacja', 'Napoje', 'Suplementy'];
-const SORTS = [['days', '⏳ Najmniej dni'], ['urgent', '🚨 Najpilniejsze'], ['shop', '🛒 Do zakupów'],
-  ['name', '🔤 Nazwa A–Z'], ['cat', '📂 Kategoria'], ['most', '📈 Najwięcej dni']];
+const SORTS = [['days', 'Najmniej dni'], ['urgent', 'Najpilniejsze'], ['shop', 'Do zakupów'],
+  ['name', 'Nazwa A–Z'], ['cat', 'Kategoria'], ['most', 'Najwięcej dni']];
 const LABEL = { OK: 'Zapas OK', WARNING: 'Średni stan', CRITICAL: 'Pilny brak', UNKNOWN: 'Brak stanu', UNTRACKED: 'Nieśledzony' };
 const DN = ['Nd', 'Pn', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob'], MN = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
 const v31Date = d => { const [y, m, dd] = d.split('-').map(Number); const x = new Date(y, m - 1, dd); return `${DN[x.getDay()]}, ${dd} ${MN[m - 1]}`; };
 const UNITS = ['g', 'kaps.', 'szt.', 'ml', 'tabl.'];
 const rank = { CRITICAL: 0, WARNING: 1, UNKNOWN: 2, OK: 3, UNTRACKED: 4 };
+// Rozwinięte sekcje przetrwają przerysowanie widoku po zapisie (np. kilka korekt z rzędu) — stan wyłącznie interfejsu.
+const opened = new Set();
+const keepOpen = key => ({ open: opened.has(key) || null, ontoggle: e => { if (e.target.open) opened.add(key); else opened.delete(key); } });
 
 const dialog = (title, ...body) => {
   const d = h('dialog', { class: 'sheet' });
@@ -64,49 +68,73 @@ export function renderZapasy(root, ctx) {
   const counts = rows.reduce((m, r) => ((m[r.status] = (m[r.status] || 0) + 1), m), {});
   const soonest = rows.filter(r => r.fc?.runOut).sort((a, b) => (a.fc.runOut < b.fc.runOut ? -1 : 1))[0];
 
-  // ---------- nagłówek: stan magazynu i najbliższe zakupy
-  add(root, h('h1', {}, '📦 Zapasy spożywcze'), msg,
-    h('div', { class: 'dash' },
-      h('div', { class: 'dash-box' }, h('p', { class: 'dash-l' }, 'Stan magazynu'),
-        h('p', { class: 'dash-v' }, `${rows.length} poz.`),
-        h('p', { class: 'dash-dots' },
-          h('span', { class: 'dot d-CRITICAL' }, `● ${counts.CRITICAL || 0}`),
-          h('span', { class: 'dot d-WARNING' }, `● ${counts.WARNING || 0}`),
-          h('span', { class: 'dot d-OK' }, `● ${counts.OK || 0}`)),
-        soonest && h('p', { class: 'muted' }, `Najbliższy brak: ${soonest.it.name} (${shortDate(soonest.fc.runOut)})`)),
-      h('div', { class: 'dash-box' }, h('p', { class: 'dash-l' }, 'Następne zakupy'),
-        h('p', { class: 'dash-v' }, `${dayShort(shop.date)} ${shortDate(shop.date)}`),
-        h('p', { class: 'muted' }, shop.inDays === 0 ? 'dzisiaj' : `za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}`),
-        h('p', { class: 'muted' }, `${list.length} ${plural(list.length, 'pozycja', 'pozycje', 'pozycji')} · ${list.reduce((n, x) => n + x.packs, 0)} ${plural(list.reduce((n, x) => n + x.packs, 0), 'opakowanie', 'opakowania', 'opakowań')}`))));
-
-  // ---------- karta dnia + korekty zużycia
-  add(root, h('div', { class: 'daycard' },
-    h('div', {}, h('p', { class: 'dash-l' }, 'Dzień'), h('p', { class: 'dash-v' }, `${dayShort(today)} ${longDate(today)}`),
-      h('p', { class: 'muted' }, `${day.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · Faza ${day.phase ?? 0} · zużycie liczone automatycznie`)),
-    h('div', { class: 'row' },
-      h('button', { onclick: () => save('inv.dayshift', { date: today, dir: 1 }, 'Cofnięto zużycie jednego dnia.') }, '⏪ +1 dzień (cofnij zużycie)'),
-      h('button', { onclick: () => save('inv.dayshift', { date: today, dir: -1 }, 'Odliczono zużycie jednego dnia.') }, '⏩ −1 dzień (odlicz)'))));
-
-  // ---------- pasek akcji
   const undoable = store.allEvents().filter(e => ['inv.count', 'inv.move', 'inv.dayshift'].includes(e.t))
     .sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
   const last = undoable[undoable.length - 1];
-  add(root, h('div', { class: 'actions' },
-    h('button', { class: 'primary', onclick: () => addDialog() }, '➕ Dodaj'),
-    h('button', { onclick: () => shopDialog() }, '🛒 Zakupy'),
-    h('button', { onclick: () => receiptDialog() }, '📥 Paragon'),
-    h('button', { disabled: !last, onclick: () => undo(last) }, '↩ Cofnij'),
-    h('button', { onclick: () => historyDialog() }, '🕘 Historia'),
-    h('button', { onclick: () => aiStatus() }, '🤖 Status AI'),
-    h('button', { onclick: () => backupDialog() }, '💾 Kopia')));
+  const packs = list.reduce((n, x) => n + x.packs, 0);
+  const known = rows.filter(r => r.st != null && r.it.tracked !== false).length;
+  // Kolejność listy zakupów wg pilności (najwcześniejszy brak najpierw) — ta sama lista co w oknie planu zakupów
+  const runOut = id => rows.find(r => r.it.id === id)?.fc?.runOut || '9999-12-31';
+  const byNeed = list.slice().sort((a, b) => (runOut(a.id) < runOut(b.id) ? -1 : runOut(a.id) > runOut(b.id) ? 1 : a.name.localeCompare(b.name, 'pl')));
+
+  // ---------- nagłówek
+  add(root, h('header', { class: 'zp-head' }, h('h1', {}, 'Zapasy'),
+    h('div', { class: 'topline' }, h('span', { class: 'date' }, `${dayShort(today)} ${longDate(today)}`),
+      h('span', { class: 'chip' }, `Faza ${day.phase ?? 0}`), h('span', { class: 'chip' }, day.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'))), msg);
+
+  // ---------- przegląd: zdrowie magazynu (pasek z liczników statusów) i najbliższe zakupy (D-072)
+  const seg = k => (counts[k] || 0) / (rows.length || 1) * 100;
+  add(root, h('section', { class: 'dash', 'aria-label': 'Przegląd zapasów' },
+    h('div', { class: 'dash-box zp-health' }, h('p', { class: 'dash-l' }, 'Stan magazynu'),
+      h('p', { class: 'dash-v' }, `${rows.length} pozycji`),
+      h('span', { class: 'zp-hbar', role: 'img', 'aria-label': `Pilne ${counts.CRITICAL || 0}, średnie ${counts.WARNING || 0}, wystarczające ${counts.OK || 0}, bez stanu ${counts.UNKNOWN || 0}` },
+        ['CRITICAL', 'WARNING', 'OK', 'UNKNOWN'].map(k => h('span', { class: `s-${k}`, style: { width: `${seg(k)}%` } }))),
+      h('p', { class: 'zp-legend' },
+        [['CRITICAL', 'pilne'], ['WARNING', 'średnie'], ['OK', 'OK'], ['UNKNOWN', 'bez stanu']].filter(([k]) => counts[k]).map(([k, l]) =>
+          h('span', {}, h('span', { class: `dot-s s-${k}`, 'aria-hidden': 'true' }), `${counts[k]} ${l}`))),
+      soonest && h('p', { class: 'muted' }, `Najbliższy brak: ${soonest.it.name} (${dayShort(soonest.fc.runOut)} ${shortDate(soonest.fc.runOut)})`))));
+
+  // ---------- akcje: zwarta siatka ikon (wszystkie funkcje D-046 bez zmian)
+  const act = (ic, label, onclick, extra = {}) => h('button', { class: 'zp-act', onclick, ...extra }, icon(ic, { size: 20 }), h('span', {}, label));
+  add(root, h('div', { class: 'actions', role: 'group', 'aria-label': 'Narzędzia zapasów' },
+    act('shopping-cart', 'Zakupy', () => shopDialog(), { class: 'zp-act primary' }),
+    act('plus', 'Dodaj', () => addDialog()),
+    act('receipt', 'Paragon', () => receiptDialog()),
+    act('undo-2', 'Cofnij', () => undo(last), { disabled: !last }),
+    act('history', 'Historia', () => historyDialog()),
+    act('bot', 'Status AI', () => aiStatus()),
+    act('save', 'Kopia', () => backupDialog())));
+
+  // ---------- do kupienia: najpilniejsze pozycje z listy zakupów, „Kupione” jednym dotknięciem (D-072)
+  const shopCard = h('section', { class: 'zp-shop', 'aria-labelledby': 'zp-shop-h' },
+    h('div', { class: 'zp-shop-h' }, h('h2', { id: 'zp-shop-h' }, icon('shopping-cart', { size: 18 }), 'Do kupienia'),
+      h('span', { class: 'zp-shop-d' }, `${dayShort(shop.date)} ${shortDate(shop.date)} · ${shop.inDays === 0 ? 'dzisiaj' : `za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}`}`)),
+    h('p', { class: 'muted' }, `Następne zakupy: ${list.length} ${plural(list.length, 'pozycja', 'pozycje', 'pozycji')} · ${packs} ${plural(packs, 'opakowanie', 'opakowania', 'opakowań')}. Najpilniejsze:`),
+    list.length === 0 ? h('p', { class: 'muted' }, known ? 'Nic nie trzeba kupować — zapasy wystarczą.' : 'Ustaw stany pozycji, aby wyliczyć zakupy.') :
+      h('ul', { class: 'zp-buy' }, byNeed.slice(0, 5).map(x => h('li', {},
+        h('span', { class: 'zp-buy-n' }, x.name, h('span', { class: 'muted' }, `${x.packs} × ${fmt(x.packSize)} ${x.unit} · masz ${fmt(x.current, 1)}`)),
+        h('button', { class: 'zp-buy-b', 'aria-label': `Kupione: ${x.name}, +${fmt(x.toBuy)} ${x.unit}`,
+          onclick: () => save('inv.move', { prod: x.id, qty: x.toBuy, date: today, kind: 'purchase' }, `${x.name}: +${fmt(x.toBuy)} ${x.unit} (kupione)`) },
+          icon('check', { size: 16 }), h('span', {}, `+${fmt(x.toBuy)} ${x.unit}`))))),
+    list.length > 5 && h('button', { class: 'zp-more-b', onclick: () => shopDialog() }, `Pełny plan zakupów (${list.length})`));
+
+  // ---------- korekta zużycia dnia (rzadko) — zwinięta
+  const dayFix = h('details', { class: 'daycard', ...keepOpen('dayfix') },
+    h('summary', {}, icon('sliders-horizontal', { size: 18 }), h('span', {}, 'Korekta zużycia dnia'),
+      h('span', { class: 'muted' }, 'zużycie liczone automatycznie z planu')),
+    h('p', { class: 'muted' }, `${dayShort(today)} ${longDate(today)} · ${day.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · Faza ${day.phase ?? 0}. Użyj, gdy rzeczywiste zużycie różni się od planu o cały dzień.`),
+    h('div', { class: 'row' },
+      h('button', { onclick: () => save('inv.dayshift', { date: today, dir: 1 }, 'Cofnięto zużycie jednego dnia.') }, '+1 dzień (cofnij zużycie)'),
+      h('button', { onclick: () => save('inv.dayshift', { date: today, dir: -1 }, 'Odliczono zużycie jednego dnia.') }, '−1 dzień (odlicz)')));
 
   // ---------- filtry, wyszukiwarka, sortowanie, kategorie
-  add(root, h('div', { class: 'counters' },
-    [['CRITICAL', '🚨 Pilne braki'], ['WARNING', '⚠️ Średni stan'], ['OK', '🟢 Zapas OK']].map(([k, lab]) =>
+  const zmain = h('div', { class: 'zp-main' });
+  add(zmain, h('div', { class: 'counters', role: 'group', 'aria-label': 'Filtr statusu' },
+    [['CRITICAL', 'Pilne'], ['WARNING', 'Średnie'], ['OK', 'OK']].map(([k, lab]) =>
       h('button', { class: `counter c-${k}${filter === k ? ' is-on' : ''}`, 'aria-pressed': String(filter === k),
-        onclick: () => goto({ s: filter === k ? 'all' : k }) }, h('strong', {}, String(counts[k] || 0)), h('span', {}, lab)))),
+        onclick: () => goto({ s: filter === k ? 'all' : k }) }, h('span', { class: `dot-s s-${k}`, 'aria-hidden': 'true' }), h('strong', {}, String(counts[k] || 0)), h('span', {}, lab)))),
     h('div', { class: 'toolbar' },
-      h('input', { type: 'search', value: query, placeholder: '🔍 Szukaj pozycji…', 'aria-label': 'Szukaj pozycji',
+      h('input', { type: 'search', value: query, placeholder: 'Szukaj pozycji…', 'aria-label': 'Szukaj pozycji',
         onchange: e => goto({ q: e.target.value }) }),
       h('select', { 'aria-label': 'Sortowanie', onchange: e => goto({ sort: e.target.value }) },
         SORTS.map(([v, lab]) => h('option', { value: v, selected: v === sort }, lab)))),
@@ -125,60 +153,76 @@ export function renderZapasy(root, ctx) {
     cat: (a, b) => (a.it.category || '').localeCompare(b.it.category || '', 'pl') || a.it.name.localeCompare(b.it.name, 'pl') };
   visible = visible.sort(cmp[sort] || cmp.days);
 
-  add(root, h('div', { class: 'inv' }, visible.length === 0 ? h('p', { class: 'muted' }, 'Brak pozycji dla tego widoku.') :
+  add(zmain, h('div', { class: 'inv' }, visible.length === 0 ? h('p', { class: 'muted' }, 'Brak pozycji dla tego widoku.') :
     visible.map(r => {
       const it = r.it;
       const runsOutBeforeShopping = r.fc?.runOut && r.fc.runOut <= shop.date;
-      return h('article', { class: `inv-item st-${r.status}` },
+      const rw = r.st != null && it.tracked !== false && r.daily > 0 ? runway(it, r.fc, shop.inDays) : null;
+      const unitTag = it.unit === 'g' || it.unit === 'ml' ? it.unit.toUpperCase() : ` ${it.unit}`;
+      return h('article', { class: `inv-item st-${r.status}`, id: `zp-${it.id}` },
         h('div', { class: 'inv-head' },
           h('h3', {}, it.name),
-          h('span', { class: `pill pill-${r.status}` }, r.info.badge),
-          String(it.id).startsWith('custom_') && h('button', { class: 'icon', 'aria-label': `Usuń ${it.name}`,
-            onclick: () => confirm(`Usunąć pozycję „${it.name}”?`) && save('cat.delete', { id: it.id }, `Usunięto ${it.name}.`) }, '🗑️')),
-        h('p', { class: 'inv-tags' },
-          h('span', { class: 'tag' }, it.category === 'Suplementy' ? '💊 SUPLEMENT' : it.shelfLife === 'short' ? '⏱️ ŚWIEŻE (≤7D)' : '📦 TRWAŁE (>7D)'),
-          it.packSize && h('span', { class: 'tag' }, `🛍️ ${fmt(it.packSize)}${it.unit === 'g' || it.unit === 'ml' ? it.unit.toUpperCase() : ` ${it.unit}`}`),
-          it.maxLimit && h('span', { class: 'tag' }, `Limit: ${fmt(it.maxLimit)} ${it.unit}`),
-          r.daily > 0 && h('span', { class: 'tag' }, `${fmt(r.daily, 2)} ${it.unit}/d`),
-          it.note && h('span', { class: 'tag' }, `📂 ${it.note}`)),
-        h('p', { class: 'inv-meta' },
-          r.st == null ? 'Stan nieznany — ustaw stan poniżej.' :
-          r.st <= 0 ? 'Wystarczy do: DZIŚ (Brak)' :
-          r.fc?.lastCovered ? `Wystarczy do: ${v31Date(r.fc.lastCovered)}` : r.daily ? 'Wystarczy do: dziś' : 'Nie jest zużywana'),
-        r.st != null && it.tracked !== false && r.daily > 0 && h('p', { class: runsOutBeforeShopping || r.st <= 0 ? 'inv-warn' : 'inv-ok' },
-          (() => {
-            if (r.st <= 0) return `⚠️ Brak na ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')} przed zakupami`;
-            if (!runsOutBeforeShopping) return '✓ Wystarczy do zakupów';
-            const d = Math.max(1, diffDays(r.fc.runOut, shop.date));
-            return `⚠️ Skończy się ${d}d przed zakupami`;
-          })()),
+          h('span', { class: `pill pill-${r.status}` }, r.info.badge)),
+        h('p', { class: 'inv-sum' },
+          h('span', { class: 'tag' }, it.category === 'Suplementy' ? 'SUPLEMENT' : it.shelfLife === 'short' ? 'ŚWIEŻE (≤7D)' : 'TRWAŁE (>7D)'),
+          h('span', { class: 'inv-meta' },
+            r.st == null ? 'Stan nieznany — ustaw stan poniżej.' :
+            r.st <= 0 ? 'Wystarczy do: DZIŚ (Brak)' :
+            r.fc?.lastCovered ? `Wystarczy do: ${v31Date(r.fc.lastCovered)}` : r.daily ? 'Wystarczy do: dziś' : 'Nie jest zużywana'),
+          r.st != null && it.tracked !== false && r.daily > 0 && h('span', { class: runsOutBeforeShopping || r.st <= 0 ? 'inv-warn' : 'inv-ok' },
+            (() => {
+              if (r.st <= 0) return `⚠️ Brak na ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')} przed zakupami`;
+              if (!runsOutBeforeShopping) return '✓ Wystarczy do zakupów';
+              const d = Math.max(1, diffDays(r.fc.runOut, shop.date));
+              return `⚠️ Skończy się ${d}d przed zakupami`;
+            })())),
+        // Pasek zapasu: dni pokrycia na tle 14 dni (suplementy 30) z kreską dnia zakupów
+        rw && h('span', { class: 'zp-run', role: 'img', 'aria-label': `Zapas na ${fmt(rw.days, 1)} dnia, zakupy za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}` },
+          h('span', { class: 'zp-run-f', style: { width: `${rw.pct}%` } }), h('span', { class: 'zp-run-s', style: { left: `${rw.shopPct}%` } })),
         it.tracked === false ? h('p', { class: 'muted' }, 'Pozycja nieśledzona (zapas wieloletni).') :
           h('div', { class: 'inv-actions' },
-            h('button', { onclick: () => save('inv.move', { prod: it.id, qty: -(r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: −1 porcja`) }, '− porcja'),
-            h('button', { onclick: () => save('inv.move', { prod: it.id, qty: (r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: +1 porcja`) }, '+ porcja'),
-            h('button', { onclick: () => save('inv.move', { prod: it.id, qty: it.packSize || 1, date: today, kind: 'purchase' }, `${it.name}: +${fmt(it.packSize || 1)} ${it.unit}`) },
-              `+ opakowanie (${fmt(it.packSize || 1)} ${it.unit})`),
-            h('label', { class: 'inv-set' }, h('span', {}, 'Stan'),
+            h('label', { class: 'inv-set' }, h('span', { class: 'sr-only' }, 'Stan'),
               h('input', { type: 'number', inputmode: 'decimal', step: 'any', min: '0', value: r.st == null ? '' : String(r.st),
                 'aria-label': `Stan: ${it.name}`,
                 onchange: e => { const v = Number(e.target.value); if (Number.isFinite(v) && v >= 0) save('inv.count', { prod: it.id, qty: v, date: today }, `${it.name}: stan ${fmt(v, 1)} ${it.unit}`); } }),
-              h('span', {}, it.unit))));
+              h('span', {}, it.unit)),
+            h('button', { class: 'zp-pack', 'aria-label': `+ opakowanie (${fmt(it.packSize || 1)} ${it.unit}): ${it.name}`,
+              onclick: () => save('inv.move', { prod: it.id, qty: it.packSize || 1, date: today, kind: 'purchase' }, `${it.name}: +${fmt(it.packSize || 1)} ${it.unit}`) },
+              icon('plus', { size: 16 }), h('span', {}, `${fmt(it.packSize || 1)} ${it.unit}`)),
+            moreBox()),
+        it.tracked === false && moreBox());
+      // Szczegóły i rzadsze korekty — zwinięte (w wierszu czynności; po rozwinięciu zajmują całą szerokość)
+      function moreBox() { return h('details', { class: 'zp-more', ...keepOpen(`more:${it.id}`) }, h('summary', { 'aria-label': `Szczegóły i korekty: ${it.name}` }, icon('ellipsis', { size: 18 }), h('span', {}, 'Więcej')),
+          h('p', { class: 'inv-tags' },
+            it.packSize && h('span', { class: 'tag' }, `Opakowanie ${fmt(it.packSize)}${unitTag}`),
+            it.maxLimit && h('span', { class: 'tag' }, `Limit: ${fmt(it.maxLimit)} ${it.unit}`),
+            r.daily > 0 && h('span', { class: 'tag' }, `${fmt(r.daily, 2)} ${it.unit}/d`),
+            it.note && h('span', { class: 'tag' }, it.note),
+            h('span', { class: 'tag' }, it.category)),
+          it.tracked !== false && h('div', { class: 'row' },
+            h('button', { onclick: () => save('inv.move', { prod: it.id, qty: -(r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: −1 porcja`) }, '− porcja'),
+            h('button', { onclick: () => save('inv.move', { prod: it.id, qty: (r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: +1 porcja`) }, '+ porcja'),
+            String(it.id).startsWith('custom_') && h('button', { class: 'danger', 'aria-label': `Usuń ${it.name}`,
+              onclick: () => confirm(`Usunąć pozycję „${it.name}”?`) && save('cat.delete', { id: it.id }, `Usunięto ${it.name}.`) }, 'Usuń pozycję'))); }
     })));
 
-  // ---------- operacje zbiorcze
-  add(root, h('div', { class: 'row bulk' },
+  // ---------- operacje zbiorcze (rzadkie, nieodwracalne bez historii) — zwinięte
+  add(zmain, h('details', { class: 'zp-bulk' }, h('summary', {}, 'Operacje zbiorcze'), h('div', { class: 'row bulk' },
     h('button', { class: 'danger', onclick: async () => {
       if (!confirm('Wyzerować stany wszystkich pozycji? Zmianę można cofnąć w historii.')) return;
       try { for (const r of rows) if (r.it.tracked !== false) await store.record('inv.count', { prod: r.it.id, qty: 0, date: today });
         ctx.flash('Wyzerowano stany.'); ctx.rerender(); } catch (e) { err(e); }
-    } }, '↺ Zeruj stany'),
+    } }, 'Zeruj stany'),
     h('button', { onclick: async () => {
       const custom = store.state.catalogUser || [];
       if (!custom.length) return ctx.flash('Lista jest już fabryczna.') || ctx.rerender();
       if (!confirm(`Usunąć ${custom.length} własnych pozycji? Stany fabrycznych pozycji zostaną bez zmian.`)) return;
       try { for (const c of custom) await store.record('cat.delete', { id: c.id });
         ctx.flash('Przywrócono listę fabryczną.'); ctx.rerender(); } catch (e) { err(e); }
-    } }, '🔄 Fabryczna lista')));
+    } }, 'Fabryczna lista'))));
+
+  // Układ: telefon — przegląd, zakupy, akcje, lista; komputer — lista + przyklejona kolumna zakupów (D-072)
+  add(root, h('div', { class: 'zp-layout' }, zmain, h('aside', { class: 'zp-aside', 'aria-label': 'Zakupy i korekty' }, shopCard, dayFix)));
 
   // ================= okna =================
   function undo(ev) {
@@ -198,7 +242,7 @@ export function renderZapasy(root, ctx) {
     const field = (label, el) => h('label', { class: 'field' }, h('span', {}, label), el);
     const input = (key, props) => (f[key] = h('input', props));
     const select = (key, opts) => (f[key] = h('select', {}, opts.map(o => h('option', { value: o[0] }, o[1]))));
-    const dlg = dialog('➕ Dodaj nową pozycję',
+    const dlg = dialog('Dodaj nową pozycję',
       field('Nazwa', input('name', { placeholder: 'np. Cynk organiczny, Dorsz' })),
       field('Kategoria', select('cat', CATS.slice(1).concat([['Inne']]).map(c => (Array.isArray(c) ? c : [c, c])))),
       field('Trwałość', select('shelf', [['short', 'Świeże (≤ 7 dni, alert < 2 dni)'], ['long', 'Trwałe (> 7 dni, alert < 7 dni)']])),
@@ -222,7 +266,7 @@ export function renderZapasy(root, ctx) {
           if (Number.isFinite(q) && q >= 0) await store.record('inv.count', { prod: id, qty: q, date: today });
           dlg.close(); ctx.flash(`Dodano pozycję: ${name}.`); ctx.rerender();
         } catch (e) { dlg.close(); err(e); }
-      } }, '💾 Zapisz pozycję'));
+      } }, 'Zapisz pozycję'));
   }
 
   function shopDialog() {
@@ -233,7 +277,7 @@ export function renderZapasy(root, ctx) {
       const pct = list.length ? Math.round((checked.size / list.length) * 100) : 100;
       txt.textContent = `${checked.size} / ${list.length} (${pct}%)`; bar.style.width = `${pct}%`;
     };
-    const dlg = dialog(`🛒 Plan zakupów — ${dayShort(shop.date)} ${shortDate(shop.date)}`,
+    const dlg = dialog(`Plan zakupów — ${dayShort(shop.date)} ${shortDate(shop.date)}`,
       h('div', { class: 'prog' }, h('span', { class: 'prog-bar' }, bar), txt),
       list.length === 0 ? h('p', {}, 'Nic nie trzeba kupować — zapasy wystarczą.') :
         h('ul', { class: 'shop-list' }, list.map(x => h('li', {},
@@ -279,7 +323,7 @@ export function renderZapasy(root, ctx) {
         ctx.rerender();
       } catch (e) { dlg.close(); err(e); }
     };
-    const dlg = dialog('📥 Importuj rachunek / paragon',
+    const dlg = dialog('Importuj rachunek / paragon',
       h('p', { class: 'muted' }, 'Wklej dane JSON: identyfikator pozycji i ilość w jednostce magazynu, np. {"banan": 1200} lub {"banan": {"qty": "1,2"}}.'),
       h('p', { class: 'muted' }, `Identyfikatory: ${items.map(i => i.id).join(', ')}`),
       ta,
@@ -308,7 +352,7 @@ export function renderZapasy(root, ctx) {
         dlg.close(); ctx.flash(`↩ Przywrócono stan z: ${new Date(e.at).toLocaleString('pl-PL')}`); ctx.rerender();
       } catch (x) { dlg.close(); err(x); }
     };
-    const dlg = dialog('🕘 Historia i cofanie zmian',
+    const dlg = dialog('Historia i cofanie zmian',
       evs.length === 0 ? h('p', {}, 'Brak zapisanych zmian.') :
         h('ul', { class: 'hist' }, evs.map(e => h('li', {},
           h('span', { class: 'muted' }, `${new Date(e.at).toLocaleString('pl-PL')} · ${e.dev === store.device ? 'to urządzenie' : 'inne urządzenie'}`),
@@ -334,7 +378,7 @@ export function renderZapasy(root, ctx) {
       if (!confirm(`Plik: ${f.name}\nNowe zmiany: ${pv.fresh.length}, już znane: ${pv.known}, konflikty: ${pv.conflicts.length}.\n\nScalić dane?`)) return;
       try { const n = await apply(store, pv); dlg.close(); ctx.flash(`Wczytano kopię: ${n} zmian.`); ctx.rerender(); } catch (e) { dlg.close(); err(e); }
     } });
-    const dlg = dialog('💾 Kopia zapasowa (plik .json)',
+    const dlg = dialog('Kopia zapasowa (plik .json)',
       h('p', { class: 'muted' }, 'Kopia zawiera wszystkie dane aplikacji (także zapasy) i jest tym samym plikiem co synchronizacja przez iCloud. Wczytanie scala dane — nic nie jest nadpisywane.'),
       h('div', { class: 'row' },
         h('button', { class: 'primary', onclick: async () => {

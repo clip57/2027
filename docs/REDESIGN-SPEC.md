@@ -1,6 +1,6 @@
 # REDESIGN-SPEC — system projektowy aplikacji „2027”
 
-Stan: obowiązuje od Fazy 3, zaktualizowany w Fazie 5.0 i Fazie 5 (Trening, CFA) — 24.09.2026. Źródło prawdy dla wartości: `src/ui/tokens.css`; dla komponentów: `src/ui/system.css`.
+Stan: obowiązuje od Fazy 3, zaktualizowany w Fazie 5.0 i Fazie 5 (Trening, CFA, Dieta, Zapasy) — 24.09.2026. Źródło prawdy dla wartości: `src/ui/tokens.css`; dla komponentów: `src/ui/system.css`.
 Jeśli ten dokument i kod się różnią — **kod jest źródłem prawdy**, a rozbieżność zgłoś w raporcie.
 
 ## 1. Kierunek wizualny
@@ -8,6 +8,12 @@ Jeśli ten dokument i kod się różnią — **kod jest źródłem prawdy**, a r
 duże liczby KPI z krótkim opisem; karty o 2 poziomach głębi; paski i pierścienie postępu **tylko tam, gdzie istnieje
 rzeczywisty licznik** (serie, bloki CFA, kroki meal prepu, kcal, zapasy). Kolory domen modułów są wyłącznie sygnaturą
 (ikona, cienki pasek, kropka) — nigdy tłem dużych powierzchni.
+
+**Kierunek od Fazy 5 (D-073): „premium personal OS”** — spokojne karty o jednej skali, zwarte wiersze z najważniejszą informacją
+na wierzchu i szczegółami „Więcej”, jedno główne działanie na ekran, wskaźniki postępu wyłącznie z danych (paski zapasu, pasek stanu
+magazynu, makro w kcal), kolumna boczna z podsumowaniem na komputerze, siatka akcji z ikonami na telefonie. Inspiracją są zrzuty
+użytkownika (LifeOS, mobilne „productivity”); elementy tych projektów bez pokrycia w danych (Focus Score, nastrój, AI chat,
+„efficiency”) są świadomie pominięte.
 
 **Unikaj:** glassmorphismu (wyjątek: przezroczysty dolny pasek na telefonie), neumorfizmu, gradientów dekoracyjnych,
 przesadnych cieni, animacji bez funkcji, metryk bez danych, kopiowania referencji 1:1.
@@ -92,7 +98,7 @@ Trasy modułów zawsze w postaci `#/modul?param=…`.
 | Tabele | `table.data`: nagłówki `--muted`; przewijanie tylko w kontenerze `.scroll-x` (fokusowalny, `aria-label`) |
 | Okna | `dialog`: `--surface-2`, `--r-lg`, `--e2`. **< 600 px: arkusz od dołu** (pełna szerokość, `max-height 90dvh`, zaokrąglona góra, margines `safe-area-inset-bottom`, animacja 200 ms) |
 | Przełącznik motywu | `.theme-switch` / `.ts-b` (tor jak segmenty) |
-| Ikony | `icon(name, {size, label})` z `src/ui/icons.js`; bez `label` → `aria-hidden="true"`; rozmiary 14–22 px; dostępne (45; od Fazy 5 także square, copy, skip-forward, calendar-clock, list-todo): sun, moon, monitor, utensils, dumbbell, graduation-cap, ellipsis, pill, package, chef-hat, shield-check, target, database, cloud-upload, cloud-download, panel-left-close, panel-left-open, chevron-left/right/down, check, x, triangle-alert, info, clock, calendar, flame, timer, play, pause, plus, minus, search, list-checks, book-open, refresh-cw, circle-check, shopping-cart, heart-pulse, zap. Nowa ikona: dopisz nazwę w `tools/icons.mjs` i uruchom `node tools/icons.mjs` |
+| Ikony | `icon(name, {size, label})` z `src/ui/icons.js`; bez `label` → `aria-hidden="true"`; rozmiary 14–22 px; dostępne (53; od Fazy 5 także square, copy, skip-forward, calendar-clock, list-todo, undo-2, history, bot, save, receipt, sliders-horizontal, package-check, clock-3): sun, moon, monitor, utensils, dumbbell, graduation-cap, ellipsis, pill, package, chef-hat, shield-check, target, database, cloud-upload, cloud-download, panel-left-close, panel-left-open, chevron-left/right/down, check, x, triangle-alert, info, clock, calendar, flame, timer, play, pause, plus, minus, search, list-checks, book-open, refresh-cw, circle-check, shopping-cart, heart-pulse, zap. Nowa ikona: dopisz nazwę w `tools/icons.mjs` i uruchom `node tools/icons.mjs` |
 | Link jako przycisk | `a.btn` — `inline-flex`, wyśrodkowanie, odstęp ikony, bez podkreślenia (od Fazy 5) |
 | Tylko dla czytników | `.sr-only` — komunikaty `aria-live` bez widocznego tekstu (licznik przerwy) |
 
@@ -114,6 +120,23 @@ albo „Na bieżąco z planem”, „Plan do wczoraj: X / Y”, „Z wyprzedzeni
 (jak w „Dziś”), **panel `.cf-backlog`** (tylko dzień bieżący: 5 najstarszych zaległych bloków do odhaczenia + „Wszystkie zaległe”),
 `.cf-next` i `.cfa-row.is-next` (następny blok dnia). Error log: pole `.cf-search` i filtr `.cf-kinds` (przyciski `aria-pressed`).
 Kalendarz: dzień bieżący obrysowany akcentem.
+
+### Dieta (Faza 5, klasy `dt-*`)
+Nagłówek `.dt-head` (h1, nagłówek planu z PDF, „obowiązuje dziś” albo link `a.chip.dt-today` „Pokaż plan na dziś”), przełączniki
+faza / rodzaj dnia jako segmenty o równych kolumnach. Siatka `.dt-grid`: kolumna boczna `.dt-aside` (kafel `.hero` kcal + makro,
+karta `.dt-next` „Następny posiłek” z godziną i „Pokaż skład”, karta `.dt-stock` „Składniki w zapasach” — 3 najpilniejsze + link do
+Zapasów) i główna `.dt-main` (nawigacja `.dt-nav` — posiłki z godziną i kcal, na telefonie przyklejona i przewijana w poziomie;
+karty `.meal` w kolejności godzin z paskiem udziału makro `.dt-bar`; pozycje: nazwa, ilość, linia `.dt-mac`, przy pilnym braku
+`.dt-stock-b`; zwinięte panele `.dt-extra`). ≥ 1100 px: kolumna boczna 340 px po prawej (przyklejona przy wysokości ≥ 940 px).
+
+### Zapasy (Faza 5, klasy `zp-*`)
+Nagłówek `.zp-head` (data, faza, rodzaj dnia). Przegląd `.dash` (`.zp-hbar` — udział pilnych/średnich/OK/bez stanu, legenda, najbliższy
+brak). Siatka akcji `.actions` z `.zp-act` (ikona nad etykietą, 4 kolumny na telefonie, 7 od 700 px; „Zakupy” jako główna).
+Kolumna `.zp-aside` (na telefonie przed listą): `.zp-shop` „Do kupienia” (data i liczba zakupów, 5 najpilniejszych z przyciskiem
+„Kupione +ilość”, „Pełny plan zakupów”) i zwinięta `.daycard` „Korekta zużycia dnia”. Lista `.zp-main`: liczniki-filtry `.counters`
+(kropka, liczba, etykieta), wyszukiwarka i sortowanie, kategorie `.pills`, wiersze `.inv-item` (nazwa + status, typ + „Wystarczy do” +
+relacja do zakupów, pasek `.zp-run` z kreską dnia zakupów `.zp-run-s`, stan + „+ opakowanie” + `.zp-more` „Więcej” z porcjami, tagami,
+usunięciem własnej pozycji), zwinięte `.zp-bulk`. Rozwinięcie sekcji przetrwa zapis (stan w pamięci karty).
 
 ### Dashboard „Dziś” (Faza 4, klasy `dz-*`)
 Nagłówek (`.dz-head`: h1, `.topline` z datą i plakietkami, `.daynav`) → skróty (`.quicklinks`, pigułki z ikonami) →

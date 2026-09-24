@@ -14,6 +14,29 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 
 ## 2. Wyniki regresji
 
+### Faza 5 — Dieta i Zapasy (24.09.2026, konfiguracja B)
+Build: **OK** — wersja `0.2.0+b6d6a8961c`; `dist/web/app.*.js` 681 KB; `dist/single/2027.html` 821 KB.
+
+| Zestaw | Wynik |
+|---|---|
+| Jednostkowe | 87 uruchomionych · **86 zaliczonych · 0 niezaliczonych · 1 pominięty** (migracja prawdziwej kopii ZAPASY) |
+| Weryfikacja danych | **nieuruchomiona** (wymaga `SOURCES_DIR`) |
+| E2E | **923 kontrole · 923 zaliczone · 0 niezaliczonych · 0 pominiętych bloków** (+38 względem Treningu/CFA) |
+| Synchronizacja i aktualizacja | **21 kontroli · 21 zaliczonych · 0 pominiętych** (scenariusz korzysta z przebudowanych wierszy Zapasów) |
+| Dostępność | 124 przebiegi (20 widoków + 11 stanów × 2 szerokości × 2 motywy), z danymi syntetycznymi · **0 typów naruszeń** · przewijanie w poziomie: **brak** |
+
+Kontrola wizualna: Dieta i Zapasy na 375 px (ciemny, jasny) i 1440 px (jasny, ciemny); regresja wyglądu Dziś, Suplementacji, Treningu —
+bez zmian układu, brak przewijania w poziomie.
+
+Nowe kontrole: `tests/unit/diet-stock.test.mjs` (3: `mealTimes`, `nextMeal`, `runway`); E2E (dane syntetyczne) — pasek stanu
+magazynu, karta „Do kupienia”, „Kupione” zdejmuje pozycję z listy, pasek zapasu z kreską zakupów, „Więcej” z korektami porcji
+i pozostawanie rozwiniętym po zapisie, korekta dnia rozwinięta po zapisie, oznaczenia składników w Diecie; E2E z zegarem —
+następny posiłek (10:00 → przekąska 11:15), kolejność godzin w nawigacji, „Pokaż skład”, inny wariant bez karty; cele dotykowe
+≥ 44 px także dla `summary`, `a.chip`, `.dt-nav-a` w Treningu, CFA, Diecie i Zapasach. a11y: przed audytem import syntetycznej
+kopii zapasów (statusy, paski, ostrzeżenia w Diecie widoczne dla axe), nowe stany „rozwinięte korekty i szczegóły”, „filtr pilnych”.
+Zmienione nazwy przycisków Zapasów w testach: „Zakupy”, „Kopia”, „Cofnij”, „Historia” (ikony zamiast emoji), korekty dnia bez emoji
+i w zwiniętej sekcji `.daycard` (test najpierw ją rozwija).
+
 ### Faza 5 — Trening i CFA (24.09.2026, konfiguracja B)
 Build: **OK** — wersja `0.2.0+4830b6b2a4`; `dist/web/app.*.js` 674 KB (+7 KB: licznik, karty, 5 ikon); `dist/single/2027.html` 801 KB.
 
@@ -80,7 +103,8 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .panel .pill-b .pills .prep-card .prep-list .priv-in .priv-miss .prog .quicklinks .rk-sec .safety-table .set .set-copy .set-h
 .set-toggle .sf-card .sheet .sheet-head .shop-list .side .side-a .side-gl .slot .slot-items .slot-title .stats .tabs .tm
 .tm-clock .tm-man .topic .topline .gd-card .gd-rt .more-ic .more-n .mp-jump .prep-list .cfa-row .set:not(.set-h)
-.tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa`
+.tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa
+.dt-next .dt-nav-n .dt-stock .dt-alerts .dt-stock-b a.dt-today .zp-hbar .zp-shop .zp-buy-n .zp-buy-b .zp-run .zp-run-s .zp-more .daycard`
 (od Fazy 5.0 także: atrybut `data-meal`, identyfikatory `mp-ph-N`, tekst „Przejdź do karty”; od Fazy 5: identyfikatory `ex-<id>`,
 przyciski „Rozpocznij trening”, „Zakończ trening”, „+30 s”, „Pomiń przerwę”, „Dodaj wpis”, „pośpiech: 1”, „Wszystkie: N”, linki
 „Przejdź do ćwiczenia”, „Następny dzień”, teksty „Zaległe: N bloków”, „Plan do wczoraj”, „Sesja ukończona”, „Następny: blok A”).

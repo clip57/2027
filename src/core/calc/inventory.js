@@ -94,3 +94,13 @@ export function shoppingList(inv, asOf, items) {
 }
 
 export const allItems = () => Object.values(catalogById);
+
+// Pasek zapasu: ile dni pokrywa stan na tle horyzontu (14 dni; suplementy 30) i gdzie wypada dzień zakupów.
+// Wyłącznie z prognozy (forecast) — bez nowych danych. null, gdy stan nieznany lub pozycja nie jest zużywana.
+export function runway(item, fc, shopInDays) {
+  if (!fc || fc.days === Infinity) return null;
+  const horizon = item.category === 'Suplementy' ? 30 : 14;
+  const days = Math.min(fc.days, horizon);
+  return { days: fc.days, horizon, pct: Math.round((days / horizon) * 1000) / 10, shopPct: Math.round((Math.min(shopInDays, horizon) / horizon) * 1000) / 10,
+    beforeShopping: fc.days < shopInDays };
+}

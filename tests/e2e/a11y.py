@@ -1,5 +1,7 @@
 """Audyt dostępności (axe-core, WCAG 2.1 A/AA) i responsywności: wszystkie widoki i stany interakcji × 390/1280 px × motyw jasny/ciemny."""
-import asyncio, json, pathlib, sys, collections, datetime as dt
+import asyncio, json, os, pathlib, sys, collections, datetime as dt
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixtures
 from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 AXE = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
@@ -14,7 +16,11 @@ STATES = [('#/trening?d=2026-09-21', "document.querySelector('.set:not(.set-h) .
   ('#/bezpieczenstwo?m=poradnik', OPEN_ALL, 'rozwinięte sekcje'), ('#/rekompozycja', OPEN_ALL, 'rozwinięte sekcje'),
   ('#/dieta', OPEN_ALL, 'rozwinięte posiłki'), ('#/trening?d=2026-09-21', "document.querySelector('.ex-tech').click()", 'okno techniki'),
   ('#/trening', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'licznik przerwy'),
-  ('#/cfa?v=log', "document.querySelector('.cf-kinds .chip-b')?.click()", 'filtr error logu')]
+  ('#/cfa?v=log', "document.querySelector('.cf-kinds .chip-b')?.click()", 'filtr error logu'),
+  ('#/zapasy', "document.querySelectorAll('.daycard, .zp-more, .zp-bulk').forEach(d => d.open = true)", 'rozwinięte korekty i szczegóły'),
+  ('#/zapasy?s=CRITICAL', None, 'filtr pilnych')]
+# Stany zapasów: SYNTETYCZNA kopia (D-065) importowana przed audytem — statusy, paski zapasu, „Do kupienia”, ostrzeżenia w Diecie
+SYN = fixtures.write(fixtures.synthetic_zapasy(dt.date(2026, 9, 27))[0], 'zapasy_syntetyczne.json')
 # Stały zegar (poniedziałek 28.09.2026 10:00): „dziś” ma trening (licznik przerwy) i zaległe bloki CFA — widoki zależne od daty są audytowane zawsze
 CLOCK = dt.datetime(2026, 9, 28, 10, 0, tzinfo=dt.timezone(dt.timedelta(hours=2)))
 async def main():
@@ -28,9 +34,13 @@ async def main():
         # motyw jawnie: 'dark' | 'light' (domyślny jest ciemny — bez tego oba przebiegi sprawdzałyby ten sam motyw)
         await ctx.add_init_script(f"localStorage.setItem('p2027.theme', '{scheme}')")
         pg = await ctx.new_page()
+        await pg.goto((ROOT / 'dist/single/2027.html').as_uri() + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
+        await pg.set_input_files('input[type=file]', str(SYN)); await pg.wait_for_selector('dialog[open]')
+        await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano')
         for r, action, label in [(r, None, '') for r in ROUTES] + STATES:
           await pg.goto((ROOT / 'dist/single/2027.html').as_uri() + r); await pg.wait_for_timeout(350)
-          if action: await pg.evaluate(action); await pg.wait_for_timeout(400); r = f'{r} [{label}]'
+          if action: await pg.evaluate(action); await pg.wait_for_timeout(400)
+          if label: r = f'{r} [{label}]'
           sw = await pg.evaluate('document.documentElement.scrollWidth')
           if sw > w: overflow.append(f'{w}/{scheme} {r}: {sw}px')
           await pg.add_script_tag(content=AXE)

@@ -1,6 +1,6 @@
 # REDESIGN-DECISIONS — decyzje obowiązujące przy redesignie
 
-Źródło: `docs/DECYZJE_2027.md` (pełny rejestr D-001…D-070, brzmienie nadrzędne) oraz historia projektu.
+Źródło: `docs/DECYZJE_2027.md` (pełny rejestr D-001…D-073, brzmienie nadrzędne) oraz historia projektu.
 Kolumna „Potwierdzenie” mówi, gdzie decyzja jest widoczna w kodzie/testach. Pozycje oznaczone **[do weryfikacji]**
 nie mają pełnego potwierdzenia w kodzie lub u użytkownika.
 
@@ -57,6 +57,13 @@ nie mają pełnego potwierdzenia w kodzie lub u użytkownika.
 | D-068 | Licznik przerwy: tylko dzień bieżący, czas z planu, stan lokalny (bez zdarzeń, bez synchronizacji) | `trening.js` (`restBar`), `calc/training.js` (`restSeconds`), E2E z zegarem, unit |
 | D-069 | Karta „Następna seria” i podsumowanie sesji — wyłącznie z planu i dziennika | `trening.js`, `calc/training.js` (`nextSet`), E2E, unit |
 | D-070 | CFA: zaległe = przed dziś i nieodhaczone; panel zaległych, filtr w harmonogramie, filtr/wyszukiwanie error logu | `cfa.js`, `calc/cfa.js` (`cfaPace`), E2E z zegarem, unit |
+
+## C4. Decyzje Fazy 5 — Dieta i Zapasy (24.09.2026)
+| ID | Treść | Potwierdzenie |
+|---|---|---|
+| D-071 | Dieta: kolejność godzin, następny posiłek, zwarte pozycje, składniki z Zapasów, sekcje rzadkie zwinięte | `dieta.js`, `calc/diet.js` (`mealTimes`, `nextMeal`), unit, E2E z zegarem |
+| D-072 | Zapasy: przegląd, siatka akcji, „Do kupienia” z „Kupione”, zwarte wiersze, pasek zapasu, zwinięte korekty | `zapasy.js`, `calc/inventory.js` (`runway`), unit, E2E (dane syntetyczne), a11y z danymi |
+| D-073 | Kierunek „premium personal OS” w ramach tokenów, bez efektów i metryk bez danych | `REDESIGN-SPEC.md` §1 |
 
 Decyzje użytkownika wydane przed Fazą 3 (w rozmowie, zapisane jako D-060…D-063): mobile 4 + Więcej (Dziś, Dieta, Trening, CFA);
 grupy panelu jw. „o ile analiza kodu potwierdzi” — **potwierdzone** polem `domain` w rejestrze; motyw „systemowy jako domyślny

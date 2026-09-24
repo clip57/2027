@@ -41,3 +41,14 @@ export function phaseDiff(variant, fromPhase, toPhase) {
   }
   return out;
 }
+
+// Godziny posiłków z planu dnia (szablon godzin jest wspólny dla wszystkich dni — D-004): { breakfast: '09:00', … }.
+export function mealTimes(slots) {
+  return Object.fromEntries(slots.flatMap(s => s.items).filter(i => i.kind === 'meal' && i.time).map(i => [i.meal, i.time]));
+}
+
+// Następny posiłek dnia: pierwszy o godzinie ≥ hhmm (kolejność godzin, nie kolejność w PDF). null — wszystkie za nami.
+export function nextMeal(meals, times, hhmm) {
+  return meals.filter(m => times[m.id]).map(m => ({ ...m, time: times[m.id] }))
+    .sort((a, b) => (a.time < b.time ? -1 : 1)).find(m => m.time >= hhmm) || null;
+}
