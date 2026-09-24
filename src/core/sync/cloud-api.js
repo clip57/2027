@@ -1,6 +1,6 @@
 // Klient REST Supabase (Auth + PostgREST) bez SDK — sam `fetch` (D-078, Etap 1). Nie przechowuje niczego sam:
 // sesję zapisuje przekazany `storage` ({ get(k), set(k, v), remove(k) }, np. magazyn `meta` w IndexedDB).
-// Adres projektu i klucz „anon” podaje użytkownik — nie ma ich w repozytorium.
+// Adres projektu i Publishable Key podaje użytkownik na urządzeniu (cloud-local.js) — nie ma ich w repozytorium.
 export class CloudError extends Error {
   constructor(msg, code, status = null) { super(msg); this.name = 'CloudError'; this.code = code; this.status = status; }
 }
@@ -11,7 +11,7 @@ const MARGIN_S = 60;                               // odśwież token minutę pr
 export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind(globalThis), storage, now = () => Date.now() }) {
   if (!/^https:\/\/[^/]+$/.test(url || '') && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(url || ''))
     throw new CloudError('Adres projektu musi mieć postać https://<projekt>.supabase.co', 'bad-config');
-  if (!anonKey) throw new CloudError('Brak klucza „anon” projektu.', 'bad-config');
+  if (!anonKey) throw new CloudError('Brak klucza projektu (Publishable Key).', 'bad-config');
   const base = url.replace(/\/$/, '');
 
   async function call(path, { method = 'GET', body, token, prefer, auth = true } = {}) {

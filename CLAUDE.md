@@ -14,12 +14,14 @@ raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Pr
 Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
 (urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `4e68589` (Faza 5 kompletna).
 **Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
-**Nowy etap: synchronizacja przez chmurę (Supabase, D-078…D-080)** — Etap 1 (rdzeń bez interfejsu: `src/core/sync/crypto.js`,
-`cloud-api.js`, `cloud.js`, `tools/supabase/schema.sql`, testy na fałszywym serwerze) — wykonany, **nieużywany przez aplikację**.
-Projekt, audyt i etapy: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu
-projektu, kluczy, haseł ani `service_role`.
+**Synchronizacja przez chmurę (Supabase, D-078…D-083)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
+`cloud.js`, `tools/supabase/schema.sql`) i Etap 2 (interfejs: sekcja „Synchronizacja w chmurze” w Dane —
+`src/modules/dane-cloud.js`, warstwa urządzenia `src/core/sync/cloud-local.js`, `tools/supabase/check.sql`, `npm run e2e:cloud`)
+wykonane. Adres projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta`), synchronizacja tylko
+przyciskiem „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
+plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu projektu, kluczy, haseł ani `service_role`.
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-080).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-083).
 
 ---
 
@@ -34,7 +36,7 @@ Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-080).
 | UI — komponenty | `src/ui/components.js`, `icons.js`, `prefs.js`, `charts.js`, `bodymap.js`, `figure.js`, `movement.js` | `segmented, stat, statGrid, section, macroChips, progressRing`; ikony Lucide `icon(name,{size,label})`; preferencje per urządzenie |
 | Style | `src/ui/tokens.css` → `src/ui/styles.css` → `src/ui/system.css` | sklejane w tej kolejności przez `tools/build.mjs`. **Tokeny tylko w `tokens.css`** |
 | Dane źródłowe | `src/data/*.json` | generowane skryptami `tools/extract/*` z plików źródłowych użytkownika (NIE w repozytorium); traktuj jako tylko do odczytu |
-| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js`, `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js` |
+| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js` |
 | Build | `tools/build.mjs` | esbuild → `dist/web/` (index + `app.<hash>.js/css` + `fonts/` + `sw.js` + manifest) i `dist/single/2027.html` (wszystko wbudowane) |
 | Ikony | `tools/icons.mjs` → `src/ui/icons.js` | plik wygenerowany i wersjonowany; regeneracja: `node tools/icons.mjs` (wymaga devDependency `lucide-static`) |
 | Fonty | `public/fonts/inter-latin*.woff2` | podzbiór Inter (OFL); **brak skryptu podzbioru w repo** — zob. REDESIGN-STATUS „znane ograniczenia” |
@@ -55,6 +57,7 @@ npm run build             # dist/web + dist/single/2027.html (wymagane przed tes
 npm test                  # testy jednostkowe (node --test)
 npm run e2e               # testy w przeglądarce: Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
 npm run e2e:sync          # synchronizacja między 2 profilami + aktualizacja kodu za zgodą (kilka razy przebudowuje dist/)
+npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py)
 npm run a11y              # axe-core WCAG 2.1 A/AA: 20 widoków × 390/1280 px × jasny/ciemny + przewijanie w poziomie
 npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika), bez nich nie działa
 ```
@@ -71,8 +74,10 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 1. **Dane i model danych:** nie zmieniaj typów zdarzeń, kluczy, nazwy bazy (`p2027`), wersji IndexedDB, struktury
    magazynów ani `reduce()` w sposób zmieniający wynik dla istniejących danych.
 2. **Synchronizacja:** format `2027-sync.json` bez zmian (pola `format, schema, exportedAt, device, count, sha256, events`;
-   deduplikacja po `id`; import idempotentny). Synchronizacja jest **ręczna** (D-033) — nie dodawaj „automatycznej” ani
-   jej pozorów. Aktualizacja kodu (service worker) to **inna** sprawa niż synchronizacja danych (D-057).
+   deduplikacja po `id`; import idempotentny). Synchronizacja jest **ręczna** (D-033) — plikiem albo przyciskiem
+   „Synchronizuj teraz” w chmurze (D-083); nie dodawaj „automatycznej” (przy starcie, w tle, zegarem) ani jej pozorów.
+   Chmura: tylko zaszyfrowane zdarzenia, wiersze niezmienne, klucze sekretne odrzucane (D-078…D-082).
+   Aktualizacja kodu (service worker) to **inna** sprawa niż synchronizacja danych (D-057).
 3. **Zgodność w przód (D-056):** zdarzeń o poprawnej kopercie i nieznanym typie nie wolno usuwać ani przenosić do
    kwarantanny; pomijane w obliczeniach, raportowane banerem „Niepełne przetwarzanie”.
 4. **Aktualizacja kodu tylko za zgodą (D-057):** żadnego automatycznego `location.reload()`; przycisk „Nowa wersja — odśwież”.
@@ -82,8 +87,9 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 6. **Treść merytoryczna:** nie zmieniaj wartości w `src/data/*.json`, dawek, gramatur, godzin ani tekstów źródłowych.
    Suplementy wyłącznie z SUPLEMENTACJI (D-001); **w zakładce „Dziś” nazwy dawek tylko w planie dnia — bez dublowania
    (D-041, D-064)**. Nie twórz metryk ani wykresów bez danych (np. „Focus Score”, nastrój, AI insight).
-7. **Bez płatnych usług i backendu (D-034); offline-first** — nowe zasoby muszą działać w obu wariantach buildu
-   (w `2027.html` wszystko inline) i trafiać do listy `SHELL` service workera.
+7. **Bez płatnych usług i własnego backendu (D-034); offline-first** — jedyny serwer to opcjonalny projekt Supabase
+   użytkownika w planie bezpłatnym (D-078), wyłącznie REST bez SDK; aplikacja musi działać w pełni bez niego. Nowe zasoby
+   muszą działać w obu wariantach buildu (w `2027.html` wszystko inline) i trafiać do listy `SHELL` service workera.
 8. **Bezpieczeństwo DOM:** nigdy `innerHTML`/`insertAdjacentHTML` z danymi. Budowanie przez `h()`; dołączanie wartości
    warunkowych/tablic przez `add()` (nie `el.append(cond && x)` — wyświetla „false”/„null”/„undefined”).
 9. **Nie zmieniaj nazw klas CSS używanych przez testy** (lista w `docs/REDESIGN-TESTING.md`). Zmieniaj ich wygląd.
@@ -124,4 +130,5 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | `--muted` na tle `--sunken` (jasny motyw) | 4,47:1 — poniżej AA | na `--sunken` używaj `--text-2` (para w `tokens.test.mjs`) |
 | `setInterval` sprawdzający `isConnected` przed wstawieniem elementu do DOM | licznik nigdy nie startuje | pierwsze wypełnienie bez warunku, zatrzymanie dopiero gdy element zniknie z DOM |
 | `<details>` przerysowywany po każdym zapisie | sekcja zamyka się po każdej korekcie | stan rozwinięcia w pamięci modułu (`keepOpen()` w `zapasy.js`) |
+| `page.goto(url + '#/dane')`, gdy strona już jest pod tym adresem | brak przerysowania; test czyta komunikat poprzedniej akcji | przed akcją wyczyść obszar komunikatu (aplikacja robi to w `run()` sekcji chmury) albo przejdź najpierw na inną trasę |
 | Przycisk z krótkim tekstem widocznym („+ 500 g”) | test szukający „+ opakowanie” go nie znajduje | pełna nazwa w `aria-label` (testy i czytniki ekranu używają nazwy dostępnej) |

@@ -1,5 +1,6 @@
 -- Projekt 2027 — schemat synchronizacji w chmurze (D-078). Wklej w Supabase → SQL Editor → Run (raz, na nowym projekcie).
--- Brak sekretów: adres projektu i klucz „anon” użytkownik wpisuje w aplikacji (Etap 2), nie w repozytorium.
+-- Brak sekretów: adres projektu i Publishable Key (dawniej klucz „anon”) użytkownik wpisuje w aplikacji na urządzeniu
+-- (Dane → Synchronizacja w chmurze), nie w repozytorium. Kontrola zabezpieczeń po uruchomieniu: tools/supabase/check.sql.
 -- Serwer przechowuje wyłącznie zaszyfrowane zdarzenia: `sid` = HMAC identyfikatora zdarzenia, `blob` = AES-GCM.
 -- Zasady: wiersze tylko dopisywane (brak UPDATE), każdy użytkownik widzi i zmienia wyłącznie własne wiersze (RLS),
 -- rola `anon` (sam klucz publiczny, bez zalogowania) nie ma żadnego dostępu.

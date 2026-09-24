@@ -7,12 +7,24 @@
 | Weryfikacja danych | `npm run verify` | zgodność `src/data/*.json` z plikami źródłowymi (407 kontroli) | **`SOURCES_DIR`** (pliki użytkownika — brak w repo) |
 | E2E | `npm run build && npm run e2e` | wszystkie moduły w 2 wariantach buildu (web przez http://localhost:8765, jeden plik przez file://) × 390 px (mobile, dotyk) / 1280 px; brak przewijania w poziomie, brak artefaktów „null/false/undefined/NaN”, cele dotykowe ≥ 44 px (widok Dane na 390 px), funkcje modułów, trwałość zapisu, eksport/import, offline (SW), kontrast odhaczonych elementów, linki w obrębie strony, sygnatury modułów | Python 3, Playwright ≥ 1.56, Chromium; `SOURCES_DIR`, `PRIVATE_PACK` opcjonalnie — bez nich dane syntetyczne (D-065) |
 | Synchronizacja i aktualizacja | `npm run e2e:sync` | 2 oddzielne profile (osobne bazy): sync w obu kierunkach, niezależne zmiany, brak duplikatów, ostrzeżenie o starszym pliku, zdarzenia z nowszej wersji (baner, brak utraty), aktualizacja kodu tylko za zgodą, offline po aktualizacji, przejście ze starego SW | jw.; **przebudowuje `dist/` kilka razy** (na końcu przywraca zwykły build); porty 8791 |
+| Synchronizacja w chmurze | `npm run build && npm run e2e:cloud` | lokalny fałszywy serwer Supabase (`tests/e2e/fake_supabase.py`, CORS, RLS, rotacja tokenów) + 2 profile Chromium (390 ciemny / 1280 jasny) + plik `2027.html`: konfiguracja (odrzucenie klucza sekretnego), logowanie, hasło szyfrowania (pierwsze urządzenie z powtórzeniem, błędne na drugim), brak synchronizacji bez kliknięcia, brak treści jawnej na serwerze, klucze po przeładowaniu, offline, konflikt, wygasły token, wylogowanie, odłączenie; axe, przewijanie i cele dotykowe w każdym kroku (49 kontroli) | jw.; porty 8793 i 54329 |
 | Dostępność | `npm run build && npm run a11y` | axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
 
 Kolejność po każdej zmianie w Fazie 5: `npm run build && npm test && npm run e2e && npm run a11y`;
-dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, `tools/build.mjs`, `src/modules/dane.js`.
+dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, `tools/build.mjs`, `src/modules/dane.js`;
+`npm run e2e:cloud`, jeśli dotyka `src/core/sync/**`, `src/core/storage/**` albo `src/modules/dane*.js`.
 
 ## 2. Wyniki regresji
+
+### Synchronizacja w chmurze — Etap 2 (24.09.2026, konfiguracja B — bez plików użytkownika, fałszywy serwer Supabase)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 120 testów: 119 zaliczonych, 1 pominięty (migracja kopii ZAPASY — wymaga `SOURCES_DIR`), 0 niezaliczonych |
+| `npm run e2e` | 956/956 |
+| `npm run e2e:sync` | 21/21 |
+| `npm run e2e:cloud` | 49/49 (w tym axe w 5 stanach sekcji chmury, 390 ciemny i 1280 jasny) |
+| `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
+| `schema.sql` + `check.sql` | sprawdzone na lokalnym PostgreSQL 16 z imitacją `auth.uid()` i ról: `anon` bez dostępu, izolacja użytkowników, brak UPDATE, wstawianie z pominięciem duplikatów, `check.sql` wykrywa nadane UPDATE |
 
 ### Faza 5 — moduły 5–9: Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja, Dane (24.09.2026, konfiguracja B)
 Build: **OK** — wersja `0.2.0+276680fffc`; `dist/web/app.*.js` 688 KB; `dist/single/2027.html` 834 KB.
@@ -122,7 +134,12 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .set-toggle .sf-card .sheet .sheet-head .shop-list .side .side-a .side-gl .slot .slot-items .slot-title .stats .tabs .tm
 .tm-clock .tm-man .topic .topline .gd-card .gd-rt .more-ic .more-n .mp-jump .prep-list .cfa-row .set:not(.set-h)
 .tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa
-.dt-next .dt-nav-n .dt-stock .dt-alerts .dt-stock-b a.dt-today .zp-hbar .zp-shop .zp-buy-n .zp-buy-b .zp-run .zp-run-s .zp-more .daycard`
+.dt-next .dt-nav-n .dt-stock .dt-alerts .dt-stock-b a.dt-today .zp-hbar .zp-shop .zp-buy-n .zp-buy-b .zp-run .zp-run-s .zp-more .daycard
+.dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent`
+(chmura, Etap 2: etykiety pól „Project URL”, „Publishable Key”, „E-mail konta”, „Hasło konta”, „Hasło szyfrowania”, „Powtórz hasło
+szyfrowania”, przyciski „Zapisz konfigurację”, „Zaloguj”, „Odblokuj”, „Ustaw hasło szyfrowania”, „Synchronizuj teraz”, „Wyloguj”,
+„Odłącz to urządzenie”, pole `name=email`, klucze `meta` `cloud.keys`, komunikaty „Konfiguracja zapisana”, „Zalogowano”,
+„Synchronizacja zakończona”, „Pobrane z chmury: N”, „wysłane: N”, „Brak połączenia”, „Nieprawidłowe hasło szyfrowania”)
 (od Fazy 5.0 także: atrybut `data-meal`, identyfikatory `mp-ph-N`, tekst „Przejdź do karty”; od Fazy 5: identyfikatory `ex-<id>`,
 przyciski „Rozpocznij trening”, „Zakończ trening”, „+30 s”, „Pomiń przerwę”, „Dodaj wpis”, „pośpiech: 1”, „Wszystkie: N”, linki
 „Przejdź do ćwiczenia”, „Następny dzień”, teksty „Zaległe: N bloków”, „Plan do wczoraj”, „Sesja ukończona”, „Następny: blok A”).
@@ -147,6 +164,8 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
    Trening (dzień z treningiem): po odhaczeniu serii pasek przerwy nad dolnym paskiem; przy wygaszonym ekranie i powrocie czas się zgadza;
    przy otwartej klawiaturze (pole kg) pasek przerwy się chowa i wraca. CFA: panel zaległych i nawigacja dni czytelne na 375 px.
 8. Synchronizacja: pełna procedura `docs/TEST_IPHONE_SYNC.md` (komputer ↔ Safari ↔ PWA, niezależne zmiany, starszy plik, offline, aktualizacja za zgodą).
+9. Synchronizacja w chmurze (Etap 2): kontrola ręczna `docs/SYNC_CHMURA.md` §5.6 (prawdziwy projekt Supabase, Safari i PWA osobno,
+   klucze po ponownym uruchomieniu, tryb samolotowy) — **jeszcze niewykonana**.
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 

@@ -1,7 +1,8 @@
-# Synchronizacja przez chmurę (Supabase) — audyt doprecyzowujący i Etap 1 (24.09.2026)
+# Synchronizacja przez chmurę (Supabase) — audyt, Etap 1 (rdzeń) i Etap 2 (interfejs) (24.09.2026)
 
 Kierunek zaakceptowany przez użytkownika (D-078): **Supabase**, IndexedDB pozostaje źródłem prawdy, ręczna synchronizacja
-`2027-sync.json` zostaje jako mechanizm awaryjny. Etap 1 = rdzeń bez interfejsu (ten dokument). Interfejs — Etap 2.
+`2027-sync.json` zostaje jako mechanizm awaryjny. Etap 1 = rdzeń bez interfejsu (§3). Etap 2 = interfejs w module Dane,
+konfiguracja na urządzeniu i instrukcja uruchomienia (§5). **Szybki start: §5.2.**
 
 ## 1. Audyt doprecyzowujący
 
@@ -86,8 +87,10 @@ dokumentację Supabase (źródła niżej); **do potwierdzenia przez użytkownika
 2. SQL Editor → wklej `tools/supabase/schema.sql` → Run.
 3. Authentication → Users → Add user: e-mail + hasło konta, „Auto confirm”.
 4. Authentication → Sign In / Providers: **wyłącz rejestrację nowych użytkowników**; e-mail/hasło włączone.
-5. Project Settings → API: zanotuj **Project URL** i klucz **anon (public)** — wpiszesz je w aplikacji w Etapie 2. Nigdy nie
-   używaj klucza `service_role` w aplikacji ani w repozytorium.
+5. Zanotuj **Project URL** (Project Settings → Data API albo przycisk „Connect”) i **Publishable Key**
+   (Project Settings → API Keys, zaczyna się od `sb_publishable_`; starszy klucz „anon (public)” też zadziała). Wpiszesz je
+   w aplikacji (§5.2). Nigdy nie używaj klucza sekretnego (`sb_secret_…`) ani `service_role` — aplikacja je odrzuca.
+6. (Zalecane) SQL Editor → wklej `tools/supabase/check.sql` → Run: każdy wiersz powinien mieć `ok = true`.
 
 ## 3. Etap 1 — co powstało (bez interfejsu, bez zmian w działaniu aplikacji)
 | Plik | Zawartość |
@@ -102,14 +105,106 @@ dokumentację Supabase (źródła niżej); **do potwierdzenia przez użytkownika
 
 Moduły chmury **nie są importowane przez aplikację** — rozmiar paczki i działanie bez zmian do Etapu 2.
 
-## 4. Nierozwiązane ryzyka (do Etapu 2+)
-- Test na prawdziwym projekcie Supabase (fałszywy serwer odwzorowuje podzbiór REST; różnice komunikatów błędów możliwe).
-- Safari/WebKit: WebCrypto (PBKDF2, HKDF, AES-GCM) sprawdzone w Chromium i Node; Safari — test na iPhonie w Etapie 2.
-- Przechowywanie `CryptoKey` w IndexedDB (klonowanie strukturalne) — obsługiwane w przeglądarkach, sprawdzenie w Etapie 2.
-- `cloud.acked` rośnie z liczbą zdarzeń (~40 tys. identyfikatorów ≈ 1–1,5 MB w `meta`, zapis przy każdej rundzie) —
-  do optymalizacji, jeśli okaże się wolne (np. znacznik „wszystko do HLC X potwierdzone” + lista wyjątków).
-- Zapas kursora = ponowne pobranie do 1000 wierszy w każdej rundzie (~400 KB) — do zmniejszenia po pomiarach.
-- Wspólna domena GitHub Pages — decyzja użytkownika (§1.1).
+## 4. Nierozwiązane ryzyka (stan po Etapie 2)
+| Ryzyko | Stan |
+|---|---|
+| Test na prawdziwym projekcie Supabase | **do wykonania przez użytkownika** (§5.6) — testy automatyczne używają fałszywego serwera odwzorowującego podzbiór REST; komunikaty błędów prawdziwego serwera mogą się różnić treścią |
+| Safari/WebKit: WebCrypto i zapis `CryptoKey` w IndexedDB | Chromium: sprawdzone w teście przeglądarkowym (klucze po przeładowaniu, `extractable: false`). Safari na iPhonie — **kontrola ręczna** (§5.6). Gdy przeglądarka nie zapisze klucza, aplikacja trzyma go tylko do zamknięcia karty i informuje o tym |
+| `cloud.acked` rośnie z liczbą zdarzeń | bez zmian (~40 tys. identyfikatorów ≈ 1–1,5 MB, zapis przy każdej rundzie) — do optymalizacji po pomiarach |
+| Zapas kursora = ponowne pobranie do 1000 wierszy w każdej rundzie (~400 KB) | bez zmian — do zmniejszenia po pomiarach na prawdziwych danych |
+| Wspólna domena GitHub Pages | bez zmian — decyzja użytkownika (§1.1) |
+| Pierwsza synchronizacja z dużą bazą (tysiące zdarzeń) | szyfrowanie i wysyłka partiami po 250; przerwana runda wznawia się od miejsca przerwania |
+
+## 5. Etap 2 — interfejs, konfiguracja i uruchomienie
+
+### 5.1 Co powstało
+| Plik | Zawartość |
+|---|---|
+| `src/core/sync/cloud-local.js` | warstwa urządzenia: `checkConfig` (walidacja adresu i klucza, **odrzucenie `sb_secret_…` i `service_role`**), `saveConfig`, `cloudStatus`, `signIn`, `unlock` (hasło szyfrowania; pierwsze urządzenie z powtórzeniem), `signOut`, `resetDevice`, `syncNow` (jedna runda naraz, także między kartami — Web Locks), `describeError` / `describeResult` (komunikaty po polsku) |
+| `src/modules/dane-cloud.js` | sekcja „Synchronizacja w chmurze” w module Dane (pod sekcją iCloud Drive — ta bez zmian) |
+| `src/modules/dane.js` | włączenie sekcji; dwa zdania opisu uzupełnione o synchronizację w chmurze |
+| `src/ui/styles.css`, `tools/icons.mjs` → `src/ui/icons.js` | style `dn-cloud*` (wspólne z `dn-sync`), 6 ikon (`cloud`, `cloud-check`, `cloud-off`, `lock`, `log-in`, `log-out`) |
+| `tools/supabase/check.sql` | kontrola zabezpieczeń w SQL Editor (tylko odczyt) |
+| `tests/unit/cloud-local.test.mjs` | 9 testów warstwy urządzenia (fałszywy serwer) |
+| `tests/e2e/fake_supabase.py`, `tests/e2e/cloud_sync.py` | fałszywy serwer HTTP z CORS i test w przeglądarce (`npm run e2e:cloud`) |
+
+Model danych, `reduce()`, typy zdarzeń, format `2027-sync.json`, IndexedDB (nazwa, wersja, magazyny) — **bez zmian**.
+Stan chmury per urządzenie w istniejącym magazynie `meta`: `cloud.config` (adres + Publishable Key), `cloud.session`
+(tokeny), `cloud.keys` (nieeksportowalne `CryptoKey`), `cloud.owner`, `cloud.cursor`, `cloud.acked`, `cloud.lastSync`,
+`cloud.lastBackup`. Żaden z nich nie trafia do `2027-sync.json` (eksport zawiera wyłącznie zdarzenia — test).
+
+### 5.2 Uruchomienie — krok po kroku (na każdym urządzeniu i w każdym sposobie uruchomienia)
+Safari, aplikacja z ekranu początkowego, przeglądarka na Macu i plik `2027.html` mają **osobne bazy** — każde miejsce
+konfigurujesz raz.
+1. **Dane → Synchronizacja w chmurze**: wklej **Project URL** (`https://<projekt>.supabase.co`) i **Publishable Key**
+   (`sb_publishable_…`) → „Zapisz konfigurację”.
+2. **E-mail i hasło konta** (utworzonego w Authentication → Users) → „Zaloguj”.
+3. **Hasło szyfrowania** (min. 12 znaków, inne niż hasło konta; zapisz je w menedżerze haseł):
+   - na **pierwszym** urządzeniu aplikacja poprosi o powtórzenie i utworzy parametry szyfrowania w chmurze;
+   - na kolejnych — to samo hasło; błędne jest wykrywane od razu (weryfikator), nic nie jest pobierane.
+4. **„Synchronizuj teraz”** — pobiera zmiany z innych urządzeń, zapisuje je lokalnie, wysyła zmiany z tego urządzenia.
+   Zalecana kolejność pierwszej synchronizacji: najpierw urządzenie z **pełnymi** danymi, potem pozostałe.
+5. Kolejne razy: tylko „Synchronizuj teraz” (sesja i klucze pozostają na urządzeniu; token odświeżany automatycznie).
+
+Synchronizacja **nigdy nie uruchamia się sama** (D-033/D-083): brak zegarów, synchronizacji przy starcie czy w tle —
+sprawdzone testem (zmiana, przeładowanie, nawigacja → zero zapytań do tabel).
+
+### 5.3 Publishable Key w statycznej aplikacji — decyzja i konsekwencje (D-081)
+- **Klucza nie ma w repozytorium ani w paczce** — wpisujesz go lokalnie (§5.2). Powód: repozytorium i GitHub Pages są
+  publiczne, a adres projektu i klucz nie są potrzebne nikomu poza Tobą. Koszt: jednorazowe wklejenie na każdym urządzeniu.
+- Publishable Key jest **z założenia publiczny** (Supabase projektuje go do umieszczania w przeglądarce). Nawet gdyby wyciekł,
+  dane chronią trzy niezależne warstwy:
+  1. **RLS** (`schema.sql`, kontrola: `check.sql`): rola `anon` (sam klucz, bez logowania) nie ma żadnych uprawnień;
+     zalogowany użytkownik widzi i usuwa wyłącznie własne wiersze; brak UPDATE.
+  2. **Wyłączona rejestracja**: z samym kluczem nie da się założyć konta (bez tego obcy mógłby założyć konto i zapisywać
+     własne dane w Twoim limicie 500 MB — Twoich danych i tak by nie odczytał).
+  3. **Szyfrowanie na urządzeniu**: nawet z tokenem konta serwer oddaje tylko szyfrogramy.
+- Co może zrobić ktoś z samym kluczem: próbować logowania (ograniczenia liczby prób po stronie Supabase — stosuj silne hasło
+  konta), generować ruch do limitów planu bezpłatnego (skutek: odrzucane zapytania, **nie** opłaty — plan Free bez karty).
+- **Klucze omijające RLS** (`sb_secret_…`, `service_role`) są odrzucane przez aplikację (`checkConfig`, test) — nie mogą
+  trafić na urządzenie.
+- Alternatywa (niewybrana): wstrzyknięcie adresu i klucza przy budowie (zmienne środowiskowe w workflow) — wygodniejsze,
+  ale wiąże publiczną paczkę z konkretnym projektem; możliwe później bez zmian w rdzeniu.
+
+### 5.4 Sesja i klucze na urządzeniu (D-082)
+- **Sesja**: token dostępu (1 h) i jednorazowy token odświeżania w `meta.cloud.session`; odświeżenie minutę przed
+  wygaśnięciem i po odpowiedzi 401. Nieważny token odświeżania → komunikat „Sesja wygasła — zaloguj się ponownie”;
+  klucze tego samego konta zostają (bez ponownego hasła szyfrowania).
+- **Hasło konta i hasło szyfrowania nie są nigdzie zapisywane** (test: brak w `meta`). Zapisywane są wyłącznie
+  wyprowadzone, **nieeksportowalne** `CryptoKey`, przypisane do konta (`user`).
+- **Wyloguj**: usuwa sesję i klucze z urządzenia, unieważnia sesję na serwerze; kursor zostaje (to samo konto nie pobiera
+  wszystkiego ponownie). Logowanie **innym** kontem zeruje kursor i potwierdzenia.
+- **Odłącz to urządzenie** (w „Konfiguracja projektu”): usuwa konfigurację, sesję, klucze i stan synchronizacji. Dane lokalne
+  i dane w chmurze bez zmian. Zmiana adresu projektu działa tak samo (inny serwer = od nowa).
+
+### 5.5 Działanie offline, błędy, konflikty
+| Sytuacja | Zachowanie |
+|---|---|
+| Brak internetu | aplikacja działa jak dotąd; „Synchronizuj teraz” → „Brak połączenia z chmurą. Dane są bezpieczne na tym urządzeniu…”; zmiany czekają (licznik „Do wysłania do chmury”) |
+| Przerwanie w trakcie rundy | kursor przesuwany dopiero po zapisie pobranych zdarzeń; potwierdzenia wysyłki po każdej partii — następna runda kontynuuje bez utraty i bez duplikatów |
+| Konflikt (ta sama rzecz zmieniona na dwóch urządzeniach) | oba zdarzenia trafiają do obu baz; niezmieniony `reduce()` wybiera nowszą zmianę (HLC), starsza zostaje w historii — jak przy imporcie pliku (test: zbieżność 222/222) |
+| Dwie karty naraz | jedna runda naraz (Web Locks); druga karta: „Synchronizacja już trwa…” |
+| Zły klucz / adres | „Serwer odrzucił klucz projektu…” / „Nie można połączyć się z serwerem… sprawdź adres” |
+| Brak tabel (404) | „Uruchom tools/supabase/schema.sql…” |
+| RLS odmawia (403) | „Serwer odmówił dostępu (zasady RLS)…” |
+| Projekt wstrzymany (5xx) | „…mógł zostać wstrzymany po 7 dniach bez aktywności — wznowisz go w panelu Supabase” |
+| Wpis w chmurze nie do odczytania | pominięty, raportowany w wyniku; dane lokalne bez zmian |
+| Kopia przed dopisaniem | najwyżej raz dziennie („Kopie automatyczne” w Dane) |
+
+### 5.6 Testy i kontrola ręczna
+```bash
+npm test               # m.in. cloud-crypto (8), cloud-sync (14), cloud-local (9)
+npm run build && npm run e2e:cloud   # 2 profile Chromium + plik 2027.html, fałszywy serwer: 49 kontroli (w tym axe w każdym kroku)
+```
+Kontrola ręczna (wymaga Twojego projektu — nie do zautomatyzowania bez kluczy):
+1. SQL Editor → `tools/supabase/check.sql` → wszystkie `ok = true`.
+2. Mac (przeglądarka): konfiguracja → logowanie → hasło szyfrowania (pierwsze urządzenie) → „Synchronizuj teraz”.
+   W panelu Supabase → Table Editor → `events`: kolumna `blob` zawiera wyłącznie `p2027.c1.…` (bez czytelnej treści).
+3. iPhone **Safari** i osobno **aplikacja z ekranu początkowego**: konfiguracja → logowanie → to samo hasło szyfrowania →
+   „Synchronizuj teraz” → porównaj stan wybranej pozycji w Zapasach z Makiem.
+4. Zamknij i uruchom ponownie aplikację na iPhonie → w Dane powinien od razu być przycisk „Synchronizuj teraz” (klucze
+   zapamiętane). Jeśli pojawi się informacja, że przeglądarka nie zapamiętuje kluczy — zgłoś (ograniczenie WebKit).
+5. Tryb samolotowy → zmiana w Zapasach → „Synchronizuj teraz” (komunikat o braku połączenia) → wyłącz tryb → ponownie.
 
 Źródła: [Supabase — Pricing](https://supabase.com/pricing) · [Billing FAQ](https://supabase.com/docs/guides/platform/billing-faq) ·
 [Project Pausing](https://supabase.com/docs/guides/platform/free-project-pausing) ·

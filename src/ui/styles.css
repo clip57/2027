@@ -827,16 +827,25 @@ a.chip.sp-low-link { display: inline-flex; align-items: center; gap: var(--s-1);
 .rk-search { flex: 1 1 16rem; }
 .rk-search input { width: 100%; min-height: 44px; padding: var(--s-2) var(--s-3); font-size: 16px; }
 .rk-hits { margin: 0 0 var(--s-3); }
-.dn-sync { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); display: grid; gap: var(--s-3); }
-.dn-sync.has-unsent { border-color: color-mix(in srgb, var(--warning) 55%, var(--border)); }
-.dn-sync h2 { display: flex; align-items: center; gap: var(--s-2); margin: 0; }
-.dn-sync h2 .ico { color: var(--accent); }
-.dn-sync p { margin: 0; }
+.dn-sync, .dn-cloud { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); display: grid; gap: var(--s-3); }
+.dn-sync.has-unsent, .dn-cloud.has-unsent { border-color: color-mix(in srgb, var(--warning) 55%, var(--border)); }
+.dn-sync h2, .dn-cloud h2 { display: flex; align-items: center; gap: var(--s-2); margin: 0; }
+.dn-sync h2 .ico, .dn-cloud h2 .ico { color: var(--accent); }
+.dn-sync p, .dn-cloud p { margin: 0; }
 .dn-sync-s { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-lg); font-weight: 650; }
 .dn-sync-s .ico { color: var(--success); }
-.dn-sync.has-unsent .dn-sync-s .ico { color: var(--warning); }
-.dn-sync-m { font-size: var(--fs-sm); color: var(--text-2); }
-.dn-sync .row button { display: inline-flex; align-items: center; gap: var(--s-2); padding: 0 var(--s-4); }
-@media (max-width: 599px) { .dn-sync .row button { flex: 1 1 100%; justify-content: center; } }
+.dn-sync.has-unsent .dn-sync-s .ico, .dn-cloud.has-unsent .dn-sync-s .ico { color: var(--warning); }
+.dn-cloud:not(.is-ready) .dn-sync-s .ico { color: var(--text-2); }
+.dn-sync-m { font-size: var(--fs-sm); color: var(--text-2); overflow-wrap: anywhere; }
+.dn-sync .row button, .dn-cloud .row button { display: inline-flex; align-items: center; gap: var(--s-2); padding: 0 var(--s-4); }
+@media (max-width: 599px) { .dn-sync .row button, .dn-cloud .row button { flex: 1 1 100%; justify-content: center; } }
+/* Synchronizacja w chmurze (Etap 2): formularze kroków, komunikat, zwinięta konfiguracja projektu */
+.dn-cloud-form { display: grid; gap: var(--s-3); max-width: 34rem; }
+.dn-cloud-hint { font-size: var(--fs-sm); }
+.dn-cloud-msg:empty, .dn-cloud [hidden] { display: none; }
+.dn-cloud-cfg > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--text-2); font-size: var(--fs-sm); font-weight: 600; }
+.dn-cloud-cfg[open] > summary { margin-bottom: var(--s-2); }
+.dn-cloud-cfg .row { margin-top: var(--s-3); }
+.dn-cloud-v { font-weight: 500; font-size: var(--fs-sm); }
 /* Cele dotykowe ≥ 44 px dla rozwijanych szczegółów (wykryte testem Fazy 5) */
 .sf-more > summary, .rk-orig > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; }

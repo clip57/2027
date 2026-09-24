@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 24.09.2026 (D-036 – D-080; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 24.09.2026 (D-036 – D-083; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -82,6 +82,9 @@
 | D-078 | **Synchronizacja przez chmurę — kierunek zaakceptowany:** Supabase (plan Free, bez karty); IndexedDB pozostaje źródłem prawdy; ręczna synchronizacja `2027-sync.json` zostaje jako mechanizm awaryjny. **Zmienia D-033** (dotąd wyłącznie ręczna) i **D-034** (dopuszczony bezpłatny zewnętrzny backend; nadal zero płatnych usług). Synchronizowane są zdarzenia (nie stan), scalanie = suma po `id`, konflikty — `reduce()` bez zmian. Wdrażane etapami (`docs/SYNC_CHMURA.md`); automatyczne wyzwalanie dopiero po przetestowaniu rdzenia |
 | D-079 | Chmura: szyfrowanie po stronie urządzenia — PBKDF2-SHA256 (600 000 iteracji) → HKDF → AES-GCM-256 (treść) i HMAC-SHA256 (identyfikator `sid`); serwer nie zna treści, typów ani `id` zdarzeń (także pakietu prywatnego); brak odzyskiwania hasła szyfrowania (z założenia) |
 | D-080 | Chmura: logowanie e-mailem i hasłem konta (konto zakładane w panelu, rejestracja wyłączona) zamiast kodu z e-maila — wbudowana poczta Supabase wysyła 2 e-maile/godz. wyłącznie do członków zespołu; brak logowania przez Google/Apple (przekierowania w PWA na iOS) |
+| D-081 | Chmura (Etap 2): **Project URL i Publishable Key wpisywane lokalnie na każdym urządzeniu** (Dane → Synchronizacja w chmurze), zapis w `meta` IndexedDB — nie w repozytorium, paczce ani `2027-sync.json`. Klucz publiczny z założenia; ochrona: RLS (`schema.sql`, kontrola `check.sql`), wyłączona rejestracja, szyfrowanie na urządzeniu. Aplikacja odrzuca `sb_secret_…` i `service_role`. | 24.09.2026 |
+| D-082 | Chmura (Etap 2): hasło konta i hasło szyfrowania **nie są zapisywane**; na urządzeniu zostają sesja (tokeny) i nieeksportowalne `CryptoKey` przypisane do konta. Pierwsze urządzenie wymaga powtórzenia hasła szyfrowania. „Wyloguj” usuwa sesję i klucze (kursor zostaje); inne konto lub inny projekt zeruje stan synchronizacji; „Odłącz to urządzenie” usuwa całą konfigurację. Dane lokalne nigdy nie są usuwane. | 24.09.2026 |
+| D-083 | Chmura (Etap 2): synchronizacja **wyłącznie przyciskiem „Synchronizuj teraz”** (zgodnie z D-033 — bez synchronizacji przy starcie, w tle ani zegarem); jedna runda naraz (Web Locks między kartami); sekcja w Dane pod ręczną synchronizacją plikiem, która pozostaje bez zmian. | 24.09.2026 |
 | D-077 | Dane: synchronizacja (status niewysłanych zmian, ostatnie wysłanie/import, „Wyślij do iCloud”, „Pobierz z iCloud”) jako pierwsza sekcja; mechanizm, teksty rozróżniające kod/dane i format pliku bez zmian |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 

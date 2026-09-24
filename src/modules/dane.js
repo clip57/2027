@@ -6,6 +6,7 @@ import { sha256 } from '../core/hash.js';
 import { stockAt, forecast, status, allItems } from '../core/calc/inventory.js';
 import { shortDate } from '../core/dates.js';
 import { icon } from '../ui/icons.js';
+import { cloudSection } from './dane-cloud.js';
 
 const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY v31', private: 'Pakiet prywatny',
   'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)' };
@@ -54,7 +55,7 @@ export async function renderDane(root, ctx) {
         h('dt', {}, 'Zapis'), h('dd', { style: { color: health.ok ? 'var(--ok-ink)' : 'var(--err-ink)' } }, health.ok ? 'działa, każdy zapis sprawdzany odczytem' : (health.error || 'niedostępny')),
         h('dt', {}, 'Ochrona przed usunięciem'), h('dd', {}, health.persisted ? 'przyznana przez przeglądarkę' : 'nieprzyznana — eksportuj kopię regularnie'),
         h('dt', {}, 'Wersja aplikacji'), h('dd', {}, appVersion()),
-        h('dt', {}, 'Uruchomiono jako'), h('dd', {}, runMode(), h('span', { class: 'muted block' }, 'To miejsce ma własną, oddzielną bazę danych — dane z innych miejsc trafiają tu tylko przez import pliku 2027-sync.json.')),
+        h('dt', {}, 'Uruchomiono jako'), h('dd', {}, runMode(), h('span', { class: 'muted block' }, 'To miejsce ma własną, oddzielną bazę danych — dane z innych miejsc trafiają tu tylko przez import pliku 2027-sync.json albo synchronizację w chmurze.')),
         h('dt', {}, 'To urządzenie'), h('dd', {}, store?.device || '—'),
         h('dt', {}, 'Zapisane zmiany'), h('dd', {}, store ? fmt(store.allEvents().length) : '—'),
         health.quarantined > 0 && [h('dt', {}, 'Kwarantanna'), h('dd', {}, `${health.quarantined} uszkodzonych wpisów odłożono przy otwarciu`)],
@@ -67,7 +68,7 @@ export async function renderDane(root, ctx) {
 
     // --- Aktualizacja kodu aplikacji (oddzielnie od synchronizacji danych)
     h('section', { class: 'panel', 'aria-labelledby': 'h-upd' }, h('h2', { id: 'h-upd' }, 'Aktualizacja aplikacji'),
-      h('p', { class: 'muted' }, 'Dotyczy wyłącznie kodu aplikacji. Aktualizacja nie przenosi ani nie zmienia danych — dane między urządzeniami przenosi tylko plik 2027-sync.json (sekcja niżej).'),
+      h('p', { class: 'muted' }, 'Dotyczy wyłącznie kodu aplikacji. Aktualizacja nie przenosi ani nie zmienia danych — dane między urządzeniami przenosi plik 2027-sync.json albo synchronizacja w chmurze (sekcje wyżej).'),
       h('dl', { class: 'kv' }, h('dt', {}, 'Działająca wersja'), h('dd', {}, appVersion()),
         h('dt', {}, 'Stan'), h('dd', {}, ctx.update?.state === 'ready' ? 'nowa wersja pobrana — czeka na Twoją zgodę' : ctx.update?.state === 'checking' ? 'sprawdzanie…' : globalThis.__SINGLE__ ? 'plik lokalny — aktualizacja przez podmianę pliku' : 'aktualna (ostatnie sprawdzenie w tej sesji)')),
       !globalThis.__SINGLE__ && h('div', { class: 'row' },
@@ -93,7 +94,9 @@ export async function renderDane(root, ctx) {
     h('p', { class: 'dn-sync-m' }, `Ostatnie wysłanie: ${meta.exp ? new Date(meta.exp.at).toLocaleString('pl-PL') : 'jeszcze nie'} · ostatni import: ${meta.imp ? new Date(meta.imp.at).toLocaleString('pl-PL') : 'jeszcze nie'}`),
     h('p', { class: 'muted' }, 'Po pracy na jednym urządzeniu wybierz „Wyślij do iCloud” i zapisz plik 2027-sync.json w iCloud Drive/2027. Na drugim urządzeniu wybierz „Pobierz z iCloud” i wskaż ten plik. Dane są scalane — nic nie jest nadpisywane, a ten sam plik możesz wczytać wiele razy.'),
     h('div', { class: 'row' }, sendBtn, pickBtn, input),
-    h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA oraz pakiet prywatny.')));
+    h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA oraz pakiet prywatny.')),
+    // Synchronizacja w chmurze (D-078, Etap 2) — niezależna od pliku; ręczna, przyciskiem
+    await cloudSection(ctx));
 
   async function onFile(file) {
     if (!file) return;
