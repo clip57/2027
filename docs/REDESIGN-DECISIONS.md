@@ -90,5 +90,5 @@ nieistotnym wzroście paczki — spełnione przez podzbiór.
 ## E. Punkty otwarte (nierozstrzygnięte)
 - G-20: dziennik kolana i monitoring (waga, sen, obwody) — brak decyzji, czy mają trafić do aplikacji.
 - D-031: import postępu i error logu CFA v3 od użytkownika — funkcje gotowe, pliki nie zostały dostarczone.
-- Potwierdzenie przez użytkownika wyglądu Faz 3–4 na iPhonie (Safari i PWA) — **brak** (użytkownik potwierdził działanie
+- ~~Potwierdzenie wyglądu na iPhonie (Safari i PWA)~~ — **potwierdzone przez użytkownika 24.09.2026** dla wersji `4e68589` (wszystkie punkty `REDESIGN-TESTING.md` §5).
   naprawy synchronizacji, wersji sprzed redesignu).

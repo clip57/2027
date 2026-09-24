@@ -150,5 +150,6 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 
-Stan: **punkty 1–8 dla Faz 3–4 i 5.0 nie zostały jeszcze zweryfikowane przez użytkownika.** Procedura synchronizacji
+Stan: **wszystkie punkty tej sekcji (iPhone Safari i PWA, MacBook, synchronizacja wg `TEST_IPHONE_SYNC.md`) sprawdzone ręcznie
+przez użytkownika na wersji opublikowanej `4e68589` (Faza 5 zakończona) — działa (potwierdzenie 24.09.2026).**
 (`TEST_IPHONE_SYNC.md`) została potwierdzona dla wersji sprzed redesignu.

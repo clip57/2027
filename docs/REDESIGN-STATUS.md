@@ -6,7 +6,8 @@ na GitHub Pages (workflow „Publikacja 2027”, przebieg 3). **Na `main` nie ma
 są w jednym commicie `b65b9fa` na gałęzi `redesign-faza4`; Faza 5.0 — zmiany robocze na tej samej gałęzi (bez commita).
 Wcześniejszy zapis „użytkownik potwierdził działanie wersji z naprawą synchronizacji” nie ma pokrycia w historii git ani w publikacjach
 Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie naprawy i redesignu razem (24.09.2026).
-**Wersja z Fazami 3–4 i 5.0 nie została jeszcze sprawdzona przez użytkownika na urządzeniach [do weryfikacji].**
+**Wersja opublikowana `4e68589` (Fazy 3–5, wszystkie moduły) sprawdzona ręcznie przez użytkownika na urządzeniach według
+`REDESIGN-TESTING.md` §5 — działa (24.09.2026).** Pozostaje Faza 7 z plikami użytkownika (`SOURCES_DIR`, `PRIVATE_PACK`).
 
 ## 1. Przebieg (kontekst)
 | Etap | Zakres | Raport |

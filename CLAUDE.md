@@ -12,7 +12,8 @@ następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `
 Faza 5, moduły 3–4 (Dieta, Zapasy jako jeden system; kierunek „premium personal OS” — D-071…D-073) — zakończone,
 raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja,
 Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
-(urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `dbd901d` (do Diety i Zapasów włącznie).
+(urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `4e68589` (Faza 5 kompletna).
+**Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
 Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-077).
 
