@@ -2,7 +2,7 @@
 // Zasady: (1) każdy zapis potwierdzany odczytem; (2) błąd zapisu = wyjątek + trwały stan „błąd zapisu”,
 // nigdy ciche przełączenie na pamięć; (3) zdarzenia niepoprawne trafiają do kwarantanny;
 // (4) przed operacjami zbiorczymi automatyczna kopia (maks. 5).
-import { validateEvent, SCHEMA } from './validate.js';
+import { validateEvent, classifyEvent, isKnownType, SCHEMA } from './validate.js';
 import { hlc, observe, randomId } from '../ids.js';
 
 export class StorageError extends Error { constructor(msg, cause) { super(msg); this.name = 'StorageError'; this.cause = cause; } }
@@ -27,7 +27,10 @@ export function lwwKey(e) {
 export function reduce(events) {
   const sorted = [...events].sort((a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0));
   const st = { inv: { counts: {}, moves: {}, shifts: [] }, lww: new Map(), superseded: [], archive: [] };
+  const unprocessed = { count: 0, types: {} };
   for (const e of sorted) {
+    // Zdarzenie z nowszej wersji aplikacji: zachowane w bazie i w eksporcie, ale nie wpływa na stan (jawnie raportowane).
+    if (!isKnownType(e.t)) { unprocessed.count++; unprocessed.types[e.t] = (unprocessed.types[e.t] || 0) + 1; continue; }
     if (e.t === 'inv.count') (st.inv.counts[e.d.prod] ||= []).push({ id: e.id, qty: e.d.qty, date: e.d.date, hlc: e.hlc });
     else if (e.t === 'inv.move') (st.inv.moves[e.d.prod] ||= []).push({ id: e.id, qty: e.d.qty, date: e.d.date, kind: e.d.kind, hlc: e.hlc, note: e.d.note });
     else if (e.t === 'inv.dayshift') st.inv.shifts.push({ id: e.id, date: e.d.date, dir: e.d.dir, hlc: e.hlc });
@@ -52,6 +55,7 @@ export function reduce(events) {
     catalogUser: pick('cat:').filter(e => e.t === 'cat.upsert').map(e => e.d.item),
     archive: st.archive,
     superseded: st.superseded,
+    unprocessed,
   };
 }
 
@@ -67,12 +71,22 @@ export class Store {
       const raw = await this.adapter.getAllEvents();
       let q = 0;
       for (const e of raw) {
-        const err = validateEvent(e);
-        if (err) { q++; await this.adapter.addQuarantine({ at: new Date().toISOString(), reason: err, raw: e }); continue; }
+        const c = classifyEvent(e);
+        // 'ok' i 'future' (poprawna koperta, typ z nowszej wersji) zostają w bazie. Do kwarantanny trafiają
+        // wyłącznie zdarzenia uszkodzone (ich surowa kopia jest zachowana w magazynie kwarantanny).
+        if (c !== 'ok' && c !== 'future') { q++; await this.adapter.addQuarantine({ at: new Date().toISOString(), reason: c, raw: e }); continue; }
         this.events.set(e.id, e); observe(e.hlc);
       }
       if (q) await this.adapter.replaceAllEvents([...this.events.values()]);
-      this.health = { ok: true, persisted, error: null, quarantined: q };
+      // Odzyskiwanie: zdarzenia, które starsza wersja przeniosła do kwarantanny, a które ta wersja rozpoznaje
+      // (albo które mają poprawną kopertę), wracają do bazy. Kopia w kwarantannie pozostaje nienaruszona.
+      const restore = [];
+      for (const item of await this.adapter.getQuarantine()) {
+        const e = item?.raw, c = classifyEvent(e);
+        if ((c === 'ok' || c === 'future') && !this.events.has(e.id)) { restore.push(e); this.events.set(e.id, e); observe(e.hlc); }
+      }
+      if (restore.length) await this.adapter.putEvents(restore);
+      this.health = { ok: true, persisted, error: null, quarantined: q, restored: restore.length };
     } catch (err) {
       this.health = { ok: false, persisted: false, error: `Nie można otworzyć bazy danych: ${err.message}`, quarantined: 0 };
       throw new StorageError(this.health.error, err);
@@ -122,7 +136,7 @@ export class Store {
   // Dołączenie wielu zdarzeń (import/synchronizacja) — atomowo, po kopii zapasowej.
   async appendMany(list, reason) {
     if (!this.health.ok) throw new StorageError(this.health.error || 'Zapis wyłączony');
-    for (const e of list) { const err = validateEvent(e); if (err) throw new StorageError(`Odrzucono import: ${err} (${e.id})`); }
+    for (const e of list) { const c = classifyEvent(e); if (c !== 'ok' && c !== 'future') throw new StorageError(`Odrzucono import: ${c} (${e?.id})`); }
     const fresh = list.filter(e => !this.events.has(e.id));
     if (!fresh.length) return 0;
     await this.backup(reason);

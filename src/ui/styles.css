@@ -1,24 +1,4 @@
-/* Projekt 2027 — tokeny. Czcionki systemowe Apple (offline, bez usług zewnętrznych — D-034);
-   zaokrąglony krój dla nagłówków i godzin, cyfry tabelaryczne. Kolory domen z PLAN_DNIA. */
-:root {
-  color-scheme: light dark;
-  --paper: #f3f5f7; --surface: #ffffff; --ink: #17202b; --ink-2: #4a5663; --line: #d5dce3; --focus: #1e40af;
-  --cfa: #1e40af; --diet: var(--ok); --prep: var(--warn); --train: #8a3324; --regen: #6b21a8;
-  --warn-bg: #fff4d6; --warn-ink: #6b4a00; --err-bg: #fde4e4; --err-ink: var(--bad); --ok-ink: #15603a;
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
-  --r-1: 10px; --r-2: 16px; --tab-h: 58px; --side-w: 232px;
-  box-sizing: border-box;
-  padding-top: env(safe-area-inset-top, 0px);
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --paper: #0f141a; --surface: #171e27; --ink: #e8edf2; --ink-2: #a7b3bf; --line: #2a3441; --focus: #93b4ff;
-  --cfa: #7aa2ff; --diet: #5fd08a; --prep: #f0b24a; --train: #f08c78; --regen: #c9a0ff;
-  --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --err-ink: #ffb4b4; --ok-ink: #8fe0b0; } }
-:root[data-theme="dark"] {
-  --paper: #0f141a; --surface: #171e27; --ink: #e8edf2; --ink-2: #a7b3bf; --line: #2a3441; --focus: #93b4ff;
-  --cfa: #7aa2ff; --diet: #5fd08a; --prep: #f0b24a; --train: #f08c78; --regen: #c9a0ff;
-  --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --err-ink: #ffb4b4; --ok-ink: #8fe0b0; }
+/* Projekt 2027 — style komponentów i modułów. Tokeny: src/ui/tokens.css (jedyne źródło kolorów i skali). */
 *, *::before, *::after { box-sizing: inherit; }
 html, body { height: 100%; margin: 0; }
 body { background: var(--paper); color: var(--ink); font: 16px/1.5 var(--font); -webkit-text-size-adjust: 100%; font-variant-numeric: tabular-nums; }
@@ -42,30 +22,7 @@ input, select { font: inherit; font-size: 16px; min-height: 44px; }
   border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
 
 /* Nawigacja: iPhone — pasek dolny; komputer — panel boczny */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(6, 1fr);
-  background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.tabs a { min-height: var(--tab-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  font-size: .72rem; font-weight: 600; color: var(--ink-2); text-decoration: none; }
-.tabs a .dot { width: 22px; height: 4px; border-radius: 2px; background: transparent; }
-.tabs a[aria-current="page"] { color: var(--ink); }
-.tabs a[aria-current="page"] .dot { background: var(--ink); }
-.side { display: none; }
-.more-list { display: grid; gap: .5rem; margin-top: 1rem; }
-.more-list a { display: flex; justify-content: space-between; align-items: center; min-height: 52px; padding: .5rem 1rem; background: var(--surface);
-  border: 1px solid var(--line); border-radius: var(--r-1); color: var(--ink); text-decoration: none; font-weight: 600; }
-.more-list a small { color: var(--ink-2); font-weight: 500; }
-
-@media (min-width: 900px) {
-  .app { grid-template-columns: var(--side-w) minmax(0, 1fr); }
-  .tabs { display: none; }
-  .side { display: flex; flex-direction: column; gap: 2px; position: sticky; top: 0; height: 100vh; padding: 1.25rem .75rem; border-right: 1px solid var(--line); background: var(--surface); }
-  .side .brand { font-family: var(--font-round); font-weight: 800; font-size: 1.6rem; padding: 0 .75rem .75rem; letter-spacing: -.02em; }
-  .side a { display: flex; align-items: center; gap: .6rem; min-height: 40px; padding: 0 .75rem; border-radius: var(--r-1); color: var(--ink-2); text-decoration: none; font-weight: 600; }
-  .side a .bar { width: 4px; height: 18px; border-radius: 2px; background: var(--dc, var(--line)); }
-  .side a[aria-current="page"] { background: var(--paper); color: var(--ink); }
-  .main { padding: 2rem 2.5rem 3rem; }
-}
+/* Nawigacja (panel boczny, pasek dolny, „Więcej”) — src/ui/system.css */
 
 /* Komunikaty */
 .banner { border-radius: var(--r-1); padding: .75rem 1rem; margin-bottom: 1rem; font-weight: 500; }
@@ -164,9 +121,7 @@ ul.food .macros { grid-column: 1 / -1; }
 tr.is-off td { opacity: .55; }
 
 /* --- Etap 3, odsłona 2: wyraźniejsza hierarchia w modułach Dieta i Suplementacja --- */
-:root { --p-col: #1d4ed8; --c-col: #92400e; --f-col: #5b21b6; --ok: #11632f; --warn: #8a4204; --bad: #9b1c16; --org: #0b5f75; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --ok: #7fe0a6; --warn: #f5bd6b; --bad: #ff9f97; --org: #7fd6ea; } }
-:root[data-theme="dark"] { --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --ok: #7fe0a6; --warn: #f5bd6b; --bad: #ff9f97; --org: #7fd6ea; }
+/* (tokeny makro i stanów przeniesione do tokens.css) */
 
 /* Kafel główny diety: duża liczba kalorii + paski udziału makroskładników */
 .hero { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-2); padding: 1.1rem 1.15rem;
@@ -552,8 +507,6 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .sf-facts dt { font-size: .68rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink-2); }
 .sf-facts dd { margin: .1rem 0 0; font-size: .88rem; font-weight: 600; }
 .sf-risk { margin: 0; padding: .5rem .65rem; border-radius: 12px; font-size: .86rem; background: color-mix(in srgb, var(--bad) 8%, transparent); color: var(--bad); max-width: none; }
-:root[data-theme="dark"] .sf-risk { color: #ffb4b4; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sf-risk { color: #ffb4b4; } }
 .sf-more summary { cursor: pointer; font-size: .84rem; font-weight: 600; color: var(--ink-2); min-height: 32px; }
 .sf-more p { margin: .3rem 0 0; font-size: .86rem; }
 .safety-table td, .safety-table th { min-width: 7rem; }
@@ -638,3 +591,5 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .tg-me { background: color-mix(in srgb, var(--f-col) 14%, transparent); color: var(--f-col); }
 .tg-ok { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
 .tg-warn { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
+.banner.info { background: color-mix(in srgb, var(--accent, var(--cfa)) 12%, var(--surface)); color: var(--ink); }
+.update-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem; }

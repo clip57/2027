@@ -9,10 +9,12 @@
     "build": "node tools/build.mjs",
     "verify": "python3 tools/verify/verify_all.py",
     "e2e": "python3 tests/e2e/e2e.py",
-    "a11y": "python3 tests/e2e/a11y.py"
+    "a11y": "python3 tests/e2e/a11y.py",
+    "e2e:sync": "python3 tests/e2e/sync_update.py"
   },
   "devDependencies": {
     "axe-core": "^4.13.0",
-    "esbuild": "^0.25.12"
+    "esbuild": "^0.25.12",
+    "lucide-static": "^1.47.0"
   }
 }

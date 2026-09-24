@@ -32,6 +32,30 @@ const PAYLOAD = {
 };
 export const EVENT_TYPES = Object.keys(PAYLOAD);
 
+// Koperta zdarzenia (wspólna dla wszystkich wersji aplikacji). Poprawna koperta + nieznany typ = zdarzenie
+// z nowszej wersji: ZACHOWUJEMY je (nie kasujemy, nie przenosimy do kwarantanny), tylko nie przetwarzamy.
+export function validateEnvelope(e) {
+  if (!isObj(e)) return 'zdarzenie nie jest obiektem';
+  if (!isId(e.id)) return 'brak lub błędne id';
+  if (!isStr(e.hlc) || !/^\d{13}:\d{4}:[A-Za-z0-9_-]+$/.test(e.hlc)) return 'błędny znacznik czasu (hlc)';
+  if (!isId(e.dev)) return 'brak identyfikatora urządzenia';
+  if (typeof e.t !== 'string' || !/^[a-z][a-z0-9.]{0,40}$/.test(e.t)) return 'błędny typ zdarzenia';
+  if (!isObj(e.d)) return 'niepoprawna treść zdarzenia';
+  return null;
+}
+// Treść typu z nowszej wersji: wystarczy, że to czysty JSON (bez limitu głębokości typów znanych).
+const jsonLike = (v, depth = 0) => depth < 64 && (v === null || ['string', 'number', 'boolean'].includes(typeof v) ||
+  (Array.isArray(v) && v.every(x => jsonLike(x, depth + 1))) || (isObj(v) && Object.values(v).every(x => jsonLike(x, depth + 1))));
+export const isKnownType = t => Object.prototype.hasOwnProperty.call(PAYLOAD, t);
+
+// 'ok' — znany typ, poprawna treść; 'future' — poprawna koperta, typ z nowszej wersji; inaczej: opis błędu.
+export function classifyEvent(e) {
+  const env = validateEnvelope(e);
+  if (env) return env;
+  if (!isKnownType(e.t)) return jsonLike(e.d) ? 'future' : 'niepoprawna treść zdarzenia';
+  return PAYLOAD[e.t](e.d) ? 'ok' : `niepoprawna treść zdarzenia ${e.t}`;
+}
+
 export function validateEvent(e) {
   if (!isObj(e)) return 'zdarzenie nie jest obiektem';
   if (!isId(e.id)) return 'brak lub błędne id';

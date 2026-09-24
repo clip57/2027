@@ -13,6 +13,8 @@ async def main():
     for w in (390, 1280):
       for scheme in ('light', 'dark'):
         ctx = await b.new_context(viewport={'width': w, 'height': 844}, color_scheme=scheme)
+        # motyw jawnie: 'dark' | 'light' (domyślny jest ciemny — bez tego oba przebiegi sprawdzałyby ten sam motyw)
+        await ctx.add_init_script(f"localStorage.setItem('p2027.theme', '{scheme}')")
         pg = await ctx.new_page()
         for r in ROUTES:
           await pg.goto((ROOT / 'dist/single/2027.html').as_uri() + r); await pg.wait_for_timeout(350)

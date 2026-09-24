@@ -18,6 +18,8 @@ def expected_stock(start, per_day):
 BANAN = lambda: expected_stock(240, lambda d: 0 if d.weekday() == 3 else 120)       # czwartek (NT) bez banana
 GLUKO = lambda: expected_stock(180, lambda d: 1 if d <= _dt.date(2027, 3, 21) else 0)
 def ok(cond, msg): results.append((bool(cond), msg)); print(('OK  ' if cond else 'BŁĄD'), msg)
+skipped = []
+def skip(msg): skipped.append(msg); print('POMINIĘTO', msg)
 
 def serve(port):
     class Q(http.server.SimpleHTTPRequestHandler):
@@ -58,6 +60,34 @@ async def run_variant(pw, name, url, mobile):
     ok('Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)' in main, f'{tag} źródło i strony w bloku CFA (D-039)')
     chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
     ok('UPPER 1 + sauna' in chips, f'{tag} nazwa treningu w nagłówku (D-040): {chips}')
+    # --- Redesign (Faza 3–4): motyw, nawigacja, dashboard
+    th = await pg.evaluate("document.documentElement.getAttribute('data-theme')")
+    ok(th == 'dark' or await pg.evaluate("localStorage.getItem('p2027.theme')") is not None, f'{tag} Motyw: domyślnie ciemny')
+    if mobile:
+        labels = await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())')
+        ok(labels == ['Dziś', 'Dieta', 'Trening', 'CFA', 'Więcej'], f'{tag} Pasek dolny: 4 sekcje + Więcej ({labels})')
+        ok(await pg.locator('.tabs a svg[aria-hidden=true]').count() == 5, f'{tag} Pasek dolny: ikony dekoracyjne z etykietą tekstową')
+        await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
+        ok(await pg.locator('.more-list a').count() == 6, f'{tag} Więcej: 6 pozostałych modułów w grupach')
+        await pg.get_by_role('button', name='Motyw: Jasny').click(); await pg.wait_for_timeout(200)
+        await pg.reload(); await pg.wait_for_selector('.more-list')
+        ok(await pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'light', f'{tag} Motyw: wybór jasnego zapamiętany po przeładowaniu')
+        await pg.get_by_role('button', name='Motyw: Systemowy').click(); await pg.wait_for_timeout(200)
+        ok(await pg.evaluate("document.documentElement.hasAttribute('data-theme')") is False, f'{tag} Motyw: systemowy (bez wymuszenia)')
+        await pg.get_by_role('button', name='Motyw: Ciemny').click(); await pg.wait_for_timeout(200)
+    else:
+        groups = await pg.eval_on_selector_all('.side .side-gl', 'e => e.map(x => x.textContent.trim())')
+        ok(groups == ['Dzień', 'Trening', 'Dieta', 'Nauka', 'System'], f'{tag} Panel: grupy {groups}')
+        ok(await pg.locator('.side .side-a').count() == 10, f'{tag} Panel: 10 modułów')
+        await pg.get_by_role('button', name='Zwiń panel').click(); await pg.wait_for_timeout(200)
+        await pg.reload(); await pg.wait_for_selector('.side')
+        ok(await pg.locator('.side.is-min').count() == 1, f'{tag} Panel: zwinięcie zapamiętane')
+        await pg.get_by_role('button', name='Rozwiń panel').click(); await pg.wait_for_timeout(200)
+    await pg.goto(url + '#/dzis?d=2026-09-21'); await pg.wait_for_selector('.dz-kpis')
+    kp = await pg.inner_text('.dz-kpis')
+    ok('2629 kcal' in kp and '/ 10' in kp and '/ 8 bloków' in kp, f'{tag} Dziś: kafle z danych (kcal, serie, bloki CFA)')
+    ok(await pg.locator('.dz-aside .dz-card').count() >= 4 and 'Plan dnia' in await pg.inner_text('main'), f'{tag} Dziś: karty podsumowań i plan dnia')
+
     # --- Etap 3: Dziś, Dieta, Suplementacja
     await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.stats')
     stats = await pg.inner_text('.stats')
@@ -82,7 +112,10 @@ async def run_variant(pw, name, url, mobile):
     txt = await pg.inner_text('main')
     ok('Tauryna' in txt and 'do 2027-03-21' in txt, f'{tag} Suplementacja: tauryna (D-014) i okres preparatów czasowych (D-015)')
     ok('Stan i prognoza pochodz' not in txt and 'Potem nie są kontynuowane' not in txt, f'{tag} Suplementacja: bez usuniętych podpisów')
-    ok('Cynk' not in (await pg.inner_text('.day, .slot') if await pg.locator('.day').count() else txt.split('Preparaty')[0]), f'{tag} Suplementacja: we wtorek bez cynku')
+    # najbliższy wtorek (test niezależny od dnia uruchomienia)
+    tue = (_dt.date.today() + _dt.timedelta(days=(1 - _dt.date.today().weekday()) % 7)).isoformat()
+    await pg.goto(url + f'#/suplementy?d={tue}'); await pg.wait_for_selector('.dose-list')
+    ok('Cynk' not in (await pg.inner_text('main')).split('Preparaty')[0], f'{tag} Suplementacja: we wtorek bez cynku')
     await pg.goto(url + '#/suplementy?d=2026-09-24'); await pg.wait_for_selector('.dose-list')
     ok('Cynk' in (await pg.inner_text('main')).split('Preparaty')[0], f'{tag} Suplementacja: czwartek z cynkiem')
     # --- Etap 5: Trening
@@ -256,7 +289,8 @@ async def run_variant(pw, name, url, mobile):
         ok(await pg.locator('.inv-item').count() == 14, f'{tag} Zapasy: kategoria Suplementy (14 pozycji)')
         await pg.get_by_role('button', name='Wszystko').click(); await pg.wait_for_timeout(200)
         ok('wystarczy do' in inv.lower(), f'{tag} Zapasy: prognoza wyczerpania')
-        await pg.select_option('.toolbar select', 'name'); await pg.wait_for_timeout(300)
+        # pozycja zużywana KAŻDEGO dnia (także w czwartek) — test korekty dnia niezależny od dnia tygodnia
+        await pg.goto(url + '#/zapasy?q=Płatki'); await pg.wait_for_selector('.inv-item')
         before = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
         await pg.locator('.inv-item').first.get_by_role('button', name='+ opakowanie', exact=False).click()
         await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
@@ -311,8 +345,10 @@ async def run_variant(pw, name, url, mobile):
             ok(has, f'{tag} pakiet prywatny zapisany w bazie')
             await pg.goto(url + '#/rekompozycja?s=s13'); await pg.wait_for_selector('.rk-sec')
             ok(await pg.locator('.priv-in').count() == 30 and await pg.locator('.priv-miss').count() == 0, f'{tag} Rekompozycja: 30 fragmentów z pakietu prywatnego wstawionych, nic ukrytego')
+        else:
+            skip(f'{tag} import pakietu prywatnego i Rekompozycja z pakietem — brak PRIVATE_PACK')
     else:
-        ok(True, f'{tag} (pominięto import — brak pliku kopii w SOURCES_DIR)')
+        skip(f'{tag} import kopii ZAPASY i zależne kontrole — brak pliku w SOURCES_DIR')
     # --- offline (tylko wariant web z service workerem)
     if name == 'web':
         await pg.goto(url + '#/dzis')
@@ -337,7 +373,7 @@ async def main():
             await run_variant(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), mobile)
     srv.shutdown()
     bad = [m for c, m in results if not c]
-    print(f'\nE2E: {len(results)} kontroli, błędów: {len(bad)}')
+    print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')
     sys.exit(1 if bad else 0)
 
 asyncio.run(main())

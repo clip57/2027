@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Projekt 2027 — system projektowy (tokeny). JEDYNE miejsce definicji kolorów, typografii, odstępów,
+   promieni, głębi i ruchu. Motyw: data-theme="dark" | "light" na <html>; brak atrybutu = zgodnie z systemem.
+   Domyślnie ciemny (ustawiane przed pierwszym renderem). Kontrast par tekst/tło sprawdzony wg WCAG AA.
+   ========================================================================== */
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191-2193, U+2212, U+2215; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  /* Typografia (Inter lokalnie, podzbiór znaków aplikacji; awaryjnie font systemowy) */
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-round: var(--font);
+  --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.5rem;
+  /* Odstępy (siatka 4 px) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+  /* Promienie (4 poziomy) */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-full: 999px;
+  --r-1: var(--r-md); --r-2: var(--r-lg);                  /* aliasy dotychczasowych nazw */
+  /* Ruch */
+  --dur-1: 120ms; --dur-2: 200ms; --ease: cubic-bezier(.2, .8, .2, 1);
+  /* Układ */
+  --tab-h: 60px; --side-w: 244px; --side-w-min: 76px; --content-max: 1180px;
+
+  /* ---- Motyw jasny ---- */
+  color-scheme: light;
+  --bg: #f6f5f2; --surface: #ffffff; --surface-2: #ffffff; --sunken: #efede9;
+  --text: #16171b; --text-2: #4a4f59; --muted: #676d78;
+  --border: #e5e2dc; --border-strong: #8f8b83;
+  --accent: #4845d2; --accent-ink: #ffffff; --accent-soft: #ecebfb;
+  --success: #11632f; --warning: #8a4204; --danger: #9b1c16; --info: #4845d2;
+  --e1: 0 1px 2px rgb(20 20 30 / .05), 0 1px 1px rgb(20 20 30 / .03);
+  --e2: 0 12px 32px rgb(20 20 30 / .12), 0 2px 6px rgb(20 20 30 / .06);
+  /* domeny (sygnatura modułu — ikona, pasek, kropka) */
+  --cfa: #1e40af; --train: #8a3324; --regen: #6b21a8;
+  --p-col: #1d4ed8; --c-col: #92400e; --f-col: #5b21b6; --org: #0b5f75;
+  --warn-bg: #fff4d6; --warn-ink: #6b4a00; --err-bg: #fde4e4; --ok-ink: #15603a;
+}
+/* ---- Motyw ciemny (ręcznie wybrany albo systemowy) — wspólna definicja ---- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0f13; --surface: #15181e; --surface-2: #1c2028; --sunken: #0a0b0e;
+  --text: #eceef3; --text-2: #b3b9c5; --muted: #8f96a3;
+  --border: #262a33; --border-strong: #666e7c;
+  --accent: #a5a8ff; --accent-ink: #0d0f13; --accent-soft: #23254a;
+  --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
+  --e1: 0 0 0 transparent; --e2: 0 16px 40px rgb(0 0 0 / .5);
+  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff;
+  --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
+  --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --ok-ink: #8fe0b0;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) {
+  color-scheme: dark;
+  --bg: #0d0f13; --surface: #15181e; --surface-2: #1c2028; --sunken: #0a0b0e;
+  --text: #eceef3; --text-2: #b3b9c5; --muted: #8f96a3;
+  --border: #262a33; --border-strong: #666e7c;
+  --accent: #a5a8ff; --accent-ink: #0d0f13; --accent-soft: #23254a;
+  --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
+  --e1: 0 0 0 transparent; --e2: 0 16px 40px rgb(0 0 0 / .5);
+  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff;
+  --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
+  --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --ok-ink: #8fe0b0; } }
+
+/* Aliasy dotychczasowych nazw (istniejące reguły korzystają z nowej palety bez zmian w kodzie modułów) */
+:root, :root[data-theme] {
+  --paper: var(--bg); --ink: var(--text); --ink-2: var(--text-2); --line: var(--border); --focus: var(--accent);
+  --ok: var(--success); --warn: var(--warning); --bad: var(--danger); --err-ink: var(--danger);
+  --diet: var(--success); --prep: var(--warning);
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-1: 0ms; --dur-2: 0ms; } }

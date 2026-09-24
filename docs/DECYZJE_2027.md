@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 22.09.2026 (D-036 – D-055) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 22.09.2026 (D-036 – D-064) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -58,6 +58,15 @@
 | D-053 | A2.9 zaakceptowane: komórki tabel suplementów w REKOMPOZYCJI s.6 zgodne z SUPLEMENTACJĄ; melatonina 1 mg także w s.18 i s.22 (uzupełnienie A2.4, ta sama zmiana) |
 | D-054 | Zmiana redakcyjna E-1: odesłanie do pliku Tabeli w poradniku Bezpieczne v3 zastąpione odesłaniem do zakładki „Tabela” modułu |
 | D-055 | Dostępność: semantyczne kolory statusów z wariantem jasnym i ciemnym (kontrast WCAG AA), przewijane obszary dostępne z klawiatury; audyt axe-core jako stały test (`npm run a11y`) |
+| D-056 | Zgodność w przód: zdarzenia o poprawnej budowie i nieznanym typie (z nowszej wersji) są zachowywane w bazie, imporcie i eksporcie, pomijane w obliczeniach i jawnie raportowane („Niepełne przetwarzanie”); nie trafiają do kwarantanny. Zdarzenia przeniesione do kwarantanny przez starszą wersję są odzyskiwane, gdy obecna wersja je rozpoznaje |
+| D-057 | Aktualizacja kodu aplikacji wyłącznie za zgodą użytkownika („Nowa wersja — odśwież”); sprawdzanie aktualizacji przy powrocie aplikacji na ekran; jednorazowe przejście ze starego service workera bez przeładowania otwartej strony. Aktualizacja kodu jest oddzielona od ręcznej synchronizacji danych |
+| D-058 | Format pliku 2027-sync.json bez zmian (istniejące: schema, exportedAt, device, count, sha256, identyfikatory zdarzeń, deduplikacja po id); podgląd importu korzysta z istniejących pól exportedAt i device |
+| D-059 | Redesign — system projektowy: jedno źródło tokenów (`src/ui/tokens.css`), warstwa komponentów (`src/ui/system.css`); nazwy klas używane przez moduły i testy bez zmian |
+| D-060 | Font Inter (OFL) osadzony lokalnie jako podzbiór znaków aplikacji (32 KB, 2 pliki woff2; w wariancie jednoplikowym jako data URI); awaryjnie font systemowy |
+| D-061 | Motyw: domyślnie ciemny, przełącznik ciemny / jasny / systemowy; preferencje interfejsu (motyw, zwinięty panel) zapisywane per urządzenie (localStorage), poza dziennikiem zdarzeń i plikiem synchronizacji |
+| D-062 | Nawigacja: panel boczny z grupami Dzień / Trening / Dieta / Nauka / System (zgodne z domenami modułów w rejestrze), ikony Lucide (ISC, 40 ikon wbudowanych, 7 KB); telefon: Dziś, Dieta, Trening, CFA + „Więcej” |
+| D-063 | Akcent indygo: #4845D2 (jasny, 6,9:1 na karcie) / #A5A8FF (ciemny, 8,2:1) |
+| D-064 | Dashboard „Dziś” wyłącznie z istniejących danych (resolver + dziennik zdarzeń); suplementy na dashboardzie tylko jako podsumowanie liczbowe — nazwy dawek wyłącznie w planie dnia (zgodnie z D-041) |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
 ## Decyzje zastąpione

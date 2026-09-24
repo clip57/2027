@@ -10,6 +10,15 @@ const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY 
   'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)' };
 const TYPE = { 'inv.count': 'stany magazynu', 'inv.move': 'zakupy i korekty', 'cat.upsert': 'własne pozycje', 'cfa.done': 'bloki CFA',
   'cfa.err.put': 'wpisy error logu', 'train.set': 'serie treningowe', setting: 'ustawienia', 'private.pack': 'pakiet prywatny', archive: 'archiwum' };
+// Środowisko uruchomienia: każde (przeglądarka, aplikacja z ekranu początkowego, plik lokalny) ma OSOBNĄ bazę danych.
+export const appVersion = () => document.querySelector('meta[name="app-version"]')?.content || 'nieznana';
+export function runMode() {
+  if (globalThis.__SINGLE__) return 'plik lokalny (jeden plik HTML)';
+  const standalone = matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+  return standalone ? 'aplikacja z ekranu początkowego / Docka' : 'karta przeglądarki';
+}
+const when = iso => (iso ? new Date(iso).toLocaleString('pl-PL') : '—');
+
 const STATUS = { OK: 'OK', WARNING: 'Średni', CRITICAL: 'Pilne', UNKNOWN: 'Brak stanu', UNTRACKED: 'Nieśledzony' };
 
 async function shareOrDownload(text, name) {
@@ -40,11 +49,26 @@ export async function renderDane(root, ctx) {
       h('dl', { class: 'kv' },
         h('dt', {}, 'Zapis'), h('dd', { style: { color: health.ok ? 'var(--ok-ink)' : 'var(--err-ink)' } }, health.ok ? 'działa, każdy zapis sprawdzany odczytem' : (health.error || 'niedostępny')),
         h('dt', {}, 'Ochrona przed usunięciem'), h('dd', {}, health.persisted ? 'przyznana przez przeglądarkę' : 'nieprzyznana — eksportuj kopię regularnie'),
+        h('dt', {}, 'Wersja aplikacji'), h('dd', {}, appVersion()),
+        h('dt', {}, 'Uruchomiono jako'), h('dd', {}, runMode(), h('span', { class: 'muted block' }, 'To miejsce ma własną, oddzielną bazę danych — dane z innych miejsc trafiają tu tylko przez import pliku 2027-sync.json.')),
         h('dt', {}, 'To urządzenie'), h('dd', {}, store?.device || '—'),
         h('dt', {}, 'Zapisane zmiany'), h('dd', {}, store ? fmt(store.allEvents().length) : '—'),
         health.quarantined > 0 && [h('dt', {}, 'Kwarantanna'), h('dd', {}, `${health.quarantined} uszkodzonych wpisów odłożono przy otwarciu`)],
         h('dt', {}, 'Ostatnie wysłanie'), h('dd', {}, meta.exp ? new Date(meta.exp.at).toLocaleString('pl-PL') : 'jeszcze nie'),
-        h('dt', {}, 'Ostatni import'), h('dd', {}, meta.imp ? `${new Date(meta.imp.at).toLocaleString('pl-PL')} · ${KIND[meta.imp.kind] || meta.imp.kind} · +${meta.imp.added}` : 'jeszcze nie'))));
+        h('dt', {}, 'Ostatni import'), h('dd', {}, meta.imp ? `${new Date(meta.imp.at).toLocaleString('pl-PL')} · ${KIND[meta.imp.kind] || meta.imp.kind} · +${meta.imp.added}` : 'jeszcze nie'),
+        meta.imp?.file && [h('dt', {}, 'Wczytany plik'), h('dd', {}, `wyeksportowany ${when(meta.imp.file.exportedAt)} na urządzeniu ${meta.imp.file.device || '—'}`)],
+        store?.state?.unprocessed?.count > 0 && [h('dt', {}, 'Niepełne przetwarzanie'), h('dd', { style: { color: 'var(--warn)' } },
+          `${store.state.unprocessed.count} zdarzeń z nowszej wersji aplikacji jest zachowanych, ale nie jest uwzględnianych w widokach (${Object.keys(store.state.unprocessed.types).join(', ')}). Zaktualizuj aplikację.`)],
+        health.restored > 0 && [h('dt', {}, 'Odzyskane z kwarantanny'), h('dd', {}, `${health.restored} zdarzeń przywróconych do bazy`)])),
+
+    // --- Aktualizacja kodu aplikacji (oddzielnie od synchronizacji danych)
+    h('section', { class: 'panel', 'aria-labelledby': 'h-upd' }, h('h2', { id: 'h-upd' }, 'Aktualizacja aplikacji'),
+      h('p', { class: 'muted' }, 'Dotyczy wyłącznie kodu aplikacji. Aktualizacja nie przenosi ani nie zmienia danych — dane między urządzeniami przenosi tylko plik 2027-sync.json (sekcja niżej).'),
+      h('dl', { class: 'kv' }, h('dt', {}, 'Działająca wersja'), h('dd', {}, appVersion()),
+        h('dt', {}, 'Stan'), h('dd', {}, ctx.update?.state === 'ready' ? 'nowa wersja pobrana — czeka na Twoją zgodę' : ctx.update?.state === 'checking' ? 'sprawdzanie…' : globalThis.__SINGLE__ ? 'plik lokalny — aktualizacja przez podmianę pliku' : 'aktualna (ostatnie sprawdzenie w tej sesji)')),
+      !globalThis.__SINGLE__ && h('div', { class: 'row' },
+        ctx.update?.state === 'ready' && h('button', { class: 'primary', onclick: () => ctx.update.apply() }, 'Nowa wersja — odśwież'),
+        h('button', { onclick: async () => { await ctx.update?.check?.(); ctx.rerender(); } }, 'Sprawdź aktualizację'))));
 
   // --- Synchronizacja iCloud (wariant A)
   const sendBtn = h('button', { class: 'primary', disabled: !store, onclick: async () => {
@@ -78,8 +102,13 @@ export async function renderDane(root, ctx) {
   function showPreview(pv, name) {
     const dlg = h('dialog', { 'aria-labelledby': 'pv-h' });
     const close = () => { dlg.close(); dlg.remove(); };
-    dlg.append(h('h2', { id: 'pv-h' }, pv.ok ? 'Podgląd importu' : 'Nie można zaimportować'),
+    add(dlg, h('h2', { id: 'pv-h' }, pv.ok ? 'Podgląd importu' : 'Nie można zaimportować'),
       h('p', { class: 'muted' }, `${name} · ${KIND[pv.kind] || 'nierozpoznany'}`),
+      pv.file && h('p', {}, `Plik wyeksportowany ${when(pv.file.exportedAt)} na urządzeniu ${pv.file.device || '—'}${pv.file.device === store.device ? ' (to urządzenie)' : ''}.`),
+      pv.file?.exportedAt && meta.imp?.file?.exportedAt && pv.file.exportedAt < meta.imp.file.exportedAt &&
+        h('div', { class: 'banner warn' }, `Ten plik jest STARSZY niż ostatnio wczytany (${when(meta.imp.file.exportedAt)}). W iCloud Drive może być nowsza kopia, np. „2027-sync 2.json”.`),
+      pv.future?.count > 0 && h('div', { class: 'banner warn' },
+        `${pv.future.count} zdarzeń pochodzi z nowszej wersji aplikacji (${Object.keys(pv.future.types).join(', ')}). Zostaną zachowane w bazie, ale do czasu aktualizacji aplikacji nie będą uwzględniane w widokach.`),
       pv.errors.length > 0 && h('div', { class: 'banner err' }, pv.errors.join(' ')),
       pv.ok && h('dl', { class: 'kv' },
         h('dt', {}, 'Nowe zmiany'), h('dd', {}, fmt(pv.fresh.length)),

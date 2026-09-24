@@ -1,6 +1,6 @@
 // Synchronizacja wariant A (D-033): plik 2027-sync.json w iCloud Drive.
 // Ten sam plik jest kopią zapasową. Import: walidacja -> podgląd -> kopia -> scalenie (idempotentne).
-import { validateEvent, SCHEMA } from '../storage/validate.js';
+import { classifyEvent, SCHEMA } from '../storage/validate.js';
 import { lwwKey } from '../storage/store.js';
 import { migrateZapasyV31, isZapasyV31 } from '../migrate/zapasy-v31.js';
 import { isPrivatePack, privatePackEvent } from '../private.js';
@@ -42,13 +42,21 @@ export async function preview(store, obj) {
   } else {
     return { ok: false, kind: 'unknown', errors: ['Nie rozpoznano pliku. Obsługiwane: kopia 2027 (2027-sync.json), kopia ZAPASY v31, postęp CFA (postep-nauki.json), error log CFA (error-log.csv), pakiet prywatny.'] };
   }
-  return previewEvents(store, events, kind, errors);
+  const pv = previewEvents(store, events, kind, errors);
+  // Informacje o pliku (pola istniejące w formacie od początku — bez zmiany formatu)
+  if (kind === 'sync') pv.file = { exportedAt: obj.exportedAt || null, device: obj.device || null, schema: obj.schema ?? null };
+  return pv;
 }
 
 export function previewEvents(store, events, kind, errors = []) {
-  const invalid = [], valid = [];
-  for (const e of events) { const err = validateEvent(e); if (err) invalid.push(`${e?.id ?? '?'}: ${err}`); else valid.push(e); }
-  if (invalid.length) errors.push(`${invalid.length} niepoprawnych zdarzeń, np. ${invalid[0]}`);
+  const invalid = [], valid = [], future = { count: 0, types: {} };
+  for (const e of events) {
+    const c = classifyEvent(e);
+    if (c === 'ok') valid.push(e);
+    else if (c === 'future') { valid.push(e); future.count++; future.types[e.t] = (future.types[e.t] || 0) + 1; } // zachowane, nie blokują importu
+    else invalid.push(`${e?.id ?? '?'}: ${c}`);
+  }
+  if (invalid.length) errors.push(`${invalid.length} uszkodzonych zdarzeń, np. ${invalid[0]}`);
   const fresh = valid.filter(e => !store.events.has(e.id));
   // Konflikt = nowe zdarzenie dotyczy rekordu, który lokalnie ma inną wersję.
   const latest = new Map();
@@ -59,12 +67,13 @@ export function previewEvents(store, events, kind, errors = []) {
     if (local) conflicts.push({ key: k, winner: e.hlc > local.hlc ? 'plik' : 'lokalnie', local, incoming: e });
   }
   const byType = fresh.reduce((m, e) => ((m[e.t] = (m[e.t] || 0) + 1), m), {});
-  return { ok: errors.length === 0, kind, errors, total: events.length, fresh, known: events.length - fresh.length, conflicts, byType };
+  return { ok: errors.length === 0, kind, errors, total: events.length, fresh, known: events.length - fresh.length, conflicts, byType,
+    future: { count: fresh.filter(e => classifyEvent(e) === 'future').length, types: future.types } };
 }
 
 export async function apply(store, pv) {
   if (!pv.ok) throw new Error('Nie można zastosować importu z błędami');
   const n = await store.appendMany(pv.fresh, `przed importem (${pv.kind})`);
-  await store.adapter.setMeta('lastImport', { at: new Date().toISOString(), kind: pv.kind, added: n });
+  await store.adapter.setMeta('lastImport', { at: new Date().toISOString(), kind: pv.kind, added: n, file: pv.file || null });
   return n;
 }
