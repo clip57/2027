@@ -8,6 +8,8 @@ import { reduce } from '../core/storage/store.js';
 import { exportBundle, preview, apply } from '../core/sync/bundle.js';
 import { consumptionForDay } from '../core/calc/consumption.js';
 import { SRC, catalogById } from '../core/data.js';
+// Nazwy z Tabeli bezpieczeństwa — link „Przechowywanie” tylko przy identycznej nazwie (bez zgadywania powiązań)
+const SAFE = new Set(SRC.safety.rows.map(r => r.Produkt));
 import { addDays, dayShort, longDate, shortDate, diffDays } from '../core/dates.js';
 import { resolveDay } from '../core/resolver.js';
 
@@ -198,7 +200,8 @@ export function renderZapasy(root, ctx) {
             it.maxLimit && h('span', { class: 'tag' }, `Limit: ${fmt(it.maxLimit)} ${it.unit}`),
             r.daily > 0 && h('span', { class: 'tag' }, `${fmt(r.daily, 2)} ${it.unit}/d`),
             it.note && h('span', { class: 'tag' }, it.note),
-            h('span', { class: 'tag' }, it.category)),
+            h('span', { class: 'tag' }, it.category),
+            SAFE.has(it.name) && h('a', { class: 'btn zp-safe', href: `#/bezpieczenstwo?q=${encodeURIComponent(it.name)}` }, 'Przechowywanie →')),
           it.tracked !== false && h('div', { class: 'row' },
             h('button', { onclick: () => save('inv.move', { prod: it.id, qty: -(r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: −1 porcja`) }, '− porcja'),
             h('button', { onclick: () => save('inv.move', { prod: it.id, qty: (r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: +1 porcja`) }, '+ porcja'),

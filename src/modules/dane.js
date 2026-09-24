@@ -5,6 +5,7 @@ import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
 import { sha256 } from '../core/hash.js';
 import { stockAt, forecast, status, allItems } from '../core/calc/inventory.js';
 import { shortDate } from '../core/dates.js';
+import { icon } from '../ui/icons.js';
 
 const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY v31', private: 'Pakiet prywatny',
   'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)' };
@@ -44,7 +45,10 @@ export async function renderDane(root, ctx) {
 
   // --- Stan zapisu
   const health = store?.health || { ok: false, error: ctx.storeError };
-  add(root, h('h1', {}, 'Dane i synchronizacja'), msg,
+  // Kolejność (D-077): synchronizacja — najczęstsza czynność — na górze; potem aktualizacja kodu, stan zapisu, kontrola, kopie
+  const syncSlot = h('div', { class: 'dn-slot' });
+  add(root, h('header', { class: 'dn-head' }, h('h1', {}, 'Dane i synchronizacja'),
+    h('div', { class: 'topline' }, h('span', { class: 'date' }, `${runMode()} · wersja ${appVersion()}`))), msg, syncSlot,
     h('section', { class: 'panel', 'aria-labelledby': 'h-stan' }, h('h2', { id: 'h-stan' }, 'Stan zapisu'),
       h('dl', { class: 'kv' },
         h('dt', {}, 'Zapis'), h('dd', { style: { color: health.ok ? 'var(--ok-ink)' : 'var(--err-ink)' } }, health.ok ? 'działa, każdy zapis sprawdzany odczytem' : (health.error || 'niedostępny')),
@@ -79,11 +83,14 @@ export async function renderDane(root, ctx) {
     await store.adapter.setMeta('lastExport', { at: new Date().toISOString(), hlc: maxHlc, count: b.count });
     ctx.flash(res === 'share' ? 'Plik przekazany. Zapisz go w Plikach → iCloud Drive → 2027, zastępując poprzedni.' : 'Plik pobrany. Przenieś go do iCloud Drive → 2027.');
     ctx.rerender();
-  } }, 'Wyślij do iCloud');
+  } }, icon('cloud-upload', { size: 18 }), h('span', {}, 'Wyślij do iCloud'));
   const input = h('input', { type: 'file', accept: '.json,.csv,application/json,text/csv', hidden: true, onchange: () => onFile(input.files[0]) });
-  const pickBtn = h('button', { disabled: !store, onclick: () => { input.value = ''; input.click(); } }, 'Pobierz z iCloud lub importuj plik');
-  add(root, h('section', { class: 'panel', 'aria-labelledby': 'h-sync' }, h('h2', { id: 'h-sync' }, 'Synchronizacja przez iCloud Drive'),
-    h('p', {}, unsent ? `Masz ${unsent} niewysłanych zmian z tego urządzenia.` : 'Wszystkie zmiany z tego urządzenia zostały wysłane.'),
+  const pickBtn = h('button', { disabled: !store, onclick: () => { input.value = ''; input.click(); } }, icon('cloud-download', { size: 18 }), h('span', {}, 'Pobierz z iCloud lub importuj plik'));
+  add(syncSlot, h('section', { class: `panel dn-sync${unsent ? ' has-unsent' : ''}`, 'aria-labelledby': 'h-sync' },
+    h('h2', { id: 'h-sync' }, icon('refresh-cw', { size: 20 }), 'Synchronizacja przez iCloud Drive'),
+    h('p', { class: 'dn-sync-s' }, icon(unsent ? 'cloud-upload' : 'circle-check', { size: 20 }),
+      h('span', {}, unsent ? `Masz ${unsent} niewysłanych zmian z tego urządzenia.` : 'Wszystkie zmiany z tego urządzenia zostały wysłane.')),
+    h('p', { class: 'dn-sync-m' }, `Ostatnie wysłanie: ${meta.exp ? new Date(meta.exp.at).toLocaleString('pl-PL') : 'jeszcze nie'} · ostatni import: ${meta.imp ? new Date(meta.imp.at).toLocaleString('pl-PL') : 'jeszcze nie'}`),
     h('p', { class: 'muted' }, 'Po pracy na jednym urządzeniu wybierz „Wyślij do iCloud” i zapisz plik 2027-sync.json w iCloud Drive/2027. Na drugim urządzeniu wybierz „Pobierz z iCloud” i wskaż ten plik. Dane są scalane — nic nie jest nadpisywane, a ten sam plik możesz wczytać wiele razy.'),
     h('div', { class: 'row' }, sendBtn, pickBtn, input),
     h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA oraz pakiet prywatny.')));

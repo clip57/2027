@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 24.09.2026 (D-036 – D-073; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 24.09.2026 (D-036 – D-077; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -76,6 +76,10 @@
 | D-071 | Dieta: posiłki (karty i nawigacja) w kolejności godzin planu dnia (napoje na końcu; wartości PDF bez zmian), „Następny posiłek” wg godziny (tylko plan obowiązujący dziś), makroskładniki pozycji jako jedna linia, rzadkie sekcje (różnice faz, zamienniki, przyprawy) zwinięte; składniki planu z pilnym/średnim stanem w Zapasach — karta w kolumnie bocznej, przy produkcie tylko stan pilny. Bez odhaczania zjedzonych posiłków (wymagałoby nowego typu zdarzenia) |
 | D-072 | Zapasy: przegląd (pasek stanu magazynu z liczników statusów, najbliższy brak), siatka 7 akcji z ikonami (wszystkie funkcje D-046 zachowane), karta „Do kupienia” (5 najpilniejszych pozycji listy zakupów, „Kupione” = istniejące zdarzenie `inv.move` purchase na wyliczoną ilość), zwarte wiersze pozycji (status, wystarczy do, pasek zapasu z dniem zakupów, stan, „+ opakowanie”; porcje, tagi i usuwanie w „Więcej”), korekta dnia i operacje zbiorcze zwinięte; na komputerze lista + przyklejona kolumna zakupów |
 | D-073 | Nowy kierunek wizualny „premium personal OS” (inspiracja: zrzuty użytkownika; strona Figma niedostępna w środowisku) realizowany w ramach istniejącego systemu tokenów: bez glassmorphismu, gradientów i metryk bez danych; kierunek obowiązuje w dalszych modułach Fazy 5 |
+| D-074 | Meal Prep: „Składniki na jutro” — stan na koniec dziś porównany ze zużyciem jutra wg planu (tylko produkty użyte w kartach), oznaczenie kart z brakami, wyróżniona karta z następnym krokiem; tabele i „Dlaczego tak” zwinięte |
+| D-075 | Suplementacja: minione pory dnia przygaszone (tło, bez przezroczystości tekstu), następna pora wyróżniona; karta „Zapas suplementów” (status v31 < 10 / < 20 dni) z „Kupione +opakowanie” (`inv.move` purchase) pod osią dnia; pasek zapasu w tabeli preparatów |
+| D-076 | Bezpieczeństwo i Rekompozycja: nagłówki jak w pozostałych modułach, „Wyczyść filtry”; w Rekompozycji wyszukiwanie w treści planu (bez pakietu prywatnego) i „Rozwiń / Zwiń wszystko”. Zapasy → Bezpieczeństwo: link „Przechowywanie” wyłącznie przy identycznej nazwie pozycji w Tabeli bezpieczeństwa (15 z 55 — bez zgadywania powiązań, `product_links` nie zmieniane) |
+| D-077 | Dane: synchronizacja (status niewysłanych zmian, ostatnie wysłanie/import, „Wyślij do iCloud”, „Pobierz z iCloud”) jako pierwsza sekcja; mechanizm, teksty rozróżniające kod/dane i format pliku bez zmian |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
 ## Decyzje zastąpione

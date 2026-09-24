@@ -369,8 +369,19 @@ async def run_variant(pw, name, url, mobile):
     # --- Faza 5: Dieta (D-071) — składniki z Zapasów (dane syntetyczne mają pozycje pilne)
     await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
     ok(await pg.locator('.dt-stock .dt-alerts li').count() >= 1 and await pg.locator('.meal .dt-stock-b').count() >= 1, f'{tag} Dieta: składniki z niskim zapasem oznaczone (z modułu Zapasy)')
+    # --- Faza 5: Meal Prep (D-074), Suplementacja (D-075), Zapasy → Bezpieczeństwo (dane syntetyczne)
     await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
-    mp = await pg.inner_text('main')
+    ok('Składniki na jutro' in await pg.inner_text('.mp-stock') and await pg.locator('.mp-short-list li').count() >= 1 and await pg.locator('.prep-card .mp-short').count() >= 1,
+       f'{tag} Meal Prep: braki składników na jutro (karta i oznaczenia kart)')
+    await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list')
+    ok(await pg.locator('.sp-stock .sp-low li').count() >= 1, f'{tag} Suplementacja: zapas suplementów z modułu Zapasy')
+    await pg.locator('.sp-low .zp-buy-b').first.click(); await pg.wait_for_selector('text=(kupione)')
+    ok(True, f'{tag} Suplementacja: „Kupione” dodaje opakowanie')
+    await pg.goto(url + '#/zapasy?q=Banan'); await pg.wait_for_selector('.inv-item')
+    await pg.locator('.inv-item .zp-more > summary').first.click(); await pg.wait_for_timeout(200)
+    ok('bezpieczenstwo?q=Banan' in (await pg.locator('.zp-safe').first.get_attribute('href') or ''), f'{tag} Zapasy: link do zasad przechowywania (identyczna nazwa w Tabeli bezpieczeństwa)')
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    mp = await pg.evaluate("document.querySelector('main').textContent")   # tabele progów w zwiniętych panelach (Faza 5)
     ok('płatki owsiane 70 g' in mp, f'{tag} Meal Prep: ilości z Fazy 0')
     ok('prosto z patelni' in mp and '> 63 °C' in mp, f'{tag} Meal Prep: progi wg D-013')
     allmp = await pg.evaluate("document.querySelector('main').textContent")  # także treść zwiniętych sekcji
@@ -496,8 +507,26 @@ async def run_features(pw, name, url, mobile):
     ok(await pg.evaluate('location.hash') == '#/dieta' and await pg.evaluate('document.activeElement.id') == 'dt-snack', f'{tag} Dieta: „Pokaż skład” przewija do posiłku')
     await pg.goto(url + '#/dieta?f=0&w=NT'); await pg.wait_for_selector('.meal')
     ok(await pg.locator('.dt-next').count() == 0 and await pg.locator('a.dt-today').count() == 1, f'{tag} Dieta: inny wariant — bez „następnego posiłku”, link do planu na dziś')
+    # Suplementacja (D-075): minione i następna pora dnia; Meal Prep: bieżąca karta
+    await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list')
+    ok(await pg.locator('.tl-item.is-next time').inner_text() == '10:30' and await pg.locator('.tl-item.is-past').count() == 2, f'{tag} Suplementacja: 07:00 i 09:00 minione, następna 10:30')
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    ok(await pg.locator('.prep-card.is-next').count() == 1, f'{tag} Meal Prep: wyróżniona karta z następnym krokiem')
+    # Rekompozycja (D-076): wyszukiwanie w planie, rozwiń / zwiń wszystko
+    await pg.goto(url + '#/rekompozycja?q=kreatyna'); await pg.wait_for_selector('.rk-sec')
+    n = await pg.locator('.rk-sec').count()
+    ok(1 <= n < 24 and 'kreatyna' in await pg.inner_text('.rk-hits'), f'{tag} Rekompozycja: wyszukiwanie zawęża sekcje ({n})')
+    await pg.get_by_role('button', name='Rozwiń wszystko').click()
+    ok(await pg.locator('.rk-sec[open]').count() == n, f'{tag} Rekompozycja: „Rozwiń wszystko”')
+    # Bezpieczeństwo: wyczyszczenie filtrów; Dane (D-077): synchronizacja na górze
+    await pg.goto(url + '#/bezpieczenstwo?q=termos'); await pg.wait_for_selector('.sf-card')
+    await pg.get_by_role('button', name='Wyczyść filtry').click(); await pg.wait_for_timeout(400)
+    ok(await pg.locator('.sf-card').count() == 71, f'{tag} Bezpieczeństwo: „Wyczyść filtry” przywraca 71 pozycji')
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
+    order = await pg.evaluate("[...document.querySelectorAll('main section.panel h2')].map(x => x.textContent)")
+    ok(order and 'Synchronizacja' in order[0], f'{tag} Dane: synchronizacja jako pierwsza sekcja ({order[:2]})')
     if mobile:   # cele dotykowe w rozbudowanych modułach
-        for r in ('#/trening', '#/cfa?v=dzien', '#/cfa?v=log', '#/dieta', '#/zapasy'):
+        for r in ('#/trening', '#/cfa?v=dzien', '#/cfa?v=log', '#/dieta', '#/zapasy', '#/mealprep', '#/suplementy', '#/bezpieczenstwo', '#/rekompozycja', '#/dane'):
             await pg.goto(url + r); await pg.wait_for_timeout(300)
             small = await pg.evaluate('''[...document.querySelectorAll('main button, main a.btn, main a.chip, main summary, .dt-nav-a, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length''')
             ok(small == 0, f'{tag} {r}: elementy dotykowe ≥ 44 px (za małych: {small})')

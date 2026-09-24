@@ -14,6 +14,24 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 
 ## 2. Wyniki regresji
 
+### Faza 5 — moduły 5–9: Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja, Dane (24.09.2026, konfiguracja B)
+Build: **OK** — wersja `0.2.0+276680fffc`; `dist/web/app.*.js` 688 KB; `dist/single/2027.html` 834 KB.
+
+| Zestaw | Wynik |
+|---|---|
+| Jednostkowe | 89 uruchomionych · **88 zaliczonych · 0 niezaliczonych · 1 pominięty** (migracja prawdziwej kopii ZAPASY) |
+| Weryfikacja danych | **nieuruchomiona** (wymaga `SOURCES_DIR`) |
+| E2E | **956 kontroli · 956 zaliczonych · 0 niezaliczonych · 0 pominiętych bloków** (+33) |
+| Synchronizacja i aktualizacja | **21 kontroli · 21 zaliczonych · 0 pominiętych** |
+| Dostępność | 136 przebiegów (20 widoków + 14 stanów × 2 szerokości × 2 motywy), z danymi syntetycznymi · **0 typów naruszeń** · przewijanie w poziomie: **brak** |
+
+Nowe kontrole: `tests/unit/prep-supp.test.mjs` (`coverage`); E2E — składniki na jutro w Meal Prep i oznaczenia kart, zapas
+suplementów i „Kupione”, link przechowywania z Zapasów, minione / następna pora suplementów (zegar 10:00), bieżąca karta Meal
+Prep, wyszukiwanie i „Rozwiń wszystko” w Rekompozycji, „Wyczyść filtry” w Bezpieczeństwie, synchronizacja jako pierwsza sekcja
+Danych; cele dotykowe ≥ 44 px we wszystkich 10 modułach na 390 px (wykryły i pozwoliły naprawić 71 + 3 za małe elementy
+rozwijane). Test Meal Prep czyta progi z `textContent` (tabele w zwiniętych panelach). a11y: stany „wyszukiwanie w planie”,
+„filtr produktów”, „rozwinięte tabele”.
+
 ### Faza 5 — Dieta i Zapasy (24.09.2026, konfiguracja B)
 Build: **OK** — wersja `0.2.0+b6d6a8961c`; `dist/web/app.*.js` 681 KB; `dist/single/2027.html` 821 KB.
 

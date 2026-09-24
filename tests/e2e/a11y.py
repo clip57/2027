@@ -18,7 +18,8 @@ STATES = [('#/trening?d=2026-09-21', "document.querySelector('.set:not(.set-h) .
   ('#/trening', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'licznik przerwy'),
   ('#/cfa?v=log', "document.querySelector('.cf-kinds .chip-b')?.click()", 'filtr error logu'),
   ('#/zapasy', "document.querySelectorAll('.daycard, .zp-more, .zp-bulk').forEach(d => d.open = true)", 'rozwinięte korekty i szczegóły'),
-  ('#/zapasy?s=CRITICAL', None, 'filtr pilnych')]
+  ('#/zapasy?s=CRITICAL', None, 'filtr pilnych'), ('#/rekompozycja?q=kreatyna', None, 'wyszukiwanie w planie'),
+  ('#/bezpieczenstwo?q=termos', None, 'filtr produktów'), ('#/mealprep', "document.querySelectorAll('details.fold').forEach(d => d.open = true)", 'rozwinięte tabele')]
 # Stany zapasów: SYNTETYCZNA kopia (D-065) importowana przed audytem — statusy, paski zapasu, „Do kupienia”, ostrzeżenia w Diecie
 SYN = fixtures.write(fixtures.synthetic_zapasy(dt.date(2026, 9, 27))[0], 'zapasy_syntetyczne.json')
 # Stały zegar (poniedziałek 28.09.2026 10:00): „dziś” ma trening (licznik przerwy) i zaległe bloki CFA — widoki zależne od daty są audytowane zawsze

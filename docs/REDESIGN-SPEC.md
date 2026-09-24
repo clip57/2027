@@ -138,6 +138,19 @@ Kolumna `.zp-aside` (na telefonie przed listą): `.zp-shop` „Do kupienia” (d
 relacja do zakupów, pasek `.zp-run` z kreską dnia zakupów `.zp-run-s`, stan + „+ opakowanie” + `.zp-more` „Więcej” z porcjami, tagami,
 usunięciem własnej pozycji), zwinięte `.zp-bulk`. Rozwinięcie sekcji przetrwa zapis (stan w pamięci karty).
 
+### Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja, Dane (Faza 5, klasy `mp-*`, `sp-*`, `sf-*`, `rk-*`, `dn-*`)
+- **Meal Prep:** nagłówek `.hero-tr` (pierścień kroków, następny krok), nawigacja faz `.mp-jump`, karta `.mp-stock` „Składniki na jutro”
+  (braki: potrzeba / zostanie, link do Zapasów), `.prep-card.is-next` (karta z następnym krokiem), `.mp-short` na kartach z brakami,
+  minutnik 44 px; tabele i „Dlaczego tak” w zwijanych panelach `details.panel.fold`.
+- **Suplementacja:** nagłówek `.sp-head` (liczba dawek, „następna pora”, link „do uzupełnienia”), dni w 7 równych kolumnach, oś dnia
+  (`.tl-item.is-past` — tło `--sunken`, `.is-next` — ramka w akcencie i znacznik „następna”), `.sp-stock` pod osią (pilne i średnie,
+  „Kupione”), tabela „Preparaty” z paskiem `.zp-run`.
+- **Bezpieczeństwo:** `.sf-head`, wyszukiwarka 44 px, `.sf-count` z „Wyczyść filtry”, rozwijane „Przechowywanie i opakowanie” 44 px.
+- **Rekompozycja:** `.rk-tools` (wyszukiwanie w treści, „Rozwiń / Zwiń wszystko”), `.rk-hits`, spis treści i sekcje zawężone do trafień.
+- **Dane:** `.dn-head` (tryb uruchomienia, wersja), karta `.dn-sync` na górze (status niewysłanych zmian z ikoną, ostatnie wysłanie /
+  import, przyciski z ikonami; na telefonie przyciski na pełną szerokość), dalej aktualizacja kodu, stan zapisu, kontrola, kopie.
+- **Wspólne:** `details.panel.fold` — zwijany panel treści rzadkiej (Dieta, Meal Prep); `.dot-s.s-*` — kropki statusów zapasów.
+
 ### Dashboard „Dziś” (Faza 4, klasy `dz-*`)
 Nagłówek (`.dz-head`: h1, `.topline` z datą i plakietkami, `.daynav`) → skróty (`.quicklinks`, pigułki z ikonami) →
 siatka `.dz-grid`: karta „Teraz” (`.nowcard.dz-now`, pierścień postępu dnia) · kafle `.stats.dz-kpis` (Dieta, Trening,

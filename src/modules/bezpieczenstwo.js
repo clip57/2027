@@ -2,6 +2,7 @@
 // Dane: Tabela bezpieczeństwa (70 pozycji) + termos (D-013); nazwy wg D-020; brokuły mrożone -> brokuły świeże (D-028).
 import { h, add, plural } from '../ui/dom.js';
 import { segmented } from '../ui/components.js';
+import { icon } from '../ui/icons.js';
 import { SRC } from '../core/data.js';
 import guide from '../data/guide.json' with { type: 'json' };
 
@@ -28,26 +29,29 @@ export function renderBezpieczenstwo(root, ctx) {
   const rows = S.rows.filter(r => (!sec || r.section === sec) && (!link || r.Produkt === link)
     && (!q || Object.values(r).join(' ').toLowerCase().includes(q)));
 
-  add(root, h('h1', {}, 'Bezpieczeństwo żywności'),
+  const filtered = !!(q || sec || link);
+  add(root, h('header', { class: 'sf-head' }, h('h1', {}, 'Bezpieczeństwo żywności'),
+    h('div', { class: 'topline' }, h('span', { class: 'date' }, 'Limity przechowywania z poziomem dowodów'))),
     h('div', { class: 'rules' },
       [['🧊', 'Lodówka', '≤ 4 °C'], ['❄️', 'Zamrażarka', '−18 °C'], ['⏱', 'Poza chłodzeniem', 'maks. 2 h'],
         ['♨️', 'Odgrzewanie', '70 °C / 2 min lub 75 °C / 30 s'], ['🥡', 'Lunch w termosie', 'prosto z patelni, > 63 °C przy jedzeniu']]
         .map(([i, t, v]) => h('div', { class: 'rule' }, h('span', { class: 'rule-i', 'aria-hidden': 'true' }, i), h('span', { class: 'rule-t' }, t), h('strong', {}, v)))),
     h('div', { class: 'sf-search' },
-      h('input', { type: 'search', value: ctx.params.get('q') || '', placeholder: '🔍 Szukaj produktu, miejsca lub ryzyka', 'aria-label': 'Szukaj',
+      h('input', { type: 'search', value: ctx.params.get('q') || '', placeholder: 'Szukaj produktu, miejsca lub ryzyka', 'aria-label': 'Szukaj',
         onchange: e => go({ q: e.target.value, p: '' }) }),
       segmented('Widok', [{ value: 'karty', label: 'Karty' }, { value: 'tabela', label: 'Tabela' }, { value: 'poradnik', label: 'Poradnik' }], mode, m => go({ m }))),
     h('div', { class: 'pills', role: 'group', 'aria-label': 'Kategoria' },
       h('button', { class: `pill-b${!sec ? ' is-on' : ''}`, 'aria-pressed': String(!sec), onclick: () => go({ s: '', p: '' }) }, 'Wszystko'),
       SECTIONS.map(x => h('button', { class: `pill-b${x === sec ? ' is-on' : ''}`, 'aria-pressed': String(x === sec), onclick: () => go({ s: x, p: '' }) }, SHORT(x)))),
-    h('p', { class: 'muted' }, `${rows.length} ${plural(rows.length, 'pozycja', 'pozycje', 'pozycji')}${link ? ` · odesłanie: ${link}` : ''}`));
+    h('div', { class: 'sf-count' }, h('p', { class: 'muted' }, `${rows.length} ${plural(rows.length, 'pozycja', 'pozycje', 'pozycji')}${link ? ` · odesłanie: ${link}` : ''}`),
+      filtered && mode !== 'poradnik' && h('button', { class: 'ghost', onclick: () => go({ q: '', s: '', p: '' }) }, icon('x', { size: 16 }), 'Wyczyść filtry')));
 
   if (mode === 'poradnik') { renderGuide(root, ctx); return; }
   if (mode === 'tabela') {
     add(root, h('div', { class: 'scroll-x' }, h('table', { class: 'data safety-table' },
       h('thead', {}, h('tr', {}, S.columns.map(c => h('th', {}, c)))),
       h('tbody', {}, rows.map(r => h('tr', { class: r.user_decision ? 'is-decision' : null }, S.columns.map(c => h('td', {}, r[c] || ''))))))),
-    h('button', { onclick: () => print() }, '🖨 Drukuj (A4 poziomo)'));
+    h('button', { onclick: () => print() }, 'Drukuj (A4 poziomo)'));
     return;
   }
 

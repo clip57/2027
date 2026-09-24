@@ -104,3 +104,13 @@ export function runway(item, fc, shopInDays) {
   return { days: fc.days, horizon, pct: Math.round((days / horizon) * 1000) / 10, shopPct: Math.round((Math.min(shopInDays, horizon) / horizon) * 1000) / 10,
     beforeShopping: fc.days < shopInDays };
 }
+
+// Pokrycie zużycia wskazanego dnia (`forDate`) stanem na koniec dnia `asOf` — np. „czy mam składniki na jutro”.
+// Wyłącznie plan (zużycie dnia) i dziennik; stock === null = stan nieznany (bez oceny).
+export function coverage(inv, prods, asOf, forDate) {
+  const use = consumptionForDay(forDate);
+  return [...new Set(prods)].filter(p => use[p] > 0).map(p => {
+    const stock = stockAt(inv, p, asOf);
+    return { prod: p, need: round(use[p]), stock, short: stock == null ? null : stock < use[p] - 1e-9 };
+  });
+}

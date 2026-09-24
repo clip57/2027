@@ -1,10 +1,12 @@
 // Moduł Meal Prep (Etap 4): procedury z MEAL_PREP z ilościami wyliczonymi dla aktywnej fazy i wariantu dnia (D-003),
 // progami z D-013, odhaczaniem kroków i zapisem testów kalibracyjnych. Fragmenty z wynikami badań: pakiet prywatny (D-035).
 import { h, clear, fmt, add } from '../ui/dom.js';
-import { section, progressRing } from '../ui/components.js';
+import { progressRing } from '../ui/components.js';
 import { SRC, plan, catalogById } from '../core/data.js';
 import { resolveDay } from '../core/resolver.js';
-import { longDate } from '../core/dates.js';
+import { longDate, addDays, dayShort, shortDate } from '../core/dates.js';
+import { coverage } from '../core/calc/inventory.js';
+import { icon } from '../ui/icons.js';
 
 // {produkt} -> gramatura z planu diety na dany dzień; brak pozycji w planie = jawna informacja
 export function resolveText(text, phase, variant, pack) {
@@ -23,12 +25,15 @@ export function resolveText(text, phase, variant, pack) {
   });
 }
 
+// Produkty katalogu użyte w karcie (znaczniki {produkt} w krokach i notatkach)
+const cardProds = c => [...new Set([...JSON.stringify(c.blocks).matchAll(/\{(\w+)\}/g)].map(m => m[1]).filter(k => catalogById[k]))];
+
 const timerMin = text => { const m = text.match(/(\d+)(?:–(\d+))?\s*min/); return m ? Number(m[2] || m[1]) : null; };
 
 function timer(minutes, label) {
   const out = h('span', { class: 'timer-v' }, `${minutes}:00`);
   let left = minutes * 60, id = null;
-  const btn = h('button', { class: 'timer-b', onclick: () => {
+  const btn = h('button', { class: 'timer-b', 'aria-label': `Minutnik ${minutes} min: ${label}`, onclick: () => {
     if (id) { clearInterval(id); id = null; btn.textContent = 'Start'; return; }
     btn.textContent = 'Stop';
     id = setInterval(() => {
@@ -54,6 +59,13 @@ export function renderMealPrep(root, ctx) {
   const byId = Object.fromEntries(SRC.mealprep.cards.map(c => [c.id, c]));
   const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${today}|${c.id}|${bi * 100 + i}`, text: it, card: c })));
   const allSteps = SRC.mealprep.phases.flatMap(ph => ph.cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
+  // Składniki na jutro (D-074): stan na koniec dziś vs zużycie jutra wg planu — dla produktów używanych w kartach
+  const tomorrow = addDays(today, 1), rt = resolveDay(tomorrow);
+  const inv = store?.state?.inv;
+  const cover = inv ? coverage(inv, SRC.mealprep.cards.filter(c => c.id).flatMap(cardProds), today, tomorrow) : [];
+  const known = cover.filter(x => x.stock != null), short = known.filter(x => x.short);
+  const shortIds = new Set(short.map(x => x.prod));
+  const unitOf = id => catalogById[id]?.unit || '';
   const ringBox = h('div', { class: 'mp-ring' });
   const nextBox = h('div', { class: 'mp-next' });
   const cardBars = {};
@@ -61,6 +73,8 @@ export function renderMealPrep(root, ctx) {
     const n = allSteps.filter(x => state[x.key]).length;
     ringBox.replaceChildren(progressRing(n, allSteps.length, 'Wykonane kroki'), h('span', { class: 'muted' }, `${n} / ${allSteps.length} kroków`));
     const nx = allSteps.find(x => !state[x.key]);
+    document.querySelectorAll('.prep-card.is-next').forEach(el => el.classList.remove('is-next'));
+    if (nx) document.getElementById(`mp-${nx.card.id}`)?.classList.add('is-next');
     nextBox.replaceChildren(nx
       ? h('div', {}, h('p', { class: 'eyebrow' }, `Następny krok · ${nx.card.title}${nx.card.time ? ` · ${nx.card.time}` : ''}`),
           h('p', { class: 'mp-next-t' }, T(nx.text)), h('a', { class: 'btn', href: `#mp-${nx.card.id}` }, 'Przejdź do karty'))
@@ -88,7 +102,17 @@ export function renderMealPrep(root, ctx) {
         h('p', { class: 'muted' }, 'Ilości wyliczone z jadłospisu na dziś.')),
       h('div', { class: 'hero-tr-side' }, ringBox),
       h('div', { class: 'hero-tr-map' }, nextBox)),
-    h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, SRC.mealprep.phases.map((ph, i) => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, ph.title))));
+    h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, SRC.mealprep.phases.map((ph, i) => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, ph.title))),
+    inv && h('section', { class: `mp-stock${short.length ? ' has-short' : ''}`, 'aria-labelledby': 'mp-stock-h' },
+      h('div', { class: 'mp-stock-h' }, h('h2', { id: 'mp-stock-h' }, icon('package-check', { size: 18 }), 'Składniki na jutro'),
+        h('span', { class: 'muted' }, `${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${rt.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'}`)),
+      !known.length ? h('p', { class: 'muted' }, 'Brak stanów składników — ustaw je w module Zapasy.')
+        : short.length === 0 ? h('p', { class: 'mp-ok' }, icon('circle-check', { size: 16 }), `Wszystkie ${known.length} składniki kart wystarczą na jutro.`)
+        : [h('ul', { class: 'mp-short-list' }, short.map(x => h('li', {},
+            h('span', {}, catalogById[x.prod].name),
+            h('span', { class: 'muted' }, `potrzeba ${fmt(x.need, 1)} ${unitOf(x.prod)} · zostanie ${fmt(Math.max(0, x.stock), 1)} ${unitOf(x.prod)}`)))),
+          h('p', { class: 'muted' }, `Wystarczy: ${known.length - short.length} z ${known.length} składników.`),
+          h('a', { class: 'btn', href: '#/zapasy?s=CRITICAL' }, icon('shopping-cart', { size: 18 }), 'Uzupełnij w Zapasach')]));
 
   SRC.mealprep.phases.forEach((ph, pi) => {
     add(root, h('h2', { class: 'prep-phase', id: `mp-ph-${pi}` }, ph.title));
@@ -99,6 +123,8 @@ export function renderMealPrep(root, ctx) {
       const card = h('article', { class: 'prep-card', id: `mp-${c.id}` },
         h('div', { class: 'prep-head' }, h('span', { class: 'prep-ico' }, c.icon), h('h3', {}, c.title),
           c.time && h('span', { class: 'chip' }, c.time), text),
+        cardProds(c).some(k => shortIds.has(k)) && h('p', { class: 'mp-short' }, icon('triangle-alert', { size: 14 }),
+          `Brak na jutro: ${cardProds(c).filter(k => shortIds.has(k)).map(k => catalogById[k].name).join(', ')}`),
         h('span', { class: 'prog-bar mp-bar' }, fill),
         c.blocks.map((b, bi) => {
           if (b.items) {
@@ -137,11 +163,11 @@ export function renderMealPrep(root, ctx) {
     const title = isTest ? 'Testy kalibracyjne' : t.head[0] === 'Wkłady' ? 'Wkłady chłodzące' : `Tabela: ${t.head[0]}`;
     const head = h('tr', {}, t.head.map(x => h('th', {}, x)), isTest && store ? h('th', {}, 'Wynik') : null);
     const body = t.rows.map((row, ri) => h('tr', {}, row.map(cell => h('td', {}, T(cell))), isTest && store ? testCell(ri) : null));
-    add(root, section(`h-t-${t.head[0].slice(0, 6)}`, title,
+    add(root, h('details', { class: 'panel fold' }, h('summary', {}, h('h2', {}, title)),
       h('div', { class: 'scroll-x' }, h('table', { class: 'data' }, h('thead', {}, head), h('tbody', {}, body)))));
   }
 
-  add(root, section('h-why', 'Dlaczego tak', SRC.mealprep.why.map(w =>
+  add(root, h('details', { class: 'panel fold' }, h('summary', {}, h('h2', {}, 'Dlaczego tak')), SRC.mealprep.why.map(w =>
     h('details', { class: 'meal' }, h('summary', {}, h('span', { class: 'meal-n' }, w.title)),
       h('div', { class: 'why-body' }, w.body.map(b => h('p', {}, T(b))))))));
 }

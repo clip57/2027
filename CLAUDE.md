@@ -5,14 +5,16 @@ meal prep, trening, nauka CFA, bezpieczeństwo żywności, plan rekompozycji. Je
 iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych), przeglądarka na komputerze.
 Język interfejsu i dokumentacji: **polski**.
 
-**Bieżące zadanie: redesign UI/UX, Faza 5** (przeniesienie pozostałych modułów na nowy system projektowy).
+**Bieżące zadanie: redesign UI/UX — Faza 5 zakończona; następnie Faza 6–7** (urządzenia, regresja końcowa).
 Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
 24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
 następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
 Faza 5, moduły 3–4 (Dieta, Zapasy jako jeden system; kierunek „premium personal OS” — D-071…D-073) — zakończone,
-raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Następne: Meal Prep, Suplementacja. `main`/Pages = commit `3adcb36` (Trening + CFA).
+raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja,
+Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
+(urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `dbd901d` (do Diety i Zapasów włącznie).
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-073).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-077).
 
 ---
 

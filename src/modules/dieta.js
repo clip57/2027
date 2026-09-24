@@ -111,7 +111,7 @@ export function renderDieta(root, ctx) {
           h('span', { class: 'f-q' }, qty(i.label)), macroLine(i));
       })))),
     // Rzadziej potrzebne informacje — zwinięte
-    h('details', { class: 'panel dt-extra' }, h('summary', {}, h('h2', {}, 'Co zmienia się między fazami')),
+    h('details', { class: 'panel fold dt-extra' }, h('summary', {}, h('h2', {}, 'Co zmienia się między fazami')),
       h('div', { class: 'scroll-x' }, h('table', { class: 'data' },
         h('thead', {}, h('tr', {}, h('th', {}, 'Pozycja'), [0, 1, 2].filter(p => p !== phase).map(p => h('th', {}, `Faza ${phase} → ${p}`)))),
         h('tbody', {}, (() => {
@@ -123,9 +123,9 @@ export function renderDieta(root, ctx) {
           return rows.size === 0 ? [h('tr', {}, h('td', { colspan: String(other.length + 1) }, 'Brak różnic'))]
             : [...rows.entries()].map(([name, v]) => h('tr', {}, h('td', {}, name), other.map(p => h('td', {}, v[p] || '—'))));
         })())))),
-    h('details', { class: 'panel dt-extra' }, h('summary', {}, h('h2', {}, 'Zamienniki (opcjonalnie)')),
+    h('details', { class: 'panel fold dt-extra' }, h('summary', {}, h('h2', {}, 'Zamienniki (opcjonalnie)')),
       h('ul', { class: 'food' }, s.optional.map(o => h('li', {}, h('span', { class: 'f-n' }, o.name), h('span', { class: 'f-q' }, qty(o.label)), macroLine(o))))),
-    h('details', { class: 'panel dt-extra' }, h('summary', {}, h('h2', {}, 'Przyprawy')), h('p', { class: 'chips' }, s.spices.map(x => h('span', { class: 'chip' }, x)))));
+    h('details', { class: 'panel fold dt-extra' }, h('summary', {}, h('h2', {}, 'Przyprawy')), h('p', { class: 'chips' }, s.spices.map(x => h('span', { class: 'chip' }, x)))));
 
   add(root, h('div', { class: 'dt-grid' }, aside, main));
 }

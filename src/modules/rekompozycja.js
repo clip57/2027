@@ -1,6 +1,7 @@
 // Moduł Rekompozycja (Etap 6): dokument PLAN_REKOMPOZYCJI po zaakceptowanych zmianach (D-049, D-050).
 // Sekcje 1 i 21 oraz zdania z danymi osobowymi i medycznymi pochodzą z pakietu prywatnego (D-035).
-import { h, add } from '../ui/dom.js';
+import { h, add, plural } from '../ui/dom.js';
+import { icon } from '../ui/icons.js';
 import rekomp from '../data/rekomp.json' with { type: 'json' };
 
 const BOX = { key: ['📌', 'Najważniejsze'], cal: ['🗓', 'Harmonogram'], stop: ['⛔', 'Uwaga'], go: ['✅', 'Tak działaj'] };
@@ -49,15 +50,29 @@ function privateSection(id, pack) {
 export function renderRekompozycja(root, ctx) {
   const pack = ctx.store?.state?.privatePack || null;
   const open = ctx.params.get('s');
+  // Szukanie w planie (D-076): sekcje z trafieniem rozwinięte, pozostałe ukryte — tylko widok, treść bez zmian
+  const q = (ctx.params.get('q') || '').trim().toLowerCase();
+  const textOf = s => JSON.stringify(s.blocks || '').toLowerCase() + ' ' + s.title.toLowerCase();
+  const hits = q ? rekomp.sections.filter(s => textOf(s).includes(q)) : null;
+  const setAll = v => document.querySelectorAll('.rk-sec').forEach(d => { d.open = v; });
   add(root,
     h('section', { class: 'hero-tr rk-hero' }, h('div', { class: 'hero-tr-main' },
       h('p', { class: 'eyebrow' }, 'Plan indywidualny · punkt startowy 21.09.2026'),
       h('h1', {}, 'Plan rekompozycji'),
       h('p', { class: 'muted' }, 'Dieta, trening, regeneracja i monitoring — z uwzględnieniem Twoich decyzji. Sekcje i zdania z danymi medycznymi pochodzą z pakietu prywatnego.'),
       !pack && h('p', { class: 'priv-miss block' }, '🔒 Pakiet prywatny nie jest zaimportowany — część treści jest ukryta.'))),
-    h('nav', { class: 'rk-toc', 'aria-label': 'Spis treści' }, rekomp.sections.map(s =>
+    h('div', { class: 'rk-tools' },
+      h('label', { class: 'rk-search' }, h('span', { class: 'sr-only' }, 'Szukaj w planie'),
+        h('input', { type: 'search', value: ctx.params.get('q') || '', placeholder: 'Szukaj w planie (np. kreatyna, sen, sauna)',
+          onchange: e => { const v = e.target.value.trim(); location.hash = v ? `#/rekompozycja?q=${encodeURIComponent(v)}` : '#/rekompozycja'; } })),
+      h('button', { onclick: () => setAll(true) }, icon('chevron-down', { size: 16 }), 'Rozwiń wszystko'),
+      h('button', { onclick: () => setAll(false) }, 'Zwiń wszystko')),
+    hits && h('p', { class: 'muted rk-hits', role: 'status' }, hits.length
+      ? `„${ctx.params.get('q')}”: ${hits.length} ${plural(hits.length, 'sekcja', 'sekcje', 'sekcji')}`
+      : `Brak „${ctx.params.get('q')}” w treści planu (fragmenty z pakietu prywatnego nie są przeszukiwane).`),
+    h('nav', { class: 'rk-toc', 'aria-label': 'Spis treści' }, (hits || rekomp.sections).map(s =>
       h('a', { href: `#/rekompozycja?s=${s.id}`, class: `rk-toc-a${s.id === open ? ' is-on' : ''}` }, h('span', { class: 'rk-n' }, s.num), s.title, s.private && h('span', { 'aria-label': 'prywatne' }, ' 🔒')))),
-    rekomp.sections.map(s => h('details', { class: 'rk-sec', id: `rk-${s.id}`, open: s.id === open || null },
+    (hits || rekomp.sections).map(s => h('details', { class: 'rk-sec', id: `rk-${s.id}`, open: s.id === open || (hits && hits.length <= 3) || null },
       h('summary', {}, h('span', { class: 'rk-n' }, s.num), h('span', { class: 'rk-t' }, s.title), s.private && h('span', { class: 'rk-lock' }, '🔒')),
       h('div', { class: 'rk-body' }, s.private ? privateSection(s.id, pack) : s.blocks.map(b => block(b, pack))))));
   if (open) requestAnimationFrame(() => document.getElementById(`rk-${open}`)?.scrollIntoView({ block: 'start' }));
