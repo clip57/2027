@@ -1,6 +1,6 @@
 # REDESIGN-DECISIONS — decyzje obowiązujące przy redesignie
 
-Źródło: `docs/DECYZJE_2027.md` (pełny rejestr D-001…D-064, brzmienie nadrzędne) oraz historia projektu.
+Źródło: `docs/DECYZJE_2027.md` (pełny rejestr D-001…D-070, brzmienie nadrzędne) oraz historia projektu.
 Kolumna „Potwierdzenie” mówi, gdzie decyzja jest widoczna w kodzie/testach. Pozycje oznaczone **[do weryfikacji]**
 nie mają pełnego potwierdzenia w kodzie lub u użytkownika.
 
@@ -42,12 +42,25 @@ nie mają pełnego potwierdzenia w kodzie lub u użytkownika.
 | D-061 | Motyw domyślnie ciemny; przełącznik ciemny/jasny/systemowy; preferencje UI per urządzenie w localStorage, poza synchronizacją | `src/ui/prefs.js`, `index.html`, E2E |
 | D-062 | Panel boczny: grupy Dzień/Trening/Dieta/Nauka/System, ikony Lucide; telefon: Dziś, Dieta, Trening, CFA + Więcej | `registry.js`, `app.js`, E2E |
 | D-063 | Akcent indygo `#4845D2` (jasny) / `#A5A8FF` (ciemny) | `tokens.css`, a11y |
-| D-055 | Kolory statusów jako tokeny z wariantem dla obu motywów; audyt axe-core jako stały test | `npm run a11y` |
+| D-055 | Kolory statusów jako tokeny z wariantem dla obu motywów; audyt axe-core jako stały test | `npm run a11y` (od Fazy 5.0 także stany: `STATES`), `tests/unit/tokens.test.mjs` |
+
+## C2. Decyzje Fazy 5.0 (stabilizacja, 24.09.2026)
+| ID | Treść | Potwierdzenie |
+|---|---|---|
+| D-065 | Dane syntetyczne w testach bez plików użytkownika (fikcyjne, generowane, tylko w katalogu tymczasowym) | `tests/e2e/fixtures.py`, `e2e.py`, `sync_update.py` |
+| D-066 | Odnośniki `#id` w obrębie strony: przewinięcie + fokus, bez zmiany trasy | `app.js` (`inPageLink`), E2E „Meal Prep: skrót fazy…” |
+| D-067 | `theme-color` i manifest w kolorze motywu domyślnego (ciemny); `status-bar-style` bez zmian (`default`) | `src/index.html`, `public/manifest.webmanifest` |
+
+## C3. Decyzje Fazy 5 — Trening i CFA (24.09.2026)
+| ID | Treść | Potwierdzenie |
+|---|---|---|
+| D-068 | Licznik przerwy: tylko dzień bieżący, czas z planu, stan lokalny (bez zdarzeń, bez synchronizacji) | `trening.js` (`restBar`), `calc/training.js` (`restSeconds`), E2E z zegarem, unit |
+| D-069 | Karta „Następna seria” i podsumowanie sesji — wyłącznie z planu i dziennika | `trening.js`, `calc/training.js` (`nextSet`), E2E, unit |
+| D-070 | CFA: zaległe = przed dziś i nieodhaczone; panel zaległych, filtr w harmonogramie, filtr/wyszukiwanie error logu | `cfa.js`, `calc/cfa.js` (`cfaPace`), E2E z zegarem, unit |
 
 Decyzje użytkownika wydane przed Fazą 3 (w rozmowie, zapisane jako D-060…D-063): mobile 4 + Więcej (Dziś, Dieta, Trening, CFA);
 grupy panelu jw. „o ile analiza kodu potwierdzi” — **potwierdzone** polem `domain` w rejestrze; motyw „systemowy jako domyślny
-… (ale domyślnie dark)” — **interpretacja przyjęta: domyślnie ciemny + przełącznik z opcją systemowego; interpretacja nie została
-jeszcze wprost zatwierdzona przez użytkownika [do weryfikacji]**; akcent indygo dobrany wg WCAG; Lucide; Inter tylko przy
+… (ale domyślnie dark)” — **interpretacja: domyślnie ciemny + przełącznik z opcją systemowego — zatwierdzona przez użytkownika 24.09.2026**; akcent indygo dobrany wg WCAG; Lucide; Inter tylko przy
 nieistotnym wzroście paczki — spełnione przez podzbiór.
 
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)

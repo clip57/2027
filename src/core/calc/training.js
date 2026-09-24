@@ -83,3 +83,17 @@ export function streakWeeks(train, sess, today) {
   while (ws.has(w)) { n++; w = addDays(w, -7); }
   return n;
 }
+
+// Przerwa między seriami z planu („2–3 min”, „90 s”, „2 min”) → { min, max } w sekundach; null, gdy zapis nieczytelny.
+export function restSeconds(text) {
+  const m = String(text || '').trim().match(/^(\d+)(?:\s*[–-]\s*(\d+))?\s*(min|s)\b/);
+  if (!m) return null;
+  const k = m[3] === 'min' ? 60 : 1;
+  return { min: Number(m[1]) * k, max: Number(m[2] || m[1]) * k };
+}
+
+// Następna seria do wykonania: pierwsza nieodhaczona seria w kolejności planu (plan: [{ e, n }], n = serie w fazie).
+export function nextSet(plan, train, date) {
+  for (const { e, n } of plan) for (let s = 1; s <= n; s++) if (!train[`${date}|${e.id}|${s}`]?.done) return { e, set: s, of: n };
+  return null;
+}

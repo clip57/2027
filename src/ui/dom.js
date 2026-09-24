@@ -5,7 +5,8 @@ export function h(tag, props = {}, ...children) {
     if (v == null || v === false) continue;
     if (k === 'class') el.className = v;
     else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2).toLowerCase(), v);
-    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    // Zmienne CSS (--nazwa) wymagają setProperty — przypisanie przez Object.assign byłoby po cichu pominięte.
+    else if (k === 'style' && typeof v === 'object') for (const [p, x] of Object.entries(v)) { if (p.startsWith('--')) el.style.setProperty(p, x); else el.style[p] = x; }
     else el.setAttribute(k, v === true ? '' : String(v));
   }
   for (const c of children.flat(Infinity)) if (c != null && c !== false) el.append(c instanceof Node ? c : document.createTextNode(String(c)));

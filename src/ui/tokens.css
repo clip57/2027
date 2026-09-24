@@ -14,11 +14,12 @@
   /* Typografia (Inter lokalnie, podzbiór znaków aplikacji; awaryjnie font systemowy) */
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-round: var(--font);
-  --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.5rem;
+  --fs-2xs: .6875rem; --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.5rem; --fs-stat: var(--fs-xl);
   /* Odstępy (siatka 4 px) */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
   /* Promienie (4 poziomy) */
   --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-full: 999px;
+  --r-in: calc(var(--r-md) - 4px);                      /* element wewnątrz toru z paddingiem 4 px (segmenty, motyw) */
   --r-1: var(--r-md); --r-2: var(--r-lg);                  /* aliasy dotychczasowych nazw */
   /* Ruch */
   --dur-1: 120ms; --dur-2: 200ms; --ease: cubic-bezier(.2, .8, .2, 1);
@@ -32,14 +33,18 @@
   --border: #e5e2dc; --border-strong: #8f8b83;
   --accent: #4845d2; --accent-ink: #ffffff; --accent-soft: #ecebfb;
   --success: #11632f; --warning: #8a4204; --danger: #9b1c16; --info: #4845d2;
+  --on-success: #ffffff;                                   /* tekst/ikona na wypełnieniu --success (≥ 4,5:1) */
   --e1: 0 1px 2px rgb(20 20 30 / .05), 0 1px 1px rgb(20 20 30 / .03);
   --e2: 0 12px 32px rgb(20 20 30 / .12), 0 2px 6px rgb(20 20 30 / .06);
+  --e-raise: 0 1px 3px rgb(20 20 30 / .14);               /* aktywny element toru (segment, motyw) */
+  --scrim: rgb(5 6 10 / .45);                              /* tło pod oknem */
   /* domeny (sygnatura modułu — ikona, pasek, kropka) */
   --cfa: #1e40af; --train: #8a3324; --regen: #6b21a8;
   --p-col: #1d4ed8; --c-col: #92400e; --f-col: #5b21b6; --org: #0b5f75;
   --warn-bg: #fff4d6; --warn-ink: #6b4a00; --err-bg: #fde4e4; --ok-ink: #15603a;
 }
-/* ---- Motyw ciemny (ręcznie wybrany albo systemowy) — wspólna definicja ---- */
+/* ---- Motyw ciemny (ręcznie wybrany albo systemowy). Oba bloki niżej MUSZĄ być identyczne
+   (pilnuje tego tests/unit/tokens.test.mjs, który sprawdza też kontrast par tokenów) ---- */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #0d0f13; --surface: #15181e; --surface-2: #1c2028; --sunken: #0a0b0e;
@@ -47,6 +52,7 @@
   --border: #262a33; --border-strong: #666e7c;
   --accent: #a5a8ff; --accent-ink: #0d0f13; --accent-soft: #23254a;
   --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
+  --on-success: #0d0f13; --e-raise: 0 1px 3px rgb(0 0 0 / .5); --scrim: rgb(5 6 10 / .6);
   --e1: 0 0 0 transparent; --e2: 0 16px 40px rgb(0 0 0 / .5);
   --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff;
   --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
@@ -59,6 +65,7 @@
   --border: #262a33; --border-strong: #666e7c;
   --accent: #a5a8ff; --accent-ink: #0d0f13; --accent-soft: #23254a;
   --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
+  --on-success: #0d0f13; --e-raise: 0 1px 3px rgb(0 0 0 / .5); --scrim: rgb(5 6 10 / .6);
   --e1: 0 0 0 transparent; --e2: 0 16px 40px rgb(0 0 0 / .5);
   --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff;
   --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;

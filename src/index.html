@@ -2,11 +2,10 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<script>/* motyw przed pierwszym renderem (domyślnie ciemny, preferencja per urządzenie) */try{var t=localStorage.getItem("p2027.theme");if(t!=="system")document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-theme","dark")}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#f3f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f141a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0d0f13">
+<script>/* motyw przed pierwszym renderem (domyślnie ciemny, preferencja per urządzenie) + kolor paska przeglądarki (= --bg) */(function(){var t;try{t=localStorage.getItem("p2027.theme")}catch(e){}if(t!=="system")document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.querySelector('meta[name="theme-color"]').setAttribute("content","#f6f5f2")})()</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="2027">

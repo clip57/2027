@@ -6,6 +6,8 @@ D) przejście ze starego service workera (wersja obecnie zainstalowana na urząd
 Uruchomienie: SOURCES_DIR=… python3 tests/e2e/sync_update.py   (wymaga Playwright + Chromium; buduje dist/ kilka razy)."""
 import asyncio, json, os, pathlib, shutil, subprocess, sys, tempfile, threading, http.server, datetime as dt
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixtures
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BACKUP = pathlib.Path(os.environ.get('SOURCES_DIR', '/nonexistent')) / 'zapasy_kopia_2026-09-22.json'
@@ -84,17 +86,10 @@ async def main():
         for p in (desk, phone): await p.add_init_script('delete Navigator.prototype.share; delete Navigator.prototype.canShare;')
 
         # ---------- A) ręczna synchronizacja danych ----------
-        if BACKUP.exists():
-            await desk.goto(URL); await import_file(desk, BACKUP)
-        else:
-            skip('import kopii ZAPASY — brak SOURCES_DIR (stan startowy ustawiany ręcznie, reszta scenariusza działa)')
-            await desk.goto(URL + '#/zapasy?q=Banan'); await desk.wait_for_selector('.inv-item')
-            await desk.locator('.inv-item').first.locator('input[type=number]').fill('240'); await desk.locator('.inv-item').first.locator('input[type=number]').press('Tab')
-            await desk.wait_for_selector('text=Banan: stan 240 g')   # potwierdzenie zapisu przed dalszymi krokami (bez wyścigu)
-            # wartości TESTOWE (nie dane użytkownika): scenariusz niezależnych zmian używa też kefiru
-            await desk.goto(URL + '#/zapasy?q=Kefir'); await desk.wait_for_selector('.inv-item')
-            await desk.locator('.inv-item').first.locator('input[type=number]').fill('800'); await desk.locator('.inv-item').first.locator('input[type=number]').press('Tab')
-            await desk.wait_for_selector('text=Kefir 1,5%: stan 800 ml/g')
+        # stan startowy: kopia użytkownika (SOURCES_DIR) albo SYNTETYCZNA kopia z fikcyjnymi wartościami (tests/e2e/fixtures.py)
+        start = BACKUP if BACKUP.exists() else fixtures.write(fixtures.synthetic_zapasy()[0], 'zapasy_syntetyczne.json')
+        await desk.goto(URL); await import_file(desk, start)
+        ok(await stock(desk, 'Kefir') is not None and await stock(desk, 'Banan') is not None, f'A: stan startowy zaimportowany ({"kopia użytkownika" if BACKUP.exists() else "dane syntetyczne"})')
         await desk.goto(URL + '#/zapasy?q=Banan'); await desk.wait_for_selector('.inv-item')
         await desk.locator('.inv-item').first.get_by_role('button', name='+ opakowanie', exact=False).click(); await desk.wait_for_timeout(400)
         d_ban = await stock(desk, 'Banan')
@@ -148,6 +143,9 @@ async def main():
             raise
         await upd.wait_for_timeout(2500)
         ok((await ver()).endswith('-v1'), 'C: nowa wersja pobrana, ale BEZ automatycznego przeładowania')
+        await upd.evaluate("document.querySelector('main').dataset.probe = '1'; document.dispatchEvent(new Event('visibilitychange'))")
+        await upd.wait_for_timeout(1500)
+        ok(await upd.evaluate("document.querySelector('main').dataset.probe") == '1', 'C: kolejny powrót na ekran przy czekającej wersji nie przerysowuje widoku (wpis nie ginie)')
         async with upd.expect_navigation():
             await upd.get_by_role('button', name='Nowa wersja — odśwież').first.click()
         ok((await ver()).endswith('-v2'), 'C: po kliknięciu użytkownika działa v2')

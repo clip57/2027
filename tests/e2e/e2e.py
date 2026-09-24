@@ -2,20 +2,34 @@
 Uruchomienie: python3 tests/e2e/e2e.py  (wymaga dist/ oraz opcjonalnie SOURCES_DIR z kopią ZAPASY)."""
 import asyncio, json, os, sys, threading, http.server, functools, tempfile, pathlib
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixtures
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BACKUP = os.environ.get('SOURCES_DIR') and pathlib.Path(os.environ['SOURCES_DIR']) / 'zapasy_kopia_2026-09-22.json'
 ROUTES = ['#/bezpieczenstwo?m=poradnik', '#/rekompozycja', '#/rekompozycja?s=s6', '#/bezpieczenstwo', '#/bezpieczenstwo?m=tabela', '#/trening?v=stat', '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/dzis?d=2026-10-03', '#/trening', '#/trening?d=2026-09-24', '#/zapasy', '#/mealprep', '#/dieta?f=1&w=NT', '#/suplementy?d=2026-09-24', '#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-24', '#/dane', '#/wiecej', '#/dieta', '#/zapasy', '#/trening', '#/cfa', '#/suplementy', '#/bezpieczenstwo']
 results = []
+# Kontrast tekstu elementu względem jego własnego (nieprzezroczystego) tła — WCAG; stany, których axe nie widzi.
+CONTRAST = '''el => { const px = c => { const x = document.createElement('canvas').getContext('2d'); x.fillStyle = c; x.fillRect(0, 0, 1, 1); return [...x.getImageData(0, 0, 1, 1).data]; };
+  const L = ([r, g, b]) => [r, g, b].map(v => v / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0);
+  const s = getComputedStyle(el), a = L(px(s.color)), b = L(px(s.backgroundColor)); return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05); }'''
 
 # Oczekiwany stan liczony niezależnie od kodu aplikacji (D-027: stan na koniec 22.09, odliczanie od 23.09).
 import datetime as _dt
-def expected_stock(start, per_day):
-    d, q, today = _dt.date(2026, 9, 23), start, _dt.date.today()
+def expected_stock(start, per_day, since=_dt.date(2026, 9, 22)):
+    d, q, today = since + _dt.timedelta(days=1), start, _dt.date.today()
     while d <= today:
         q -= per_day(d); d += _dt.timedelta(days=1)
     return q
-BANAN = lambda: expected_stock(240, lambda d: 0 if d.weekday() == 3 else 120)       # czwartek (NT) bez banana
+# Dane do bloku zapasów: prawdziwa kopia użytkownika (SOURCES_DIR) albo SYNTETYCZNA kopia z fikcyjnymi wartościami
+# (tests/e2e/fixtures.py) — dzięki temu funkcje Zapasów, Meal Prep, eksportu i importu są sprawdzane także bez plików użytkownika.
+if BACKUP and BACKUP.exists():
+    DATA = {'label': '', 'path': BACKUP, 'events': 55, 'ban': 240, 'since': _dt.date(2026, 9, 22)}
+else:
+    _obj, _n, _stocks = fixtures.synthetic_zapasy()
+    DATA = {'label': ' (dane syntetyczne)', 'path': fixtures.write(_obj, 'zapasy_syntetyczne.json'), 'events': _n,
+            'ban': _stocks['banan'], 'since': _dt.date.fromisoformat(_obj['lastSyncDate'])}
+BANAN = lambda: expected_stock(DATA['ban'], lambda d: 0 if d.weekday() == 3 else 120, DATA['since'])   # czwartek (NT) bez banana
 GLUKO = lambda: expected_stock(180, lambda d: 1 if d <= _dt.date(2027, 3, 21) else 0)
 def ok(cond, msg): results.append((bool(cond), msg)); print(('OK  ' if cond else 'BŁĄD'), msg)
 skipped = []
@@ -69,6 +83,9 @@ async def run_variant(pw, name, url, mobile):
         ok(await pg.locator('.tabs a svg[aria-hidden=true]').count() == 5, f'{tag} Pasek dolny: ikony dekoracyjne z etykietą tekstową')
         await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
         ok(await pg.locator('.more-list a').count() == 6, f'{tag} Więcej: 6 pozostałych modułów w grupach')
+        dcs = await pg.eval_on_selector_all('.more-list a', 'e => e.map(a => a.style.getPropertyValue("--dc"))')
+        ok(all(dcs) and await pg.eval_on_selector('.more-ic', 'e => getComputedStyle(e).color') != await pg.eval_on_selector('.more-n', 'e => getComputedStyle(e).color'),
+           f'{tag} Więcej: ikony w kolorze domeny modułu (zmienna --dc ustawiona)')
         await pg.get_by_role('button', name='Motyw: Jasny').click(); await pg.wait_for_timeout(200)
         await pg.reload(); await pg.wait_for_selector('.more-list')
         ok(await pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'light', f'{tag} Motyw: wybór jasnego zapamiętany po przeładowaniu')
@@ -87,6 +104,21 @@ async def run_variant(pw, name, url, mobile):
     kp = await pg.inner_text('.dz-kpis')
     ok('2629 kcal' in kp and '/ 10' in kp and '/ 8 bloków' in kp, f'{tag} Dziś: kafle z danych (kcal, serie, bloki CFA)')
     ok(await pg.locator('.dz-aside .dz-card').count() >= 4 and 'Plan dnia' in await pg.inner_text('main'), f'{tag} Dziś: karty podsumowań i plan dnia')
+    # --- Faza 5.0: regresje wykryte w audycie (nawigacja w obrębie strony, sygnatury modułów, zmienne CSS)
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    await pg.locator('.mp-jump a').nth(1).click(); await pg.wait_for_timeout(700)
+    top = await pg.evaluate("document.getElementById('mp-ph-1').getBoundingClientRect().top")
+    ok(await pg.evaluate('location.hash') == '#/mealprep' and await pg.locator('.prep-card').count() > 0 and -5 <= top < 200,
+       f'{tag} Meal Prep: skrót fazy przewija do sekcji i zostaje w module (top {top:.0f}px)')
+    ok(await pg.evaluate("document.activeElement.id") == 'mp-ph-1', f'{tag} Meal Prep: fokus na sekcji docelowej skrótu')
+    await pg.get_by_text('Przejdź do karty').click(); await pg.wait_for_timeout(700)
+    ok(await pg.evaluate('location.hash') == '#/mealprep' and 'Meal Prep' in await pg.inner_text('main h1'), f'{tag} Meal Prep: „Przejdź do karty” zostaje w module')
+    await pg.goto(url + '#/dieta?f=0&w=T'); await pg.wait_for_selector('.meal')
+    stripe = await pg.eval_on_selector('.meal[data-meal="dinner"]', 'e => [getComputedStyle(e).borderLeftColor, getComputedStyle(e).borderTopColor]')
+    ok(stripe[0] != stripe[1], f'{tag} Dieta: kolorowa krawędź posiłku zachowana ({stripe[0]})')
+    await pg.goto(url + '#/bezpieczenstwo?m=poradnik'); await pg.wait_for_selector('.gd-rt', state='attached')   # w zwiniętej sekcji
+    stripe = await pg.eval_on_selector('.gd-rt', 'e => [getComputedStyle(e).borderLeftColor, getComputedStyle(e).borderTopColor]')
+    ok(stripe[0] != stripe[1], f'{tag} Poradnik: kolorowa krawędź karty zachowana')
 
     # --- Etap 3: Dziś, Dieta, Suplementacja
     await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.stats')
@@ -129,6 +161,8 @@ async def run_variant(pw, name, url, mobile):
     await pg.reload(); await pg.wait_for_selector('.ex')
     ok(await pg.locator(SETS).first.locator('.set-toggle').get_attribute('aria-pressed') == 'true' and await pg.locator(SETS).first.locator('input[placeholder=kg]').input_value() == '45',
        f'{tag} Trening: seria i ciężar zapisane trwale')
+    c = await pg.locator(SETS).first.locator('.set-toggle').evaluate(CONTRAST)
+    ok(c >= 4.5, f'{tag} Trening: kontrast odhaczonej serii ≥ 4,5:1 ({c:.2f})')
     ok('1 / 10 serii' in await pg.inner_text('.hero-tr'), f'{tag} Trening: pierścień postępu sesji')
     await pg.locator(SETS).nth(1).locator('.set-copy').click(); await pg.wait_for_timeout(500)
     ok(await pg.locator(SETS).nth(1).locator('input[placeholder=kg]').input_value() == '45', f'{tag} Trening: kopiowanie wartości z poprzedniej serii')
@@ -150,8 +184,8 @@ async def run_variant(pw, name, url, mobile):
     ok('Wskazówka 2 /' in await pg.inner_text('dialog .mv-cues'), f'{tag} Trening: wskazówki krok po kroku')
     await pg.locator('dialog .sheet-head button').click()
     # czas treningu
-    await pg.get_by_role('button', name='▶ Rozpocznij trening').click(); await pg.wait_for_selector('.tm-clock')
-    await pg.get_by_role('button', name='⏹ Zakończ trening').click(); await pg.wait_for_timeout(500)
+    await pg.get_by_role('button', name='Rozpocznij trening').click(); await pg.wait_for_selector('.tm-clock')
+    await pg.get_by_role('button', name='Zakończ trening').click(); await pg.wait_for_timeout(500)
     await pg.locator('.tm-man input').fill('72'); await pg.locator('.tm-man input').press('Tab'); await pg.wait_for_timeout(500)
     await pg.reload(); await pg.wait_for_selector('.ex')
     ok('Zapisano: 72 min' in await pg.evaluate("document.querySelector('.tm').textContent"), f'{tag} Trening: czas treningu zapisany trwale')
@@ -207,6 +241,8 @@ async def run_variant(pw, name, url, mobile):
     await pg.reload(); await pg.wait_for_selector('.cfa-row')
     ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 416' in await pg.inner_text('.hero-cfa'),
        f'{tag} CFA: postęp zapisany trwale')
+    c = await pg.locator('.cfa-row .set-toggle').first.evaluate(CONTRAST)
+    ok(c >= 4.5, f'{tag} CFA: kontrast odhaczonego bloku ≥ 4,5:1 ({c:.2f})')
     await pg.goto(url + '#/cfa?v=harmonogram&kat=Schweser'); await pg.wait_for_selector('.filters')
     ok('75 bloków' in await pg.inner_text('.filters'), f'{tag} CFA: filtr kategorii (Schweser = 75 bloków)')
     await pg.goto(url + '#/cfa?v=kalendarz'); await pg.wait_for_selector('.cal')
@@ -236,119 +272,122 @@ async def run_variant(pw, name, url, mobile):
         small = await pg.evaluate('''[...document.querySelectorAll('button, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length''')
         ok(small == 0, f'{tag} elementy dotykowe ≥ 44 px (za małych: {small})')
     # --- import kopii ZAPASY przez interfejs
-    if BACKUP and BACKUP.exists():
-        await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
-        await pg.set_input_files('input[type=file]', str(BACKUP))
-        await pg.wait_for_selector('dialog[open]')
-        txt = await pg.inner_text('dialog')
-        ok('Nowe zmiany' in txt and '55' in txt, f'{tag} podgląd importu kopii ZAPASY: 55 zmian (51 stanów + 3 suplementy D-015 + archiwum)')
-        await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano 55 zmian')
-        backup = json.loads(BACKUP.read_text(encoding='utf8'))
-        await pg.reload(); await pg.wait_for_selector('table.data')
-        rows = await pg.eval_on_selector_all('table.data tbody tr', 'e => e.map(r => [...r.children].map(c => c.textContent))')
-        by = {r[0]: r for r in rows}
-        ok(by.get('Banan', [None, ''])[1].startswith(f'{BANAN():g} '), f'{tag} po przeładowaniu stan zachowany: Banan {by.get("Banan", ["", "?"])[1]} (oczekiwane {BANAN():g} g)')
-        ok(by.get('Glukozamina', [None, ''])[1].startswith(f'{GLUKO():g} '), f'{tag} glukozamina {GLUKO():g} kaps. (D-015, odliczanie od 23.09)')
-        ok(by.get('Cynk', ['', '', '', ''])[3] == 'Nieśledzony', f'{tag} cynk nieśledzony (D-016)')
-        ok(len(rows) == 55, f'{tag} tabela kontroli: {len(rows)} pozycji')
-        # --- eksport i ponowny import (idempotencja)
-        async with pg.expect_download() as dl:
-            await pg.get_by_role('button', name='Wyślij do iCloud').click()
-        d = await dl.value
-        path = await d.path()
-        bundle = json.loads(pathlib.Path(path).read_text(encoding='utf8'))
-        ok(bundle['format'] == '2027-sync' and bundle['count'] >= 55 and bundle['count'] == len(bundle['events']) and len(bundle['sha256']) == 64, f'{tag} eksport 2027-sync.json: {bundle["count"]} zmian, suma kontrolna')
-        await pg.wait_for_selector('text=Wszystkie zmiany z tego urządzenia zostały wysłane')
-        ok(True, f'{tag} po eksporcie brak niewysłanych zmian')
-        tmp = pathlib.Path(tempfile.mkdtemp()) / '2027-sync.json'; tmp.write_text(json.dumps(bundle), encoding='utf8')
-        await pg.set_input_files('input[type=file]', str(tmp)); await pg.wait_for_selector('dialog[open]')
-        txt = await pg.inner_text('dialog')
-        ok('Scal dane' not in txt and 'Już znane' in txt, f'{tag} ponowny import tego samego pliku: 0 nowych zmian')
-        await pg.click('dialog >> text=Zamknij')
-        # --- Etap 4: Zapasy i Meal Prep na danych z kopii
-        await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
-        inv = await pg.inner_text('main')
-        ok('55' in await pg.inner_text('.dash'), f'{tag} Zapasy: 55 pozycji')
-        for lab in ['Dodaj', 'Zakupy', 'Paragon', 'Cofnij', 'Historia', 'Status AI', 'Kopia']:
-            ok(await pg.locator('.actions').get_by_text(lab, exact=False).count() > 0, f'{tag} Zapasy: przycisk {lab}')
-        ok(await pg.locator('.pills .pill-b').count() == 9, f'{tag} Zapasy: 9 kategorii')
-        ok(await pg.locator('.counters .counter').count() == 3, f'{tag} Zapasy: liczniki statusów')
-        tags = await pg.inner_text('.inv')
-        ok('ŚWIEŻE (≤7D)' in tags and 'TRWAŁE (>7D)' in tags and 'SUPLEMENT' in tags, f'{tag} Zapasy: klasyfikacja wg terminu przydatności')
-        ok(any(b in tags for b in ['🚨 < 2 dni', '⚠️ Niski (2-3.9d)', '🟢 OK (≥4d)', '⛔ BRAK (0)']), f'{tag} Zapasy: statusy świeżych wg progów 2/4 dni')
-        ok('Wystarczy do:' in tags and ('✓ Wystarczy do zakupów' in tags or 'przed zakupami' in tags), f'{tag} Zapasy: prognoza w formacie v31')
-        await pg.get_by_role('button', name='🛒 Zakupy').click(); await pg.wait_for_selector('dialog.sheet')
-        ok(await pg.locator('dialog .shop-list li').count() > 0, f'{tag} Zapasy: okno planu zakupów z listą')
-        await pg.locator('dialog .shop-list input[type=checkbox]').first.check()
-        ok('1 / ' in await pg.inner_text('dialog .prog'), f'{tag} Zapasy: pasek postępu zakupów')
-        await pg.locator('dialog .sheet-head button').click()
-        await pg.get_by_role('button', name='💾 Kopia').click(); await pg.wait_for_selector('dialog.sheet')
-        ok('Pobierz kopię' in await pg.inner_text('dialog'), f'{tag} Zapasy: okno kopii zapasowej w module')
-        await pg.locator('dialog .sheet-head button').click()
-        await pg.get_by_role('button', name='Suplementy', exact=False).first.click(); await pg.wait_for_timeout(300)
-        ok(await pg.locator('.inv-item').count() == 14, f'{tag} Zapasy: kategoria Suplementy (14 pozycji)')
-        await pg.get_by_role('button', name='Wszystko').click(); await pg.wait_for_timeout(200)
-        ok('wystarczy do' in inv.lower(), f'{tag} Zapasy: prognoza wyczerpania')
-        # pozycja zużywana KAŻDEGO dnia (także w czwartek) — test korekty dnia niezależny od dnia tygodnia
-        await pg.goto(url + '#/zapasy?q=Płatki'); await pg.wait_for_selector('.inv-item')
-        before = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
-        await pg.locator('.inv-item').first.get_by_role('button', name='+ opakowanie', exact=False).click()
-        await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
-        after = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
-        ok(float(after) > float(before), f'{tag} Zapasy: zakup opakowania zwiększa stan ({before} → {after})')
-        await pg.reload(); await pg.wait_for_selector('.inv-item')
-        kept = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
-        ok(kept == after, f'{tag} Zapasy: zmiana stanu zapisana trwale')
-        await pg.get_by_role('button', name='↩ Cofnij').click()
-        await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value === v', arg=before, timeout=8000)
-        ok(True, f'{tag} Zapasy: cofnięcie ostatniej zmiany przywraca stan')
-        await pg.get_by_role('button', name='⏩ −1 dzień (odlicz)').click()
-        await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
-        ok(True, f'{tag} Zapasy: korekta dnia zmienia stany')
-        await pg.get_by_role('button', name='⏪ +1 dzień (cofnij zużycie)').click()
-        await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value === v', arg=before, timeout=8000)
-        ok(True, f'{tag} Zapasy: odwrotna korekta dnia wraca do stanu wyjściowego')
-        await pg.get_by_role('button', name='🕘 Historia').click(); await pg.wait_for_selector('dialog.sheet')
-        ok('Historia i cofanie zmian' in await pg.inner_text('dialog') and await pg.locator('dialog .hist li').count() >= 4, f'{tag} Zapasy: historia z wpisami')
-        pg.once('dialog', lambda d: asyncio.ensure_future(d.accept()))
-        await pg.locator('dialog .hist li').last.get_by_role('button', name='↩ Przywróć ten stan').click()
-        await pg.wait_for_selector('text=Przywrócono stan', timeout=15000)
-        ok(True, f'{tag} Zapasy: przywrócenie stanu z historii')
-        ok('pozycj' in await pg.inner_text('.dash'), f'{tag} Zapasy: podsumowanie najbliższych zakupów na pulpicie')
-        await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
-        mp = await pg.inner_text('main')
-        ok('płatki owsiane 70 g' in mp, f'{tag} Meal Prep: ilości z Fazy 0')
-        ok('prosto z patelni' in mp and '> 63 °C' in mp, f'{tag} Meal Prep: progi wg D-013')
-        allmp = await pg.evaluate("document.querySelector('main').textContent")  # także treść zwiniętych sekcji
-        ok('ferrytyn' not in allmp and 'pakiecie prywatnym' in allmp, f'{tag} Meal Prep: dane z badań tylko w pakiecie prywatnym (D-035)')
-        cb = pg.locator('.prep-list input[type=checkbox]').first
-        await cb.check(); await pg.wait_for_timeout(300)
-        await pg.reload(); await pg.wait_for_selector('.prep-card')
-        ok(await pg.locator('.prep-list input[type=checkbox]').first.is_checked(), f'{tag} Meal Prep: odhaczony krok zapisany trwale')
-        ok('1 / ' in await pg.inner_text('.mp-ring'), f'{tag} Meal Prep: pierścień postępu')
-        ok('następny krok' in (await pg.inner_text('.mp-next')).lower(), f'{tag} Meal Prep: karta następnego kroku')
-        await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('table.data')
-        tbl = await pg.inner_text('table.data')
-        ok(f'{GLUKO():g} kaps.' in tbl and 'nieśledzony' in tbl, f'{tag} Suplementacja: stan z magazynu (glukozamina {GLUKO():g}) i cynk nieśledzony')
-        for r in ROUTES:  # szerokość ponownie — z danymi (tabela stanów) — wcześniej przeoczone
-            await pg.goto(url + r); await pg.wait_for_timeout(250)
-            sw = await pg.evaluate('Math.max(...[...document.querySelectorAll(".panel, main")].map(e => Math.ceil(e.getBoundingClientRect().right)), document.documentElement.scrollWidth)')
-            ok(sw <= vp['width'], f'{tag} {r} z danymi: nic nie wychodzi poza ekran ({sw}px)')
-        pack = os.environ.get('PRIVATE_PACK')
-        if pack and pathlib.Path(pack).exists():
-            await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
-            await pg.set_input_files('input[type=file]', pack); await pg.wait_for_selector('dialog[open]')
-            txt = await pg.inner_text('dialog')
-            ok('Pakiet prywatny' in txt and 'Scal dane' in txt, f'{tag} pakiet prywatny rozpoznany')
-            await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano 1 zmian')
-            has = await pg.evaluate('''new Promise(r => { const q = indexedDB.open('p2027'); q.onsuccess = () => { const g = q.result.transaction('events').objectStore('events').getAll(); g.onsuccess = () => r(g.result.some(e => e.t === 'private.pack' && e.d.pack.sections.length === 4)); }; })''')
-            ok(has, f'{tag} pakiet prywatny zapisany w bazie')
-            await pg.goto(url + '#/rekompozycja?s=s13'); await pg.wait_for_selector('.rk-sec')
-            ok(await pg.locator('.priv-in').count() == 30 and await pg.locator('.priv-miss').count() == 0, f'{tag} Rekompozycja: 30 fragmentów z pakietu prywatnego wstawionych, nic ukrytego')
-        else:
-            skip(f'{tag} import pakietu prywatnego i Rekompozycja z pakietem — brak PRIVATE_PACK')
-    else:
-        skip(f'{tag} import kopii ZAPASY i zależne kontrole — brak pliku w SOURCES_DIR')
+    tag0, tag = tag, tag + DATA['label']
+    N = DATA['events']
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
+    await pg.set_input_files('input[type=file]', str(DATA['path']))
+    await pg.wait_for_selector('dialog[open]')
+    txt = await pg.inner_text('dialog')
+    ok('Nowe zmiany' in txt and str(N) in txt, f'{tag} podgląd importu kopii ZAPASY: {N} zmian (stany + 3 suplementy D-015 + archiwum)')
+    await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector(f'text=Zaimportowano {N} zmian')
+    await pg.reload(); await pg.wait_for_selector('table.data')
+    rows = await pg.eval_on_selector_all('table.data tbody tr', 'e => e.map(r => [...r.children].map(c => c.textContent))')
+    by = {r[0]: r for r in rows}
+    ok(by.get('Banan', [None, ''])[1].startswith(f'{BANAN():g} '), f'{tag} po przeładowaniu stan zachowany: Banan {by.get("Banan", ["", "?"])[1]} (oczekiwane {BANAN():g} g)')
+    ok(by.get('Glukozamina', [None, ''])[1].startswith(f'{GLUKO():g} '), f'{tag} glukozamina {GLUKO():g} kaps. (D-015, odliczanie od 23.09)')
+    ok(by.get('Cynk', ['', '', '', ''])[3] == 'Nieśledzony', f'{tag} cynk nieśledzony (D-016)')
+    ok(len(rows) == 55, f'{tag} tabela kontroli: {len(rows)} pozycji')
+    # --- eksport i ponowny import (idempotencja)
+    async with pg.expect_download() as dl:
+        await pg.get_by_role('button', name='Wyślij do iCloud').click()
+    d = await dl.value
+    path = await d.path()
+    bundle = json.loads(pathlib.Path(path).read_text(encoding='utf8'))
+    ok(bundle['format'] == '2027-sync' and bundle['count'] >= 55 and bundle['count'] == len(bundle['events']) and len(bundle['sha256']) == 64, f'{tag} eksport 2027-sync.json: {bundle["count"]} zmian, suma kontrolna')
+    await pg.wait_for_selector('text=Wszystkie zmiany z tego urządzenia zostały wysłane')
+    ok(True, f'{tag} po eksporcie brak niewysłanych zmian')
+    tmp = pathlib.Path(tempfile.mkdtemp()) / '2027-sync.json'; tmp.write_text(json.dumps(bundle), encoding='utf8')
+    await pg.set_input_files('input[type=file]', str(tmp)); await pg.wait_for_selector('dialog[open]')
+    txt = await pg.inner_text('dialog')
+    ok('Scal dane' not in txt and 'Już znane' in txt, f'{tag} ponowny import tego samego pliku: 0 nowych zmian')
+    await pg.click('dialog >> text=Zamknij')
+    # --- Etap 4: Zapasy i Meal Prep na danych z kopii
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+    inv = await pg.inner_text('main')
+    ok('55' in await pg.inner_text('.dash'), f'{tag} Zapasy: 55 pozycji')
+    for lab in ['Dodaj', 'Zakupy', 'Paragon', 'Cofnij', 'Historia', 'Status AI', 'Kopia']:
+        ok(await pg.locator('.actions').get_by_text(lab, exact=False).count() > 0, f'{tag} Zapasy: przycisk {lab}')
+    ok(await pg.locator('.pills .pill-b').count() == 9, f'{tag} Zapasy: 9 kategorii')
+    ok(await pg.locator('.counters .counter').count() == 3, f'{tag} Zapasy: liczniki statusów')
+    tags = await pg.inner_text('.inv')
+    ok('ŚWIEŻE (≤7D)' in tags and 'TRWAŁE (>7D)' in tags and 'SUPLEMENT' in tags, f'{tag} Zapasy: klasyfikacja wg terminu przydatności')
+    ok(any(b in tags for b in ['🚨 < 2 dni', '⚠️ Niski (2-3.9d)', '🟢 OK (≥4d)', '⛔ BRAK (0)']), f'{tag} Zapasy: statusy świeżych wg progów 2/4 dni')
+    ok('Wystarczy do:' in tags and ('✓ Wystarczy do zakupów' in tags or 'przed zakupami' in tags), f'{tag} Zapasy: prognoza w formacie v31')
+    await pg.get_by_role('button', name='🛒 Zakupy').click(); await pg.wait_for_selector('dialog.sheet')
+    ok(await pg.locator('dialog .shop-list li').count() > 0, f'{tag} Zapasy: okno planu zakupów z listą')
+    await pg.locator('dialog .shop-list input[type=checkbox]').first.check()
+    ok('1 / ' in await pg.inner_text('dialog .prog'), f'{tag} Zapasy: pasek postępu zakupów')
+    await pg.locator('dialog .sheet-head button').click()
+    await pg.get_by_role('button', name='💾 Kopia').click(); await pg.wait_for_selector('dialog.sheet')
+    ok('Pobierz kopię' in await pg.inner_text('dialog'), f'{tag} Zapasy: okno kopii zapasowej w module')
+    await pg.locator('dialog .sheet-head button').click()
+    await pg.get_by_role('button', name='Suplementy', exact=False).first.click(); await pg.wait_for_timeout(300)
+    ok(await pg.locator('.inv-item').count() == 14, f'{tag} Zapasy: kategoria Suplementy (14 pozycji)')
+    await pg.get_by_role('button', name='Wszystko').click(); await pg.wait_for_timeout(200)
+    ok('wystarczy do' in inv.lower(), f'{tag} Zapasy: prognoza wyczerpania')
+    # pozycja zużywana KAŻDEGO dnia (także w czwartek) — test korekty dnia niezależny od dnia tygodnia
+    await pg.goto(url + '#/zapasy?q=Płatki'); await pg.wait_for_selector('.inv-item')
+    before = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
+    await pg.locator('.inv-item').first.get_by_role('button', name='+ opakowanie', exact=False).click()
+    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
+    after = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
+    ok(float(after) > float(before), f'{tag} Zapasy: zakup opakowania zwiększa stan ({before} → {after})')
+    await pg.reload(); await pg.wait_for_selector('.inv-item')
+    kept = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
+    ok(kept == after, f'{tag} Zapasy: zmiana stanu zapisana trwale')
+    await pg.get_by_role('button', name='↩ Cofnij').click()
+    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value === v', arg=before, timeout=8000)
+    ok(True, f'{tag} Zapasy: cofnięcie ostatniej zmiany przywraca stan')
+    await pg.get_by_role('button', name='⏩ −1 dzień (odlicz)').click()
+    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
+    ok(True, f'{tag} Zapasy: korekta dnia zmienia stany')
+    await pg.get_by_role('button', name='⏪ +1 dzień (cofnij zużycie)').click()
+    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value === v', arg=before, timeout=8000)
+    ok(True, f'{tag} Zapasy: odwrotna korekta dnia wraca do stanu wyjściowego')
+    await pg.get_by_role('button', name='🕘 Historia').click(); await pg.wait_for_selector('dialog.sheet')
+    ok('Historia i cofanie zmian' in await pg.inner_text('dialog') and await pg.locator('dialog .hist li').count() >= 4, f'{tag} Zapasy: historia z wpisami')
+    pg.once('dialog', lambda d: asyncio.ensure_future(d.accept()))
+    await pg.locator('dialog .hist li').last.get_by_role('button', name='↩ Przywróć ten stan').click()
+    await pg.wait_for_selector('text=Przywrócono stan', timeout=15000)
+    ok(True, f'{tag} Zapasy: przywrócenie stanu z historii')
+    ok('pozycj' in await pg.inner_text('.dash'), f'{tag} Zapasy: podsumowanie najbliższych zakupów na pulpicie')
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    mp = await pg.inner_text('main')
+    ok('płatki owsiane 70 g' in mp, f'{tag} Meal Prep: ilości z Fazy 0')
+    ok('prosto z patelni' in mp and '> 63 °C' in mp, f'{tag} Meal Prep: progi wg D-013')
+    allmp = await pg.evaluate("document.querySelector('main').textContent")  # także treść zwiniętych sekcji
+    ok('ferrytyn' not in allmp and 'pakiecie prywatnym' in allmp, f'{tag} Meal Prep: dane z badań tylko w pakiecie prywatnym (D-035)')
+    cb = pg.locator('.prep-list input[type=checkbox]').first
+    await cb.check(); await pg.wait_for_timeout(300)
+    await pg.reload(); await pg.wait_for_selector('.prep-card')
+    ok(await pg.locator('.prep-list input[type=checkbox]').first.is_checked(), f'{tag} Meal Prep: odhaczony krok zapisany trwale')
+    ok('1 / ' in await pg.inner_text('.mp-ring'), f'{tag} Meal Prep: pierścień postępu')
+    ok('następny krok' in (await pg.inner_text('.mp-next')).lower(), f'{tag} Meal Prep: karta następnego kroku')
+    await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('table.data')
+    tbl = await pg.inner_text('table.data')
+    ok(f'{GLUKO():g} kaps.' in tbl and 'nieśledzony' in tbl, f'{tag} Suplementacja: stan z magazynu (glukozamina {GLUKO():g}) i cynk nieśledzony')
+    for r in ROUTES:  # szerokość ponownie — z danymi (tabela stanów) — wcześniej przeoczone
+        await pg.goto(url + r); await pg.wait_for_timeout(250)
+        sw = await pg.evaluate('Math.max(...[...document.querySelectorAll(".panel, main")].map(e => Math.ceil(e.getBoundingClientRect().right)), document.documentElement.scrollWidth)')
+        ok(sw <= vp['width'], f'{tag} {r} z danymi: nic nie wychodzi poza ekran ({sw}px)')
+    pack = os.environ.get('PRIVATE_PACK')
+    real_pack = bool(pack and pathlib.Path(pack).exists())
+    if not real_pack:   # pakiet SYNTETYCZNY: poprawna struktura, wyłącznie teksty zastępcze (bez danych osobowych)
+        pack = str(fixtures.write(fixtures.synthetic_private_pack(), 'pakiet_syntetyczny.json'))
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
+    await pg.set_input_files('input[type=file]', pack); await pg.wait_for_selector('dialog[open]')
+    txt = await pg.inner_text('dialog')
+    ok('Pakiet prywatny' in txt and 'Scal dane' in txt, f'{tag} pakiet prywatny rozpoznany')
+    await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano 1 zmian')
+    has = await pg.evaluate('''new Promise(r => { const q = indexedDB.open('p2027'); q.onsuccess = () => { const g = q.result.transaction('events').objectStore('events').getAll(); g.onsuccess = () => r(g.result.some(e => e.t === 'private.pack' && e.d.pack.sections.length === 4)); }; })''')
+    ok(has, f'{tag} pakiet prywatny zapisany w bazie')
+    await pg.goto(url + '#/rekompozycja?s=s13'); await pg.wait_for_selector('.rk-sec')
+    want = 30 if real_pack else fixtures.rekomp_marker_uses()
+    ok(await pg.locator('.priv-in').count() == want and await pg.locator('.priv-miss').count() == 0, f'{tag} Rekompozycja: {want} fragmentów z pakietu prywatnego wstawionych, nic ukrytego')
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    mpp = await pg.evaluate("document.querySelector('main').textContent")
+    ok('fragment w pakiecie prywatnym' not in mpp, f'{tag} Meal Prep: fragmenty z pakietu prywatnego wstawione')
+    tag = tag0
     # --- offline (tylko wariant web z service workerem)
     if name == 'web':
         await pg.goto(url + '#/dzis')
@@ -365,12 +404,87 @@ async def run_variant(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
 
+# --- Faza 5 (Trening, CFA): funkcje zależne od bieżącej godziny — zegar przeglądarki ustawiony na poniedziałek
+# 28.09.2026 10:00 (UPPER 1, Faza 0; CFA: 7 dni planu przed „dziś”). Oczekiwania liczone z danych, nie z kodu aplikacji.
+CLOCK = _dt.datetime(2026, 9, 28, 10, 0, tzinfo=_dt.timezone(_dt.timedelta(hours=2)))
+CFA_D = json.loads((ROOT / 'src/data/cfa.json').read_text(encoding='utf8'))['D']
+def rest_left(t):  # '1:58' / '+0:13' -> sekundy do końca przerwy (ujemne po czasie)
+    m, s_ = t.lstrip('+').split(':'); v = int(m) * 60 + int(s_); return -v if t.startswith('+') else v
+
+async def run_features(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [zegar 28.09 10:00]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=CLOCK)
+    # Trening: następna seria, licznik przerwy (tylko dla dnia bieżącego), podsumowanie sesji
+    await pg.goto(url + '#/trening'); await pg.wait_for_selector('.ex')
+    nx = await pg.inner_text('.tr-next')
+    ok('Wyciskanie sztangi leżąc · seria 1 z 2' in nx and 'przerwa 2–3 min' in nx, f'{tag} Trening: karta pierwszej serii z planu')
+    await pg.locator('.set:not(.set-h) .set-toggle').first.click(); await pg.wait_for_selector('.tr-rest')
+    t0 = rest_left(await pg.inner_text('.tr-rest-t'))
+    ok(115 <= t0 <= 120 and 'plan 2–3 min' in await pg.inner_text('.tr-rest-n'), f'{tag} Trening: licznik przerwy po odhaczeniu serii ({t0} s z 120)')
+    ok('seria 2 z 2' in await pg.inner_text('.tr-next') and 'seria 2 z 2' in await pg.inner_text('.tr-rest-next'), f'{tag} Trening: następna seria po odhaczeniu')
+    await pg.clock.fast_forward(60000); await pg.wait_for_timeout(1200)
+    t1 = rest_left(await pg.inner_text('.tr-rest-t'))
+    ok(52 <= t1 <= 60, f'{tag} Trening: przerwa odlicza czas zegara ({t1} s po 60 s)')
+    await pg.locator('.tr-rest').get_by_role('button', name='+30 s').click(); await pg.wait_for_timeout(300)
+    t2 = rest_left(await pg.inner_text('.tr-rest-t'))
+    ok(t2 - t1 >= 28, f'{tag} Trening: „+30 s” wydłuża przerwę ({t1} → {t2} s)')
+    await pg.clock.fast_forward(100000); await pg.wait_for_timeout(1200)
+    ok('is-ready' in await pg.get_attribute('.tr-rest', 'class') and 'Przerwa zakończona' in await pg.inner_text('.tr-rest .sr-only'), f'{tag} Trening: koniec przerwy oznaczony i ogłoszony czytnikom ekranu')
+    await pg.get_by_role('button', name='Pomiń przerwę').click()
+    ok(await pg.locator('.tr-rest').count() == 0, f'{tag} Trening: „Pomiń” zamyka licznik')
+    await pg.get_by_role('link', name='Przejdź do ćwiczenia').click(); await pg.wait_for_timeout(600)
+    ok(await pg.evaluate('location.hash') == '#/trening' and (await pg.evaluate('document.activeElement.id')).startswith('ex-'), f'{tag} Trening: „Przejdź do ćwiczenia” przewija w module')
+    for _ in range(9):   # pozostałe serie sesji
+        await pg.locator('.set:not(.set-h) .set-toggle[aria-pressed=false]').first.click(); await pg.wait_for_timeout(350)
+    done_txt = await pg.inner_text('.tr-next')
+    ok('Sesja ukończona' in done_txt and '10 serii' in done_txt and await pg.locator('.tr-rest').count() == 0, f'{tag} Trening: podsumowanie ukończonej sesji, bez przerwy po ostatniej serii')
+    await pg.goto(url + '#/trening?d=2026-09-29'); await pg.wait_for_selector('.ex')
+    await pg.locator('.set:not(.set-h) .set-toggle').first.click(); await pg.wait_for_timeout(500)
+    ok(await pg.locator('.tr-rest').count() == 0, f'{tag} Trening: brak licznika przerwy dla innego dnia niż dziś')
+    # CFA: tempo względem planu, zaległe bloki, następny blok, nawigacja dni, filtr error logu
+    due = [b for b in CFA_D['bloki'] if b['data'] < '2026-09-28']
+    await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.cfa-row')
+    hero = await pg.inner_text('.hero-cfa')
+    ok(f'Zaległe: {len(due)} bloków' in hero and f'Plan do wczoraj: 0 / {len(due)}' in hero, f'{tag} CFA: tempo i zaległe z planu ({len(due)})')
+    ok(await pg.locator('.cf-backlog .cfa-row').count() == 5 and 'Następny: blok A' in await pg.inner_text('.cfa-dayhead'), f'{tag} CFA: panel zaległych (5 najstarszych) i następny blok dnia')
+    await pg.locator('.cf-backlog .set-toggle').first.click(); await pg.wait_for_timeout(500)
+    ok(f'Zaległe: {len(due) - 1} bloków' in await pg.inner_text('.hero-cfa') and f'Plan do wczoraj: 1 / {len(due)}' in await pg.inner_text('.hero-cfa'),
+       f'{tag} CFA: odhaczenie zaległego bloku zmniejsza zaległości')
+    await pg.get_by_role('link', name='Następny dzień').click(); await pg.wait_for_timeout(400)
+    ok('d=2026-09-29' in await pg.evaluate('location.hash') and await pg.locator('.cf-backlog').count() == 0, f'{tag} CFA: nawigacja dni (panel zaległych tylko dla dnia bieżącego)')
+    await pg.goto(url + '#/cfa?v=harmonogram&zal=1'); await pg.wait_for_selector('.filters')
+    ok(f'{len(due) - 1} bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row').count() == len(due) - 1, f'{tag} CFA: filtr „tylko zaległe” w harmonogramie')
+    await pg.goto(url + '#/cfa?v=log'); await pg.wait_for_selector('.form-grid')
+    for temat, kind in (('[TEST] FI — duration', 'pośpiech'), ('[TEST] QM — hipotezy', 'brak wiedzy')):
+        await pg.fill('.form-grid input:not([type=date])', temat); await pg.select_option('.form-grid select', kind)
+        await pg.get_by_role('button', name='Dodaj wpis').click(); await pg.wait_for_selector(f'text={temat}')
+    await pg.get_by_role('button', name='pośpiech: 1').click(); await pg.wait_for_timeout(300)
+    ok(await pg.locator('.log-item').count() == 1 and 'duration' in await pg.inner_text('.log-list'), f'{tag} CFA: filtr error logu wg rodzaju błędu')
+    await pg.get_by_role('button', name='Wszystkie: 2').click(); await pg.wait_for_timeout(300)
+    await pg.fill('.cf-search input', 'hipotezy'); await pg.press('.cf-search input', 'Enter'); await pg.wait_for_timeout(400)
+    ok(await pg.locator('.log-item').count() == 1 and 'hipotezy' in await pg.inner_text('.log-list'), f'{tag} CFA: wyszukiwanie w error logu')
+    if mobile:   # cele dotykowe w rozbudowanych modułach
+        for r in ('#/trening', '#/cfa?v=dzien', '#/cfa?v=log'):
+            await pg.goto(url + r); await pg.wait_for_timeout(300)
+            small = await pg.evaluate('''[...document.querySelectorAll('main button, main a.btn, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length''')
+            ok(small == 0, f'{tag} {r}: elementy dotykowe ≥ 44 px (za małych: {small})')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
         for mobile in (True, False):
             await run_variant(pw, 'web', 'http://localhost:8765/index.html', mobile)
             await run_variant(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), mobile)
+        await run_features(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_features(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

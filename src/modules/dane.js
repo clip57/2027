@@ -100,8 +100,9 @@ export async function renderDane(root, ctx) {
   }
 
   function showPreview(pv, name) {
-    const dlg = h('dialog', { 'aria-labelledby': 'pv-h' });
-    const close = () => { dlg.close(); dlg.remove(); };
+    // Usunięcie z DOM także po zamknięciu klawiszem Esc (bez powielonych okien i identyfikatorów)
+    const dlg = h('dialog', { 'aria-labelledby': 'pv-h', onclose: () => dlg.remove() });
+    const close = () => dlg.close();
     add(dlg, h('h2', { id: 'pv-h' }, pv.ok ? 'Podgląd importu' : 'Nie można zaimportować'),
       h('p', { class: 'muted' }, `${name} · ${KIND[pv.kind] || 'nierozpoznany'}`),
       pv.file && h('p', {}, `Plik wyeksportowany ${when(pv.file.exportedAt)} na urządzeniu ${pv.file.device || '—'}${pv.file.device === store.device ? ' (to urządzenie)' : ''}.`),
@@ -124,7 +125,7 @@ export async function renderDane(root, ctx) {
     document.body.append(dlg); dlg.showModal();
   }
 
-  // --- Kontrola stanów (tylko odczyt; pełny moduł Zapasy — Etap 4)
+  // --- Kontrola stanów (tylko odczyt; edycja stanów — moduł Zapasy)
   if (store) {
     const rows = allItems().map(it => {
       const st = stockAt(store.state.inv, it.id, ctx.today);
@@ -132,7 +133,7 @@ export async function renderDane(root, ctx) {
       return { it, st, fc, status: status(it, st, fc) };
     });
     add(root, h('section', { class: 'panel', 'aria-labelledby': 'h-inv' }, h('h2', { id: 'h-inv' }, 'Kontrola stanów magazynu'),
-      h('p', { class: 'muted' }, 'Stan na koniec dzisiejszego dnia, liczony z inwentaryzacji i planu (faza, typ dnia). Pełny moduł Zapasy powstanie w Etapie 4.'),
+      h('p', { class: 'muted' }, 'Stan na koniec dzisiejszego dnia, liczony z inwentaryzacji i planu (faza, typ dnia). Stany zmienisz w module ', h('a', { href: '#/zapasy' }, 'Zapasy'), '.'),
       rows.every(r => r.st == null) ? h('p', {}, 'Brak stanów. Zaimportuj kopię ZAPASY (plik zapasy_kopia_….json).')
         : h('div', { class: 'scroll-x' }, h('table', { class: 'data' },
           h('thead', {}, h('tr', {}, h('th', {}, 'Pozycja'), h('th', { class: 'num' }, 'Stan'), h('th', {}, 'Wystarczy do'), h('th', {}, 'Status'))),

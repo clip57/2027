@@ -9,7 +9,8 @@ const DIR = path.join(ROOT, 'node_modules/lucide-static/icons');
 export const NAMES = ['sun', 'moon', 'monitor', 'utensils', 'dumbbell', 'graduation-cap', 'ellipsis', 'pill', 'package', 'chef-hat',
   'shield-check', 'target', 'database', 'cloud-upload', 'cloud-download', 'panel-left-close', 'panel-left-open', 'chevron-left',
   'chevron-right', 'chevron-down', 'check', 'x', 'triangle-alert', 'info', 'clock', 'calendar', 'flame', 'timer', 'play', 'pause',
-  'plus', 'minus', 'search', 'list-checks', 'book-open', 'refresh-cw', 'circle-check', 'shopping-cart', 'heart-pulse', 'zap'];
+  'plus', 'minus', 'search', 'list-checks', 'book-open', 'refresh-cw', 'circle-check', 'shopping-cart', 'heart-pulse', 'zap',
+  'square', 'copy', 'skip-forward', 'calendar-clock', 'list-todo'];
 const out = {};
 for (const n of NAMES) {
   const svg = fs.readFileSync(path.join(DIR, `${n}.svg`), 'utf8');

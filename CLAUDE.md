@@ -6,8 +6,12 @@ iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy da
 Język interfejsu i dokumentacji: **polski**.
 
 **Bieżące zadanie: redesign UI/UX, Faza 5** (przeniesienie pozostałych modułów na nowy system projektowy).
+Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
+24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
+następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
+Następny moduł: Dieta. Gałąź `redesign-faza4` nie jest jeszcze na `main`/Pages.
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-064).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-070).
 
 ---
 
@@ -47,8 +51,11 @@ npm run a11y              # axe-core WCAG 2.1 A/AA: 20 widoków × 390/1280 px �
 npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika), bez nich nie działa
 ```
 Zmienne opcjonalne: `SOURCES_DIR` (katalog z plikami źródłowymi, m.in. `zapasy_kopia_2026-09-22.json`),
-`PRIVATE_PACK` (ścieżka do `2027-prywatne.json`). **Nie masz ich w repozytorium** — testy zależne od nich raportują się
-jako „pominięte” (szczegóły: `docs/REDESIGN-TESTING.md`). Nigdy nie próbuj ich odtwarzać ani wymyślać.
+`PRIVATE_PACK` (ścieżka do `2027-prywatne.json`). **Nie masz ich w repozytorium.** Bez nich E2E i `e2e:sync` używają
+**danych syntetycznych** z `tests/e2e/fixtures.py` (D-065: fikcyjne stany wyliczane wzorem z katalogu, pakiet prywatny
+z tekstami „[DANE TESTOWE] …”, pliki tylko w katalogu tymczasowym). Tylko `npm run verify` i test migracji kopii ZAPASY
+wymagają plików użytkownika (raportowane jako „pominięte”). Nigdy nie próbuj odtwarzać ani wymyślać plików użytkownika;
+nie dopisuj do fixtures wartości „podobnych do prawdziwych” — wyłącznie wzór z katalogu i teksty zastępcze.
 Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test` → `npm run build` → publikacja `dist/web`.
 
 ## 3. ZASADY BEZWZGLĘDNE (nie naruszaj bez wyraźnej zgody użytkownika)
@@ -99,3 +106,12 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Testy zależne od dnia tygodnia / daty uruchomienia | fałszywe błędy (np. czwartek bez banana) | w testach używaj jawnych dat |
 | Serwer testowy: odpowiedź 304 wg daty pliku (1 s) | „brak aktualizacji” w teście SW | kopie z bieżącą datą (`deploy()` w `sync_update.py`) |
 | Kolor wpisany na sztywno w ciemnym motywie | kontrast poniżej AA | wyłącznie tokeny; `npm run a11y` w obu motywach |
+| `#fff` na `--success` (odhaczona seria) | kontrast 1,6:1 w ciemnym motywie; axe nie widział stanu | tekst na wypełnieniu = token `--on-…`; pary w `tests/unit/tokens.test.mjs`, stany w `a11y.py` (`STATES`) |
+| `style: {'--x': …}` przez `Object.assign` | zmienna CSS po cichu nieustawiona | `h()` używa `setProperty` dla `--*` (od Fazy 5.0) |
+| Odnośnik `href="#id"` (bez `/`) | router pokazuje „Dziś” zamiast przewinąć | obsługuje go `inPageLink()` w `app.js` (przewinięcie + fokus); trasy zawsze `#/modul` |
+| Wspólna reguła `border-color` kart w `system.css` | znikają kolorowe lewe krawędzie modułów | sygnatury przywrócone w `system.css`; nowe krawędzie dopisz tam lub zwiększ specyficzność |
+| Element w zwiniętym `<details>` w teście | `wait_for_selector` czeka na widoczność i kończy się błędem | `state='attached'` albo najpierw rozwiń sekcję |
+| `location.hash = ten sam adres` | brak `hashchange` — zapis wykonany, widok nieodświeżony (drugi wpis error logu CFA) | porównaj z `location.hash`, przy równości `ctx.rerender()` (`go()` w `cfa.js`) |
+| Funkcja zależna od „dziś” / godziny w teście | wynik zależny od dnia uruchomienia | zegar Playwright: `page.clock.install(time=…)` (`CLOCK` w `e2e.py`, `a11y.py`); przerwy — `clock.fast_forward` |
+| `--muted` na tle `--sunken` (jasny motyw) | 4,47:1 — poniżej AA | na `--sunken` używaj `--text-2` (para w `tokens.test.mjs`) |
+| `setInterval` sprawdzający `isConnected` przed wstawieniem elementu do DOM | licznik nigdy nie startuje | pierwsze wypełnienie bez warunku, zatrzymanie dopiero gdy element zniknie z DOM |

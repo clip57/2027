@@ -8,6 +8,8 @@ import { addDays, diffDays, longDate, shortDate, dayShort, weekday, parse } from
 import { previewEvents, apply } from '../core/sync/bundle.js';
 import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
 import { sha256 } from '../core/hash.js';
+import { cfaPace } from '../core/calc/cfa.js';
+import { icon } from '../ui/icons.js';
 
 const D = SRC.cfa.D;
 const EXAM = SRC.cfa.exam;
@@ -19,10 +21,9 @@ const MODE_CLASS = { 'FIRST PASS': 'm-fp', CONSOLIDATION: 'm-co', MOCK: 'm-mo', 
 export function renderCFA(root, ctx) {
   const { store, today } = ctx;
   const view = ctx.params.get('v') || 'dzien';
-  const go = o => {
-    const p = new URLSearchParams({ v: view, ...Object.fromEntries(ctx.params), ...o });
-    location.hash = `#/cfa?${p}`;
-  };
+  const link = o => `#/cfa?${new URLSearchParams({ v: view, ...Object.fromEntries(ctx.params), ...o })}`;
+  // Ten sam adres nie wywołuje hashchange (np. drugi wpis error logu z rzędu) — wtedy przerysowanie wprost
+  const go = o => { const to = link(o); if (location.hash === to) ctx.rerender(); else location.hash = to; };
   const done = store?.state?.cfaDone || new Set();
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const err = e => clear(msg).append(h('div', { class: 'banner err' }, e.message || String(e)));
@@ -33,17 +34,25 @@ export function renderCFA(root, ctx) {
   const doneCount = done.size;
   const hoursDone = Math.round(doneCount * 53 / 60 * 10) / 10;
   const toExam = diffDays(today, EXAM);
+  // Tempo względem harmonogramu (D-070): wyłącznie daty bloków z planu i dziennik cfa.done
+  const pace = cfaPace(D.bloki, done, today);
+  const late = pace.overdue.length;
 
   add(root, h('section', { class: 'hero-tr hero-cfa' },
     h('div', { class: 'hero-tr-main' },
       h('p', { class: 'eyebrow' }, `CFA Level I · egzamin ${longDate(EXAM)}`),
       h('h1', {}, toExam > 0 ? `${toExam} ${plural(toExam, 'dzień', 'dni', 'dni')} do egzaminu` : toExam === 0 ? 'Egzamin dziś' : 'Po egzaminie'),
-      h('p', { class: 'muted' }, `${doneCount} / ${D.bloki.length} bloków · ${fmt(hoursDone, 1)} / ${fmt(D.stat.godziny, 2)} h netto`)),
+      h('p', { class: 'muted' }, `${doneCount} / ${D.bloki.length} bloków · ${fmt(hoursDone, 1)} / ${fmt(D.stat.godziny, 2)} h netto`),
+      pace.due > 0 && h('div', { class: 'cf-pace' },
+        late ? h('a', { class: 'chip cf-late', href: `#/cfa?v=harmonogram&zal=1` }, icon('calendar-clock', { size: 16 }), `Zaległe: ${late} ${plural(late, 'blok', 'bloki', 'bloków')}`)
+          : h('span', { class: 'chip cf-ok' }, icon('circle-check', { size: 16 }), 'Na bieżąco z planem'),
+        h('span', { class: 'chip' }, `Plan do wczoraj: ${pace.doneDue} / ${pace.due}`),
+        pace.ahead > 0 && h('span', { class: 'chip' }, `Z wyprzedzeniem: ${pace.ahead}`))),
     h('div', { class: 'hero-tr-side' }, progressRing(doneCount, D.bloki.length, 'Wykonane bloki'))),
   msg,
   h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))));
 
-  const blockRow = b => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}` },
+  const blockRow = (b, next = false) => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}${next ? ' is-next' : ''}` },
     h('button', { class: 'set-toggle', 'aria-pressed': String(done.has(b.nr)), 'aria-label': `Blok ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`,
       onclick: () => toggle(b.nr, !done.has(b.nr)) }, done.has(b.nr) ? '✓' : b.blok),
     h('div', { class: 'cfa-body' },
@@ -59,16 +68,24 @@ export function renderCFA(root, ctx) {
     const dDone = blocks.filter(b => done.has(b.nr)).length;
     const isMock = D.mockCFA.includes(date);
     const recall = weekday(date) !== 5 && weekday(date) !== 6 && date >= first && date <= last;
+    const nextBlock = date === today ? blocks.find(b => !done.has(b.nr)) : null;
     add(root, h('div', { class: 'row daynav' },
-      date > first && h('button', { onclick: () => go({ d: addDays(date, -1) }) }, 'Poprzedni dzień'),
-      date !== today && today >= first && today <= last && h('button', { onclick: () => go({ d: today }) }, 'Dziś'),
-      date < last && h('button', { onclick: () => go({ d: addDays(date, 1) }) }, 'Następny dzień')),
+      date > first && h('a', { class: 'btn dz-nav', href: link({ d: addDays(date, -1) }) }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
+      date !== today && today >= first && today <= last && h('a', { class: 'btn dz-nav', href: link({ d: today }) }, 'Dziś'),
+      date < last && h('a', { class: 'btn dz-nav', href: link({ d: addDays(date, 1) }) }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 }))),
+      // Zaległe bloki z wcześniejszych dni (tylko w widoku dnia bieżącego): najstarsze najpierw, odhaczane jak w harmonogramie
+      date === today && late > 0 && h('section', { class: 'panel cf-backlog', 'aria-labelledby': 'cf-bl-h' },
+        h('h2', { id: 'cf-bl-h' }, icon('calendar-clock', { size: 20 }), `Zaległe z poprzednich dni: ${late}`),
+        h('p', { class: 'muted' }, 'Bloki zaplanowane przed dzisiaj i jeszcze nieodhaczone. Pokazano najstarsze.'),
+        h('div', { class: 'cfa-list' }, pace.overdue.slice(0, 5).map(b => blockRow(b))),
+        late > 5 && h('a', { class: 'btn', href: '#/cfa?v=harmonogram&zal=1' }, `Wszystkie zaległe (${late})`)),
       h('div', { class: 'panel' },
         h('div', { class: 'cfa-dayhead' },
           h('div', {}, h('h2', {}, `${dayShort(date)} ${longDate(date)}`),
-            h('p', { class: 'muted' }, `${dDone} / ${blocks.length} bloków${isMock ? ' · dzień mocka' : ''}${recall ? ' · recall 22:00' : ' · bez recall'}`)),
+            h('p', { class: 'muted' }, `${dDone} / ${blocks.length} bloków${isMock ? ' · dzień mocka' : ''}${recall ? ' · recall 22:00' : ' · bez recall'}`),
+            nextBlock && h('p', { class: 'cf-next' }, `Następny: blok ${nextBlock.blok} · ${nextBlock.godz} · ${nextBlock.temat}`)),
           progressRing(dDone, blocks.length || 1, 'Bloki dnia')),
-        blocks.length ? h('div', { class: 'cfa-list' }, blocks.map(blockRow)) : h('p', {}, 'Brak bloków w tym dniu (poza planem).'),
+        blocks.length ? h('div', { class: 'cfa-list' }, blocks.map(b => blockRow(b, b === nextBlock))) : h('p', {}, 'Brak bloków w tym dniu (poza planem).'),
         blocks.length > 0 && h('div', { class: 'row' },
           h('button', { onclick: async () => { try { for (const b of blocks) if (!done.has(b.nr)) await store.record('cfa.done', { block: b.nr, done: true }); ctx.rerender(); } catch (e) { err(e); } } }, 'Oznacz cały dzień'),
           h('button', { onclick: async () => { try { for (const b of blocks) if (done.has(b.nr)) await store.record('cfa.done', { block: b.nr, done: false }); ctx.rerender(); } catch (e) { err(e); } } }, 'Wyczyść dzień'))));
@@ -77,10 +94,10 @@ export function renderCFA(root, ctx) {
   // ---------------- Harmonogram z filtrami
   if (view === 'harmonogram') {
     const q = (ctx.params.get('q') || '').toLowerCase();
-    const kat = ctx.params.get('kat') || '', tryb = ctx.params.get('tryb') || '', todo = ctx.params.get('todo') === '1';
+    const kat = ctx.params.get('kat') || '', tryb = ctx.params.get('tryb') || '', todo = ctx.params.get('todo') === '1', zal = ctx.params.get('zal') === '1';
     const sel = (name, label, opts, val) => h('label', { class: 'field' }, h('span', {}, label),
       h('select', { onchange: e => go({ [name]: e.target.value }) }, h('option', { value: '' }, 'wszystkie'), opts.map(o => h('option', { value: o, selected: o === val }, o))));
-    const list = D.bloki.filter(b => (!kat || b.kategoria === kat) && (!tryb || b.tryb === tryb) && (!todo || !done.has(b.nr))
+    const list = D.bloki.filter(b => (!kat || b.kategoria === kat) && (!tryb || b.tryb === tryb) && (!todo || !done.has(b.nr)) && (!zal || (b.data < today && !done.has(b.nr)))
       && (!q || `${b.temat} ${b.zrodlo} ${b.zakres} ${b.data}`.toLowerCase().includes(q)));
     const byDay = list.reduce((m, b) => ((m[b.data] ||= []).push(b), m), {});
     add(root, h('div', { class: 'panel filters' },
@@ -89,6 +106,7 @@ export function renderCFA(root, ctx) {
       sel('kat', 'Kategoria', Object.keys(D.stat.kat), kat),
       sel('tryb', 'Tryb', Object.keys(D.stat.tryb), tryb),
       h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: todo, onchange: e => go({ todo: e.target.checked ? '1' : '' }) }), ' tylko niewykonane'),
+      h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: zal, onchange: e => go({ zal: e.target.checked ? '1' : '' }) }), ` tylko zaległe (przed dziś: ${late})`),
       h('p', { class: 'muted' }, `${list.length} ${plural(list.length, 'blok', 'bloki', 'bloków')} w ${Object.keys(byDay).length} ${plural(Object.keys(byDay).length, 'dniu', 'dniach', 'dniach')}`)),
     Object.entries(byDay).map(([d, bl]) => h('section', { class: 'panel' },
       h('h2', { class: 'cfa-dh' }, h('a', { href: `#/cfa?v=dzien&d=${d}` }, `${dayShort(d)} ${shortDate(d)}`),
@@ -122,7 +140,9 @@ export function renderCFA(root, ctx) {
 
   // ---------------- Error log
   if (view === 'log') {
-    const entries = [...(store?.state?.cfaErrors || [])].sort((a, b) => (a.data < b.data ? 1 : -1));
+    const all = [...(store?.state?.cfaErrors || [])].sort((a, b) => (a.data < b.data ? 1 : -1));
+    const lk = ctx.params.get('lk') || '', lq = (ctx.params.get('lq') || '').toLowerCase();
+    const entries = all.filter(x => (!lk || x.rodzaj === lk) && (!lq || `${x.temat} ${x.regula} ${x.data}`.toLowerCase().includes(lq)));
     const edit = ctx.params.get('e');
     const cur = entries.find(x => x.id === edit) || {};
     const f = {
@@ -148,7 +168,7 @@ export function renderCFA(root, ctx) {
         const n = await apply(store, pv); ctx.flash(`Zaimportowano ${n} wpisów.`); ctx.rerender();
       } catch (e) { err(e); }
     } });
-    const counts = KINDS.map(k => [k, entries.filter(x => x.rodzaj === k).length]).filter(([, n]) => n);
+    const counts = KINDS.map(k => [k, all.filter(x => x.rodzaj === k).length]).filter(([, n]) => n);
     add(root, h('section', { class: 'panel' }, h('h2', {}, cur.id ? 'Edytuj wpis' : 'Nowy wpis'),
       h('div', { class: 'form-grid' },
         h('label', { class: 'field' }, h('span', {}, 'Data'), f.data),
@@ -157,16 +177,21 @@ export function renderCFA(root, ctx) {
         h('label', { class: 'field wide' }, h('span', {}, 'Prawidłowa reguła'), f.regula)),
       h('div', { class: 'row' }, h('button', { class: 'primary', disabled: !store, onclick: saveEntry }, cur.id ? 'Zapisz zmiany' : 'Dodaj wpis'),
         cur.id && h('button', { onclick: () => go({ e: '' }) }, 'Anuluj'))),
-    counts.length > 0 && h('p', { class: 'chips' }, counts.map(([k, n]) => h('span', { class: 'chip' }, `${k}: ${n}`))),
+    // Filtr wg rodzaju błędu i wyszukiwanie (powtórka przed egzaminem) — tylko widok, bez zmian w danych
+    all.length > 0 && h('div', { class: 'cf-search field' }, h('span', {}, 'Szukaj w error logu'),
+      h('input', { type: 'search', value: ctx.params.get('lq') || '', placeholder: 'temat, reguła, data', 'aria-label': 'Szukaj w error logu', onchange: e => go({ lq: e.target.value }) })),
+    counts.length > 0 && h('div', { class: 'cf-kinds', role: 'group', 'aria-label': 'Rodzaj błędu' },
+      h('button', { class: 'chip-b', 'aria-pressed': String(!lk), onclick: () => go({ lk: '' }) }, `Wszystkie: ${all.length}`),
+      counts.map(([k, n]) => h('button', { class: 'chip-b', 'aria-pressed': String(lk === k), onclick: () => go({ lk: lk === k ? '' : k }) }, `${k}: ${n}`))),
     h('div', { class: 'row' },
-      h('button', { disabled: !entries.length, onclick: () => {
+      h('button', { disabled: !all.length, onclick: () => {
         const head = 'egzamin;data;temat_zrodlo;rodzaj_bledu;prawidlowa_regula';
-        const rows = entries.map(e => [e.egz || 'CFA', e.data, e.temat, e.rodzaj, e.regula].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'));
+        const rows = all.map(e => [e.egz || 'CFA', e.data, e.temat, e.rodzaj, e.regula].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'));
         const file = new File(['\ufeff' + head + '\n' + rows.join('\n')], 'error-log.csv', { type: 'text/csv' });
         const a = h('a', { href: URL.createObjectURL(file), download: file.name }); document.body.append(a); a.click(); a.remove();
       } }, 'Eksport CSV'),
       h('button', { disabled: !store, onclick: () => { csvInput.value = ''; csvInput.click(); } }, 'Import CSV (v3)'), csvInput),
-    entries.length === 0 ? h('p', { class: 'muted' }, 'Error log jest pusty.') :
+    entries.length === 0 ? h('p', { class: 'muted' }, all.length ? 'Brak wpisów spełniających filtr.' : 'Error log jest pusty.') :
       h('div', { class: 'log-list' }, entries.map(e => h('article', { class: 'log-item' },
         h('div', { class: 'log-head' }, h('span', { class: 'mode m-an' }, e.rodzaj), h('span', { class: 'muted' }, e.data)),
         h('p', { class: 'log-t' }, e.temat),
@@ -196,6 +221,7 @@ export function renderCFA(root, ctx) {
     section('h-stat', 'Statystyki planu', h('dl', { class: 'kv' },
       h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni × 8)`),
       h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h + recall ${fmt(D.stat.recallH, 2)} h (${D.stat.recall} sesji)`),
+      h('dt', {}, 'Tempo (do wczoraj)'), h('dd', {}, `${pace.doneDue} z ${pace.due} zaplanowanych · zaległe ${late} · z wyprzedzeniem ${pace.ahead}`),
       Object.entries(D.stat.tryb).map(([k, n]) => [h('dt', {}, k), h('dd', {}, `${n} ${plural(n, 'blok', 'bloki', 'bloków')} · wykonane ${D.bloki.filter(b => b.tryb === k && done.has(b.nr)).length}`)]))));
   }
 }

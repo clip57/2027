@@ -99,8 +99,25 @@ async function render() {
   document.title = `${id === 'wiecej' ? 'Więcej' : byId[id].name} · 2027`;
 }
 
+// Odnośniki w obrębie strony (#id, bez „/”): przewinięcie do elementu zamiast zmiany trasy. Router traktowałby
+// „#mp-ph-1” jak nieznany moduł i pokazywał „Dziś”. Fokus przechodzi na cel (czytniki ekranu, klawiatura).
+function inPageLink(e) {
+  const a = e.target.closest?.('a[href^="#"]');
+  if (!a || e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const href = a.getAttribute('href');
+  if (href.startsWith('#/')) return;
+  e.preventDefault();
+  let el = null;
+  try { el = document.getElementById(decodeURIComponent(href.slice(1))); } catch { /* niepoprawny zapis %xx — brak celu */ }
+  if (!el) return;
+  el.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  if (!el.matches('a[href], button, input, select, textarea, [tabindex]')) el.setAttribute('tabindex', '-1');
+  el.focus({ preventScroll: true });
+}
+
 async function boot() {
   applyTheme();
+  document.addEventListener('click', inPageLink);
   // Klawiatura ekranowa (pole w fokusie) — chowamy dolny pasek, żeby nie „pływał” nad klawiaturą na iOS
   const isField = el => el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'range', 'button', 'file'].includes(el.type)));
   document.addEventListener('focusin', e => { if (isField(e.target)) document.body.classList.add('kbd'); });
@@ -121,10 +138,13 @@ async function boot() {
 // Aktualizacja kodu: nowy service worker jest pobierany w tle i CZEKA. Przeładowanie tylko po kliknięciu użytkownika.
 function setupUpdates(reg) {
   let userAsked = false;
-  const markReady = () => { if (reg.waiting && navigator.serviceWorker.controller) { ctx.update.state = 'ready'; render(); } };
+  // Pokazanie przycisku wymaga przerysowania widoku — nie w trakcie wpisywania (pole w fokusie), żeby nie stracić wpisu.
+  const show = () => (document.body.classList.contains('kbd') ? setTimeout(show, 1000) : render());
+  const markReady = () => { if (reg.waiting && navigator.serviceWorker.controller && ctx.update.state !== 'ready') { ctx.update.state = 'ready'; show(); } };
   ctx.update = {
     state: 'idle',
-    check: async () => { ctx.update.state = 'checking'; try { await reg.update(); } catch { /* offline */ } if (ctx.update.state === 'checking') ctx.update.state = 'idle'; markReady(); },
+    // Gdy nowa wersja już czeka na zgodę, kolejne sprawdzenia (np. przy każdym powrocie na ekran) niczego nie przerysowują.
+    check: async () => { if (ctx.update.state === 'ready') return; ctx.update.state = 'checking'; try { await reg.update(); } catch { /* offline */ } if (ctx.update.state === 'checking') ctx.update.state = 'idle'; markReady(); },
     apply: () => { if (!reg.waiting) return; userAsked = true; reg.waiting.postMessage({ type: 'SKIP_WAITING' }); },
   };
   reg.addEventListener('updatefound', () => {

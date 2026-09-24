@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 22.09.2026 (D-036 – D-064) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 24.09.2026 (D-036 – D-070; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -63,10 +63,16 @@
 | D-058 | Format pliku 2027-sync.json bez zmian (istniejące: schema, exportedAt, device, count, sha256, identyfikatory zdarzeń, deduplikacja po id); podgląd importu korzysta z istniejących pól exportedAt i device |
 | D-059 | Redesign — system projektowy: jedno źródło tokenów (`src/ui/tokens.css`), warstwa komponentów (`src/ui/system.css`); nazwy klas używane przez moduły i testy bez zmian |
 | D-060 | Font Inter (OFL) osadzony lokalnie jako podzbiór znaków aplikacji (32 KB, 2 pliki woff2; w wariancie jednoplikowym jako data URI); awaryjnie font systemowy |
-| D-061 | Motyw: domyślnie ciemny, przełącznik ciemny / jasny / systemowy; preferencje interfejsu (motyw, zwinięty panel) zapisywane per urządzenie (localStorage), poza dziennikiem zdarzeń i plikiem synchronizacji |
+| D-061 | Motyw: domyślnie ciemny (potwierdzone przez użytkownika 24.09.2026), przełącznik ciemny / jasny / systemowy; preferencje interfejsu (motyw, zwinięty panel) zapisywane per urządzenie (localStorage), poza dziennikiem zdarzeń i plikiem synchronizacji |
 | D-062 | Nawigacja: panel boczny z grupami Dzień / Trening / Dieta / Nauka / System (zgodne z domenami modułów w rejestrze), ikony Lucide (ISC, 40 ikon wbudowanych, 7 KB); telefon: Dziś, Dieta, Trening, CFA + „Więcej” |
 | D-063 | Akcent indygo: #4845D2 (jasny, 6,9:1 na karcie) / #A5A8FF (ciemny, 8,2:1) |
 | D-064 | Dashboard „Dziś” wyłącznie z istniejących danych (resolver + dziennik zdarzeń); suplementy na dashboardzie tylko jako podsumowanie liczbowe — nazwy dawek wyłącznie w planie dnia (zgodnie z D-041) |
+| D-065 | Testy bez plików użytkownika korzystają z danych SYNTETYCZNYCH (`tests/e2e/fixtures.py`): fikcyjne stany zapasów wyliczane wzorem z katalogu, pakiet prywatny wyłącznie z tekstami zastępczymi „[DANE TESTOWE]”; pliki tworzone w katalogu tymczasowym, nigdy w repozytorium; zero danych osobowych/medycznych. Zgoda użytkownika 24.09.2026 |
+| D-066 | Odnośniki w obrębie strony (`#id`) przewijają do elementu (`scrollIntoView`, fokus na celu) bez zmiany trasy routera; trasy modułów wyłącznie `#/modul` |
+| D-067 | PWA: kolor paska przeglądarki (`theme-color`) i ekranu startowego (manifest) zgodne z motywem domyślnym (ciemny `#0d0f13`); `apple-mobile-web-app-status-bar-style` pozostaje `default` (bez `black-translucent` — decyzja użytkownika 24.09.2026); zachowanie paska statusu do sprawdzenia na iPhonie |
+| D-068 | Trening: licznik przerwy między seriami — uruchamiany odhaczeniem serii w dniu bieżącym, czas z planu (`2–3 min` → 2:00 do gotowości, 3:00 do końca), „+30 s” i „Pomiń”; stan wyłącznie interfejsu (pamięć karty), **nie jest zapisywany w dzienniku zdarzeń ani synchronizowany**; bez powiadomień systemowych i dźwięku |
+| D-069 | Trening: karta „Następna seria” (pierwsza nieodhaczona seria w kolejności planu, z planem powtórzeń/RIR/przerwy i ostatnim wynikiem) oraz podsumowanie ukończonej sesji (serie, objętość, powtórzenia, czas) — wyłącznie z planu i dziennika `train.set`/`train.session` |
+| D-070 | CFA: tempo względem harmonogramu v3 — „zaległe” = bloki z datą wcześniejszą niż dziś i nieodhaczone (bloki dnia bieżącego nie są zaległe); panel zaległych (5 najstarszych) w widoku dnia bieżącego, filtr „tylko zaległe” w harmonogramie, następny blok dnia; error log z filtrem rodzaju błędu i wyszukiwaniem (tylko widok). Bez prognoz i metryk spoza planu |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
 ## Decyzje zastąpione
@@ -109,4 +115,5 @@
 
 ## Propozycje oczekujące na decyzję
 
-Brak.
+- G-20: dziennik kolana i monitoring (waga, sen, obwody) — czy mają trafić do aplikacji.
+- D-031: pliki eksportu CFA (postęp, error log) nie zostały dostarczone — funkcje importu są gotowe.

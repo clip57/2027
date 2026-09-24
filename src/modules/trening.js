@@ -3,9 +3,10 @@
 // mapa mięśni z free-exercise-db (domena publiczna).
 import { h, clear, add, fmt, plural } from '../ui/dom.js';
 import { progressRing, segmented, section, statGrid, stat } from '../ui/components.js';
+import { icon } from '../ui/icons.js';
 import { movementPlayer } from '../ui/movement.js';
 import { barChart, lineChart } from '../ui/charts.js';
-import { sessions, weekly, muscleSets, exerciseHistory, records, streakWeeks, weekStart } from '../core/calc/training.js';
+import { sessions, weekly, muscleSets, exerciseHistory, records, streakWeeks, weekStart, restSeconds, nextSet } from '../core/calc/training.js';
 import { bodyMap, MUSCLE_PL } from '../ui/bodymap.js';
 import { SRC } from '../core/data.js';
 import { resolveDay } from '../core/resolver.js';
@@ -17,6 +18,45 @@ const M = muscles.exercises;
 const TABS = [['pon', 'PN', 1], ['wt', 'WT', 2], ['sr', 'ŚR', 3], ['czw', 'CZW', 4], ['pt', 'PT', 5], ['sob', 'SOB', 6], ['nd', 'ND', 7]];
 const strip = html => (html || '').replace(/<[^>]+>/g, ' ').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 const serie = n => (n === 1 ? 'seria' : n >= 2 && n <= 4 ? 'serie' : 'serii');
+// Parametry ćwiczenia z planu (wiersz źródłowy `raw` ma pierwszeństwo — zawiera też zakres ruchu i progresję).
+const spec = e => (e.raw ? { reps: e.raw[2], rir: e.raw[3], rest: e.raw[4], range: e.raw[5], prog: e.raw[6] } : { reps: e.reps, rir: e.rir, rest: e.rest });
+const mmss = sec => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+
+// Licznik przerwy między seriami (D-068): stan wyłącznie interfejsu, w pamięci karty — nie trafia do dziennika zdarzeń
+// ani do pliku synchronizacji. Czas liczony od znacznika startu (poprawny także po wygaszeniu ekranu telefonu).
+let rest = null; // { key, date, name, set, of, next, start, min, max, label }
+function startRest(e, set, of, date, next) {
+  const r = restSeconds(spec(e).rest);
+  rest = r && next ? { key: `${date}|${e.id}|${set}`, date, name: e.name, set, of, next, start: Date.now(), ...r, label: spec(e).rest } : null;
+}
+function restBar() {
+  if (!rest) return null;
+  if ((Date.now() - rest.start) / 1000 > rest.max + 300) { rest = null; return null; } // dawno zakończona — nie wracamy do niej
+  const time = h('strong', { class: 'tr-rest-t' }), note = h('span', { class: 'tr-rest-n' }), fill = h('span', { class: 'tr-rest-fill' });
+  const live = h('span', { class: 'sr-only', role: 'status', 'aria-live': 'polite' });
+  let ready = false;
+  const bar = h('section', { class: 'tr-rest', 'aria-label': 'Przerwa między seriami' },
+    h('span', { class: 'tr-rest-ic' }, icon('timer', { size: 20 })),
+    h('div', { class: 'tr-rest-main' }, note, time, h('span', { class: 'tr-rest-next' }, `Następnie: ${rest.next.e.name} · seria ${rest.next.set} z ${rest.next.of}`),
+      h('span', { class: 'tr-rest-bar', role: 'presentation' }, fill)),
+    h('div', { class: 'tr-rest-act' },
+      h('button', { onclick: () => { rest.min += 30; rest.max += 30; ready = false; tick(); } }, '+30 s'),
+      h('button', { 'aria-label': 'Pomiń przerwę', onclick: () => { rest = null; bar.remove(); } }, icon('skip-forward', { size: 18 }), h('span', {}, 'Pomiń'))),
+    live);
+  function tick() {
+    if (!rest) return false;
+    const el = (Date.now() - rest.start) / 1000, left = rest.min - el;
+    time.textContent = left > 0 ? mmss(Math.ceil(left)) : `+${mmss(-left)}`;
+    fill.style.width = `${Math.min(100, (el / rest.min) * 100)}%`;
+    note.textContent = left > 0 ? `Przerwa · plan ${rest.label}` : el < rest.max ? `Możesz zaczynać · plan ${rest.label}` : 'Przerwa zakończona';
+    bar.classList.toggle('is-ready', left <= 0);
+    if (left <= 0 && !ready) { ready = true; live.textContent = `Przerwa zakończona. Następnie: ${rest.next.e.name}, seria ${rest.next.set}.`; }
+    return true;
+  }
+  tick();
+  const id = setInterval(() => { if (!rest || !bar.isConnected) clearInterval(id); else tick(); }, 1000); // nowy widok = nowy pasek
+  return bar;
+}
 
 // Czas treningu: stoper (start/stop zapisywany w dzienniku) lub wpis ręczny w minutach (zdarzenie train.session).
 function sessionTimer(store, date, ctx, msg) {
@@ -40,8 +80,8 @@ function sessionTimer(store, date, ctx, msg) {
         : h('p', { class: 'muted' }, cur.minutes ? `Zapisano: ${cur.minutes} min` : 'Nie zapisano czasu')),
     h('div', { class: 'row' },
       running ? h('button', { class: 'primary', onclick: () => { const end = new Date().toISOString();
-          saveSess({ end, minutes: Math.max(1, Math.round((Date.parse(end) - Date.parse(cur.start)) / 60000)) }); } }, '⏹ Zakończ trening')
-        : h('button', { onclick: () => saveSess({ start: new Date().toISOString(), end: null }) }, cur.minutes ? '▶ Uruchom ponownie' : '▶ Rozpocznij trening'),
+          saveSess({ end, minutes: Math.max(1, Math.round((Date.parse(end) - Date.parse(cur.start)) / 60000)) }); } }, icon('square', { size: 18 }), h('span', {}, 'Zakończ trening'))
+        : h('button', { onclick: () => saveSess({ start: new Date().toISOString(), end: null }) }, icon('play', { size: 18 }), h('span', {}, cur.minutes ? 'Uruchom ponownie' : 'Rozpocznij trening')),
       h('label', { class: 'tm-man' }, h('span', {}, 'lub wpisz:'), minutes, h('span', {}, 'min'))));
 }
 
@@ -128,6 +168,9 @@ function renderSession(root, ctx) {
   const sessionMuscles = { primary: [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.primary || []))] };
   sessionMuscles.secondary = [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.secondary || []))].filter(m => !sessionMuscles.primary.includes(m));
   const sheets = T.sheets.filter(s => s.length > 5);
+  const nx = nextSet(plan, log, date);
+  const sessNow = sessions(log, store?.state?.trainSessions || {}).find(x => x.date === date);
+  const lastLine = e => { const l = lastResult(log, e.id, date); return l ? ` · ostatnio ${l.sets.map(x => `${x.kg ?? '–'} kg × ${x.reps ?? '–'}`).join(', ')}` : ''; };
 
   // --- pasek dni z nazwami sesji
   add(root, h('div', { class: 'day-strip', role: 'tablist', 'aria-label': 'Dzień tygodnia' },
@@ -146,6 +189,17 @@ function renderSession(root, ctx) {
       total > 0 && h('p', { class: 'muted' }, `${exercises.filter((_, i) => plan[i].n > 0).length} ćwiczeń · ${total} ${serie(total)}`),
       h('div', { class: 'row' }, sheets.map(sh => h('button', { class: 'chip-b', onclick: () => infoDialog(sh) }, sh.split('✕')[0].trim())))),
     total > 0 && h('div', { class: 'hero-tr-side' }, progressRing(done, total, 'Wykonane serie'), h('span', { class: 'muted' }, `${done} / ${total} serii`)),
+    // Następna seria z planu albo podsumowanie ukończonej sesji (wyłącznie z dziennika — D-069)
+    total > 0 && (nx
+      ? h('div', { class: 'tr-next' },
+        h('div', {}, h('p', { class: 'eyebrow' }, done ? 'Następna seria' : 'Pierwsza seria'),
+          h('p', { class: 'tr-next-t' }, `${nx.e.name} · seria ${nx.set} z ${nx.of}`),
+          h('p', { class: 'muted' }, `plan: ${spec(nx.e).reps} powt. · RIR ${spec(nx.e).rir} · przerwa ${spec(nx.e).rest}${lastLine(nx.e)}`)),
+        h('a', { class: 'btn', href: `#ex-${nx.e.id}` }, icon('chevron-down', { size: 18 }), h('span', {}, 'Przejdź do ćwiczenia')))
+      : h('div', { class: 'tr-next tr-done' },
+        h('span', { class: 'tr-done-ic' }, icon('circle-check', { size: 22 })),
+        h('div', {}, h('p', { class: 'tr-next-t' }, 'Sesja ukończona'),
+          h('p', { class: 'muted' }, `${sessNow.sets} ${plural(sessNow.sets, 'seria', 'serie', 'serii')} · ${fmt(Math.round(sessNow.volume))} kg objętości · ${fmt(sessNow.reps)} powt.${sessNow.minutes ? ` · ${sessNow.minutes} min` : ' · czas nie zapisany'}`)))),
     sessionTimer(store, date, ctx, msg),
     total > 0 && h('div', { class: 'hero-tr-map' }, bodyMap(sessionMuscles, { size: 'md', title: 'Mięśnie w tej sesji' }), muscleLegend(sessionMuscles))));
 
@@ -174,8 +228,8 @@ function renderSession(root, ctx) {
   add(root, phaseBlock('🔥 Rozgrzewka · 10 min', T.warmup[key]));
 
   add(root, h('div', { class: 'ex-list' }, plan.map(({ e, n }, idx) => {
-    const rom = e.raw ? { reps: e.raw[2], rir: e.raw[3], rest: e.raw[4], range: e.raw[5], prog: e.raw[6] } : null;
-    const reps = rom ? rom.reps : e.reps, rir = rom ? rom.rir : e.rir, rest = rom ? rom.rest : e.rest;
+    const rom = e.raw ? spec(e) : null;
+    const { reps, rir, rest: pause } = spec(e);
     const last = lastResult(log, e.id, date);
     const exDone = [...Array(n)].filter((_, i) => log[`${date}|${e.id}|${i + 1}`]?.done).length;
     const sets = [...Array(n)].map((_, i) => {
@@ -185,21 +239,26 @@ function renderSession(root, ctx) {
         onchange: ev => { const x = ev.target.value === '' ? null : Number(ev.target.value); if (x === null || Number.isFinite(x)) save(e.id, s, { [field]: x }); } });
       return h('div', { class: `set${v.done ? ' is-done' : ''}` },
         h('button', { class: 'set-toggle', 'aria-pressed': String(!!v.done), 'aria-label': `Seria ${s} ${v.done ? 'wykonana' : 'do wykonania'}`,
-          onclick: () => save(e.id, s, { done: !v.done }, true) }, v.done ? '✓' : String(s)),
+          onclick: () => {
+            const key = `${date}|${e.id}|${s}`;
+            if (!v.done && date === ctx.today) startRest(e, s, n, date, nextSet(plan, { ...store?.state?.train, [key]: { done: true } }, date));
+            else if (v.done && rest?.key === key) rest = null;
+            save(e.id, s, { done: !v.done }, true);
+          } }, v.done ? '✓' : String(s)),
         num('kg', 'kg', '0.5'), num('reps', 'powt.', '1'), num('rir', 'RIR', '1'),
         s > 1 && prev && (prev.kg != null || prev.reps != null) && !v.kg && !v.reps
           ? h('button', { class: 'set-copy', title: 'Skopiuj z poprzedniej serii', 'aria-label': `Skopiuj wartości serii ${s - 1}`,
-            onclick: () => save(e.id, s, { kg: prev.kg ?? null, reps: prev.reps ?? null, rir: prev.rir ?? null }, true) }, '↧')
+            onclick: () => save(e.id, s, { kg: prev.kg ?? null, reps: prev.reps ?? null, rir: prev.rir ?? null }, true) }, icon('copy', { size: 16 }))
           : h('span', { class: 'set-copy-sp' }));
     });
-    return h('article', { class: `ex${n > 0 && exDone === n ? ' is-complete' : ''}` },
+    return h('article', { class: `ex${n > 0 && exDone === n ? ' is-complete' : ''}${nx?.e === e ? ' is-next' : ''}`, id: `ex-${e.id}` },
       h('div', { class: 'ex-top' },
         h('div', { class: 'ex-main' },
           h('div', { class: 'ex-head' }, h('span', { class: 'ex-n' }, n > 0 && exDone === n ? '✓' : String(idx + 1)),
             h('div', { class: 'ex-title' }, h('h3', {}, e.name), h('p', { class: 'muted' }, T.info[e.name]?.en || ''))),
           h('p', { class: 'ex-plan' },
             h('span', { class: 'kpi' }, h('b', {}, String(n)), serie(n)), h('span', { class: 'kpi' }, h('b', {}, reps), 'powt.'),
-            h('span', { class: 'kpi' }, h('b', {}, rir), 'RIR'), h('span', { class: 'kpi' }, h('b', {}, rest), 'przerwa')),
+            h('span', { class: 'kpi' }, h('b', {}, rir), 'RIR'), h('span', { class: 'kpi' }, h('b', {}, pause), 'przerwa')),
           rom && h('p', { class: 'ex-note' }, `Zakres: ${rom.range} · progresja: ${rom.prog}`),
           e.note_html && h('p', { class: 'ex-note' }, strip(e.note_html)),
           last && h('p', { class: 'ex-last' }, `Ostatnio (${last.date.slice(8)}.${last.date.slice(5, 7)}): `,
@@ -209,7 +268,7 @@ function renderSession(root, ctx) {
       n === 0 ? optionalSets(e) :
         h('div', { class: 'sets' }, h('div', { class: 'set set-h' }, h('span', {}, 'Seria'), h('span', {}, 'kg'), h('span', {}, 'powt.'), h('span', {}, 'RIR'), h('span', {})), sets));
   })));
-  add(root, phaseBlock('❄️ Schłodzenie · 10 min', T.cooldown[key]));
+  add(root, phaseBlock('❄️ Schłodzenie · 10 min', T.cooldown[key]), rest?.date === date ? restBar() : null);
 }
 
 // ---------------- Statystyki (styl Hevy) ----------------

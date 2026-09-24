@@ -3,37 +3,70 @@
 ## 1. Zestawy testów
 | Zestaw | Komenda | Co sprawdza | Wymaga |
 |---|---|---|---|
-| Jednostkowe | `npm test` | rdzeń: daty, resolver, zużycie, zapasy, dieta, suplementy, trening, Meal Prep, mięśnie, zapis, synchronizacja, zgodność w przód | Node 22 |
+| Jednostkowe | `npm test` | rdzeń: daty, resolver, zużycie, zapasy, dieta, suplementy, trening, Meal Prep, mięśnie, zapis, synchronizacja, zgodność w przód; tokeny wyglądu (identyczne bloki motywu ciemnego, kontrast 23 par w obu motywach) | Node 22 |
 | Weryfikacja danych | `npm run verify` | zgodność `src/data/*.json` z plikami źródłowymi (407 kontroli) | **`SOURCES_DIR`** (pliki użytkownika — brak w repo) |
-| E2E | `npm run build && npm run e2e` | wszystkie moduły w 2 wariantach buildu (web przez http://localhost:8765, jeden plik przez file://) × 390 px (mobile, dotyk) / 1280 px; brak przewijania w poziomie, brak artefaktów „null/false/undefined/NaN”, cele dotykowe ≥ 44 px, funkcje modułów, trwałość zapisu, eksport/import, offline (SW) | Python 3, Playwright ≥ 1.56, Chromium; opcjonalnie `SOURCES_DIR`, `PRIVATE_PACK` |
+| E2E | `npm run build && npm run e2e` | wszystkie moduły w 2 wariantach buildu (web przez http://localhost:8765, jeden plik przez file://) × 390 px (mobile, dotyk) / 1280 px; brak przewijania w poziomie, brak artefaktów „null/false/undefined/NaN”, cele dotykowe ≥ 44 px (widok Dane na 390 px), funkcje modułów, trwałość zapisu, eksport/import, offline (SW), kontrast odhaczonych elementów, linki w obrębie strony, sygnatury modułów | Python 3, Playwright ≥ 1.56, Chromium; `SOURCES_DIR`, `PRIVATE_PACK` opcjonalnie — bez nich dane syntetyczne (D-065) |
 | Synchronizacja i aktualizacja | `npm run e2e:sync` | 2 oddzielne profile (osobne bazy): sync w obu kierunkach, niezależne zmiany, brak duplikatów, ostrzeżenie o starszym pliku, zdarzenia z nowszej wersji (baner, brak utraty), aktualizacja kodu tylko za zgodą, offline po aktualizacji, przejście ze starego SW | jw.; **przebudowuje `dist/` kilka razy** (na końcu przywraca zwykły build); porty 8791 |
-| Dostępność | `npm run build && npm run a11y` | axe-core WCAG 2.1 A/AA na 20 widokach × 390/1280 px × motyw jasny/ciemny (80 przebiegów) + przewijanie w poziomie | jw. |
+| Dostępność | `npm run build && npm run a11y` | axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
 
 Kolejność po każdej zmianie w Fazie 5: `npm run build && npm test && npm run e2e && npm run a11y`;
 dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, `tools/build.mjs`, `src/modules/dane.js`.
 
-## 2. Wyniki regresji (24.09.2026, po przygotowaniu pakietu przekazania)
-Build: **OK** — wersja `0.2.0+c702f16bc3`; `dist/web/app.*.js` 682 660 B; `dist/single/2027.html` 806 405 B.
+## 2. Wyniki regresji
 
-| Zestaw | Konfiguracja A — z plikami użytkownika (`SOURCES_DIR`, `PRIVATE_PACK`) | Konfiguracja B — bez plików (tak jak w repozytorium) |
-|---|---|---|
-| Jednostkowe | 74 uruchomione · **74 zaliczone · 0 niezaliczonych · 0 pominiętych** | 74 · **73 zaliczone · 0 niezaliczonych · 1 pominięty** (migracja kopii ZAPASY — wymaga pliku) |
-| Weryfikacja danych | **407 kontroli · 0 błędów** | **nieuruchomiona** — skrypt kończy się komunikatem „Ustaw SOURCES_DIR” |
-| E2E | **812 kontroli · 812 zaliczonych · 0 niezaliczonych · 0 pominiętych bloków** | **516 kontroli · 516 zaliczonych · 0 niezaliczonych · 4 pominięte bloki** (import kopii ZAPASY z zależnymi kontrolami w każdej z 4 konfiguracji; w tym blok pakietu prywatnego) — 296 kontroli nie wykonano |
-| Synchronizacja i aktualizacja | **19 kontroli · 19 zaliczonych · 0 niezaliczonych · 0 pominiętych** | **19 · 19 zaliczonych · 0 niezaliczonych · 1 pominięty blok** (import kopii ZAPASY zastąpiony ustawieniem stanów testowych; reszta scenariusza wykonana) — 2 kolejne przebiegi stabilne |
-| Dostępność | 80 przebiegów · **0 typów naruszeń** · przewijanie w poziomie: **brak** | nie zależy od plików — wynik jak w A |
+### Faza 5 — Trening i CFA (24.09.2026, konfiguracja B)
+Build: **OK** — wersja `0.2.0+4830b6b2a4`; `dist/web/app.*.js` 674 KB (+7 KB: licznik, karty, 5 ikon); `dist/single/2027.html` 801 KB.
 
-Zmiany w testach wprowadzone w tym kroku (bez zmiany sprawdzeń aplikacji):
-- pominięte bloki raportowane jawnie (`skip()`; wcześniej liczone jako „zaliczone”);
-- `sync_update.py`: ścieżka bez plików ustawia testowe stany banana i kefiru i czeka na potwierdzenie zapisu
-  (wcześniej w konfiguracji B test kończył się błędem `ValueError` — błąd testu, nie aplikacji).
+| Zestaw | Wynik |
+|---|---|
+| Jednostkowe | 84 uruchomione · **83 zaliczone · 0 niezaliczonych · 1 pominięty** (migracja prawdziwej kopii ZAPASY) |
+| Weryfikacja danych | **nieuruchomiona** (wymaga `SOURCES_DIR`) |
+| E2E | **885 kontroli · 885 zaliczonych · 0 niezaliczonych · 0 pominiętych bloków** (+39 nowych z zegarem) |
+| Synchronizacja i aktualizacja | **21 kontroli · 21 zaliczonych · 0 pominiętych** (przebieg po zmianach w `core/calc`; końcowa poprawka dotyczyła tylko CSS) |
+| Dostępność | 116 przebiegów (20 widoków + 9 stanów × 2 szerokości × 2 motywy) · **0 typów naruszeń** · przewijanie w poziomie: **brak** |
+
+Kontrola wizualna: 375 px (jasny), 390 px (ciemny), 1280 px (jasny), 1440 px (ciemny) — Trening z licznikiem przerwy, CFA z panelem
+zaległych; brak przewijania w poziomie.
+
+Nowe kontrole: `tests/unit/cfa-pace.test.mjs` (6: `cfaPace`, `restSeconds` — także każda przerwa w danych TRENING, `nextSet`);
+E2E `run_features()` — przeglądarka z zegarem ustawionym na pn 28.09.2026 10:00 (Playwright `clock.install`), 2 konfiguracje
+(web 390 px, jeden plik 1280 px): karta następnej serii, licznik przerwy (start, odliczanie z `fast_forward`, „+30 s”, koniec
+ogłoszony czytnikom, „Pomiń”), przewinięcie do ćwiczenia, podsumowanie ukończonej sesji, brak licznika dla innego dnia; CFA — tempo
+i zaległe (oczekiwania liczone z `cfa.json`), panel zaległych, odhaczenie zaległego, nawigacja dni, filtr „tylko zaległe”, filtr i
+wyszukiwanie error logu, cele dotykowe ≥ 44 px w Treningu i CFA na 390 px. a11y: zegar jak wyżej, nowe stany „licznik przerwy”
+i „filtr error logu”; zmienione nazwy przycisków: „Rozpocznij trening”, „Zakończ trening” (ikony zamiast ▶/⏹).
+
+### Faza 5.0 (24.09.2026, konfiguracja B — bez plików użytkownika, jak w repozytorium; dane syntetyczne D-065)
+Build: **OK** — wersja `0.2.0+4bd48a78e2` (końcowy przebieg; numer zmienia się z każdą zmianą kodu); `dist/web/app.*.js` 667 KB; `dist/single/2027.html` 790 KB.
+
+| Zestaw | Wynik |
+|---|---|
+| Jednostkowe | 78 uruchomionych · **77 zaliczonych · 0 niezaliczonych · 1 pominięty** (migracja prawdziwej kopii ZAPASY — wymaga pliku) |
+| Weryfikacja danych | **nieuruchomiona** (wymaga `SOURCES_DIR`) |
+| E2E | **846 kontroli · 846 zaliczonych · 0 niezaliczonych · 0 pominiętych bloków** (bloki zapasów, Meal Prep, eksportu/importu i pakietu prywatnego wykonane na danych syntetycznych) |
+| Synchronizacja i aktualizacja | **21 kontroli · 21 zaliczonych · 0 pominiętych** — 2 kolejne przebiegi stabilne |
+| Dostępność | 108 przebiegów · **0 typów naruszeń** · przewijanie w poziomie: **brak** |
+
+Konfiguracja A (z plikami użytkownika) **nie była uruchamiana** w Fazie 5.0 — ścieżka z prawdziwymi plikami pozostała
+w testach bez zmian oczekiwań (55 zmian, banan od 240 g, 30 fragmentów pakietu); do potwierdzenia przy najbliższym uruchomieniu u użytkownika.
+Wyniki z Faz 3–4 (A: 74/74, E2E 812/812, sync 19/19; B: 73+1 pominięty, E2E 516 + 4 pominięte bloki, sync 19 + 1 pominięty blok) — historyczne.
+
+Nowe testy wykrywają błędy starego kodu (sprawdzone na kodzie sprzed poprawek): `tokens.test.mjs` — 2 z 4 testów niezaliczone
+(brak tokenu tekstu na `--success`); `a11y.py` ze stanami — `color-contrast` dla `.tg-law` (ciemny) i szarego tekstu odhaczonego bloku CFA (jasny).
+
+### Dane syntetyczne (D-065)
+`tests/e2e/fixtures.py`: kopia w formacie ZAPASY v31 — stany = zużycie dzienne z katalogu × umowna liczba dni (1,5 / 3 / 6 / 12 / 25,
+cyklicznie), data inwentaryzacji = wczoraj, 2 wpisy historii „[DANE TESTOWE]”; pakiet prywatny — 4 sekcje o poprawnej strukturze,
+fragmenty dla każdego znacznika `{private:N}` z tekstem „[DANE TESTOWE] …”. Oczekiwane wartości (liczba zdarzeń, stan banana,
+liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tymczasowym; nic nie trafia do repozytorium.
 
 ## 3. Kryteria akceptacji dla Fazy 5 (każdy moduł)
 1. `npm run build` bez błędów; oba warianty (`dist/web`, `dist/single/2027.html`).
 2. Jednostkowe: 0 niezaliczonych (pominięty wyłącznie test migracji bez `SOURCES_DIR`).
-3. E2E: 0 niezaliczonych; liczba kontroli nie mniejsza niż przed zmianą (konfiguracja B: ≥ 516), chyba że raport wyjaśnia różnicę.
-4. `npm run a11y`: 0 naruszeń, brak przewijania w poziomie, w obu motywach.
-5. `npm run e2e:sync` (jeśli dotyczy): 19/19.
+3. E2E: 0 niezaliczonych; liczba kontroli nie mniejsza niż przed zmianą (konfiguracja B: ≥ 846, 0 pominiętych bloków), chyba że raport wyjaśnia różnicę.
+4. `npm run a11y`: 0 naruszeń, brak przewijania w poziomie, w obu motywach; nowy stan interakcji modułu (odhaczenie, rozwinięcie, okno) dopisz do `STATES`.
+   `npm test` obejmuje `tokens.test.mjs` — nowy kolor tekstu dopisz do `PAIRS`.
+5. `npm run e2e:sync` (jeśli dotyczy): 21/21.
 6. Brak błędów w konsoli przeglądarki (E2E zbiera `pageerror` i `console.error`).
 7. Zrzuty 375/390/1280/1440 px w motywie ciemnym i jasnym przejrzane; brak regresji wyglądu innych modułów.
 8. Żadne dane, dawki, gramatury, godziny ani teksty merytoryczne nie zmienione; D-041/D-064 zachowane
@@ -46,7 +79,11 @@ Zmiany w testach wprowadzone w tym kroku (bez zmiany sprawdzeń aplikacji):
 .hist-list .inv .inv-item .is-min .log-item .log-list .meal .more-list .mp-next .mp-ring .mv-cues .mv-phase .nowcard .opt-note
 .panel .pill-b .pills .prep-card .prep-list .priv-in .priv-miss .prog .quicklinks .rk-sec .safety-table .set .set-copy .set-h
 .set-toggle .sf-card .sheet .sheet-head .shop-list .side .side-a .side-gl .slot .slot-items .slot-title .stats .tabs .tm
-.tm-clock .tm-man .topic .topline`
+.tm-clock .tm-man .topic .topline .gd-card .gd-rt .more-ic .more-n .mp-jump .prep-list .cfa-row .set:not(.set-h)
+.tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa`
+(od Fazy 5.0 także: atrybut `data-meal`, identyfikatory `mp-ph-N`, tekst „Przejdź do karty”; od Fazy 5: identyfikatory `ex-<id>`,
+przyciski „Rozpocznij trening”, „Zakończ trening”, „+30 s”, „Pomiń przerwę”, „Dodaj wpis”, „pośpiech: 1”, „Wszystkie: N”, linki
+„Przejdź do ćwiczenia”, „Następny dzień”, teksty „Zaległe: N bloków”, „Plan do wczoraj”, „Sesja ukończona”, „Następny: blok A”).
 Testy używają też: ról i nazw przycisków (np. „Wyślij do iCloud”, „Nowa wersja — odśwież”, „Motyw: Jasny”, „Zwiń panel”,
 „↩ Cofnij”, „+ opakowanie”), atrybutów `aria-pressed`, `aria-current`, `data-theme`, `meta[name=app-version]`, tekstów
 komunikatów (np. „Zaimportowano”, „Niepełne przetwarzanie”, „STARSZY”), placeholderów pól (`kg`, `powt.`, `RIR`).
@@ -63,9 +100,13 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
 5. Okna (Zapasy → Zakupy / Historia / Kopia; Trening → „Technika i mięśnie”): otwierają się jako arkusz od dołu, przewijają, zamykają.
 6. Dashboard „Dziś”: karta „Teraz”, 4 kafle, karty boczne, plan dnia — czytelne, brak poziomego przewijania.
 7. Font Inter widoczny także offline (tryb samolotowy, PWA).
+   PWA: ekran startowy ciemny (bez białego błysku); pasek statusu czytelny w motywie ciemnym i jasnym (`status-bar-style: default`, D-067).
+   Meal Prep → skróty faz i „Przejdź do karty”: przewijają w obrębie modułu (nie przenoszą na „Dziś”).
+   Trening (dzień z treningiem): po odhaczeniu serii pasek przerwy nad dolnym paskiem; przy wygaszonym ekranie i powrocie czas się zgadza;
+   przy otwartej klawiaturze (pole kg) pasek przerwy się chowa i wraca. CFA: panel zaległych i nawigacja dni czytelne na 375 px.
 8. Synchronizacja: pełna procedura `docs/TEST_IPHONE_SYNC.md` (komputer ↔ Safari ↔ PWA, niezależne zmiany, starszy plik, offline, aktualizacja za zgodą).
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 
-Stan: **punkty 1–8 dla Faz 3–4 nie zostały jeszcze zweryfikowane przez użytkownika.** Procedura synchronizacji
+Stan: **punkty 1–8 dla Faz 3–4 i 5.0 nie zostały jeszcze zweryfikowane przez użytkownika.** Procedura synchronizacji
 (`TEST_IPHONE_SYNC.md`) została potwierdzona dla wersji sprzed redesignu.
