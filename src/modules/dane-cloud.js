@@ -1,14 +1,27 @@
-// Sekcja „Synchronizacja w chmurze” modułu Dane (D-078, Etap 2; D-081…D-083). Kroki: konfiguracja projektu →
-// logowanie → hasło szyfrowania → „Synchronizuj teraz”. Synchronizacja wyłącznie przyciskiem; ręczna synchronizacja
-// plikiem 2027-sync.json (sekcja wyżej) działa niezależnie i bez zmian.
+// Sekcja „Synchronizacja w chmurze” modułu Dane (D-078, Etap 2; D-081…D-084). Kroki: konfiguracja projektu →
+// logowanie → hasło szyfrowania → synchronizacja automatyczna (D-084, przełącznik per urządzenie) i „Synchronizuj teraz”
+// (ręczne wymuszenie). Ręczna synchronizacja plikiem 2027-sync.json (sekcja wyżej) działa niezależnie i bez zmian.
 import { h, add, plural } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
-import { cloudStatus, saveConfig, signIn, unlock, signOut, resetDevice, syncNow, describeError, describeResult } from '../core/sync/cloud-local.js';
+import { cloudStatus, saveConfig, signIn, unlock, signOut, resetDevice, syncNow, setAutoEnabled, describeError, describeResult } from '../core/sync/cloud-local.js';
 
 // Stan interfejsu w pamięci modułu (przetrwa przerysowanie widoku po zapisie)
 const ui = { note: null, needConfirm: false, busy: false, focus: null };
 const when = iso => (iso ? new Date(iso).toLocaleString('pl-PL') : 'jeszcze nie');
 const maskKey = k => (k.length > 22 ? `${k.slice(0, 18)}…${k.slice(-4)}` : k);
+
+const hhmm = t => new Date(t).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+const unsentText = n => (n ? `Do wysłania do chmury: ${n} ${plural(n, 'zmiana', 'zmiany', 'zmian')} z tego urządzenia.` : 'Wszystkie zmiany z tego urządzenia są w chmurze.');
+// Stan synchronizacji automatycznej jednym zdaniem (bez komunikatów przy każdej zmianie — D-084)
+export function autoText(s, on) {
+  if (!on) return 'Automatyczna synchronizacja wyłączona na tym urządzeniu — synchronizujesz przyciskiem.';
+  switch (s?.phase) {
+    case 'running': return 'Synchronizacja w toku…';
+    case 'retry': return s.error?.code === 'network' ? 'Brak połączenia — zmiany zostaną wysłane automatycznie, gdy wróci internet.' : 'Serwer chmury chwilowo nie odpowiada — ponowienie automatyczne.';
+    case 'paused': return `Wstrzymana: ${describeError(s.error)}`;
+    default: return s?.waiting ? 'Zmiany zostaną wysłane za chwilę.' : `Synchronizacja automatyczna włączona${s?.lastOk ? ` · ostatnio ${hhmm(s.lastOk)}` : ''}.`;
+  }
+}
 
 function field(label, attrs) {
   const input = h('input', { autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false', ...attrs });
@@ -44,7 +57,7 @@ export async function cloudSection(ctx) {
     config: ['cloud-off', 'Nieskonfigurowana na tym urządzeniu.'],
     login: ['lock', 'Zaloguj się, aby synchronizować.'],
     unlock: ['lock', 'Podaj hasło szyfrowania, aby odblokować dane.'],
-    ready: st.pending ? ['cloud-upload', `Do wysłania do chmury: ${st.pending} ${plural(st.pending, 'zmiana', 'zmiany', 'zmian')} z tego urządzenia.`] : ['cloud-check', 'Wszystkie zmiany z tego urządzenia są w chmurze.'],
+    ready: [st.pending ? 'cloud-upload' : 'cloud-check', unsentText(st.pending)],
   }[st.step];
   const sec = h('section', { class: `panel dn-cloud is-${st.step}${st.step === 'ready' && st.pending ? ' has-unsent' : ''}`, 'aria-labelledby': 'h-cloud' },
     h('h2', { id: 'h-cloud' }, icon('cloud', { size: 20 }), 'Synchronizacja w chmurze'),
@@ -91,28 +104,55 @@ export async function cloudSection(ctx) {
           try {
             const r = await unlock(store, { passphrase: pass.value, confirm: ui.needConfirm ? conf.value : undefined });
             ui.needConfirm = false;
+            ctx.cloudAuto?.kick();   // pierwsza synchronizacja automatycznie (gdy włączona na urządzeniu)
             done(`${r.created ? 'Hasło szyfrowania ustawione.' : 'Hasło szyfrowania poprawne.'} ${r.persistent ? '' : 'Ta przeglądarka nie zapamiętuje kluczy — po ponownym uruchomieniu podasz hasło jeszcze raz. '}Możesz synchronizować.`, 'info', 'sync');
           } catch (e) { if (e.code === 'need-confirm') { isFirst = true; return; } throw e; }
         }, 'unlock').then(() => { if (isFirst) { reveal(); conf.focus(); } });
       }, fp, fc,
         h('div', { class: 'row' }, h('button', { class: 'primary', type: 'submit' }, icon('lock', { size: 18 }), submitLbl),
-          h('button', { type: 'button', onclick: e => run(e.currentTarget, 'Wylogowywanie…', async () => { await signOut(store); ui.needConfirm = false; done('Wylogowano z chmury.', 'info'); }) }, icon('log-out', { size: 18 }), h('span', {}, 'Wyloguj')))));
+          h('button', { type: 'button', onclick: e => run(e.currentTarget, 'Wylogowywanie…', async () => { await signOut(store); ui.needConfirm = false; ctx.cloudAuto?.kick(); done('Wylogowano z chmury.', 'info'); }) }, icon('log-out', { size: 18 }), h('span', {}, 'Wyloguj')))));
   } else {
+    const auto = ctx.cloudAuto;
+    // „Synchronizuj teraz” = ręczne wymuszenie pełnej rundy: przejmuje oczekujące zmiany, czeka na trwającą rundę automatyczną
     const syncBtn = h('button', { class: 'primary', type: 'button', onclick: () => run(syncBtn, 'Synchronizuję…', async () => {
+      auto?.cancelPending(); await auto?.idle(); auto?.cancelPending();
       const r = await syncNow(store);
+      auto?.settled(true);
       done(describeResult(r), r.rejected?.length ? 'warn' : 'info');
     }, 'sync') }, icon('refresh-cw', { size: 18 }), h('span', {}, 'Synchronizuj teraz'));
+    const toggle = h('button', { type: 'button', class: 'dn-cloud-auto-b', 'aria-pressed': String(st.auto), onclick: () => run(toggle, 'Zapisywanie…', async () => {
+      await setAutoEnabled(store, !st.auto); auto?.kick();
+      done(st.auto ? 'Synchronizacja automatyczna wyłączona na tym urządzeniu. Synchronizujesz przyciskiem.' : 'Synchronizacja automatyczna włączona na tym urządzeniu.', 'info');
+    }, 'sync') }, icon(st.auto ? 'cloud-check' : 'cloud-off', { size: 18 }), h('span', {}, 'Synchronizuj automatycznie'));
+    const line = h('p', { class: 'dn-cloud-auto', role: 'status' }, autoText(auto?.state(), st.auto));
     first = syncBtn;
-    add(sec, h('div', { class: 'row' }, syncBtn,
-      h('button', { type: 'button', onclick: e => run(e.currentTarget, 'Wylogowywanie…', async () => { await signOut(store); done('Wylogowano z chmury. Dane na tym urządzeniu pozostają bez zmian.', 'info'); }) }, icon('log-out', { size: 18 }), h('span', {}, 'Wyloguj'))),
-      h('p', { class: 'muted' }, 'Synchronizacja uruchamia się tylko tym przyciskiem: pobiera zmiany z innych urządzeń, a potem wysyła zmiany z tego urządzenia. Konflikty rozstrzyga nowsza zmiana, starsza zostaje w historii. Bez internetu aplikacja działa normalnie — zsynchronizujesz później.'));
+    add(sec, line, h('div', { class: 'row' }, syncBtn, toggle,
+      h('button', { type: 'button', onclick: e => run(e.currentTarget, 'Wylogowywanie…', async () => { await signOut(store); auto?.kick(); done('Wylogowano z chmury. Dane na tym urządzeniu pozostają bez zmian.', 'info'); }) }, icon('log-out', { size: 18 }), h('span', {}, 'Wyloguj'))),
+      h('p', { class: 'muted' }, st.auto
+        ? 'Zmiany są wysyłane automatycznie chwilę po zapisie, a zmiany z innych urządzeń pobierane przy otwarciu aplikacji, powrocie do niej i po powrocie internetu. „Synchronizuj teraz” wymusza pełną synchronizację od razu. Konflikty rozstrzyga nowsza zmiana, starsza zostaje w historii. Bez internetu aplikacja działa normalnie.'
+        : 'Synchronizacja uruchamia się tylko przyciskiem: pobiera zmiany z innych urządzeń, a potem wysyła zmiany z tego urządzenia. Konflikty rozstrzyga nowsza zmiana, starsza zostaje w historii. Bez internetu aplikacja działa normalnie — zsynchronizujesz później.'));
+    // Stan na żywo (bez przerysowania widoku): zdanie o automacie + licznik niewysłanych zmian po każdej rundzie
+    const head = sec.querySelector('.dn-sync-s span');
+    const unsub = auto?.subscribe(async s => {
+      if (!sec.isConnected) { unsub?.(); return; }
+      line.textContent = autoText(s, st.auto);
+      if (s.phase === 'idle' && !s.waiting) {
+        const cur = await cloudStatus(store);
+        if (!sec.isConnected || cur.step !== 'ready') return;
+        head.textContent = unsentText(cur.pending);
+        const m = sec.querySelector('.dn-sync-m');
+        if (m) m.textContent = `Konto: ${cur.user?.email || '—'} · ostatnia synchronizacja: ${when(cur.lastSync)}`;
+        sec.classList.toggle('has-unsent', !!cur.pending);
+        sec.querySelector('.dn-sync-s .ico')?.replaceWith(icon(cur.pending ? 'cloud-upload' : 'cloud-check', { size: 20 }));
+      }
+    });
   }
   add(sec, noteBox);
 
   if (store && st.config) {
     const reset = h('button', { class: 'danger', type: 'button', onclick: () => run(reset, 'Odłączanie…', async () => {
       if (!confirm('Odłączyć to urządzenie od chmury? Konfiguracja, sesja i klucze zostaną usunięte z tego urządzenia. Dane lokalne i dane w chmurze pozostaną bez zmian.')) return;
-      await resetDevice(store); ui.needConfirm = false; done('Urządzenie odłączone od chmury. Dane lokalne bez zmian.', 'info');
+      await resetDevice(store); ui.needConfirm = false; ctx.cloudAuto?.kick(); done('Urządzenie odłączone od chmury. Dane lokalne bez zmian.', 'info');
     }, 'config') }, 'Odłącz to urządzenie');
     add(sec, h('details', { class: 'dn-cloud-cfg' }, h('summary', {}, 'Konfiguracja projektu'),
       h('dl', { class: 'kv' }, h('dt', {}, 'Project URL'), h('dd', { class: 'dn-cloud-v' }, st.config.url),

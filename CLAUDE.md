@@ -14,14 +14,15 @@ raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Pr
 Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
 (urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `4e68589` (Faza 5 kompletna).
 **Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
-**Synchronizacja przez chmurę (Supabase, D-078…D-083)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
-`cloud.js`, `tools/supabase/schema.sql`) i Etap 2 (interfejs: sekcja „Synchronizacja w chmurze” w Dane —
+**Synchronizacja przez chmurę (Supabase, D-078…D-084)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
+`cloud.js`, `tools/supabase/schema.sql`), Etap 2 (interfejs: sekcja „Synchronizacja w chmurze” w Dane —
 `src/modules/dane-cloud.js`, warstwa urządzenia `src/core/sync/cloud-local.js`, `tools/supabase/check.sql`, `npm run e2e:cloud`)
-wykonane. Adres projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta`), synchronizacja tylko
-przyciskiem „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
+i synchronizacja automatyczna (D-084: harmonogram `src/core/sync/cloud-auto.js`, podłączony w `app.js`) wykonane. Adres
+projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta`); synchronizacja automatyczna (przełącznik
+per urządzenie) + „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
 plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu projektu, kluczy, haseł ani `service_role`.
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-083).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-084).
 
 ---
 
@@ -36,7 +37,7 @@ Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-083).
 | UI — komponenty | `src/ui/components.js`, `icons.js`, `prefs.js`, `charts.js`, `bodymap.js`, `figure.js`, `movement.js` | `segmented, stat, statGrid, section, macroChips, progressRing`; ikony Lucide `icon(name,{size,label})`; preferencje per urządzenie |
 | Style | `src/ui/tokens.css` → `src/ui/styles.css` → `src/ui/system.css` | sklejane w tej kolejności przez `tools/build.mjs`. **Tokeny tylko w `tokens.css`** |
 | Dane źródłowe | `src/data/*.json` | generowane skryptami `tools/extract/*` z plików źródłowych użytkownika (NIE w repozytorium); traktuj jako tylko do odczytu |
-| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js` |
+| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js, cloud-auto.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js` |
 | Build | `tools/build.mjs` | esbuild → `dist/web/` (index + `app.<hash>.js/css` + `fonts/` + `sw.js` + manifest) i `dist/single/2027.html` (wszystko wbudowane) |
 | Ikony | `tools/icons.mjs` → `src/ui/icons.js` | plik wygenerowany i wersjonowany; regeneracja: `node tools/icons.mjs` (wymaga devDependency `lucide-static`) |
 | Fonty | `public/fonts/inter-latin*.woff2` | podzbiór Inter (OFL); **brak skryptu podzbioru w repo** — zob. REDESIGN-STATUS „znane ograniczenia” |
@@ -74,8 +75,9 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 1. **Dane i model danych:** nie zmieniaj typów zdarzeń, kluczy, nazwy bazy (`p2027`), wersji IndexedDB, struktury
    magazynów ani `reduce()` w sposób zmieniający wynik dla istniejących danych.
 2. **Synchronizacja:** format `2027-sync.json` bez zmian (pola `format, schema, exportedAt, device, count, sha256, events`;
-   deduplikacja po `id`; import idempotentny). Synchronizacja jest **ręczna** (D-033) — plikiem albo przyciskiem
-   „Synchronizuj teraz” w chmurze (D-083); nie dodawaj „automatycznej” (przy starcie, w tle, zegarem) ani jej pozorów.
+   deduplikacja po `id`; import idempotentny). Synchronizacja **plikiem** jest ręczna (D-033). Synchronizacja **w chmurze**
+   jest automatyczna wyłącznie według D-084 (wyzwalacze, odliczanie, limity, przełącznik per urządzenie, jedna runda naraz)
+   plus przycisk „Synchronizuj teraz”; nie dodawaj innych wyzwalaczy (np. odpytywania co N minut) bez zgody użytkownika.
    Chmura: tylko zaszyfrowane zdarzenia, wiersze niezmienne, klucze sekretne odrzucane (D-078…D-082).
    Aktualizacja kodu (service worker) to **inna** sprawa niż synchronizacja danych (D-057).
 3. **Zgodność w przód (D-056):** zdarzeń o poprawnej kopercie i nieznanym typie nie wolno usuwać ani przenosić do
@@ -126,9 +128,12 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Wspólna reguła `border-color` kart w `system.css` | znikają kolorowe lewe krawędzie modułów | sygnatury przywrócone w `system.css`; nowe krawędzie dopisz tam lub zwiększ specyficzność |
 | Element w zwiniętym `<details>` w teście | `wait_for_selector` czeka na widoczność i kończy się błędem | `state='attached'` albo najpierw rozwiń sekcję |
 | `location.hash = ten sam adres` | brak `hashchange` — zapis wykonany, widok nieodświeżony (drugi wpis error logu CFA) | porównaj z `location.hash`, przy równości `ctx.rerender()` (`go()` w `cfa.js`) |
+| Oczekiwana wartość liczona w Pythonie od `date.today()` (UTC), a aplikacja w strefie Europe/Warsaw | 12 fałszywych błędów E2E między 22:00 a 24:00 UTC | „dziś” w testach zawsze w strefie przeglądarki: `datetime.now(ZoneInfo('Europe/Warsaw')).date()` (`expected_stock` w `e2e.py`) |
 | Funkcja zależna od „dziś” / godziny w teście | wynik zależny od dnia uruchomienia | zegar Playwright: `page.clock.install(time=…)` (`CLOCK` w `e2e.py`, `a11y.py`); przerwy — `clock.fast_forward` |
 | `--muted` na tle `--sunken` (jasny motyw) | 4,47:1 — poniżej AA | na `--sunken` używaj `--text-2` (para w `tokens.test.mjs`) |
 | `setInterval` sprawdzający `isConnected` przed wstawieniem elementu do DOM | licznik nigdy nie startuje | pierwsze wypełnienie bez warunku, zatrzymanie dopiero gdy element zniknie z DOM |
 | `<details>` przerysowywany po każdym zapisie | sekcja zamyka się po każdej korekcie | stan rozwinięcia w pamięci modułu (`keepOpen()` w `zapasy.js`) |
 | `page.goto(url + '#/dane')`, gdy strona już jest pod tym adresem | brak przerysowania; test czyta komunikat poprzedniej akcji | przed akcją wyczyść obszar komunikatu (aplikacja robi to w `run()` sekcji chmury) albo przejdź najpierw na inną trasę |
+| Nowa instancja `Store` bez słuchacza (przeładowanie po zmianie w innej karcie) | karta przestaje powiadamiać inne karty i planować synchronizację | każdą instancję tworzyć przez `attachStore()` w `app.js` (test „dwie karty” w `e2e:cloud`) |
+| Przerysowanie widoku „w tle” (np. po pobraniu z chmury) | utrata wpisu w polu, zamknięty arkusz | `softRender()` w `app.js` — czeka, aż pole straci fokus i żadne okno nie jest otwarte |
 | Przycisk z krótkim tekstem widocznym („+ 500 g”) | test szukający „+ opakowanie” go nie znajduje | pełna nazwa w `aria-label` (testy i czytniki ekranu używają nazwy dostępnej) |

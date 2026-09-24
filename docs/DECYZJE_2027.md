@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 24.09.2026 (D-036 – D-083; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 25.09.2026 (D-036 – D-084; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -85,6 +85,7 @@
 | D-081 | Chmura (Etap 2): **Project URL i Publishable Key wpisywane lokalnie na każdym urządzeniu** (Dane → Synchronizacja w chmurze), zapis w `meta` IndexedDB — nie w repozytorium, paczce ani `2027-sync.json`. Klucz publiczny z założenia; ochrona: RLS (`schema.sql`, kontrola `check.sql`), wyłączona rejestracja, szyfrowanie na urządzeniu. Aplikacja odrzuca `sb_secret_…` i `service_role`. | 24.09.2026 |
 | D-082 | Chmura (Etap 2): hasło konta i hasło szyfrowania **nie są zapisywane**; na urządzeniu zostają sesja (tokeny) i nieeksportowalne `CryptoKey` przypisane do konta. Pierwsze urządzenie wymaga powtórzenia hasła szyfrowania. „Wyloguj” usuwa sesję i klucze (kursor zostaje); inne konto lub inny projekt zeruje stan synchronizacji; „Odłącz to urządzenie” usuwa całą konfigurację. Dane lokalne nigdy nie są usuwane. | 24.09.2026 |
 | D-083 | Chmura (Etap 2): synchronizacja **wyłącznie przyciskiem „Synchronizuj teraz”** (zgodnie z D-033 — bez synchronizacji przy starcie, w tle ani zegarem); jedna runda naraz (Web Locks między kartami); sekcja w Dane pod ręczną synchronizacją plikiem, która pozostaje bez zmian. | 24.09.2026 |
+| D-084 | Chmura: **synchronizacja automatyczna** (decyzja użytkownika 25.09.2026; zmienia D-083 dla chmury — synchronizacja plikiem pozostaje ręczna, D-033): po zapisie zmiany wysyłka po 1,5 s ciszy (najpóźniej 15 s od pierwszej zmiany, seria = jedno wysłanie); pełna runda przy otwarciu aplikacji, powrocie do niej (najwyżej raz na 60 s), powrocie sieci i przyciskiem „Synchronizuj teraz” (ręczne wymuszenie); wysyłka przy zejściu do tła. Jedna runda naraz (Web Locks), ponowienia z rosnącym odstępem tylko przy aplikacji na ekranie, wstrzymanie przy błędach wymagających działania (jeden baner na sesję, poza Dane). Przełącznik „Synchronizuj automatycznie” per urządzenie (domyślnie włączony). Lżejsze pobieranie (indeks numerów, treść tylko nowych wierszy), zapis stanu tylko przy zmianie. Bez zmian: szyfrowanie, RLS, `reduce()`, model danych, historia. | 25.09.2026 |
 | D-077 | Dane: synchronizacja (status niewysłanych zmian, ostatnie wysłanie/import, „Wyślij do iCloud”, „Pobierz z iCloud”) jako pierwsza sekcja; mechanizm, teksty rozróżniające kod/dane i format pliku bez zmian |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 

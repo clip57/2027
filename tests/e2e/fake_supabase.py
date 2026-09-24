@@ -12,6 +12,7 @@ class FakeSupabase:
         self.users, self.access, self.refresh = {}, {}, {}
         self.events, self.keys, self.log = [], {}, []
         self.seq, self.lock = 0, threading.Lock()
+        self.stats = {'bytes_out': 0, 'gets': 0, 'posts': 0}   # transfer z serwera (GET /events) i liczba zapytań
         self.url = f'http://localhost:{port}'
 
     def add_user(self, email, password):
@@ -56,18 +57,25 @@ class FakeSupabase:
             if method == 'DELETE': self.keys.pop(uid, None); return 204, None
         if path == '/rest/v1/events':
             if method == 'GET':
-                gt = int(query.get('seq', ['gt.0'])[0].removeprefix('gt.')); limit = int(query.get('limit', ['1000'])[0])
-                rows = sorted((e for e in self.events if e['user_id'] == uid and e['seq'] > gt), key=lambda e: e['seq'])[:limit]
-                return 200, [{'sid': e['sid'], 'seq': e['seq'], 'blob': e['blob']} for e in rows]
+                f = query.get('seq', ['gt.0'])[0]; limit = int(query.get('limit', ['1000'])[0])
+                cols = query.get('select', ['sid,seq,blob'])[0].split(',')
+                if f.startswith('in.('): want = {int(x) for x in f[4:-1].split(',') if x}; match = lambda e: e['seq'] in want
+                else: gt = int(f.removeprefix('gt.')); match = lambda e: e['seq'] > gt
+                rows = sorted((e for e in self.events if e['user_id'] == uid and match(e)), key=lambda e: e['seq'])[:limit]
+                out = [{c: e[c] for c in cols} for e in rows]
+                self.stats['bytes_out'] += len(json.dumps(out)); self.stats['gets'] += 1
+                return 200, out
             if method == 'POST':
                 if any(r.get('user_id') != uid for r in body): return 403, {'message': 'new row violates row-level security policy'}
                 have = {e['sid'] for e in self.events if e['user_id'] == uid}
                 if any(r['sid'] in have for r in body) and 'ignore-duplicates' not in (headers.get('prefer') or ''): return 409, {'message': 'duplicate key'}
+                inserted = []
                 for r in body:
                     if r['sid'] not in have:
-                        self.seq += 1; have.add(r['sid'])
+                        self.seq += 1; have.add(r['sid']); inserted.append({'seq': self.seq})
                         self.events.append({'user_id': uid, 'sid': r['sid'], 'blob': r['blob'], 'seq': self.seq})
-                return 201, None
+                self.stats['posts'] += 1
+                return 201, (inserted if 'return=representation' in (headers.get('prefer') or '') else None)
             if method == 'DELETE': self.events = [e for e in self.events if e['user_id'] != uid]; return 204, None
         return 404, {'message': 'not found'}
 

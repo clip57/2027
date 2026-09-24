@@ -847,5 +847,11 @@ a.chip.sp-low-link { display: inline-flex; align-items: center; gap: var(--s-1);
 .dn-cloud-cfg[open] > summary { margin-bottom: var(--s-2); }
 .dn-cloud-cfg .row { margin-top: var(--s-3); }
 .dn-cloud-v { font-weight: 500; font-size: var(--fs-sm); }
+.dn-cloud-auto { font-size: var(--fs-sm); color: var(--text-2); }
+.dn-cloud-auto-b[aria-pressed="true"] { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.dn-cloud-auto-b[aria-pressed="true"] .ico { color: var(--accent); }
+/* Baner synchronizacji poza Dane (D-084): tekst + „Przejdź do Dane” / „Zamknij” */
+.cloud-banner { display: grid; gap: var(--s-2); }
+.cloud-banner .row .btn, .cloud-banner .row button { min-height: 44px; }
 /* Cele dotykowe ≥ 44 px dla rozwijanych szczegółów (wykryte testem Fazy 5) */
 .sf-more > summary, .rk-orig > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; }

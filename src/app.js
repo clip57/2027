@@ -1,8 +1,10 @@
-// Start aplikacji: magazyn (IndexedDB), routing, nawigacja, banery stanu, service worker.
+// Start aplikacji: magazyn (IndexedDB), routing, nawigacja, banery stanu, service worker, synchronizacja automatyczna (D-084).
 import { h, clear, add } from './ui/dom.js';
 import { Store } from './core/storage/store.js';
 import { IdbAdapter } from './core/storage/adapter-idb.js';
 import { today } from './core/dates.js';
+import { createAutoSync } from './core/sync/cloud-auto.js';
+import { autoRound, describeError, cloudStatus } from './core/sync/cloud-local.js';
 import { setCustomItems } from './core/calc/inventory.js';
 import { MODULES, GROUPS, byId } from './modules/registry.js';
 import { icon } from './ui/icons.js';
@@ -20,9 +22,47 @@ import { renderRekompozycja } from './modules/rekompozycja.js';
 import { renderPlaceholder } from './modules/placeholder.js';
 
 const RENDER = { dzis: renderDzis, dane: renderDane, dieta: renderDieta, suplementy: renderSuplementy, zapasy: renderZapasy, mealprep: renderMealPrep, trening: renderTrening, cfa: renderCFA, bezpieczenstwo: renderBezpieczenstwo, rekompozycja: renderRekompozycja };
-const ctx = { store: null, storeError: null, update: { state: 'idle', check: async () => {}, apply: () => {} } };
+const ctx = { store: null, storeError: null, update: { state: 'idle', check: async () => {}, apply: () => {} }, cloudAuto: null };
 let flash = null; // komunikat, który ma przetrwać ponowne wyrenderowanie widoku
 const chan = 'BroadcastChannel' in globalThis ? new BroadcastChannel('p2027') : null;
+const cloudUi = { dismissed: false, stale: false, shown: '' };   // baner synchronizacji: zamknięty w tej sesji / zaległość > 24 h
+
+// Każda instancja magazynu (także po przeładowaniu z powodu zmiany w innej karcie — poprawka A4): powiadom inne karty
+// i zaplanuj automatyczną wysyłkę. Bez tego po pierwszym przeładowaniu zmiany z tej karty nie docierałyby nigdzie.
+function attachStore(store) {
+  store.on(() => { chan?.postMessage('changed'); ctx.cloudAuto?.changed(); });
+  return store;
+}
+
+// Przerysowanie „w tle” (np. po pobraniu zmian z innego urządzenia): nie w trakcie wpisywania ani przy otwartym oknie —
+// czeka, aż pole straci fokus / okno zostanie zamknięte (wpis ani otwarty arkusz nie giną).
+let softTimer = null;
+function softRender() {
+  if (softTimer) return;
+  const go = () => {
+    softTimer = null;
+    if (document.body.classList.contains('kbd') || document.querySelector('dialog[open]')) { softTimer = setTimeout(go, 1000); return; }
+    render();
+  };
+  softTimer = setTimeout(go, 0);
+}
+
+// Baner synchronizacji poza modułem Dane: tylko gdy potrzebne działanie użytkownika (sesja, klucz, hasło szyfrowania, RLS,
+// brak tabel) albo zmiany czekają na wysłanie ponad dobę. Najwyżej raz na sesję (zamknięcie = do ponownego uruchomienia).
+function cloudBannerText(s) {
+  if (!s || cloudUi.dismissed) return '';
+  if (s.phase === 'paused') return `Synchronizacja w chmurze wstrzymana: ${describeError(s.error)}`;
+  if (s.phase === 'retry' && cloudUi.stale) return 'Zmiany z tego urządzenia czekają na wysłanie do chmury ponad dobę (brak połączenia z serwerem). Dane są bezpieczne na tym urządzeniu.';
+  return '';
+}
+async function onCloudState(s) {
+  if (s.phase === 'retry' && ctx.store) {
+    const st = await cloudStatus(ctx.store).catch(() => null);
+    cloudUi.stale = !!(st?.pending && st.lastSync && Date.now() - Date.parse(st.lastSync) > 24 * 3600e3);
+  } else if (s.phase === 'idle') cloudUi.stale = false;
+  const text = cloudBannerText(s);
+  if (text !== cloudUi.shown) { cloudUi.shown = text; if (route().id !== 'dane') softRender(); }
+}
 
 function route() {
   const [path, qs] = (location.hash.replace(/^#\/?/, '') || 'dzis').split('?');
@@ -78,6 +118,10 @@ async function render() {
   if (up?.count > 0) main.append(h('div', { class: 'banner warn', role: 'alert' },
     `Niepełne przetwarzanie danych: ${up.count} zdarzeń z nowszej wersji aplikacji (${Object.keys(up.types).join(', ')}) jest zachowanych, ale nie jest uwzględnianych w widokach. Zaktualizuj aplikację na tym urządzeniu.`));
   if (flash) { main.append(h('div', { class: `banner ${flash.cls}`, role: 'status' }, flash.text)); flash = null; }
+  const cloudText = id === 'dane' ? '' : cloudBannerText(ctx.cloudAuto?.state());
+  if (cloudText) main.append(h('div', { class: 'banner warn cloud-banner', role: 'status' }, h('span', {}, cloudText),
+    h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/dane' }, 'Przejdź do Dane'),
+      h('button', { 'aria-label': 'Zamknij komunikat synchronizacji', onclick: () => { cloudUi.dismissed = true; render(); } }, 'Zamknij'))));
   if (id === 'wiecej') {
     add(main, h('h1', {}, 'Więcej'),
       GROUPS.map(g => { const list = MODULES.filter(m => m.group === g && !m.tab); return list.length ? h('section', { class: 'more-sec' },
@@ -124,13 +168,22 @@ async function boot() {
   document.addEventListener('focusout', () => setTimeout(() => { if (!isField(document.activeElement)) document.body.classList.remove('kbd'); }, 50));
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (themePref() === 'system') applyTheme('system'); });
   try {
-    ctx.store = await new Store(new IdbAdapter()).open();
-    ctx.store.on(() => chan?.postMessage('changed'));
+    ctx.store = attachStore(await new Store(new IdbAdapter()).open());
   } catch (e) { ctx.storeError = e.message; console.error(e); }
   // Inna karta/okno zmieniło dane -> przeładuj z bazy zamiast nadpisywać (ochrona przed równoległą edycją).
-  chan?.addEventListener('message', async () => { if (!ctx.store) return; ctx.store = await new Store(new IdbAdapter()).open(); render(); });
+  chan?.addEventListener('message', async () => { if (!ctx.store) return; ctx.store = attachStore(await new Store(new IdbAdapter()).open()); render(); });
   addEventListener('hashchange', render);
+  // Synchronizacja automatyczna w chmurze (D-084): działa tylko po skonfigurowaniu chmury i przy włączonym przełączniku
+  ctx.cloudAuto = createAutoSync({
+    getStore: () => ctx.store, run: (store, mode) => autoRound(store, mode),
+    isVisible: () => document.visibilityState !== 'hidden',
+    onApplied: softRender, onChange: s => { onCloudState(s); },
+  });
+  addEventListener('online', () => ctx.cloudAuto.online());
+  document.addEventListener('visibilitychange', () => (document.visibilityState === 'visible' ? ctx.cloudAuto.resume() : ctx.cloudAuto.flush()));
+  addEventListener('pagehide', () => ctx.cloudAuto.flush());
   await render();
+  ctx.cloudAuto.boot();
   if (!globalThis.__SINGLE__ && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     try { setupUpdates(await navigator.serviceWorker.register('./sw.js')); } catch (e) { console.warn('Service worker:', e.message); }
   }

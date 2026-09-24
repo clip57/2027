@@ -1,4 +1,4 @@
-# Synchronizacja przez chmurę (Supabase) — audyt, Etap 1 (rdzeń) i Etap 2 (interfejs) (24.09.2026)
+# Synchronizacja przez chmurę (Supabase) — audyt, Etap 1 (rdzeń), Etap 2 (interfejs), synchronizacja automatyczna (24–25.09.2026)
 
 Kierunek zaakceptowany przez użytkownika (D-078): **Supabase**, IndexedDB pozostaje źródłem prawdy, ręczna synchronizacja
 `2027-sync.json` zostaje jako mechanizm awaryjny. Etap 1 = rdzeń bez interfejsu (§3). Etap 2 = interfejs w module Dane,
@@ -110,8 +110,8 @@ Moduły chmury **nie są importowane przez aplikację** — rozmiar paczki i dzi
 |---|---|
 | Test na prawdziwym projekcie Supabase | **do wykonania przez użytkownika** (§5.6) — testy automatyczne używają fałszywego serwera odwzorowującego podzbiór REST; komunikaty błędów prawdziwego serwera mogą się różnić treścią |
 | Safari/WebKit: WebCrypto i zapis `CryptoKey` w IndexedDB | Chromium: sprawdzone w teście przeglądarkowym (klucze po przeładowaniu, `extractable: false`). Safari na iPhonie — **kontrola ręczna** (§5.6). Gdy przeglądarka nie zapisze klucza, aplikacja trzyma go tylko do zamknięcia karty i informuje o tym |
-| `cloud.acked` rośnie z liczbą zdarzeń | bez zmian (~40 tys. identyfikatorów ≈ 1–1,5 MB, zapis przy każdej rundzie) — do optymalizacji po pomiarach |
-| Zapas kursora = ponowne pobranie do 1000 wierszy w każdej rundzie (~400 KB) | bez zmian — do zmniejszenia po pomiarach na prawdziwych danych |
+| `cloud.acked` rośnie z liczbą zdarzeń | ~40 tys. identyfikatorów ≈ 1–1,5 MB; od D-084 zapisywana **tylko przy zmianie** (A2) — nadal odczyt przy każdej rundzie |
+| Zapas kursora | od D-084 okno czytane jako lekki indeks numerów (~12 B/wiersz), treść tylko dla nowych/spóźnionych wierszy (A1); własne wiersze nie wracają |
 | Wspólna domena GitHub Pages | bez zmian — decyzja użytkownika (§1.1) |
 | Pierwsza synchronizacja z dużą bazą (tysiące zdarzeń) | szyfrowanie i wysyłka partiami po 250; przerwana runda wznawia się od miejsca przerwania |
 
@@ -131,7 +131,8 @@ Moduły chmury **nie są importowane przez aplikację** — rozmiar paczki i dzi
 Model danych, `reduce()`, typy zdarzeń, format `2027-sync.json`, IndexedDB (nazwa, wersja, magazyny) — **bez zmian**.
 Stan chmury per urządzenie w istniejącym magazynie `meta`: `cloud.config` (adres + Publishable Key), `cloud.session`
 (tokeny), `cloud.keys` (nieeksportowalne `CryptoKey`), `cloud.owner`, `cloud.cursor`, `cloud.acked`, `cloud.lastSync`,
-`cloud.lastBackup`. Żaden z nich nie trafia do `2027-sync.json` (eksport zawiera wyłącznie zdarzenia — test).
+`cloud.lastBackup`; od D-084 także `cloud.auto` (przełącznik), `cloud.seen` (numery z okna zapasu kursora, których treść
+urządzenie już ma), `cloud.expired` (sesja wygasła). Żaden z nich nie trafia do `2027-sync.json` (eksport zawiera wyłącznie zdarzenia — test).
 
 ### 5.2 Uruchomienie — krok po kroku (na każdym urządzeniu i w każdym sposobie uruchomienia)
 Safari, aplikacja z ekranu początkowego, przeglądarka na Macu i plik `2027.html` mają **osobne bazy** — każde miejsce
@@ -142,12 +143,14 @@ konfigurujesz raz.
 3. **Hasło szyfrowania** (min. 12 znaków, inne niż hasło konta; zapisz je w menedżerze haseł):
    - na **pierwszym** urządzeniu aplikacja poprosi o powtórzenie i utworzy parametry szyfrowania w chmurze;
    - na kolejnych — to samo hasło; błędne jest wykrywane od razu (weryfikator), nic nie jest pobierane.
-4. **„Synchronizuj teraz”** — pobiera zmiany z innych urządzeń, zapisuje je lokalnie, wysyła zmiany z tego urządzenia.
+4. Po poprawnym haśle pierwsza synchronizacja uruchamia się **sama** (D-084). „Synchronizuj teraz” — pobiera zmiany z innych
+   urządzeń, zapisuje je lokalnie, wysyła zmiany z tego urządzenia — od razu, na żądanie.
    Zalecana kolejność pierwszej synchronizacji: najpierw urządzenie z **pełnymi** danymi, potem pozostałe.
-5. Kolejne razy: tylko „Synchronizuj teraz” (sesja i klucze pozostają na urządzeniu; token odświeżany automatycznie).
+5. Kolejne razy: nic nie trzeba robić — synchronizacja automatyczna (§6). Sesja i klucze pozostają na urządzeniu; token
+   odświeżany automatycznie.
 
-Synchronizacja **nigdy nie uruchamia się sama** (D-033/D-083): brak zegarów, synchronizacji przy starcie czy w tle —
-sprawdzone testem (zmiana, przeładowanie, nawigacja → zero zapytań do tabel).
+Przełącznik **„Synchronizuj automatycznie”** (per urządzenie, domyślnie włączony) — wyłączony przywraca zachowanie z Etapu 2:
+nic nie jest wysyłane ani pobierane bez kliknięcia (sprawdzone testem: zmiana, przeładowanie → zero zapytań do tabel).
 
 ### 5.3 Publishable Key w statycznej aplikacji — decyzja i konsekwencje (D-081)
 - **Klucza nie ma w repozytorium ani w paczce** — wpisujesz go lokalnie (§5.2). Powód: repozytorium i GitHub Pages są
@@ -193,8 +196,8 @@ sprawdzone testem (zmiana, przeładowanie, nawigacja → zero zapytań do tabel)
 
 ### 5.6 Testy i kontrola ręczna
 ```bash
-npm test               # m.in. cloud-crypto (8), cloud-sync (14), cloud-local (9)
-npm run build && npm run e2e:cloud   # 2 profile Chromium + plik 2027.html, fałszywy serwer: 49 kontroli (w tym axe w każdym kroku)
+npm test               # m.in. cloud-crypto (8), cloud-sync (14), cloud-local (9), cloud-auto (14)
+npm run build && npm run e2e:cloud   # 2 profile Chromium + 2. karta + plik 2027.html, fałszywy serwer: 76 kontroli (w tym axe w każdym kroku)
 ```
 Kontrola ręczna (wymaga Twojego projektu — nie do zautomatyzowania bez kluczy):
 1. SQL Editor → `tools/supabase/check.sql` → wszystkie `ok = true`.
@@ -205,6 +208,69 @@ Kontrola ręczna (wymaga Twojego projektu — nie do zautomatyzowania bez kluczy
 4. Zamknij i uruchom ponownie aplikację na iPhonie → w Dane powinien od razu być przycisk „Synchronizuj teraz” (klucze
    zapamiętane). Jeśli pojawi się informacja, że przeglądarka nie zapamiętuje kluczy — zgłoś (ograniczenie WebKit).
 5. Tryb samolotowy → zmiana w Zapasach → „Synchronizuj teraz” (komunikat o braku połączenia) → wyłącz tryb → ponownie.
+
+## 6. Synchronizacja automatyczna (D-084, 25.09.2026)
+
+### 6.1 Zasada
+Zapis lokalny kończy się **zanim** cokolwiek trafi do sieci — synchronizacja nigdy nie blokuje interfejsu, a brak internetu nie
+grozi utratą danych. Harmonogram: `src/core/sync/cloud-auto.js` (bez DOM, testowany fałszywym zegarem), podłączenie: `src/app.js`.
+
+| Wyzwalacz | Runda | Zasada |
+|---|---|---|
+| Zapis zmiany (w tym import pliku) | tylko wysyłka | 1,5 s po ostatniej zmianie, najpóźniej 15 s od pierwszej; seria zmian = jedno wysłanie; bez zmian do wysłania — zero zapytań (dopisanie zdarzeń z chmury nie zapętla) |
+| Otwarcie aplikacji | pełna | 2,5 s po pierwszym widoku |
+| Powrót do aplikacji (`visibilitychange`) | pełna | najwyżej raz na 60 s (od razu, jeśli czeka ponowienie po błędzie) |
+| Powrót sieci (`online`) | pełna | od razu, licznik błędów od zera |
+| Zejście do tła (`visibilitychange`/`pagehide`) | tylko wysyłka | od razu, jeśli zmiany czekały na odliczenie (bez gwarancji — iOS może wstrzymać stronę) |
+| Po haśle szyfrowania, przełączniku, wylogowaniu | pełna | wznowienie po wstrzymaniu |
+| „Synchronizuj teraz” | pełna | przejmuje oczekujące zmiany, czeka na trwającą rundę automatyczną |
+
+Brak odpytywania co N minut (zmiany z innych urządzeń pojawiają się przy otwarciu / powrocie / ręcznie).
+
+### 6.2 Równoległość, błędy, komunikaty
+- Jedna runda naraz: flaga w karcie + Web Locks między kartami (odświeżanie tokenu też pod blokadą — rotacja tokenów bez
+  wyścigu). Inna karta synchronizuje → ciche ponowienie po 5 s. Wyzwalacze w trakcie rundy łączone w jedną następną.
+- Każda instancja magazynu dostaje słuchacza (`attachStore`) — **poprawka A4**: wcześniej po przeładowaniu bazy z powodu
+  zmiany w innej karcie karta przestawała powiadamiać pozostałe.
+- Błędy przejściowe (sieć, limit czasu 30 s, 5xx, 429): ponowienia po 15 s, 30 s, 1, 2, 5, 15 min — tylko przy aplikacji na
+  ekranie; w tle nic (iOS i tak wstrzymuje zegary), przy powrocie od razu.
+- Błędy wymagające działania (wygasła sesja, klucz, RLS, brak tabel, brak hasła szyfrowania): wstrzymanie bez ponowień do
+  czasu działania użytkownika; **jeden** baner na sesję poza Dane („Przejdź do Dane” / „Zamknij”). Baner także wtedy, gdy
+  zmiany czekają na wysłanie ponad dobę.
+- Wygasła sesja (nieudane odświeżenie tokenu) jest zapamiętywana (`cloud.expired`) — baner wraca przy każdym uruchomieniu
+  aplikacji aż do ponownego logowania (synchronizacja nie może „cicho” stanąć).
+- Celowe wylogowanie, odłączenie, wyłączony przełącznik, brak konfiguracji: automat cicho nieaktywny (bez zapytań i banerów).
+- Udana runda i brak sieci: **bez komunikatów** — w sekcji Dane jedno zdanie stanu na żywo („włączona · ostatnio 12:03”,
+  „Brak połączenia — zmiany zostaną wysłane automatycznie…”, „Wstrzymana: …”) i licznik niewysłanych zmian.
+- Zmiany pobrane z innego urządzenia odświeżają widok dopiero, gdy nie piszesz w polu i żadne okno nie jest otwarte
+  (`softRender`) — wpis i otwarty arkusz nie giną.
+
+### 6.3 Limity (plan Free)
+- Runda „tylko wysyłka”: zwykle 1 zapytanie (+1 na każde kolejne 250 zdarzeń); odpowiedź = numery wstawionych wierszy.
+- Runda pełna: indeks numerów z okna zapasu (~12 B/wiersz; w teście 784 B dla 61 wierszy) + treść tylko wierszy nieznanych
+  lokalnie (A1); własne wysłane wiersze nie są pobierane z powrotem. Wcześniej ~400 B/wiersz × do 1000 wierszy w każdej rundzie.
+- Szacunek: 4 miejsca uruchomienia × ~30 rund pełnych dziennie ≈ kilkadziesiąt–kilkaset MB miesięcznie przy limicie 5 GB.
+- Zapis stanu w `meta` tylko przy zmianie (A2): pusta runda zapisuje jedynie `cloud.lastSync`.
+
+### 6.4 Zgodność z Safari / iOS (analiza; środowisko testowe ma tylko Chromium)
+| Element | Wymaganie | Stan |
+|---|---|---|
+| Web Locks (`navigator.locks`) | Safari 15.4+ | iOS 16+ w użyciu (build: `safari16`); bez API — zabezpieczenie w obrębie karty, duplikaty i tak pomija serwer |
+| `BroadcastChannel` | Safari 15.4+ | jak wyżej (używane od Fazy 3) |
+| Limit czasu zapytań | `AbortController` (Safari 12.1+) | celowo bez `AbortSignal.timeout` (Safari 16) |
+| `visibilitychange`, `pagehide`, `online` | wszystkie wersje | PWA na iOS: wznowienie = `visibilitychange`; `navigator.onLine` bywa zawodne — wtedy błąd sieci i ponowienia |
+| Zegary w tle | iOS wstrzymuje | wysyłka przy zejściu do tła + pełna runda przy powrocie / ponownym uruchomieniu |
+| Duże zbiory w argumentach (`Math.max(...zbiór)`) | limit argumentów WebKit | nieużywane (pętla) |
+| `CryptoKey` w IndexedDB | Safari | do potwierdzenia ręcznie (Etap 2, §5.6 pkt 4) |
+
+### 6.5 Kontrola ręczna po wdrożeniu (iPhone Safari, PWA, Mac)
+1. Dane → sekcja chmury: „Synchronizuj automatycznie” wciśnięty; zdanie „Synchronizacja automatyczna włączona · ostatnio …”.
+2. Zmiana w Zapasach na Macu → po ~2 s w Dane na Macu „Wszystkie zmiany… są w chmurze” (bez klikania).
+3. iPhone (PWA): przełącz na inną aplikację na ponad minutę i wróć → zmiana z Maca widoczna bez klikania.
+4. Tryb samolotowy na iPhonie → zmiana → w Dane „Brak połączenia — zmiany zostaną wysłane automatycznie…”, bez banerów
+   → wyłącz tryb → po chwili zmiana widoczna na Macu.
+5. Szybka seria (np. kilka serii w Treningu) → w panelu Supabase (Logs / API) jedno wysłanie zamiast wielu.
+6. Pisanie w polu podczas powrotu do aplikacji — wpis nie znika.
 
 Źródła: [Supabase — Pricing](https://supabase.com/pricing) · [Billing FAQ](https://supabase.com/docs/guides/platform/billing-faq) ·
 [Project Pausing](https://supabase.com/docs/guides/platform/free-project-pausing) ·

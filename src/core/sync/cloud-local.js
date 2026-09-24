@@ -1,11 +1,13 @@
 // Synchronizacja przez chmurę — warstwa urządzenia (D-078, Etap 2; D-081…D-083). Łączy rdzeń z Etapu 1 z interfejsem:
 // konfiguracja projektu wpisana lokalnie, sesja, klucze szyfrowania, jedna runda „Synchronizuj teraz”, komunikaty błędów.
 // Wszystko per urządzenie w magazynie `meta` IndexedDB — nic z tego nie trafia do repozytorium, paczki ani 2027-sync.json.
-// Synchronizacja uruchamia się WYŁĄCZNIE na polecenie użytkownika (brak zegarów i wyzwalaczy w tle).
+// Synchronizacja: przycisk „Synchronizuj teraz” oraz — gdy włączona na urządzeniu — rundy automatyczne (D-084, `cloud-auto.js`).
 import { createCloudClient, CloudError } from './cloud-api.js';
-import { setupKeys, syncOnce, forgetCloudState, META } from './cloud.js';
+import { setupKeys, syncOnce, forgetCloudState, pendingCount, META } from './cloud.js';
 
-export const LOCAL = { config: 'cloud.config', keys: 'cloud.keys', owner: 'cloud.owner', session: 'cloud.session' };
+// `expired` — sesja wygasła (nieudane odświeżenie tokenu), w odróżnieniu od celowego wylogowania: automat zgłasza to przy
+// każdym uruchomieniu, aż do ponownego logowania (D-084)
+export const LOCAL = { config: 'cloud.config', keys: 'cloud.keys', owner: 'cloud.owner', session: 'cloud.session', auto: 'cloud.auto', expired: 'cloud.expired' };
 
 // ---------- konfiguracja projektu (Project URL + Publishable Key)
 const JWT = /^[A-Za-z0-9_-]+\.([A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+$/;
@@ -80,6 +82,7 @@ export async function cloudStatus(store) {
     step: !config ? 'config' : !user ? 'login' : !unlocked ? 'unlock' : 'ready',
     lastSync: (await m.getMeta(META.lastSync)) || null,
     pending: store.allEvents().filter(e => !acked.has(e.id)).length,
+    auto: (await m.getMeta(LOCAL.auto)) !== false,
   };
 }
 
@@ -92,6 +95,7 @@ export async function signIn(store, { email, password }, deps = {}) {
   const owner = await store.adapter.getMeta(LOCAL.owner);
   if (owner && owner !== s.user.id) { await forgetCloudState(store); await dropKeys(store); }
   await store.adapter.setMeta(LOCAL.owner, s.user.id);
+  await store.adapter.setMeta(LOCAL.expired, null);
   return s.user;
 }
 
@@ -112,6 +116,7 @@ export async function unlock(store, { passphrase, confirm, iterations } = {}, de
 // Wylogowanie: sesja i klucze znikają z urządzenia; kursor zostaje (to samo konto kontynuuje bez ponownego pobierania)
 export async function signOut(store, deps = {}) {
   await dropKeys(store);
+  await store.adapter.setMeta(LOCAL.expired, null);
   try { await (await clientFor(store, deps)).signOut(); } catch { await store.adapter.setMeta(LOCAL.session, null); }
 }
 
@@ -119,11 +124,15 @@ export async function signOut(store, deps = {}) {
 export async function resetDevice(store, deps = {}) {
   try { if (await loadConfig(store)) await signOut(store, deps); } catch { /* offline — sesja i tak usunięta niżej */ }
   await dropKeys(store);
-  for (const k of [LOCAL.session, LOCAL.owner, LOCAL.config]) await store.adapter.setMeta(k, null);
+  for (const k of [LOCAL.session, LOCAL.owner, LOCAL.config, LOCAL.auto, LOCAL.expired]) await store.adapter.setMeta(k, null);
   await forgetCloudState(store);
 }
 
-// ---------- „Synchronizuj teraz”: jedna runda, najwyżej jedna naraz (także między kartami — Web Locks, jeśli dostępne)
+// ---------- synchronizacja automatyczna (D-084): przełącznik per urządzenie, domyślnie włączona
+export const autoEnabled = async store => (await store.adapter.getMeta(LOCAL.auto)) !== false;
+export const setAutoEnabled = (store, on) => store.adapter.setMeta(LOCAL.auto, !!on);
+
+// ---------- rundy: najwyżej jedna naraz (także między kartami — Web Locks, jeśli dostępne; odświeżanie tokenu też pod blokadą)
 let running = false;
 async function exclusive(fn) {
   if (running) throw new CloudError('Synchronizacja już trwa.', 'busy');
@@ -138,6 +147,13 @@ async function exclusive(fn) {
   } finally { running = false; }
 }
 
+// Wygaśnięcie sesji w trakcie rundy (klient usuwa wtedy sesję) zapamiętywane — patrz LOCAL.expired
+async function guarded(store, fn) {
+  try { return await fn(); }
+  catch (e) { if (e?.code === 'signed-out') await store.adapter.setMeta(LOCAL.expired, true).catch(() => {}); throw e; }
+}
+
+// „Synchronizuj teraz”: pełna runda (pobranie + wysyłka)
 export function syncNow(store, deps = {}) {
   return exclusive(async () => {
     if (globalThis.navigator?.onLine === false) throw new CloudError('Brak połączenia z internetem.', 'network');
@@ -146,7 +162,27 @@ export function syncNow(store, deps = {}) {
     if (!user?.id) throw new CloudError('Nie zalogowano do chmury.', 'signed-out');
     const keys = await readKeys(store, user.id);
     if (!keys) throw new CloudError('Podaj hasło szyfrowania.', 'locked');
-    return syncOnce({ store, client, keys, ...(deps.now && { now: () => new Date(deps.now()) }) });
+    return guarded(store, () => syncOnce({ store, client, keys, ...(deps.now && { now: () => new Date(deps.now()) }) }));
+  });
+}
+
+// Runda automatyczna. `{ off: true }` = nic do zrobienia bez udziału użytkownika (chmura nieskonfigurowana, wyłączona na
+// urządzeniu, brak sesji po wylogowaniu, baza niedostępna) — bez sieci i bez komunikatu. Runda „push” bez zmian do wysłania
+// kończy się bez żadnego zapytania. Brak kluczy przy aktywnej sesji = błąd `locked` (potrzebne hasło szyfrowania).
+export function autoRound(store, mode = 'full', deps = {}) {
+  return exclusive(async () => {
+    if (!store?.health?.ok || !(await loadConfig(store)) || !(await autoEnabled(store))) return { off: true };
+    const client = await clientFor(store, deps);
+    const user = await client.user();
+    if (!user?.id) {
+      if (await store.adapter.getMeta(LOCAL.expired)) throw new CloudError('Sesja wygasła — zaloguj się ponownie.', 'signed-out');
+      return { off: true };                                  // celowe wylogowanie: cicho
+    }
+    const keys = await readKeys(store, user.id);
+    if (!keys) throw new CloudError('Podaj hasło szyfrowania, aby wznowić synchronizację.', 'locked');
+    if (mode === 'push' && !(await pendingCount(store))) return { mode, idle: true, pulled: 0, applied: 0, pushed: 0, rejected: [] };
+    if (globalThis.navigator?.onLine === false) throw new CloudError('Brak połączenia z internetem.', 'network');
+    return guarded(store, () => syncOnce({ store, client, keys, mode, ...(deps.now && { now: () => new Date(deps.now()) }) }));
   });
 }
 
@@ -158,6 +194,7 @@ export function describeError(e, during = 'sync') {
       ? 'Brak połączenia z chmurą. Dane są bezpieczne na tym urządzeniu — synchronizuj ponownie, gdy wróci internet.'
       : 'Nie można połączyć się z serwerem. Sprawdź połączenie z internetem i adres projektu (Project URL).';
     case 'signed-out': return 'Sesja wygasła — zaloguj się ponownie. Dane na tym urządzeniu są bezpieczne.';
+    case 'locked': return 'Podaj hasło szyfrowania, aby wznowić synchronizację. Dane na tym urządzeniu są bezpieczne.';
     case 'bad-credentials': return 'Nieprawidłowy e-mail lub hasło konta.';
     case 'bad-passphrase': return 'Nieprawidłowe hasło szyfrowania. To hasło ustawione na pierwszym urządzeniu (inne niż hasło konta).';
     case 'unauthorized': return 'Serwer odrzucił klucz projektu. Sprawdź Project URL i Publishable Key w konfiguracji.';

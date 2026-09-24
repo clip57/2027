@@ -7,8 +7,9 @@ export class CloudError extends Error {
 
 const SESSION_KEY = 'cloud.session';
 const MARGIN_S = 60;                               // odśwież token minutę przed wygaśnięciem
+export const TIMEOUT_MS = 30000;                   // zawieszone połączenie nie może blokować synchronizacji (i blokady kart)
 
-export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind(globalThis), storage, now = () => Date.now() }) {
+export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind(globalThis), storage, now = () => Date.now(), timeout = TIMEOUT_MS }) {
   if (!/^https:\/\/[^/]+$/.test(url || '') && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(url || ''))
     throw new CloudError('Adres projektu musi mieć postać https://<projekt>.supabase.co', 'bad-config');
   if (!anonKey) throw new CloudError('Brak klucza projektu (Publishable Key).', 'bad-config');
@@ -18,10 +19,16 @@ export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind
     const headers = { apikey: anonKey, 'Content-Type': 'application/json' };
     if (auth) headers.Authorization = `Bearer ${token}`;
     if (prefer) headers.Prefer = prefer;
-    let res;
-    try { res = await fetch(`${base}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) }); }
-    catch (e) { throw new CloudError(`Brak połączenia z chmurą: ${e.message}`, 'network'); }
-    const text = await res.text();
+    let res, text;
+    // Limit czasu przez AbortController + setTimeout (AbortSignal.timeout dopiero od Safari 16)
+    const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ctl && setTimeout(() => ctl.abort(), timeout);
+    try {
+      res = await fetch(`${base}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), ...(ctl && { signal: ctl.signal }) });
+      text = await res.text();
+    } catch (e) {
+      throw new CloudError(ctl?.signal.aborted ? 'Serwer chmury nie odpowiedział w wyznaczonym czasie.' : `Brak połączenia z chmurą: ${e.message}`, 'network');
+    } finally { if (timer) clearTimeout(timer); }
     const data = text ? (() => { try { return JSON.parse(text); } catch { return text; } })() : null;
     if (!res.ok) {
       const msg = (data && (data.message || data.msg || data.error_description || data.error)) || `HTTP ${res.status}`;
@@ -75,9 +82,13 @@ export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind
     putKeyInfo: (userId, info) => authed('/rest/v1/sync_keys', { method: 'POST', body: { user_id: userId, ...info }, prefer: 'return=minimal' }),
     // Strona zdarzeń o numerze kolejnym większym niż `after` (rosnąco)
     pullEvents: (after, limit) => authed(`/rest/v1/events?select=sid,seq,blob&seq=gt.${Number(after) || 0}&order=seq.asc&limit=${limit}`),
-    // Wstawienie z pominięciem duplikatów (idempotentne) — ten sam `sid` wysłany drugi raz niczego nie zmienia
-    pushEvents: (userId, rows) => rows.length ? authed('/rest/v1/events?on_conflict=user_id,sid', { method: 'POST',
-      body: rows.map(r => ({ user_id: userId, sid: r.sid, blob: r.blob })), prefer: 'resolution=ignore-duplicates,return=minimal' }) : null,
+    // Lekki indeks: same numery kolejne (ok. 12 B na wiersz) — treść pobierana tylko dla wierszy nieznanych lokalnie
+    pullIndex: (after, limit) => authed(`/rest/v1/events?select=seq&seq=gt.${Number(after) || 0}&order=seq.asc&limit=${limit}`),
+    pullBySeq: seqs => authed(`/rest/v1/events?select=sid,seq,blob&seq=in.(${seqs.map(Number).join(',')})&order=seq.asc`),
+    // Wstawienie z pominięciem duplikatów (idempotentne) — ten sam `sid` wysłany drugi raz niczego nie zmienia.
+    // Zwraca numery kolejne WSTAWIONYCH wierszy (duplikaty pominięte) — urządzenie nie pobiera potem własnych wierszy.
+    pushEvents: (userId, rows) => rows.length ? authed('/rest/v1/events?on_conflict=user_id,sid&select=seq', { method: 'POST',
+      body: rows.map(r => ({ user_id: userId, sid: r.sid, blob: r.blob })), prefer: 'resolution=ignore-duplicates,return=representation' }) : null,
     // „Usuń moje dane z chmury” (Etap 4) — jedyne kasowanie; dane lokalne bez zmian
     deleteAll: userId => authed(`/rest/v1/events?user_id=eq.${userId}`, { method: 'DELETE', prefer: 'return=minimal' })
       .then(() => authed(`/rest/v1/sync_keys?user_id=eq.${userId}`, { method: 'DELETE', prefer: 'return=minimal' })),

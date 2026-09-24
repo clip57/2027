@@ -10,6 +10,7 @@ export function fakeSupabase({ anonKey = 'anon-test-key', tokenTtl = 3600, clock
   const events = [];                // { user_id, sid, seq, blob, visible }
   const keys = new Map();           // user_id -> { salt, iterations, verifier }
   let seq = 0, n = 0, holdNext = 0;
+  const stats = { bytesOut: 0, reads: 0, writes: 0 };   // transfer z serwera (treść odpowiedzi GET /events) i liczba zapytań
   const log = [];                   // [method, path] — do asercji
   const tok = p => `${p}-${++n}-${Math.random().toString(36).slice(2)}`;
   const json = (status, body) => new Response(body === undefined ? '' : JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -59,20 +60,26 @@ export function fakeSupabase({ anonKey = 'anon-test-key', tokenTtl = 3600, clock
     }
     if (u.pathname === '/rest/v1/events') {
       if (method === 'GET') {
-        const gt = Number((u.searchParams.get('seq') || 'gt.0').replace('gt.', ''));
+        const f = u.searchParams.get('seq') || 'gt.0';
+        const inList = f.startsWith('in.(') ? new Set(f.slice(4, -1).split(',').map(Number)) : null;
+        const gt = inList ? -1 : Number(f.replace('gt.', ''));
         const limit = Number(u.searchParams.get('limit') || 1000);
-        const rows = events.filter(e => e.user_id === uid && e.visible && e.seq > gt).sort((a, b) => a.seq - b.seq).slice(0, limit);
-        return json(200, rows.map(e => ({ sid: e.sid, seq: e.seq, blob: e.blob })));
+        const cols = (u.searchParams.get('select') || 'sid,seq,blob').split(',');
+        const rows = events.filter(e => e.user_id === uid && e.visible && (inList ? inList.has(e.seq) : e.seq > gt)).sort((a, b) => a.seq - b.seq).slice(0, limit);
+        const out = rows.map(e => Object.fromEntries(cols.map(c => [c, e[c]])));
+        stats.bytesOut += JSON.stringify(out).length; stats.reads++;
+        return json(200, out);
       }
       if (method === 'POST') {
         const ignore = /resolution=ignore-duplicates/.test(h.Prefer || '');
         if (body.some(r => r.user_id !== uid)) return json(403, { message: 'new row violates row-level security policy' });
         const dup = body.filter(r => events.some(e => e.user_id === uid && e.sid === r.sid));
         if (dup.length && !ignore) return json(409, { message: 'duplicate key value violates unique constraint' });
-        const hold = holdNext > 0;
-        for (const r of body) if (!events.some(e => e.user_id === uid && e.sid === r.sid)) events.push({ user_id: uid, sid: r.sid, blob: r.blob, seq: ++seq, visible: !hold });
+        const hold = holdNext > 0, inserted = [];
+        for (const r of body) if (!events.some(e => e.user_id === uid && e.sid === r.sid)) { events.push({ user_id: uid, sid: r.sid, blob: r.blob, seq: ++seq, visible: !hold }); inserted.push({ seq }); }
         if (hold) holdNext--;
-        return json(201);
+        stats.writes++;
+        return /return=representation/.test(h.Prefer || '') ? json(201, inserted) : json(201);
       }
       if (method === 'DELETE') { for (let i = events.length - 1; i >= 0; i--) if (events[i].user_id === uid) events.splice(i, 1); return json(204); }
     }
@@ -80,7 +87,7 @@ export function fakeSupabase({ anonKey = 'anon-test-key', tokenTtl = 3600, clock
   }
 
   return {
-    fetch, anonKey, url: 'http://localhost:54321', log, events, keys, access,
+    fetch, anonKey, url: 'http://localhost:54321', log, events, keys, access, stats,
     addUser(email, password) { const usr = { id: `00000000-0000-4000-8000-${String(users.size + 1).padStart(12, '0')}`, email, password }; users.set(email, usr); return usr; },
     // Następne wstawienie dostaje numery kolejne, ale jest niewidoczne do release() — jak transakcja zatwierdzona później
     holdNextInsert() { holdNext++; },

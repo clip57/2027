@@ -16,8 +16,10 @@ CONTRAST = '''el => { const px = c => { const x = document.createElement('canvas
 
 # Oczekiwany stan liczony niezależnie od kodu aplikacji (D-027: stan na koniec 22.09, odliczanie od 23.09).
 import datetime as _dt
+from zoneinfo import ZoneInfo
 def expected_stock(start, per_day, since=_dt.date(2026, 9, 22)):
-    d, q, today = since + _dt.timedelta(days=1), start, _dt.date.today()
+    # „dziś” w strefie przeglądarki testowej (Europe/Warsaw), nie serwera (UTC) — inaczej między 22:00 a 24:00 UTC różnica 1 dnia
+    d, q, today = since + _dt.timedelta(days=1), start, _dt.datetime.now(ZoneInfo('Europe/Warsaw')).date()
     while d <= today:
         q -= per_day(d); d += _dt.timedelta(days=1)
     return q
