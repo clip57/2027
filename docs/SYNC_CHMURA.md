@@ -1,4 +1,4 @@
-# Synchronizacja przez chmurę (Supabase) — audyt, Etap 1 (rdzeń), Etap 2 (interfejs), synchronizacja automatyczna (24–25.09.2026)
+# Synchronizacja przez chmurę (Supabase) — audyt, Etap 1 (rdzeń), Etap 2 (interfejs), synchronizacja i pobieranie automatyczne (24–25.09.2026)
 
 Kierunek zaakceptowany przez użytkownika (D-078): **Supabase**, IndexedDB pozostaje źródłem prawdy, ręczna synchronizacja
 `2027-sync.json` zostaje jako mechanizm awaryjny. Etap 1 = rdzeń bez interfejsu (§3). Etap 2 = interfejs w module Dane,
@@ -132,7 +132,7 @@ Model danych, `reduce()`, typy zdarzeń, format `2027-sync.json`, IndexedDB (naz
 Stan chmury per urządzenie w istniejącym magazynie `meta`: `cloud.config` (adres + Publishable Key), `cloud.session`
 (tokeny), `cloud.keys` (nieeksportowalne `CryptoKey`), `cloud.owner`, `cloud.cursor`, `cloud.acked`, `cloud.lastSync`,
 `cloud.lastBackup`; od D-084 także `cloud.auto` (przełącznik), `cloud.seen` (numery z okna zapasu kursora, których treść
-urządzenie już ma), `cloud.expired` (sesja wygasła). Żaden z nich nie trafia do `2027-sync.json` (eksport zawiera wyłącznie zdarzenia — test).
+urządzenie już ma), `cloud.expired` (sesja wygasła); od D-085 `cloud.pull` (automatyczne pobieranie zmian). Żaden z nich nie trafia do `2027-sync.json` (eksport zawiera wyłącznie zdarzenia — test).
 
 ### 5.2 Uruchomienie — krok po kroku (na każdym urządzeniu i w każdym sposobie uruchomienia)
 Safari, aplikacja z ekranu początkowego, przeglądarka na Macu i plik `2027.html` mają **osobne bazy** — każde miejsce
@@ -196,8 +196,8 @@ nic nie jest wysyłane ani pobierane bez kliknięcia (sprawdzone testem: zmiana,
 
 ### 5.6 Testy i kontrola ręczna
 ```bash
-npm test               # m.in. cloud-crypto (8), cloud-sync (14), cloud-local (9), cloud-auto (14)
-npm run build && npm run e2e:cloud   # 2 profile Chromium + 2. karta + plik 2027.html, fałszywy serwer: 76 kontroli (w tym axe w każdym kroku)
+npm test               # m.in. cloud-crypto (8), cloud-sync (14), cloud-local (9), cloud-auto (24)
+npm run build && npm run e2e:cloud   # 2 profile Chromium + 2. karta + plik 2027.html, fałszywy serwer: 100 kontroli (w tym axe w każdym kroku)
 ```
 Kontrola ręczna (wymaga Twojego projektu — nie do zautomatyzowania bez kluczy):
 1. SQL Editor → `tools/supabase/check.sql` → wszystkie `ok = true`.
@@ -225,7 +225,7 @@ grozi utratą danych. Harmonogram: `src/core/sync/cloud-auto.js` (bez DOM, testo
 | Po haśle szyfrowania, przełączniku, wylogowaniu | pełna | wznowienie po wstrzymaniu |
 | „Synchronizuj teraz” | pełna | przejmuje oczekujące zmiany, czeka na trwającą rundę automatyczną |
 
-Brak odpytywania co N minut (zmiany z innych urządzeń pojawiają się przy otwarciu / powrocie / ręcznie).
+Od D-085 dochodzi automatyczne pobieranie zmian (lekkie sprawdzanie) — §7.
 
 ### 6.2 Równoległość, błędy, komunikaty
 - Jedna runda naraz: flaga w karcie + Web Locks między kartami (odświeżanie tokenu też pod blokadą — rotacja tokenów bez
@@ -271,6 +271,51 @@ Brak odpytywania co N minut (zmiany z innych urządzeń pojawiają się przy otw
    → wyłącz tryb → po chwili zmiana widoczna na Macu.
 5. Szybka seria (np. kilka serii w Treningu) → w panelu Supabase (Logs / API) jedno wysłanie zamiast wielu.
 6. Pisanie w polu podczas powrotu do aplikacji — wpis nie znika.
+
+## 7. Automatyczne pobieranie zmian (D-085, 25.09.2026)
+
+### 7.1 Dlaczego
+Na MacBooku okno aplikacji zwykle pozostaje widoczne, gdy pracujesz na iPhonie — przeglądarka nie wysyła wtedy zdarzenia
+„powrót do aplikacji”, więc zmiana z iPhone'a nie docierała bez kliknięcia (zachowanie zgodne z D-084, ale niewygodne).
+
+### 7.2 Mechanizm (`src/core/sync/cloud-auto.js` + `autoCheck` w `cloud-local.js`)
+| Wyzwalacz | Działanie | Zasada |
+|---|---|---|
+| Aplikacja widoczna, komputer | lekkie sprawdzenie co **30 s** | tylko gdy widoczna, jest sieć, nic nie wstrzymane |
+| Aplikacja widoczna, telefon (`pointer: coarse`) | co **60 s** | jw. |
+| 5 min bez interakcji (klawiatura, mysz, dotyk, przewijanie) | co **5 min** | pierwsza interakcja przywraca 30/60 s (i sprawdza od razu, jeśli minął interwał) |
+| Powrót do okna (`focus`) | sprawdzenie od razu | najwyżej raz na **10 s** |
+
+Sprawdzenie = jedno zapytanie `GET /rest/v1/events?select=seq&seq=gt.<kursor>&order=seq.asc&limit=100` (zwykły REST PostgREST,
+ta sama sesja i RLS — **bez Realtime, WebSocketu i SDK**; zgodne z zasadą 7). Odpowiedź bez zmian: `[]`. Wiersze, których
+treść urządzenie już ma (własne wysłane — `cloud.seen`), nie są „zmianą”. Wykryty nieznany wiersz → pełna runda (jak dotąd:
+szyfrowanie, konflikty, zapas kursora bez zmian) → widok odświeżany przez `softRender` (nie w trakcie wpisywania ani przy
+otwartym oknie). Sprawdzenie nie zmienia stanu na „w toku” (bez migania komunikatu co 30 s).
+
+**Wstrzymanie:** w tle (`visibilitychange`), offline (`offline`), po wylogowaniu, przy wyłączonym przełączniku (któregokolwiek),
+przy błędach (przejściowe → ponowienia z D-084 zamiast sprawdzeń; wymagające działania → zero zapytań do `kick()`).
+Wspólna blokada z pozostałymi rundami (Web Locks + flaga w karcie) — nigdy równolegle; sprawdzenie w kolejce za pełną rundą
+jest pomijane.
+
+**Przełącznik „Automatyczne pobieranie zmian”** (`cloud.pull`, per urządzenie, domyślnie włączony, widoczny tylko przy
+włączonej synchronizacji automatycznej). Wyłączony: zmiany z innych urządzeń nadal pobierane przy otwarciu i powrocie do
+aplikacji; wysyłanie bez zmian.
+
+### 7.3 Koszty i prywatność
+- Zapytania: widoczna aplikacja na komputerze ≤ 120/h (bezczynność 12/h) — ok. 1000 dziennie przy 8 h; telefon połowa.
+  Plan Free nie limituje liczby zapytań API.
+- Transfer: treść odpowiedzi bez zmian 2 B (`[]`, test: ≤ 4 B), z nagłówkami ~0,5–1 KB → ~1 MB/dzień, ~30 MB/mies. na miejsce
+  uruchomienia (limit 5 GB).
+- Bateria: Mac — pomijalnie; iPhone — tylko przy aplikacji na ekranie (w tle przeglądarka i tak wstrzymuje zegary).
+- Prywatność: serwer (i dziennik zapytań Supabase) widzi adres IP i czas sprawdzeń, czyli **kiedy aplikacja jest otwarta** (z
+  dokładnością ~30 s). Treść nadal wyłącznie zaszyfrowana; zapytanie ujawnia tylko numer kursora.
+
+### 7.4 Kontrola ręczna
+1. Dane → „Automatyczne pobieranie zmian” wciśnięty; zdanie „… sprawdzanie zmian co 30 s” (iPhone: 60 s).
+2. MacBook: aplikacja otwarta i widoczna, bez dotykania → zmiana na iPhonie → na Macu widoczna w ciągu ~30 s.
+3. MacBook: po zmianie na iPhonie kliknij w okno aplikacji → zmiana w ~1 s.
+4. Zostaw Maca bez interakcji > 5 min → zdanie „co 5 min (bezczynność)”; ruch myszą → znów „co 30 s”.
+5. Wyłącz przełącznik → zmiany z iPhone'a docierają dopiero po powrocie do aplikacji / „Synchronizuj teraz”.
 
 Źródła: [Supabase — Pricing](https://supabase.com/pricing) · [Billing FAQ](https://supabase.com/docs/guides/platform/billing-faq) ·
 [Project Pausing](https://supabase.com/docs/guides/platform/free-project-pausing) ·

@@ -84,6 +84,8 @@ export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind
     pullEvents: (after, limit) => authed(`/rest/v1/events?select=sid,seq,blob&seq=gt.${Number(after) || 0}&order=seq.asc&limit=${limit}`),
     // Lekki indeks: same numery kolejne (ok. 12 B na wiersz) — treść pobierana tylko dla wierszy nieznanych lokalnie
     pullIndex: (after, limit) => authed(`/rest/v1/events?select=seq&seq=gt.${Number(after) || 0}&order=seq.asc&limit=${limit}`),
+    // Lekkie sprawdzenie (D-085): numery wierszy nowszych niż kursor — bez nowych wierszy odpowiedź to „[]”
+    peekEvents: (after, limit = 100) => authed(`/rest/v1/events?select=seq&seq=gt.${Number(after) || 0}&order=seq.asc&limit=${limit}`),
     pullBySeq: seqs => authed(`/rest/v1/events?select=sid,seq,blob&seq=in.(${seqs.map(Number).join(',')})&order=seq.asc`),
     // Wstawienie z pominięciem duplikatów (idempotentne) — ten sam `sid` wysłany drugi raz niczego nie zmienia.
     // Zwraca numery kolejne WSTAWIONYCH wierszy (duplikaty pominięte) — urządzenie nie pobiera potem własnych wierszy.

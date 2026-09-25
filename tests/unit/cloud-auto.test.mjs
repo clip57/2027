@@ -7,7 +7,7 @@ import { Store } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
 import { META } from '../../src/core/sync/cloud.js';
 import { MIN_ITERATIONS } from '../../src/core/sync/crypto.js';
-import { saveConfig, signIn, signOut, unlock, autoRound, setAutoEnabled, syncNow, cloudStatus } from '../../src/core/sync/cloud-local.js';
+import { saveConfig, signIn, signOut, unlock, autoRound, autoCheck, setAutoEnabled, setPullEnabled, syncNow, cloudStatus } from '../../src/core/sync/cloud-local.js';
 import { fakeSupabase } from './helpers/fake-supabase.mjs';
 
 // ---------- fałszywy zegar: setTimeout/clearTimeout + przesuwanie czasu z opróżnianiem mikrozadań
@@ -229,4 +229,146 @@ test('wygasła sesja: zgłaszana także po ponownym uruchomieniu (aż do logowan
   assert.equal((await A.round('full')).off, undefined);
   await signOut(A.store, A.deps);
   assert.equal((await A.round('full')).off, true);
+});
+
+// ---------- D-085: automatyczne pobieranie zmian (lekkie sprawdzanie)
+const P = AUTO.poll;
+function pollHarness({ mobile = false } = {}) {
+  let online = true, checkResult = () => ({ changed: false, applied: 0 });
+  const checks = [];
+  const H = harness({ isOnline: () => online, isMobile: () => mobile,
+    check: async () => { checks.push(H.clock.now()); return checkResult(); } });
+  H.checks = checks; H.setOnline = v => { online = v; }; H.setCheck = f => { checkResult = f; };
+  return H;
+}
+async function started(H) { H.auto.boot(); await H.clock.advance(AUTO.bootDelay); }   // pełna runda przy otwarciu
+
+test('sprawdzanie: komputer co 30 s, telefon co 60 s; bez zmian — bez pełnej rundy', async () => {
+  const D = pollHarness(); await started(D);
+  await D.clock.advance(P.desktop * 3);
+  assert.equal(D.checks.length, 3);
+  assert.deepEqual(D.calls, ['full'], 'sprawdzenie bez zmian nie uruchamia pełnej rundy');
+  assert.equal(D.auto.state().pollEvery, P.desktop);
+  const M = pollHarness({ mobile: true }); await started(M);
+  await M.clock.advance(P.desktop); assert.equal(M.checks.length, 0);
+  await M.clock.advance(P.mobile - P.desktop); assert.equal(M.checks.length, 1);
+});
+
+test('bezczynność: po 5 min co 5 min; interakcja przywraca 30 s', async () => {
+  const H = pollHarness(); await started(H);
+  await H.clock.advance(P.idleAfter);
+  const n = H.checks.length;                                 // ok. 10 sprawdzeń w pierwszych 5 min
+  assert.ok(n >= 9 && n <= 10, `${n}`);
+  await H.clock.advance(P.idle - 1000);
+  assert.ok(H.checks.length <= n + 1, 'w bezczynności najwyżej jedno sprawdzenie na 5 min');
+  assert.equal(H.auto.state().idle, true);
+  await H.clock.advance(P.idle);
+  const m = H.checks.length;
+  H.auto.activity(); await H.clock.advance(P.desktop);
+  assert.ok(H.checks.length >= m + 1, 'po interakcji znów co 30 s');
+  assert.equal(H.auto.state().pollEvery, P.desktop);
+});
+
+test('powrót do okna: sprawdzenie od razu, najwyżej raz na 10 s', async () => {
+  const H = pollHarness(); await started(H);
+  await H.clock.advance(20000);
+  H.auto.focus(); await H.clock.advance(0);
+  assert.equal(H.checks.length, 1);
+  H.auto.focus(); await H.clock.advance(0);
+  await H.clock.advance(5000); H.auto.focus(); await H.clock.advance(0);
+  assert.equal(H.checks.length, 1, 'w ciągu 10 s bez kolejnego sprawdzenia');
+  await H.clock.advance(6000); H.auto.focus(); await H.clock.advance(0);
+  assert.equal(H.checks.length, 2);
+});
+
+test('wykryta zmiana: pełna runda wewnątrz sprawdzenia → odświeżenie widoku', async () => {
+  const H = pollHarness(); await started(H);
+  H.setCheck(() => ({ changed: true, applied: 2 }));
+  await H.clock.advance(P.desktop);
+  assert.equal(H.applied.length, 1);
+  assert.equal(H.auto.state().phase, 'idle');
+});
+
+test('w tle i offline — bez sprawdzeń; po powrocie — wznowienie', async () => {
+  const H = pollHarness(); await started(H);
+  H.setVisible(false); H.auto.visibility(false);
+  await H.clock.advance(P.desktop * 5);
+  assert.equal(H.checks.length, 0, 'w tle');
+  H.setVisible(true); H.auto.visibility(true); await H.clock.advance(0);
+  await H.clock.advance(P.desktop);
+  const n = H.checks.length; assert.ok(n >= 1, 'po powrocie na ekran');
+  H.setOnline(false); H.auto.offline();
+  await H.clock.advance(P.desktop * 5);
+  assert.equal(H.checks.length, n, 'offline');
+  H.auto.activity();                                        // > 5 min od startu — bez interakcji byłby interwał bezczynności
+  H.setOnline(true); H.auto.online(); await H.clock.advance(P.desktop + 1);
+  assert.ok(H.checks.length > n, 'po powrocie sieci');
+});
+
+test('błędy: przejściowy — ponowienia zamiast sprawdzeń; wymagający działania — zero sprawdzeń do kick()', async () => {
+  const H = pollHarness(); await started(H);
+  H.setCheck(() => { throw new CloudError('x', 'network'); });
+  await H.clock.advance(P.desktop);
+  assert.equal(H.auto.state().phase, 'retry');
+  const n = H.checks.length;
+  await H.clock.advance(AUTO.backoff[0] - 1);
+  assert.equal(H.checks.length, n, 'w trakcie ponawiania bez dodatkowych sprawdzeń');
+  H.setCheck(() => { throw new CloudError('x', 'signed-out'); });
+  await H.clock.advance(AUTO.backoff[0] + 1);
+  assert.equal(H.auto.state().phase, 'paused');
+  const m = H.checks.length;
+  await H.clock.advance(P.desktop * 10); H.auto.focus(); await H.clock.advance(0);
+  assert.equal(H.checks.length, m, 'wstrzymane');
+  H.setCheck(() => ({ changed: false })); H.auto.kick(); await H.clock.advance(P.desktop);
+  assert.ok(H.checks.length > m, 'po kick() znów sprawdza');
+});
+
+test('pobieranie wyłączone (check → off): zero sprawdzeń, wysyłanie działa dalej', async () => {
+  const H = pollHarness(); await started(H);
+  H.setCheck(() => ({ off: true }));
+  await H.clock.advance(P.desktop);
+  const n = H.checks.length;
+  await H.clock.advance(P.desktop * 10); H.auto.focus(); await H.clock.advance(0);
+  assert.equal(H.checks.length, n);
+  H.auto.changed(); await H.clock.advance(AUTO.debounce);
+  assert.equal(H.calls.at(-1), 'push');
+});
+
+test('wspólna blokada: sprawdzenie nie startuje w trakcie rundy; po pełnej rundzie zbędne sprawdzenie pominięte', async () => {
+  const H = pollHarness(); await started(H);
+  const open = H.hold();
+  H.auto.kick(); await H.clock.advance(0);                      // pełna runda trwa
+  H.auto.focus(); await H.clock.advance(P.desktop * 2);
+  assert.equal(H.checks.length, 0);
+  open(); await H.clock.advance(0);
+  assert.equal(H.checks.length, 0, 'kolejka: sprawdzenie po pełnej rundzie pominięte');
+  await H.clock.advance(P.desktop); assert.equal(H.checks.length, 1);
+});
+
+test('sprawdzenie na serwerze: bez zmian — jedno małe zapytanie; zmiana z innego urządzenia — pobrana; własne wiersze nie są „zmianą”', async () => {
+  const srv = fakeSupabase({ anonKey: KEY }); srv.addUser(EMAIL, PWD);
+  const A = await device(srv, true), B = await device(srv);
+  await A.store.record('cfa.done', { block: 1, done: true });
+  await A.round('push');
+  await B.round('full');
+  srv.stats.bytesOut = 0; let n = srv.log.length;
+  let r = await autoCheck(B.store, B.deps);
+  assert.equal(r.changed, false);
+  assert.equal(srv.log.length - n, 1, 'jedno zapytanie');
+  assert.ok(srv.stats.bytesOut <= 4, `${srv.stats.bytesOut} B`);
+  await A.store.record('cfa.done', { block: 2, done: true });
+  await A.round('push');
+  n = srv.log.length;
+  assert.equal((await autoCheck(A.store, A.deps)).changed, false, 'A: własny wysłany wiersz nie jest zmianą');
+  assert.equal(srv.log.length - n, 1);
+  r = await autoCheck(B.store, B.deps);
+  assert.equal(r.changed, true); assert.equal(r.applied, 1);
+  assert.ok(B.store.state.cfaDone.has(2));
+  await setPullEnabled(B.store, false);
+  n = srv.log.length;
+  assert.equal((await autoCheck(B.store, B.deps)).off, true);
+  assert.equal(srv.log.length, n, 'wyłączone: bez zapytań');
+  await setPullEnabled(B.store, true); await setAutoEnabled(B.store, false);
+  assert.equal((await autoCheck(B.store, B.deps)).off, true, 'wyłączona automatyczna = wyłączone pobieranie');
+  assert.equal((await cloudStatus(B.store)).pull, true);
 });

@@ -3,7 +3,7 @@
 // (ręczne wymuszenie). Ręczna synchronizacja plikiem 2027-sync.json (sekcja wyżej) działa niezależnie i bez zmian.
 import { h, add, plural } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
-import { cloudStatus, saveConfig, signIn, unlock, signOut, resetDevice, syncNow, setAutoEnabled, describeError, describeResult } from '../core/sync/cloud-local.js';
+import { cloudStatus, saveConfig, signIn, unlock, signOut, resetDevice, syncNow, setAutoEnabled, setPullEnabled, describeError, describeResult } from '../core/sync/cloud-local.js';
 
 // Stan interfejsu w pamięci modułu (przetrwa przerysowanie widoku po zapisie)
 const ui = { note: null, needConfirm: false, busy: false, focus: null };
@@ -12,14 +12,20 @@ const maskKey = k => (k.length > 22 ? `${k.slice(0, 18)}…${k.slice(-4)}` : k);
 
 const hhmm = t => new Date(t).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
 const unsentText = n => (n ? `Do wysłania do chmury: ${n} ${plural(n, 'zmiana', 'zmiany', 'zmian')} z tego urządzenia.` : 'Wszystkie zmiany z tego urządzenia są w chmurze.');
-// Stan synchronizacji automatycznej jednym zdaniem (bez komunikatów przy każdej zmianie — D-084)
-export function autoText(s, on) {
+const every = ms => (ms >= 60000 ? `${Math.round(ms / 60000)} min` : `${Math.round(ms / 1000)} s`);
+// Stan synchronizacji automatycznej jednym zdaniem (bez komunikatów przy każdej zmianie — D-084, D-085)
+export function autoText(s, on, pull = true) {
   if (!on) return 'Automatyczna synchronizacja wyłączona na tym urządzeniu — synchronizujesz przyciskiem.';
   switch (s?.phase) {
     case 'running': return 'Synchronizacja w toku…';
     case 'retry': return s.error?.code === 'network' ? 'Brak połączenia — zmiany zostaną wysłane automatycznie, gdy wróci internet.' : 'Serwer chmury chwilowo nie odpowiada — ponowienie automatyczne.';
     case 'paused': return `Wstrzymana: ${describeError(s.error)}`;
-    default: return s?.waiting ? 'Zmiany zostaną wysłane za chwilę.' : `Synchronizacja automatyczna włączona${s?.lastOk ? ` · ostatnio ${hhmm(s.lastOk)}` : ''}.`;
+    default: {
+      if (s?.waiting) return 'Zmiany zostaną wysłane za chwilę.';
+      const check = !pull ? ' · zmiany z innych urządzeń pobierane przy otwarciu i powrocie do aplikacji'
+        : s?.pollEvery ? ` · sprawdzanie zmian co ${every(s.pollEvery)}${s.idle ? ' (bezczynność)' : ''}` : '';
+      return `Synchronizacja automatyczna włączona${s?.lastOk ? ` · ostatnio ${hhmm(s.lastOk)}` : ''}${check}.`;
+    }
   }
 }
 
@@ -124,18 +130,23 @@ export async function cloudSection(ctx) {
       await setAutoEnabled(store, !st.auto); auto?.kick();
       done(st.auto ? 'Synchronizacja automatyczna wyłączona na tym urządzeniu. Synchronizujesz przyciskiem.' : 'Synchronizacja automatyczna włączona na tym urządzeniu.', 'info');
     }, 'sync') }, icon(st.auto ? 'cloud-check' : 'cloud-off', { size: 18 }), h('span', {}, 'Synchronizuj automatycznie'));
-    const line = h('p', { class: 'dn-cloud-auto', role: 'status' }, autoText(auto?.state(), st.auto));
+    // D-085: osobny przełącznik pobierania (aktywny tylko przy włączonej synchronizacji automatycznej)
+    const pullToggle = st.auto && h('button', { type: 'button', class: 'dn-cloud-auto-b dn-cloud-pull-b', 'aria-pressed': String(st.pull), onclick: () => run(pullToggle, 'Zapisywanie…', async () => {
+      await setPullEnabled(store, !st.pull); auto?.kick();
+      done(st.pull ? 'Automatyczne pobieranie zmian wyłączone na tym urządzeniu. Zmiany z innych urządzeń pobierane przy otwarciu i powrocie do aplikacji.' : 'Automatyczne pobieranie zmian włączone na tym urządzeniu.', 'info');
+    }, 'sync') }, icon(st.pull ? 'cloud-download' : 'cloud-off', { size: 18 }), h('span', {}, 'Automatyczne pobieranie zmian'));
+    const line = h('p', { class: 'dn-cloud-auto', role: 'status' }, autoText(auto?.state(), st.auto, st.pull));
     first = syncBtn;
-    add(sec, line, h('div', { class: 'row' }, syncBtn, toggle,
+    add(sec, line, h('div', { class: 'row' }, syncBtn, toggle, pullToggle,
       h('button', { type: 'button', onclick: e => run(e.currentTarget, 'Wylogowywanie…', async () => { await signOut(store); auto?.kick(); done('Wylogowano z chmury. Dane na tym urządzeniu pozostają bez zmian.', 'info'); }) }, icon('log-out', { size: 18 }), h('span', {}, 'Wyloguj'))),
       h('p', { class: 'muted' }, st.auto
-        ? 'Zmiany są wysyłane automatycznie chwilę po zapisie, a zmiany z innych urządzeń pobierane przy otwarciu aplikacji, powrocie do niej i po powrocie internetu. „Synchronizuj teraz” wymusza pełną synchronizację od razu. Konflikty rozstrzyga nowsza zmiana, starsza zostaje w historii. Bez internetu aplikacja działa normalnie.'
+        ? `Zmiany są wysyłane automatycznie chwilę po zapisie, a zmiany z innych urządzeń pobierane przy otwarciu aplikacji, powrocie do niej i po powrocie internetu${st.pull ? ' oraz — gdy aplikacja jest na ekranie — sprawdzane co 30 s na komputerze i co 60 s na telefonie (po 5 min bezczynności co 5 min)' : ''}. „Synchronizuj teraz” wymusza pełną synchronizację od razu. Konflikty rozstrzyga nowsza zmiana, starsza zostaje w historii. Bez internetu aplikacja działa normalnie.`
         : 'Synchronizacja uruchamia się tylko przyciskiem: pobiera zmiany z innych urządzeń, a potem wysyła zmiany z tego urządzenia. Konflikty rozstrzyga nowsza zmiana, starsza zostaje w historii. Bez internetu aplikacja działa normalnie — zsynchronizujesz później.'));
     // Stan na żywo (bez przerysowania widoku): zdanie o automacie + licznik niewysłanych zmian po każdej rundzie
     const head = sec.querySelector('.dn-sync-s span');
     const unsub = auto?.subscribe(async s => {
       if (!sec.isConnected) { unsub?.(); return; }
-      line.textContent = autoText(s, st.auto);
+      line.textContent = autoText(s, st.auto, st.pull);
       if (s.phase === 'idle' && !s.waiting) {
         const cur = await cloudStatus(store);
         if (!sec.isConnected || cur.step !== 'ready') return;

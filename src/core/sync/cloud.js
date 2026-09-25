@@ -122,6 +122,16 @@ export async function syncOnce({ store, client, keys, now = () => new Date(), ov
   return out;
 }
 
+// Lekkie sprawdzenie (D-085): czy w chmurze jest wiersz nowszy niż kursor, którego treści urządzenie jeszcze nie ma.
+// Własne wysłane wiersze (znane z `seen`) nie liczą się jako zmiana. Jedno małe zapytanie; bez zapisu stanu.
+export const PEEK_LIMIT = 100;
+export async function hasRemoteChanges({ store, client }) {
+  const cursor = Number(await store.adapter.getMeta(META.cursor)) || 0;
+  const seen = new Set((await store.adapter.getMeta(META.seen)) || []);
+  const rows = await client.peekEvents(cursor, PEEK_LIMIT);
+  return Array.isArray(rows) && rows.some(r => !seen.has(r.seq));
+}
+
 // Liczba zdarzeń czekających na wysłanie (bez połączenia z siecią)
 export async function pendingCount(store) {
   const acked = new Set((await store.adapter.getMeta(META.acked)) || []);

@@ -29,9 +29,10 @@ def serve(port):
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv
 
-async def page(b, mobile, errs, theme='dark', clock=False):
+async def page(b, mobile, errs, theme='dark', clock=False, ua=None):
     vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 900}
-    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw',
+                              **({'user_agent': f'Mozilla/5.0 (p2027-test-{ua})'} if ua else {}))
     if clock: await ctx.clock.install()     # zegar płynie naturalnie; fast_forward = „aplikacja w tle przez minutę”
     await ctx.add_init_script(f"localStorage.setItem('p2027.theme', '{theme}')")
     pg = await ctx.new_page()
@@ -91,6 +92,10 @@ async def until(cond, timeout=12.0, step=0.2):
         await asyncio.sleep(step); t += step
     return False
 
+def checks_of(srv, ua):   # lekkie sprawdzenia (D-085) wykonane przez dany profil
+    return sum(1 for a, m, p, q, _ in srv.calls if f'p2027-test-{ua}' in a and m == 'GET' and p == '/rest/v1/events' and 'limit=100' in q and 'select=seq' in q)
+def calls_of(srv, ua): return sum(1 for a, m, p, q, _ in srv.calls if f'p2027-test-{ua}' in a and p.startswith('/rest/v1/events'))
+
 def event_posts(srv): return sum(1 for m, p in srv.log if m == 'POST' and p == '/rest/v1/events')
 def event_calls(srv): return sum(1 for _, p in srv.log if p.startswith('/rest/v1/events'))
 
@@ -111,7 +116,7 @@ async def main():
     errs = []
     async with async_playwright() as pw:
         b = await pw.chromium.launch()
-        A = await page(b, True, errs)                 # „iPhone” 390 px, ciemny
+        A = await page(b, True, errs, clock=True, ua='A')   # „iPhone” 390 px, ciemny
 
         # ---------- konfiguracja (A)
         await dane(A, URL)
@@ -184,7 +189,7 @@ async def main():
         a_ban = await stock(A, URL, 'Banan')
 
         # ---------- drugie urządzenie (B, zegar Playwright): błędne hasło szyfrowania, pierwsza synchronizacja automatycznie
-        B = await page(b, False, errs, 'light', clock=True)   # „komputer” 1280 px, jasny
+        B = await page(b, False, errs, 'light', clock=True, ua='B')   # „komputer” (MacBook) 1280 px, jasny
         await configure(B, URL, srv); await login(B); await msg(B, 'Zalogowano')
         await B.get_by_label('Hasło szyfrowania', exact=True).fill('zupełnie inne hasło')
         await B.get_by_role('button', name='Odblokuj').click(); await msg(B, 'Nieprawidłowe hasło szyfrowania')
@@ -216,6 +221,69 @@ async def main():
            and await B.evaluate("document.activeElement?.type") == 'search', 'B: pobranie w trakcie wpisywania — bez przerysowania, wpis i fokus zostają')
         await B.evaluate("document.activeElement.blur()")
         ok(await until(lambda: b_has(250)), 'B: po zakończeniu wpisywania widok pokazuje zmianę z A (250)')
+
+        # ---------- D-085: automatyczne pobieranie zmian na otwartym, widocznym „MacBooku” (B) — bez żadnej akcji
+        async def b_input(v):
+            x = await B.locator('.inv-item').first.locator('input[type=number]').input_value()
+            return x != '' and float(x) == v
+        async def pushed_after(n): return await until(lambda: len(srv.events) > n)
+        await B.goto(URL + '#/zapasy?q=Banan'); await B.wait_for_selector('.inv-item'); await B.keyboard.press('Shift')   # interakcja
+        await B.wait_for_timeout(1500)
+        n = len(srv.events); await set_stock(A, URL, 'Banan', 260); ok(await pushed_after(n), 'A: zmiana 260 wysłana')
+        k0 = checks_of(srv, 'B')
+        await B.clock.fast_forward(31000)
+        ok(await until(lambda: checks_of(srv, 'B') > k0), 'B (komputer): lekkie sprawdzenie zmian po 30 s, bez żadnej akcji')
+        ok(await until(lambda: b_input(260)), 'B: zmiana z A widoczna sama — bez klikania i przeładowania (sprawdzenie → pełna runda)')
+        # sprawdzenie bez zmian: jedno małe zapytanie, bez pełnej rundy
+        i0 = len(srv.calls); await B.clock.fast_forward(31000)
+        ok(await until(lambda: checks_of(srv, 'B') > k0 + 1), 'B: kolejne sprawdzenie po 30 s')
+        await B.wait_for_timeout(800)
+        mine = [c for c in srv.calls[i0:] if 'p2027-test-B' in c[0]]
+        ok(len(mine) == 1 and mine[0][4] <= 4, f'B: sprawdzenie bez zmian = jedno zapytanie, {mine[0][4] if mine else "?"} B treści, bez pełnej rundy ({len(mine)} zapytań)')
+        # powrót do okna (focus): od razu, najwyżej raz na 10 s
+        n = len(srv.events); await set_stock(A, URL, 'Banan', 270); ok(await pushed_after(n), 'A: zmiana 270 wysłana')
+        await B.clock.fast_forward(11000)
+        k1 = checks_of(srv, 'B')
+        await B.evaluate("window.dispatchEvent(new Event('focus'))")
+        ok(await until(lambda: checks_of(srv, 'B') > k1, timeout=3) and await until(lambda: b_input(270), timeout=5), 'B: powrót do okna — sprawdzenie od razu, zmiana z A pobrana')
+        await B.wait_for_timeout(500); k1 = checks_of(srv, 'B')
+        await B.evaluate("window.dispatchEvent(new Event('focus'))"); await B.wait_for_timeout(1000)
+        ok(checks_of(srv, 'B') == k1, f'B: drugi powrót do okna w ciągu 10 s — bez kolejnego sprawdzenia ({checks_of(srv, "B") - k1})')
+        # bezczynność: po 5 min bez interakcji co 5 min; interakcja przywraca 30 s
+        await B.clock.fast_forward(301000); await B.wait_for_timeout(800)
+        k2 = checks_of(srv, 'B')
+        await B.clock.fast_forward(120000); await B.wait_for_timeout(800)
+        ok(checks_of(srv, 'B') == k2, 'B: bezczynność > 5 min — w kolejnych 2 min bez sprawdzeń (interwał 5 min)')
+        await B.goto(URL + '#/dane'); await B.wait_for_selector('.dn-cloud-auto')
+        ok('co 5 min (bezczynność)' in await B.inner_text('.dn-cloud-auto'), 'B: stan „sprawdzanie zmian co 5 min (bezczynność)”')
+        await B.keyboard.press('Shift')
+        ok(await until(lambda: checks_of(srv, 'B') > k2), 'B: interakcja kończy bezczynność — sprawdzenie od razu')
+        ok(await until(lambda: B.evaluate("/co 30 s/.test(document.querySelector('.dn-cloud-auto').textContent)")), 'B: znów „sprawdzanie zmian co 30 s”')
+        # przełącznik „Automatyczne pobieranie zmian”: wyłączony = zero sprawdzeń
+        pb = B.get_by_role('button', name='Automatyczne pobieranie zmian')
+        ok(await pb.get_attribute('aria-pressed') == 'true', 'B: „Automatyczne pobieranie zmian” domyślnie włączone')
+        await audit(B, 'B 1280 jasny: przełączniki automatu i pobierania')
+        await pb.click(); await msg(B, 'pobieranie zmian wyłączone'); await B.wait_for_timeout(1000)
+        k3 = checks_of(srv, 'B'); i3 = len(srv.calls); await B.clock.fast_forward(95000); await B.wait_for_timeout(800)
+        await B.evaluate("window.dispatchEvent(new Event('focus'))"); await B.wait_for_timeout(500)
+        ok(checks_of(srv, 'B') == k3, f'B: pobieranie wyłączone — zero sprawdzeń (także przy powrocie do okna) {[(c[2], c[3][:50]) for c in srv.calls[i3:] if "test-B" in c[0]]}')
+        ok('pobierane przy otwarciu i powrocie' in await B.inner_text('.dn-cloud-auto'), 'B: stan „pobierane przy otwarciu i powrocie do aplikacji”')
+        await B.get_by_role('button', name='Automatyczne pobieranie zmian').click(); await msg(B, 'pobieranie zmian włączone')
+        # offline: zero sprawdzeń; powrót sieci — pełna runda i znów sprawdzanie
+        await B.context.set_offline(True)
+        k4 = calls_of(srv, 'B'); await B.clock.fast_forward(95000); await B.wait_for_timeout(800)
+        ok(calls_of(srv, 'B') == k4, 'B offline: zero zapytań (sprawdzanie wstrzymane)')
+        await B.context.set_offline(False)
+        ok(await until(lambda: calls_of(srv, 'B') > k4), 'B: po powrocie sieci — synchronizacja od razu')
+        # telefon (A): co 60 s, nie co 30 s
+        await A.goto(URL + '#/dzis'); await A.wait_for_selector('main h1'); await A.keyboard.press('Shift')
+        await A.clock.fast_forward(11000); await A.evaluate("window.dispatchEvent(new Event('focus'))")
+        await until(lambda: checks_of(srv, 'A') > 0, timeout=5); await A.wait_for_timeout(500)
+        ka = checks_of(srv, 'A')
+        await A.clock.fast_forward(35000); await A.wait_for_timeout(800)
+        ok(checks_of(srv, 'A') == ka, 'A (telefon): po 35 s jeszcze bez sprawdzenia')
+        await A.clock.fast_forward(30000)
+        ok(await until(lambda: checks_of(srv, 'A') > ka), 'A (telefon): sprawdzenie po 60 s')
 
         # ---------- offline i konflikt: A zmienia offline (bez żadnych zapytań), B później; powrót sieci = wysyłka automatycznie
         await A.context.set_offline(True)
@@ -263,7 +331,7 @@ async def main():
         ok('Synchronizacja zakończona' in t and any(p == '/auth/v1/token' for _, p in srv.log[-8:]), 'A: wygasły token odświeżony bez ponownego logowania')
 
         # ---------- wariant jednoplikowy (file://): pierwsza synchronizacja automatycznie
-        C = await page(b, False, errs)
+        C = await page(b, False, errs, clock=True, ua='C')
         await configure(C, SINGLE, srv); await login(C); await msg(C, 'Zalogowano')
         await C.get_by_label('Hasło szyfrowania', exact=True).fill(PASS); await C.get_by_role('button', name='Odblokuj').click(); await msg(C, 'Hasło szyfrowania poprawne')
         async def c_has(v): return (await stock(C, SINGLE, 'Banan')) == v
@@ -285,14 +353,17 @@ async def main():
         ok(await until(lambda: C.locator('.cloud-banner').count(), timeout=10), 'C: ponowne uruchomienie — wygasła sesja zgłaszana ponownie (nie „cicho wyłączona”)')
         await dane(C, SINGLE)
         ok(await C.get_by_label('E-mail konta').count() == 1, 'C: Dane — formularz logowania (sesja wygasła)')
+        kc = calls_of(srv, 'C'); await C.clock.fast_forward(95000); await C.wait_for_timeout(800)
+        await C.evaluate("window.dispatchEvent(new Event('focus'))"); await C.wait_for_timeout(500)
+        ok(calls_of(srv, 'C') == kc, 'C: synchronizacja wstrzymana (wygasła sesja) — zero sprawdzeń')
 
         # ---------- wylogowanie i odłączenie (B)
         await dane(B, URL)
         await B.get_by_role('button', name='Wyloguj').click(); await msg(B, 'Wylogowano')
         ok(await B.get_by_label('E-mail konta').count() == 1 and ('POST', '/auth/v1/logout') in srv.log, 'B: wylogowanie — formularz logowania, sesja unieważniona na serwerze')
-        c2 = event_calls(srv)
-        await set_stock(B, URL, 'Banan', 5); await B.wait_for_timeout(3000)
-        ok(event_calls(srv) == c2 and await B.locator('.cloud-banner').count() == 0, 'B: po wylogowaniu automat cicho wyłączony (bez zapytań i banerów)')
+        c2 = calls_of(srv, 'B')
+        await set_stock(B, URL, 'Banan', 5); await B.wait_for_timeout(3000); await B.clock.fast_forward(95000); await B.wait_for_timeout(800)
+        ok(calls_of(srv, 'B') == c2 and await B.locator('.cloud-banner').count() == 0, 'B: po wylogowaniu automat i sprawdzanie cicho wyłączone (bez zapytań i banerów)')
         await dane(B, URL)
         await B.locator('.dn-cloud-cfg > summary').click()
         await B.get_by_role('button', name='Odłącz to urządzenie').click(); await msg(B, 'odłączone')

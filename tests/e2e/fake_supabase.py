@@ -13,6 +13,7 @@ class FakeSupabase:
         self.events, self.keys, self.log = [], {}, []
         self.seq, self.lock = 0, threading.Lock()
         self.stats = {'bytes_out': 0, 'gets': 0, 'posts': 0}   # transfer z serwera (GET /events) i liczba zapytań
+        self.calls = []   # (user-agent, metoda, ścieżka, zapytanie, bajty treści) — rozróżnienie profili testowych
         self.url = f'http://localhost:{port}'
 
     def add_user(self, email, password):
@@ -97,6 +98,7 @@ class FakeSupabase:
                 with fake.lock:
                     status, obj = fake.handle(self.command, u.path, parse_qs(u.query), hdrs, json.loads(raw) if raw else None)
                 data = b'' if obj is None else json.dumps(obj).encode()
+                with fake.lock: fake.calls.append((hdrs.get('user-agent', ''), self.command, u.path, u.query, len(data)))
                 self.send_response(status); self.cors()
                 self.send_header('Content-Type', 'application/json'); self.send_header('Content-Length', str(len(data))); self.end_headers()
                 self.wfile.write(data)

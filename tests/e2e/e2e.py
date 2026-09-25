@@ -368,6 +368,20 @@ async def run_variant(pw, name, url, mobile):
     ok('porcja' in await pg.inner_text('.inv-item .zp-more') and 'Opakowanie' in await pg.inner_text('.inv-item .zp-more'), f'{tag} Zapasy: „Więcej” — szczegóły i korekty porcji')
     await pg.locator('.inv-item .zp-more').get_by_role('button', name='+ porcja').click(); await pg.wait_for_timeout(500)
     ok(await pg.locator('.inv-item .zp-more[open]').count() == 1, f'{tag} Zapasy: szczegóły pozostają rozwinięte po korekcie')
+    if not mobile:
+        # Układ karty po rozwinięciu „Więcej” na komputerze (błąd: kolumna czynności rozpychała kartę, nazwa łamana po literze)
+        await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+        for w in (1100, 1280, 1440):
+            await pg.set_viewport_size({'width': w, 'height': 800}); await pg.wait_for_timeout(150)
+            closed = await pg.evaluate("Math.round(document.querySelector('.inv-item .inv-head').getBoundingClientRect().width)")
+            await pg.locator('.inv-item').first.locator('.zp-more > summary').click(); await pg.wait_for_timeout(150)
+            m = await pg.evaluate('''() => { const it = document.querySelector('.inv-item'), r = s => it.querySelector(s).getBoundingClientRect();
+              return { head: Math.round(r('.inv-head').width), item: Math.round(it.getBoundingClientRect().width), more: Math.round(r('.zp-more').width),
+                sw: document.documentElement.scrollWidth, h3: Math.round(it.querySelector('.inv-head h3').getBoundingClientRect().height) }; }''')
+            ok(closed >= 200 and m['head'] >= 200 and m['more'] >= m['item'] * 0.8 and m['h3'] < 60 and m['sw'] <= w,
+               f'{tag} Zapasy {w}px: karta po „Więcej” bez zwężenia (nazwa {closed}→{m["head"]} px, szczegóły {m["more"]}/{m["item"]} px, h3 {m["h3"]} px)')
+            await pg.locator('.inv-item').first.locator('.zp-more > summary').click(); await pg.wait_for_timeout(100)
+        await pg.set_viewport_size({'width': 1280, 'height': 800})
     # --- Faza 5: Dieta (D-071) — składniki z Zapasów (dane syntetyczne mają pozycje pilne)
     await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
     ok(await pg.locator('.dt-stock .dt-alerts li').count() >= 1 and await pg.locator('.meal .dt-stock-b').count() >= 1, f'{tag} Dieta: składniki z niskim zapasem oznaczone (z modułu Zapasy)')

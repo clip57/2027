@@ -4,7 +4,7 @@ import { Store } from './core/storage/store.js';
 import { IdbAdapter } from './core/storage/adapter-idb.js';
 import { today } from './core/dates.js';
 import { createAutoSync } from './core/sync/cloud-auto.js';
-import { autoRound, describeError, cloudStatus } from './core/sync/cloud-local.js';
+import { autoRound, autoCheck, describeError, cloudStatus } from './core/sync/cloud-local.js';
 import { setCustomItems } from './core/calc/inventory.js';
 import { MODULES, GROUPS, byId } from './modules/registry.js';
 import { icon } from './ui/icons.js';
@@ -173,15 +173,21 @@ async function boot() {
   // Inna karta/okno zmieniło dane -> przeładuj z bazy zamiast nadpisywać (ochrona przed równoległą edycją).
   chan?.addEventListener('message', async () => { if (!ctx.store) return; ctx.store = attachStore(await new Store(new IdbAdapter()).open()); render(); });
   addEventListener('hashchange', render);
-  // Synchronizacja automatyczna w chmurze (D-084): działa tylko po skonfigurowaniu chmury i przy włączonym przełączniku
+  // Synchronizacja automatyczna w chmurze (D-084) i automatyczne pobieranie zmian (D-085): działają tylko po skonfigurowaniu
+  // chmury i przy włączonych przełącznikach. Telefon (wskaźnik dotykowy) sprawdza zmiany rzadziej (60 s) niż komputer (30 s).
+  const coarse = matchMedia('(pointer: coarse)');
   ctx.cloudAuto = createAutoSync({
-    getStore: () => ctx.store, run: (store, mode) => autoRound(store, mode),
-    isVisible: () => document.visibilityState !== 'hidden',
+    getStore: () => ctx.store, run: (store, mode) => autoRound(store, mode), check: store => autoCheck(store),
+    isVisible: () => document.visibilityState !== 'hidden', isOnline: () => navigator.onLine !== false, isMobile: () => coarse.matches,
     onApplied: softRender, onChange: s => { onCloudState(s); },
   });
   addEventListener('online', () => ctx.cloudAuto.online());
-  document.addEventListener('visibilitychange', () => (document.visibilityState === 'visible' ? ctx.cloudAuto.resume() : ctx.cloudAuto.flush()));
+  addEventListener('offline', () => ctx.cloudAuto.offline());
+  document.addEventListener('visibilitychange', () => ctx.cloudAuto.visibility(document.visibilityState !== 'hidden'));
   addEventListener('pagehide', () => ctx.cloudAuto.flush());
+  // Powrót do okna (MacBook: okno widoczne, praca na innym urządzeniu) i interakcja użytkownika (koniec bezczynności)
+  addEventListener('focus', () => ctx.cloudAuto.focus());
+  for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, () => ctx.cloudAuto.activity(), { capture: true, passive: true });
   await render();
   ctx.cloudAuto.boot();
   if (!globalThis.__SINGLE__ && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

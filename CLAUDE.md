@@ -14,15 +14,16 @@ raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Pr
 Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
 (urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `4e68589` (Faza 5 kompletna).
 **Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
-**Synchronizacja przez chmurę (Supabase, D-078…D-084)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
+**Synchronizacja przez chmurę (Supabase, D-078…D-085)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
 `cloud.js`, `tools/supabase/schema.sql`), Etap 2 (interfejs: sekcja „Synchronizacja w chmurze” w Dane —
 `src/modules/dane-cloud.js`, warstwa urządzenia `src/core/sync/cloud-local.js`, `tools/supabase/check.sql`, `npm run e2e:cloud`)
-i synchronizacja automatyczna (D-084: harmonogram `src/core/sync/cloud-auto.js`, podłączony w `app.js`) wykonane. Adres
+i synchronizacja automatyczna (D-084: harmonogram `src/core/sync/cloud-auto.js`, podłączony w `app.js`; D-085: automatyczne
+pobieranie zmian — lekkie sprawdzanie) wykonane. Adres
 projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta`); synchronizacja automatyczna (przełącznik
 per urządzenie) + „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
 plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu projektu, kluczy, haseł ani `service_role`.
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-084).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-085).
 
 ---
 
@@ -77,7 +78,9 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 2. **Synchronizacja:** format `2027-sync.json` bez zmian (pola `format, schema, exportedAt, device, count, sha256, events`;
    deduplikacja po `id`; import idempotentny). Synchronizacja **plikiem** jest ręczna (D-033). Synchronizacja **w chmurze**
    jest automatyczna wyłącznie według D-084 (wyzwalacze, odliczanie, limity, przełącznik per urządzenie, jedna runda naraz)
-   plus przycisk „Synchronizuj teraz”; nie dodawaj innych wyzwalaczy (np. odpytywania co N minut) bez zgody użytkownika.
+   i D-085 (lekkie sprawdzanie zmian: 30 s komputer / 60 s telefon / 5 min bezczynność, `focus` ≤ 1/10 s, osobny przełącznik)
+   plus przycisk „Synchronizuj teraz”; nie dodawaj innych wyzwalaczy ani krótszych interwałów bez zgody użytkownika.
+   Bez Realtime/WebSocketu/SDK — wyłącznie REST.
    Chmura: tylko zaszyfrowane zdarzenia, wiersze niezmienne, klucze sekretne odrzucane (D-078…D-082).
    Aktualizacja kodu (service worker) to **inna** sprawa niż synchronizacja danych (D-057).
 3. **Zgodność w przód (D-056):** zdarzeń o poprawnej kopercie i nieznanym typie nie wolno usuwać ani przenosić do
@@ -136,4 +139,6 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | `page.goto(url + '#/dane')`, gdy strona już jest pod tym adresem | brak przerysowania; test czyta komunikat poprzedniej akcji | przed akcją wyczyść obszar komunikatu (aplikacja robi to w `run()` sekcji chmury) albo przejdź najpierw na inną trasę |
 | Nowa instancja `Store` bez słuchacza (przeładowanie po zmianie w innej karcie) | karta przestaje powiadamiać inne karty i planować synchronizację | każdą instancję tworzyć przez `attachStore()` w `app.js` (test „dwie karty” w `e2e:cloud`) |
 | Przerysowanie widoku „w tle” (np. po pobraniu z chmury) | utrata wpisu w polu, zamknięty arkusz | `softRender()` w `app.js` — czeka, aż pole straci fokus i żadne okno nie jest otwarte |
+| Element rozwijany (`details[open]`) w kolumnie siatki `auto` | kolumna rozpycha się do szerokości treści, sąsiednia `minmax(0,1fr)` spada do 0 — nazwa łamana po literze (Zapasy, „Więcej”, ≥ 1100 px) | po rozwinięciu jedna kolumna (`:has(.zp-more[open])`), układ dwukolumnowy zależny od szerokości listy (`@container`), test szerokości w `e2e.py` |
+| Licznik zapytań w teście E2E przy działającym sprawdzaniu co 30 s | fałszywy błąd: sprawdzenie „w locie” w chwili odczytu licznika | liczyć per profil (`user_agent` → `checks_of`/`calls_of` w `cloud_sync.py`) i odczytywać po ustaniu ruchu |
 | Przycisk z krótkim tekstem widocznym („+ 500 g”) | test szukający „+ opakowanie” go nie znajduje | pełna nazwa w `aria-label` (testy i czytniki ekranu używają nazwy dostępnej) |

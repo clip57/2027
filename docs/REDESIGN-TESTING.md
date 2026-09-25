@@ -7,7 +7,7 @@
 | Weryfikacja danych | `npm run verify` | zgodność `src/data/*.json` z plikami źródłowymi (407 kontroli) | **`SOURCES_DIR`** (pliki użytkownika — brak w repo) |
 | E2E | `npm run build && npm run e2e` | wszystkie moduły w 2 wariantach buildu (web przez http://localhost:8765, jeden plik przez file://) × 390 px (mobile, dotyk) / 1280 px; brak przewijania w poziomie, brak artefaktów „null/false/undefined/NaN”, cele dotykowe ≥ 44 px (widok Dane na 390 px), funkcje modułów, trwałość zapisu, eksport/import, offline (SW), kontrast odhaczonych elementów, linki w obrębie strony, sygnatury modułów | Python 3, Playwright ≥ 1.56, Chromium; `SOURCES_DIR`, `PRIVATE_PACK` opcjonalnie — bez nich dane syntetyczne (D-065) |
 | Synchronizacja i aktualizacja | `npm run e2e:sync` | 2 oddzielne profile (osobne bazy): sync w obu kierunkach, niezależne zmiany, brak duplikatów, ostrzeżenie o starszym pliku, zdarzenia z nowszej wersji (baner, brak utraty), aktualizacja kodu tylko za zgodą, offline po aktualizacji, przejście ze starego SW | jw.; **przebudowuje `dist/` kilka razy** (na końcu przywraca zwykły build); porty 8791 |
-| Synchronizacja w chmurze | `npm run build && npm run e2e:cloud` | lokalny fałszywy serwer Supabase (`tests/e2e/fake_supabase.py`, CORS, RLS, rotacja tokenów, indeks numerów) + 2 profile Chromium (390 ciemny / 1280 jasny z zegarem Playwright) + druga karta + plik `2027.html`: konfiguracja (odrzucenie klucza sekretnego), logowanie, hasło szyfrowania, przełącznik automatu (wyłączony: zero zapytań bez kliknięcia), automatyczna wysyłka i grupowanie serii zmian, pierwsza synchronizacja po haśle, powrót do aplikacji, powrót sieci, konflikt, dwie karty (A4), brak przerysowania w trakcie wpisywania, transfer pustej rundy, baner wstrzymania, brak treści jawnej na serwerze, wygasły token, wylogowanie, odłączenie; axe, przewijanie i cele dotykowe w każdym kroku (76 kontroli) | jw.; porty 8793 i 54329 |
+| Synchronizacja w chmurze | `npm run build && npm run e2e:cloud` | lokalny fałszywy serwer Supabase (`tests/e2e/fake_supabase.py`, CORS, RLS, rotacja tokenów, indeks numerów) + 2 profile Chromium (390 ciemny / 1280 jasny z zegarem Playwright) + druga karta + plik `2027.html`: konfiguracja (odrzucenie klucza sekretnego), logowanie, hasło szyfrowania, przełącznik automatu (wyłączony: zero zapytań bez kliknięcia), automatyczna wysyłka i grupowanie serii zmian, pierwsza synchronizacja po haśle, powrót do aplikacji, powrót sieci, konflikt, dwie karty (A4), brak przerysowania w trakcie wpisywania, transfer pustej rundy, baner wstrzymania, brak treści jawnej na serwerze, wygasły token, wylogowanie, odłączenie; automatyczne pobieranie zmian D-085 (30 s komputer / 60 s telefon, bezczynność 5 min, powrót do okna ≤ 1/10 s, offline, przełącznik, wstrzymanie, sprawdzenie bez zmian ≤ 4 B); axe, przewijanie i cele dotykowe w każdym kroku (100 kontroli) | jw.; porty 8793 i 54329 |
 | Dostępność | `npm run build && npm run a11y` | axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
 
 Kolejność po każdej zmianie w Fazie 5: `npm run build && npm test && npm run e2e && npm run a11y`;
@@ -146,10 +146,10 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .tm-clock .tm-man .topic .topline .gd-card .gd-rt .more-ic .more-n .mp-jump .prep-list .cfa-row .set:not(.set-h)
 .tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa
 .dt-next .dt-nav-n .dt-stock .dt-alerts .dt-stock-b a.dt-today .zp-hbar .zp-shop .zp-buy-n .zp-buy-b .zp-run .zp-run-s .zp-more .daycard
-.dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent .dn-cloud-auto .dn-cloud-auto-b .cloud-banner`
+.dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent .dn-cloud-auto .dn-cloud-auto-b .dn-cloud-pull-b .cloud-banner .inv-head .zp-more[open]`
 (chmura, Etap 2: etykiety pól „Project URL”, „Publishable Key”, „E-mail konta”, „Hasło konta”, „Hasło szyfrowania”, „Powtórz hasło
 szyfrowania”, przyciski „Zapisz konfigurację”, „Zaloguj”, „Odblokuj”, „Ustaw hasło szyfrowania”, „Synchronizuj teraz”, „Wyloguj”,
-„Odłącz to urządzenie”, „Synchronizuj automatycznie” (`aria-pressed`), „Zamknij komunikat synchronizacji”, link „Przejdź do Dane”,
+„Odłącz to urządzenie”, „Synchronizuj automatycznie” i „Automatyczne pobieranie zmian” (`aria-pressed`), „Zamknij komunikat synchronizacji”, link „Przejdź do Dane”,
 pole `name=email`, pole wyszukiwania `.rk-search input`, klucze `meta` `cloud.keys`, komunikaty „Konfiguracja zapisana”, „Zalogowano”,
 „Synchronizacja zakończona”, „Pobrane z chmury: N”, „wysłane: N”, „Brak połączenia”, „Nieprawidłowe hasło szyfrowania”)
 (od Fazy 5.0 także: atrybut `data-meal`, identyfikatory `mp-ph-N`, tekst „Przejdź do karty”; od Fazy 5: identyfikatory `ex-<id>`,
@@ -178,7 +178,9 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
 8. Synchronizacja: pełna procedura `docs/TEST_IPHONE_SYNC.md` (komputer ↔ Safari ↔ PWA, niezależne zmiany, starszy plik, offline, aktualizacja za zgodą).
 9. Synchronizacja w chmurze (Etap 2): kontrola ręczna `docs/SYNC_CHMURA.md` §5.6 — wykonana przez użytkownika (lokalnie i na
    GitHub Pages, 24.09.2026). Synchronizacja automatyczna (D-084): kontrola ręczna §6.5 (Safari i PWA osobno, powrót do aplikacji,
-   tryb samolotowy, wpisywanie podczas pobierania) — **jeszcze niewykonana**.
+   tryb samolotowy, wpisywanie podczas pobierania) — wykonana przez użytkownika 25.09.2026 (odstępstwo: brak pobierania na
+   otwartym Macu → D-085). Automatyczne pobieranie zmian (D-085): kontrola ręczna §7.4 — **jeszcze niewykonana**.
+10. Zapasy na MacBooku (1280/1440 px): „Więcej” w pozycji — karta bez zwężenia, nazwa w jednej linii.
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 
