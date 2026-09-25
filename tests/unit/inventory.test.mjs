@@ -27,10 +27,11 @@ test('migracja kopii ZAPASY z 22.09: stany 1:1, odliczanie od 23.09 (D-027)', { 
     assert.equal(stockAt(s.state.inv, id, '2026-09-23'), exp, id);
   }
   assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-22'), 180);
-  // D-086: przyjmowanie od 25.09.2026 do 25.03.2027 (182 dni) przy stanie 180 / 360 z 22.09
+  // D-087: przyjmowanie od 25.09.2026 do 21.03.2027 (178 dni) przy stanie 180 / 360 z 22.09 — zostaje 2 / 4 kaps.
   assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-24'), 180, 'przed 25.09 bez zużycia');
-  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-23'), 0);
-  assert.equal(stockAt(s.state.inv, 'chondroityna', '2027-03-23'), 0);
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-21'), 2);
+  assert.equal(stockAt(s.state.inv, 'chondroityna', '2027-03-21'), 4);
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-31'), 2, 'po 21.03 bez zużycia');
   assert.equal(stockAt(s.state.inv, 'cynk', '2026-09-23'), null, 'cynk nieśledzony');
   assert.equal((await preview(s, backup)).fresh.length, 0, 'ponowny import niczego nie dodaje');
 });
@@ -96,9 +97,10 @@ test('najbliższe zakupy: sobota, po 18:00 w sobotę kolejna', () => {
 
 test('lista zakupów: maxLimit, pełne opakowania, pomija suplementy czasowe i cynk', async () => {
   const s = await new Store(new MemoryAdapter()).open();
-  await s.record('inv.count', { prod: 'kefir', qty: 0, date: '2026-09-22' });
-  await s.record('inv.count', { prod: 'glukozamina', qty: 0, date: '2026-09-22' });
-  const list = shoppingList(s.state.inv, '2026-09-22', allItems());
+  // tydzień bez wyjątków dat (D-087: 27.09.2026 z dietą NT zmieniłby zużycie kefiru)
+  await s.record('inv.count', { prod: 'kefir', qty: 0, date: '2026-10-06' });
+  await s.record('inv.count', { prod: 'glukozamina', qty: 0, date: '2026-10-06' });
+  const list = shoppingList(s.state.inv, '2026-10-06', allItems());
   const kefir = list.find(x => x.id === 'kefir');
   assert.equal(kefir.raw, 1200, '7 dni: 6 dni po 200 ml (czwartek bez kefiru)');
   assert.equal(kefir.packs, 3);

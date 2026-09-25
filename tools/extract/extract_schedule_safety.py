@@ -4,6 +4,7 @@ import json, os, re, sys
 from bs4 import BeautifulSoup
 sys.path.insert(0, os.path.dirname(__file__))
 from day_plan_d086 import apply_d086
+from day_plan_d087 import saturday_variant, apply_week_d087
 
 SRC = os.environ.get("SOURCES_DIR") or sys.exit("Ustaw SOURCES_DIR")
 DATA = os.path.join(os.path.dirname(__file__), "..", "..", "src", "data")
@@ -116,8 +117,8 @@ for sl in slots:
         items.insert(0, {"kind": "meal", "src": sl["title_src"], "text": sl["title_src"], "meal": k, "time": t})
     sl["items"] = items
 slots = apply_d086(slots)  # 9 bloków CFA: 12:13 przerwa kognitywna, 12:20 blok E, 13:13 lunch; bez spaceru (D-086)
-w("day_template.json", {"schema": 1, "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086)",
-                        "slots": slots,
+w("day_template.json", {"schema": 1, "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086) + wariant sobotni „zakupy” (D-087)",
+                        "slots": slots, "variants": {"zakupy": saturday_variant(slots)},
                         "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."})
 print("day_template.json:", len(slots), "slotów")
 
@@ -138,9 +139,9 @@ week = {"schema": 1, "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING)", "days": 
     "swim": {"warmup": "Basen (przygotowanie)", "main": "Basen 55 min", "sauna": "Wolne"},
 }, "mock": {"decision": "D-019", "replace": {"A": "S1", "B": "S1", "C": "S2", "D": "S2", "E": "S2"},
             "free_when_no_block": "D-036", "replace_decision": "D-019, D-086 (E: kontynuacja sesji 2 do 13:00)"}}
-w("week.json", week)
-w("phases.json", {"schema": 1, "decision": "D-017, D-086 (start planu 25.09.2026)", "start": "2026-09-25",
-                  "phases": [{"phase": 0, "from": "2026-09-25"}, {"phase": 1, "from": "2026-10-12"}, {"phase": 2, "from": "2026-11-16"}]})
+w("week.json", apply_week_d087(week))  # soboty: zakupy; wyjątki 25–27.09.2026 (D-087)
+w("phases.json", {"schema": 1, "decision": "D-017, D-087 (Faza 0 od 26.09.2026)", "start": "2026-09-26",
+                  "phases": [{"phase": 0, "from": "2026-09-26"}, {"phase": 1, "from": "2026-10-12"}, {"phase": 2, "from": "2026-11-16"}]})
 w("seeds.json", {"schema": 1, "note": "Stany z decyzji użytkownika (nie z pliku kopii)", "counts": [
     {"prod": "chondroityna", "qty": 360, "date": "2026-09-22", "decision": "D-015"},
     {"prod": "glukozamina", "qty": 180, "date": "2026-09-22", "decision": "D-015"},

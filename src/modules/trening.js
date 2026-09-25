@@ -9,7 +9,7 @@ import { barChart, lineChart } from '../ui/charts.js';
 import { sessions, weekly, muscleSets, exerciseHistory, records, streakWeeks, weekStart, restSeconds, nextSet } from '../core/calc/training.js';
 import { bodyMap, MUSCLE_PL } from '../ui/bodymap.js';
 import { SRC } from '../core/data.js';
-import { resolveDay } from '../core/resolver.js';
+import { resolveDay, dayPlan } from '../core/resolver.js';
 import { addDays, weekday, longDate, shortDate } from '../core/dates.js';
 import muscles from '../data/muscles.json' with { type: 'json' };
 
@@ -144,8 +144,8 @@ function renderSession(root, ctx) {
   const { store, today } = ctx;
   const monday = addDays(today, 1 - weekday(today));
   const date = ctx.params.get('d') || today;
-  const key = TABS[weekday(date) - 1][0];
   const r = resolveDay(date);
+  const key = r.session;   // sesja dnia z planu tygodnia i wyjątków dat (D-087); null = bez treningu
   const phase = r.phase ?? 0;
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const log = store?.state?.train || {};
@@ -175,7 +175,7 @@ function renderSession(root, ctx) {
   // --- pasek dni z nazwami sesji
   add(root, h('div', { class: 'day-strip', role: 'tablist', 'aria-label': 'Dzień tygodnia' },
     TABS.map(([, lab, n]) => {
-      const d = addDays(monday, n - 1), w = SRC.week.days[String(n)];
+      const d = addDays(monday, n - 1), w = dayPlan(d);
       return h('a', { class: `ds${d === date ? ' is-on' : ''}${d === today ? ' is-today' : ''}`, href: `#/trening?d=${d}`, role: 'tab', 'aria-selected': String(d === date) },
         h('span', { class: 'ds-d' }, lab), h('span', { class: 'ds-s' }, w.sessionName.replace('Bez treningu, ', '')));
     })),
@@ -186,6 +186,7 @@ function renderSession(root, ctx) {
     h('div', { class: 'hero-tr-main' },
       h('p', { class: 'eyebrow' }, `${r.dayName}, ${longDate(date)} · Faza ${phase}`),
       h('h1', {}, r.sessionLabel),
+      r.note && h('p', {}, r.note),
       total > 0 && h('p', { class: 'muted' }, `${exercises.filter((_, i) => plan[i].n > 0).length} ćwiczeń · ${total} ${serie(total)}`),
       h('div', { class: 'row' }, sheets.map(sh => h('button', { class: 'chip-b', onclick: () => infoDialog(sh) }, sh.split('✕')[0].trim())))),
     total > 0 && h('div', { class: 'hero-tr-side' }, progressRing(done, total, 'Wykonane serie'), h('span', { class: 'muted' }, `${done} / ${total} serii`)),
@@ -205,8 +206,8 @@ function renderSession(root, ctx) {
 
   if (!exercises.length) {
     add(root, h('div', { class: 'panel' },
-      h('p', {}, key === 'czw' ? 'Dzień bez treningu. Dwie rundy sauny według protokołu (arkusz „Sauna”). Kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni.'
-        : key === 'nd' ? 'Basen 55 min.' : 'Brak zaplanowanych ćwiczeń.')));
+      h('p', {}, r.dayType === 'rest_sauna2' ? 'Dzień bez treningu. Dwie rundy sauny według protokołu (arkusz „Sauna”). Kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni.'
+        : r.dayType === 'swim' ? 'Basen 55 min.' : r.dayType === 'free' ? 'Dzień bez treningu.' : 'Brak zaplanowanych ćwiczeń.')));
     return;
   }
   // Ćwiczenie spoza aktywnej fazy: zapis dobrowolny, wyraźnie oznaczony (opt: true).
@@ -341,7 +342,7 @@ function renderHistory(root, ctx) {
   const all = sessions(store?.state?.train || {}, store?.state?.trainSessions || {}).reverse();
   add(root, all.length === 0 ? h('div', { class: 'panel' }, h('p', {}, 'Brak zapisanych treningów.')) :
     h('div', { class: 'hist-list' }, all.map(s => h('a', { class: 'hist-item', href: `#/trening?d=${s.date}` },
-      h('div', { class: 'hist-h' }, h('strong', {}, `${SRC.week.days[String(weekday(s.date))].sessionName} · ${shortDate(s.date)}`),
+      h('div', { class: 'hist-h' }, h('strong', {}, `${dayPlan(s.date).sessionName} · ${shortDate(s.date)}`),
         h('span', { class: 'muted' }, s.minutes ? `${s.minutes} min` : 'czas nie zapisany')),
       h('p', { class: 'hist-k' }, h('span', {}, `${s.sets} ${plural(s.sets, 'seria', 'serie', 'serii')}`), h('span', {}, `${fmt(Math.round(s.volume))} kg`), h('span', {}, `${fmt(s.reps)} powt.`),
         s.optional > 0 && h('span', { class: 'opt-tag' }, `${s.optional} ${plural(s.optional, 'opcjonalna', 'opcjonalne', 'opcjonalnych')}`)),

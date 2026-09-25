@@ -9,7 +9,7 @@ import { resolveDay, phaseFor } from '../core/resolver.js';
 import { catalogById } from '../core/data.js';
 import { longDate, shortDate, dayShort } from '../core/dates.js';
 
-const PHASES = [{ value: 0, label: 'Faza 0', hint: 'od 25.09' }, { value: 1, label: 'Faza 1', hint: 'od 12.10' }, { value: 2, label: 'Faza 2', hint: 'od 16.11' }];
+const PHASES = [{ value: 0, label: 'Faza 0', hint: 'od 26.09' }, { value: 1, label: 'Faza 1', hint: 'od 12.10' }, { value: 2, label: 'Faza 2', hint: 'od 16.11' }];
 // Etykieta z PDF bywa samą liczbą (gramy) — dodajemy jednostkę, nie zmieniając wartości.
 const qty = label => (/^[\d,]+$/.test(label.trim()) ? `${label.trim()} g` : label);
 const VARIANTS = [{ value: 'T', label: 'Dzień treningowy', hint: 'pn–śr, pt–nd' }, { value: 'NT', label: 'Dzień nietreningowy', hint: 'czwartek' }];

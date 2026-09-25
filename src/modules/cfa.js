@@ -1,4 +1,4 @@
-// Moduł CFA (Etap 5): harmonogram z planu CFA „MASTER SCHEDULE FINAL” (D-086, zastępuje v3 z D-006), trwały postęp
+// Moduł CFA (Etap 5): harmonogram z planu CFA „MASTER SCHEDULE FINAL” v5 (D-086, D-087; zastępuje v3 z D-006), trwały postęp
 // (cfa.done) i error log (cfa.err.*), eksport i import CSV zgodny z v3. Daty lokalne (naprawa błędu UTC z v1/v2).
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
 import { segmented, progressRing, section } from '../ui/components.js';
@@ -219,7 +219,7 @@ export function renderCFA(root, ctx) {
       h('a', { href: `#/cfa?v=dzien&d=${d}` }, `Mock ${i + 1}: ${dayShort(d)} ${shortDate(d)}`),
       ` — ${(cfaByDay[d] || []).filter(b => done.has(b.nr)).length}/${(cfaByDay[d] || []).length} bloków`)))),
     section('h-stat', 'Statystyki planu', h('dl', { class: 'kv' },
-      h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni × ${D.stat.bloki / D.stat.dni})`),
+      h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad || `${D.stat.dni} × ${D.stat.bloki / D.stat.dni}`})`),
       h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h + recall ${fmt(D.stat.recallH, 2)} h (${D.stat.recall} sesji)`),
       h('dt', {}, 'Tempo (do wczoraj)'), h('dd', {}, `${pace.doneDue} z ${pace.due} zaplanowanych · zaległe ${late} · z wyprzedzeniem ${pace.ahead}`),
       Object.entries(D.stat.tryb).map(([k, n]) => [h('dt', {}, k), h('dd', {}, `${n} ${plural(n, 'blok', 'bloki', 'bloków')} · wykonane ${D.bloki.filter(b => b.tryb === k && done.has(b.nr)).length}`)]))));

@@ -23,11 +23,14 @@ projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta
 per urządzenie) + „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
 plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu projektu, kluczy, haseł ani `service_role`.
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-**Plan od 25.09.2026 (D-086):** plan CFA „MASTER SCHEDULE FINAL” — 432 bloki, 48 dni × 9 bloków po 53 min (25.09–11.11), źródło
-`PLAN_NAUKI_CFA_LEVEL_I.html` (+ kontrola `MASTER_SCHEDULE_CFA.csv`); plan dnia: 12:13–12:20 przerwa kognitywna, 12:20 blok E,
-13:13–13:30 przerwa na lunch, bez spaceru (`tools/extract/day_plan_d086.py`); Faza 0 od 25.09 (F1 12.10, F2 16.11 bez zmian);
-suplementy czasowe do 25.03.2027. Spójność planu: `tests/unit/plan-cfa.test.mjs`. Raport: `docs/RAPORT_PLAN_CFA_D086.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-086).
+**Plan od 25.09.2026 (D-086, D-087):** plan CFA „MASTER SCHEDULE FINAL” v5 — 421 bloków po 53 min (25.09–11.11: 41 dni × 9,
+6 sobót × 8, 25.09 × 4), źródło `PLAN_NAUKI_CFA_LEVEL_I.html` (+ kontrola `MASTER_SCHEDULE_CFA.csv`); plan dnia: 12:13–12:20 przerwa
+kognitywna, 12:20 blok E, 13:13–13:30 przerwa na lunch, bez spaceru (`tools/extract/day_plan_d086.py`); **soboty** (poza mockiem
+07.11): 12:13–13:13 „Zakupy” zamiast przerwy i bloku E (`variants.zakupy`); **wyjątki dat** 25–27.09 w `week.json` → `exceptions`
+(`dayPlan()` w `resolver.js` — zawsze przez nią, nie przez `SRC.week.days[weekday]`; `tools/extract/day_plan_d087.py`);
+Faza 0 od 26.09 (F1 12.10, F2 16.11 bez zmian); suplementy czasowe 25.09.2026–21.03.2027. Spójność planu:
+`tests/unit/plan-cfa.test.mjs`. Raporty: `docs/RAPORT_PLAN_CFA_D086.md`, `docs/RAPORT_PLAN_CFA_D087.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-087).
 
 ---
 
@@ -64,7 +67,7 @@ npm test                  # testy jednostkowe (node --test)
 npm run e2e               # testy w przeglądarce: Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
 npm run e2e:sync          # synchronizacja między 2 profilami + aktualizacja kodu za zgodą (kilka razy przebudowuje dist/)
 npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py)
-npm run a11y              # axe-core WCAG 2.1 A/AA: 20 widoków × 390/1280 px × jasny/ciemny + przewijanie w poziomie
+npm run a11y              # axe-core WCAG 2.1 A/AA: 21 widoków × 390/1280 px × jasny/ciemny + przewijanie w poziomie
 npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika, w tym PLAN_NAUKI_CFA_LEVEL_I.html), bez nich nie działa
 ```
 Zmienne opcjonalne: `SOURCES_DIR` (katalog z plikami źródłowymi, m.in. `zapasy_kopia_2026-09-22.json`),
@@ -147,5 +150,7 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Licznik zapytań w teście E2E przy działającym sprawdzaniu co 30 s | fałszywy błąd: sprawdzenie „w locie” w chwili odczytu licznika | liczyć per profil (`user_agent` → `checks_of`/`calls_of` w `cloud_sync.py`) i odczytywać po ustaniu ruchu |
 | Przycisk z krótkim tekstem widocznym („+ 500 g”) | test szukający „+ opakowanie” go nie znajduje | pełna nazwa w `aria-label` (testy i czytniki ekranu używają nazwy dostępnej) |
 | Liczba bloków CFA wpisana na sztywno (416) w walidacji `cfa.done` i imporcie postępu | po zmianie planu bloki 417–432 odrzucane przy zapisie | `CFA_BLOCKS` w `validate.js`, test zgodności z `cfa.json` (`plan-cfa.test.mjs`); zmiana planu = przejrzeć `grep -rn "<stara liczba>"` |
+| Typ dnia / dieta czytane z `SRC.week.days[weekday]` | wyjątek daty (np. 27.09 — dieta NT) pominięty w Zapasach, Treningu, Suplementacji | zawsze `dayPlan(date)` z `resolver.js` (wyjątki `week.exceptions`, D-087) |
+| Test zależny od prawdziwego kalendarza planu (np. lista zakupów od 22.09) | wyjątek daty zmienia oczekiwane zużycie | w testach ogólnej logiki używaj tygodni bez wyjątków (od 05.10.2026) |
 | Tytuł slotu w „Dziś” czytany w teście przez `textContent` | w dniu bieżącym dopisek „teraz” — test zależny od godziny | tytuł bez znacznika: `.slot-title` → `firstChild.textContent` |
 | Zmiana godzin planu dnia bez źródłowego `PLAN_DNIA.html` | ponowna ekstrakcja przywróciłaby stary rozkład | zmiana jako funkcja decyzji w `tools/extract/` (np. `day_plan_d086.py`) stosowana po odczycie źródła |

@@ -8,11 +8,15 @@ import { scheduleFor, supplementOverview } from '../core/calc/supplements.js';
 import { addDays, longDate, weekday, dayShort, shortDate } from '../core/dates.js';
 import { stockAt, forecast, statusInfo, runway, nextShopping } from '../core/calc/inventory.js';
 import { catalogById } from '../core/data.js';
+import { dayPlan } from '../core/resolver.js';
 
 const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
 
 export function renderSuplementy(root, ctx) {
   const date = ctx.params.get('d') || ctx.today;
+  // Dieta NT (czwartek i wyjątki dat — D-087): uwaga o kreatynie bez banana
+  const nt = dayPlan(date).diet === 'NT';
+  const ntNote = n => (weekday(date) === 4 ? n : n.replace('w czwartek', 'dziś'));
   const go = d => { location.hash = `#/suplementy?d=${d}`; };
   const week = [...Array(7)].map((_, i) => addDays(ctx.today, i))
     .map(d => ({ value: d, label: DAYS[weekday(d) - 1], hint: d === ctx.today ? 'dziś' : shortDate(d) }));
@@ -62,8 +66,8 @@ export function renderSuplementy(root, ctx) {
         h('ul', { class: 'dose-list' }, g.doses.map(d => h('li', {},
           h('div', { class: 'dose-head' }, h('span', { class: 'sn' }, d.name), h('span', { class: 'dose-badge' }, d.label)),
           h('p', { class: 'dose-form' }, d.form),
-          (d.note || (d.thursday && weekday(date) === 4)) && h('p', { class: 'dose-note' },
-            [d.note, d.thursday && weekday(date) === 4 ? d.thursday.note : null].filter(Boolean).join(' · '))))))));
+          (d.note || (d.thursday && nt)) && h('p', { class: 'dose-note' },
+            [d.note, d.thursday && nt ? ntNote(d.thursday.note) : null].filter(Boolean).join(' · '))))))));
   }
 
   // Karta zapasu suplementów — tylko pozycje z pilnym / średnim stanem, zakup jednym dotknięciem (inv.move purchase)

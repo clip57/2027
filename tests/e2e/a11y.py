@@ -5,7 +5,7 @@ import fixtures
 from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 AXE = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
-ROUTES = ['#/dzis', '#/dzis?d=2026-10-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-09-21', '#/trening?v=stat',
+ROUTES = ['#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-09-21', '#/trening?v=stat',
   '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/bezpieczenstwo',
   '#/bezpieczenstwo?m=tabela', '#/bezpieczenstwo?m=poradnik', '#/rekompozycja?s=s6', '#/dane', '#/wiecej']
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.

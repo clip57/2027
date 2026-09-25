@@ -57,7 +57,7 @@ export function renderRekompozycja(root, ctx) {
   const setAll = v => document.querySelectorAll('.rk-sec').forEach(d => { d.open = v; });
   add(root,
     h('section', { class: 'hero-tr rk-hero' }, h('div', { class: 'hero-tr-main' },
-      h('p', { class: 'eyebrow' }, 'Plan indywidualny · punkt startowy 25.09.2026'),
+      h('p', { class: 'eyebrow' }, 'Plan indywidualny · punkt startowy 26.09.2026'),
       h('h1', {}, 'Plan rekompozycji'),
       h('p', { class: 'muted' }, 'Dieta, trening, regeneracja i monitoring — z uwzględnieniem Twoich decyzji. Sekcje i zdania z danymi medycznymi pochodzą z pakietu prywatnego.'),
       !pack && h('p', { class: 'priv-miss block' }, '🔒 Pakiet prywatny nie jest zaimportowany — część treści jest ukryta.'))),

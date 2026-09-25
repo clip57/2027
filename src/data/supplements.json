@@ -97,7 +97,7 @@
    "note": "na czczo",
    "validity": {
     "from": "2026-09-25",
-    "until": "2027-03-25",
+    "until": "2027-03-21",
     "decision": "D-015"
    }
   },
@@ -132,7 +132,7 @@
    "src": "SUPL:09:00/boswellia",
    "validity": {
     "from": "2026-09-25",
-    "until": "2027-03-25",
+    "until": "2027-03-21",
     "decision": "D-015"
    }
   },
@@ -222,7 +222,7 @@
    "src": "SUPL:13:20/glukozamina",
    "validity": {
     "from": "2026-09-25",
-    "until": "2027-03-25",
+    "until": "2027-03-21",
     "decision": "D-015"
    }
   },
@@ -334,7 +334,7 @@
    "src": "SUPL:21:00/chondroityna",
    "validity": {
     "from": "2026-09-25",
-    "until": "2027-03-25",
+    "until": "2027-03-21",
     "decision": "D-015"
    }
   },
@@ -418,7 +418,7 @@
  ],
  "decisions": {
   "D-014": "tauryna codziennie, także w czwartek",
-  "D-015": "chondroityna, boswellia, glukozamina od 25.09.2026 do 25.03.2027 (D-086; wcześniej do 21.03.2027 wg I-9)",
+  "D-015": "chondroityna, boswellia, glukozamina od 25.09.2026 do 21.03.2027 (D-087; I-9)",
   "D-016": "cynk kontynuowany; stan nieśledzony"
  }
 }

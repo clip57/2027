@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086)",
+ "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086) + wariant sobotni „zakupy” (D-087)",
  "slots": [
   {
    "id": "slot.0700",
@@ -690,5 +690,43 @@
    ]
   }
  ],
+ "variants": {
+  "zakupy": {
+   "decision": "D-087",
+   "replaces": [
+    "slot.1213",
+    "slot.1220"
+   ],
+   "slots": [
+    {
+     "id": "slot.1213z",
+     "from": "12:13",
+     "to": "13:13",
+     "domain": "prep",
+     "title_src": "Zakupy",
+     "badges_src": [
+      "Zakupy"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "text": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "decision": "D-087"
+      },
+      {
+       "kind": "task",
+       "src": "Druga Kawa (12:20)",
+       "text": "Druga kawa (12:20)"
+      }
+     ],
+     "decision": "D-087"
+    }
+   ]
+  }
+ },
  "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."
 }

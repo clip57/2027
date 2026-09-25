@@ -48,7 +48,8 @@
    "sessionName": "LOWER 2",
    "sauna": 1,
    "diet": "T",
-   "recall": false
+   "recall": false,
+   "variant": "zakupy"
   },
   "7": {
    "dayType": "swim",
@@ -84,6 +85,11 @@
    "warmup": "Basen (przygotowanie)",
    "main": "Basen 55 min",
    "sauna": "Wolne"
+  },
+  "free": {
+   "warmup": "Wolne",
+   "main": "Wolne",
+   "sauna": "Wolne"
   }
  },
  "mock": {
@@ -97,5 +103,29 @@
   },
   "free_when_no_block": "D-036",
   "replace_decision": "D-019, D-086 (E: kontynuacja sesji 2 do 13:00)"
+ },
+ "variant_decision": "D-087: soboty — 12:13–13:13 zakupy (bez bloku E); nie dotyczy dnia mocka",
+ "exceptions": {
+  "2026-09-25": {
+   "decision": "D-087",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "note": "Wyjątek 25.09.2026: bez treningu — okno 17:45–20:15 wolne"
+  },
+  "2026-09-26": {
+   "decision": "D-087",
+   "note": "Trening kalibracyjny: technika i obciążenie wszystkich nowych ćwiczeń na nogi"
+  },
+  "2026-09-27": {
+   "decision": "D-087",
+   "dayType": "rest_sauna2",
+   "session": null,
+   "sessionName": "Bez treningu, 2 × sauna",
+   "sauna": 2,
+   "diet": "NT",
+   "note": "Wyjątek 27.09.2026: zamiast basenu dzień sauny (bez treningu, dieta NT)"
+  }
  }
 }

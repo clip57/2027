@@ -1,14 +1,12 @@
 // Zużycie dzienne magazynu wyliczane z planu (D-003): dieta (faza × wariant) + suplementy (D-001) + dodatki (D-021).
 import { plan, catalogById, EXTRA_DAILY } from '../data.js';
-import { phaseFor, dosesFor } from '../resolver.js';
-import { SRC } from '../data.js';
-import { weekday } from '../dates.js';
+import { phaseFor, dosesFor, dayPlan } from '../resolver.js';
 
 const cache = new Map();
 
 export function consumptionForDay(date) {
   if (cache.has(date)) return cache.get(date);
-  const variant = SRC.week.days[String(weekday(date))].diet;
+  const variant = dayPlan(date).diet;   // z wyjątkami dat (D-087)
   const p = plan(variant, phaseFor(date) ?? 0);
   const use = {};
   const add = (id, q) => { if (catalogById[id]?.tracked !== false) use[id] = (use[id] || 0) + q; };
