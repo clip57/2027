@@ -1,9 +1,12 @@
-// Import postępu i error logu z pliku CFA v3 (D-031). Deterministyczne id — import jest idempotentny.
+// Import postępu i error logu z pliku planu CFA (D-031; format `postep-nauki.json` bez zmian w planie D-086).
+// Deterministyczne id — import jest idempotentny.
+import { CFA_BLOCKS } from '../storage/validate.js';
+
 export function cfaProgressEvents(o) {
   if (!o || !Array.isArray(o.wykonane)) throw new Error('To nie jest plik postep-nauki.json');
   const at = typeof o.zapis === 'string' ? o.zapis : new Date(0).toISOString();
   const ms = String(Date.parse(at) || 0).padStart(13, '0');
-  return o.wykonane.filter(n => Number.isInteger(n) && n >= 1 && n <= 416).map((n, i) => ({
+  return o.wykonane.filter(n => Number.isInteger(n) && n >= 1 && n <= CFA_BLOCKS).map((n, i) => ({
     id: `cfa-json:${ms}:${n}`, hlc: `${ms}:${String(i % 10000).padStart(4, '0')}:migr`, dev: 'migr', t: 'cfa.done',
     d: { block: n, done: true }, at, v: 1 }));
 }

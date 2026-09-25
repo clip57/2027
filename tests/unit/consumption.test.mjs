@@ -28,7 +28,7 @@ test('Faza 1 i 2: owies/makaron/ryż/chleb rosną automatycznie (D-003)', () => 
   assert.deepEqual([f2.platki_owsiane, f2.penne, f2.ryz_parboiled, f2.chleb_zytni], [85, 100, 100, 70]);
 });
 
-test('suplementy czasowe znikają po 21.03.2027', () => {
-  assert.equal(consumptionForDay('2027-03-21').glukozamina, 1);
-  assert.equal(consumptionForDay('2027-03-22').glukozamina, undefined);
+test('suplementy czasowe znikają po 25.03.2027 (D-086)', () => {
+  assert.equal(consumptionForDay('2027-03-25').glukozamina, 1);
+  assert.equal(consumptionForDay('2027-03-26').glukozamina, undefined);
 });

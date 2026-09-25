@@ -26,11 +26,12 @@ test('cfaPace: przed startem planu i po jego końcu', () => {
   assert.deepEqual([end.due, end.overdue.length, end.ahead], [6, 0, 0]);
 });
 
-test('cfaPace na prawdziwym harmonogramie: 8 bloków dziennie od startu', () => {
+test('cfaPace na prawdziwym harmonogramie: 9 bloków dziennie od startu 25.09 (D-086)', () => {
   const D = SRC.cfa.D;
-  const p = cfaPace(D.bloki, new Set(), '2026-09-24');
-  assert.equal(p.due, D.bloki.filter(b => b.data < '2026-09-24').length);
-  assert.equal(p.today, 8);
+  assert.deepEqual([cfaPace(D.bloki, new Set(), '2026-09-24').due, cfaPace(D.bloki, new Set(), '2026-09-24').today], [0, 0]);
+  const p = cfaPace(D.bloki, new Set(), '2026-09-28');
+  assert.equal(p.due, 27);
+  assert.equal(p.today, 9);
 });
 
 test('restSeconds: zapisy przerw z planu treningowego', () => {

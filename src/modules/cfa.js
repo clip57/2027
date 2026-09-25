@@ -1,5 +1,5 @@
-// Moduł CFA (Etap 5): harmonogram z Plan_nauki_CFA v3 (D-006), trwały postęp (cfa.done) i error log (cfa.err.*),
-// eksport i import CSV zgodny z v3. Daty lokalne (naprawa błędu UTC z v1/v2).
+// Moduł CFA (Etap 5): harmonogram z planu CFA „MASTER SCHEDULE FINAL” (D-086, zastępuje v3 z D-006), trwały postęp
+// (cfa.done) i error log (cfa.err.*), eksport i import CSV zgodny z v3. Daty lokalne (naprawa błędu UTC z v1/v2).
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
 import { segmented, progressRing, section } from '../ui/components.js';
 import { SRC, cfaByDay } from '../core/data.js';
@@ -16,7 +16,7 @@ const EXAM = SRC.cfa.exam;
 const KINDS = ['brak wiedzy', 'pomyłka rachunkowa', 'niezrozumienie pytania', 'błąd interpretacyjny', 'błąd pamięciowy', 'pośpiech', 'błędna strategia'];
 const VIEWS = [{ value: 'dzien', label: 'Dzień' }, { value: 'harmonogram', label: 'Harmonogram' }, { value: 'kalendarz', label: 'Kalendarz' },
   { value: 'log', label: 'Error log' }, { value: 'plan', label: 'Plan' }];
-const MODE_CLASS = { 'FIRST PASS': 'm-fp', CONSOLIDATION: 'm-co', MOCK: 'm-mo', 'ANALIZA BŁĘDÓW': 'm-an', 'ACTIVE RECALL': 'm-ar' };
+const MODE_CLASS = { 'FIRST PASS': 'm-fp', CONSOLIDATION: 'm-co', MOCK: 'm-mo', 'ANALIZA BŁĘDÓW': 'm-an', PRACTICE: 'm-pr', 'ACTIVE RECALL': 'm-ar' };
 
 export function renderCFA(root, ctx) {
   const { store, today } = ctx;
@@ -111,7 +111,7 @@ export function renderCFA(root, ctx) {
     Object.entries(byDay).map(([d, bl]) => h('section', { class: 'panel' },
       h('h2', { class: 'cfa-dh' }, h('a', { href: `#/cfa?v=dzien&d=${d}` }, `${dayShort(d)} ${shortDate(d)}`),
         h('span', { class: 'muted' }, ` · ${bl.filter(b => done.has(b.nr)).length}/${bl.length}`)),
-      h('div', { class: 'cfa-list' }, bl.map(blockRow)))));
+      h('div', { class: 'cfa-list' }, bl.map(b => blockRow(b))))));   // bez indeksu jako „next”
   }
 
   // ---------------- Kalendarz
@@ -219,7 +219,7 @@ export function renderCFA(root, ctx) {
       h('a', { href: `#/cfa?v=dzien&d=${d}` }, `Mock ${i + 1}: ${dayShort(d)} ${shortDate(d)}`),
       ` — ${(cfaByDay[d] || []).filter(b => done.has(b.nr)).length}/${(cfaByDay[d] || []).length} bloków`)))),
     section('h-stat', 'Statystyki planu', h('dl', { class: 'kv' },
-      h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni × 8)`),
+      h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni × ${D.stat.bloki / D.stat.dni})`),
       h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h + recall ${fmt(D.stat.recallH, 2)} h (${D.stat.recall} sesji)`),
       h('dt', {}, 'Tempo (do wczoraj)'), h('dd', {}, `${pace.doneDue} z ${pace.due} zaplanowanych · zaległe ${late} · z wyprzedzeniem ${pace.ahead}`),
       Object.entries(D.stat.tryb).map(([k, n]) => [h('dt', {}, k), h('dd', {}, `${n} ${plural(n, 'blok', 'bloki', 'bloków')} · wykonane ${D.bloki.filter(b => b.tryb === k && done.has(b.nr)).length}`)]))));

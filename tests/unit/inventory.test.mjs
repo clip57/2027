@@ -27,8 +27,10 @@ test('migracja kopii ZAPASY z 22.09: stany 1:1, odliczanie od 23.09 (D-027)', { 
     assert.equal(stockAt(s.state.inv, id, '2026-09-23'), exp, id);
   }
   assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-22'), 180);
-  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-21'), 0, 'zapas D-015 kończy się dokładnie 21.03.2027');
-  assert.equal(stockAt(s.state.inv, 'chondroityna', '2027-03-21'), 0);
+  // D-086: przyjmowanie od 25.09.2026 do 25.03.2027 (182 dni) przy stanie 180 / 360 z 22.09
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-24'), 180, 'przed 25.09 bez zużycia');
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-23'), 0);
+  assert.equal(stockAt(s.state.inv, 'chondroityna', '2027-03-23'), 0);
   assert.equal(stockAt(s.state.inv, 'cynk', '2026-09-23'), null, 'cynk nieśledzony');
   assert.equal((await preview(s, backup)).fresh.length, 0, 'ponowny import niczego nie dodaje');
 });

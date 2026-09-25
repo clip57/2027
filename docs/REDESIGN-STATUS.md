@@ -21,6 +21,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | **Faza 5 (1–2)** | Trening i CFA: system projektowy + rozbudowa funkcji (D-068–D-070) | `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md` |
 | **Faza 5 (3–4)** | Dieta i Zapasy jako jeden system; kierunek „premium personal OS” (D-071–D-073) | `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md` |
 | **Faza 5 (5–9)** | Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja, Dane (D-074–D-077) | `docs/RAPORT_REDESIGN_F5_POZOSTALE.md` |
+| Plan CFA D-086 (25.09.2026) | Nowy plan CFA (432 bloki, 48 dni × 9), plan dnia 12:13–13:30 bez spaceru, start planu i Fazy 0 25.09, suplementy czasowe do 25.03.2027 | `docs/RAPORT_PLAN_CFA_D086.md` |
 
 ## 2. Wykonane
 

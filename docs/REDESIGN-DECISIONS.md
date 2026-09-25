@@ -15,8 +15,9 @@ nie mają pełnego potwierdzenia w kodzie lub u użytkownika.
 | D-040 | Nagłówek dnia: nazwa treningu (UPPER 1 + sauna, LOWER 1 …) | `resolver.js` `sessionLabel`, E2E |
 | D-013 | Termos: prosto z patelni; > 63 °C podczas jedzenia | dane Meal Prep / Bezpieczeństwo, testy |
 | D-014, D-030 | Tauryna 17:15 codziennie (także czw.); kreatyna 5 g 20:15 | testy jednostkowe suplementów |
-| D-017 | Fazy kalendarzowe F0 21.09, F1 12.10, F2 16.11.2026 | `phases.json`, testy |
-| D-018, D-036 | Warianty dnia; dzień mocka — sloty E/F „Wolne” | resolver, E2E |
+| D-017 | Fazy kalendarzowe F0 25.09 (D-086; pierwotnie 21.09), F1 12.10, F2 16.11.2026 | `phases.json`, testy |
+| D-086 | Plan CFA „MASTER SCHEDULE FINAL”: 432 bloki, 48 dni × 9 (25.09–11.11.2026); plan dnia 12:13–12:20 przerwa kognitywna, 12:20 blok E (druga kawa), 13:13–13:30 przerwa na lunch, bez spaceru; bloki F–I 13:30–17:33; suplementy czasowe do 25.03.2027 | `cfa.json`, `day_template.json` (`tools/extract/day_plan_d086.py`), `plan-cfa.test.mjs`, `resolver.test.mjs`, E2E |
+| D-018, D-036 | Warianty dnia; dzień mocka — slot F „Wolne”, slot E kontynuacja sesji 2 (D-086) | resolver, E2E |
 | D-020, D-021, D-022 | Nazwy i porcje kanoniczne; obiad codziennie | dane, `verify_all.py` |
 | D-027 | Stan zapasów = kopia z 22.09.2026, odliczanie od 23.09.2026 | test jednostkowy migracji (wymaga SOURCES_DIR) |
 | D-046 | Zapasy odtwarzają funkcje pierwotnego ZAPASY_DIETA.html (klasyfikacja wg terminu przydatności 1:1, okna, historia, kopia, paragon, raport AI) | `zapasy.js`, E2E; **w Fazie 5 nie usuwać żadnego z okien/przycisków** |

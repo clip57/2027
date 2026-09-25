@@ -11,7 +11,7 @@ ROUTES = ['#/dzis', '#/dzis?d=2026-10-26', '#/dieta', '#/suplementy', '#/zapasy'
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.
 OPEN_ALL = "document.querySelectorAll('details').forEach(d => d.open = true)"
 STATES = [('#/trening?d=2026-09-21', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),
-  ('#/cfa?v=dzien&d=2026-09-21', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
+  ('#/cfa?v=dzien&d=2026-09-25', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
   ('#/mealprep', "document.querySelector('.prep-list input[type=checkbox]').click()", 'odhaczony krok'),
   ('#/bezpieczenstwo?m=poradnik', OPEN_ALL, 'rozwinięte sekcje'), ('#/rekompozycja', OPEN_ALL, 'rozwinięte sekcje'),
   ('#/dieta', OPEN_ALL, 'rozwinięte posiłki'), ('#/trening?d=2026-09-21', "document.querySelector('.ex-tech').click()", 'okno techniki'),

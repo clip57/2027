@@ -1,6 +1,6 @@
 # Projekt „2027” — Rejestr decyzji (dokument kanoniczny)
 
-**Aktualizacja:** 25.09.2026 (D-036 – D-085; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
+**Aktualizacja:** 25.09.2026 (D-036 – D-086; D-056 i nowsze wydane 24.09.2026) · Ten plik jest nadrzędnym rejestrem decyzji. Specyfikacje (`SPEC_2027_etap1_v1.1.md` i kolejne) odwołują się do niego.
 
 ## Decyzje obowiązujące
 
@@ -10,7 +10,6 @@
 | D-001 | `SUPLEMENTACJA_2027` jest jedynym źródłem prawdy dla suplementów; sprzeczne fragmenty w innych plikach należy ujednolicić |
 | D-003 | Gramatury faz to dane logistyczne, przeliczane automatycznie z jednego źródła danych o fazach |
 | D-004 | Plan dnia ma warianty dni; godziny niezmienne, zmienia się zawartość slotów |
-| D-006 | Źródłem harmonogramu CFA są dane `D` z `Plan_nauki_CFA.html` v3 (22.09.2026); first pass kończy się 05.11 |
 | D-007 | PDF-y diety i DOCX suplementacji stają się funkcjonalnymi modułami |
 | D-008 | Trwały, wersjonowany, walidowany zapis danych użytkownika z eksportem, importem i ochroną przed utratą |
 | D-009 | Zapis lokalny oddzielony od synchronizacji (adapter) |
@@ -21,7 +20,7 @@
 | D-014 | Tauryna 2 g o 17:15 codziennie, także w czwartek; teksty TRENING i REKOMPOZYCJI do poprawy; banana w czwartek nie ma |
 | D-015 | Glukozamina, chondroityna, Boswellia — do wyczerpania zapasów (ok. 6 miesięcy), potem niekontynuowane. Stan na 22.09.2026: 180 / 180 / 360 tabl.; opakowania 90 / 90 / 60 |
 | D-016 | Cynk kontynuowany (czw., nd.); opakowanie 150 tabl.; stan nieodnotowany (duży zapas) |
-| D-017 | Fazy kalendarzowe: F0 od 21.09.2026, F1 od 12.10.2026, F2 od 16.11.2026 |
+| D-017 | Fazy kalendarzowe: F0 od **25.09.2026** (D-086; pierwotnie 21.09.2026), F1 od 12.10.2026, F2 od 16.11.2026 |
 | D-018 | Warianty dnia wg tabeli z SPEC v1.1 sekcja 5; okno 17:45–20:15 wspólne; czwartek 19:45–20:05 = wolne |
 | D-019 | Dzień mocka: posiłki i suplementy bez zmian; bloki CFA A–D zastąpione sesjami mocka; bez ostrzeżeń o kolizjach |
 | D-020 | Nazwy kanoniczne: Skyr · Białko WPC · Brokuły mrożone (świeże tylko w Tabeli bezpieczeństwa) · Chleb żytni na zakwasie |
@@ -38,7 +37,7 @@
 | D-032 | Wymaganie: aplikacja offline uruchamiana z ekranu początkowego iOS i z Docka macOS, trwały zapis, synchronizacja danych iOS ↔ macOS przez iCloud |
 | D-033 | **Synchronizacja: wariant A** — plik synchronizacji w iCloud Drive, eksport i import wykonywane ręcznie w aplikacji, automatyczne scalanie zmian (szczegóły: sekcja „Specyfikacja synchronizacji A”) |
 | D-034 | **Zero płatnych usług:** bez Apple Developer Program, CloudKit, backendu i jakichkolwiek płatnych usług synchronizacji. Hosting wyłącznie w bezpłatnym GitHub Pages (repozytorium publiczne). Warianty B i C wykluczone |
-| D-036 | Dzień mocka: sloty CFA E i F (13:30–15:23), dla których plan CFA nie ma bloków, wyświetlane jako „Wolne” (zatwierdza I-10) |
+| D-036 | Dzień mocka: slot CFA F (13:30–14:23), dla którego plan CFA nie ma bloku, wyświetlany jako „Wolne” (zatwierdza I-10). Od D-086 slot E (12:20–13:13) to kontynuacja sesji 2 mocka (10:45–13:00); wcześniej „Wolne” były E i F (13:30–15:23) |
 | D-037 | Plan dnia zachowuje godzinę obiadu „16:23” z PLAN_DNIA (SUPLEMENTACJA podaje 16:20 — bez zmian) |
 | D-038 | Plan dnia 07:00: „Pomiar wagi i ciśnienia na czczo po toalecie.” (zamiast „Pomiar wagi na czczo po toalecie.”) |
 | D-039 | Bloki CFA w zakładce Dziś pokazują źródło i zakres do przeczytania, np. „Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)” |
@@ -87,6 +86,7 @@
 | D-083 | Chmura (Etap 2): synchronizacja **wyłącznie przyciskiem „Synchronizuj teraz”** (zgodnie z D-033 — bez synchronizacji przy starcie, w tle ani zegarem); jedna runda naraz (Web Locks między kartami); sekcja w Dane pod ręczną synchronizacją plikiem, która pozostaje bez zmian. | 24.09.2026 |
 | D-084 | Chmura: **synchronizacja automatyczna** (decyzja użytkownika 25.09.2026; zmienia D-083 dla chmury — synchronizacja plikiem pozostaje ręczna, D-033): po zapisie zmiany wysyłka po 1,5 s ciszy (najpóźniej 15 s od pierwszej zmiany, seria = jedno wysłanie); pełna runda przy otwarciu aplikacji, powrocie do niej (najwyżej raz na 60 s), powrocie sieci i przyciskiem „Synchronizuj teraz” (ręczne wymuszenie); wysyłka przy zejściu do tła. Jedna runda naraz (Web Locks), ponowienia z rosnącym odstępem tylko przy aplikacji na ekranie, wstrzymanie przy błędach wymagających działania (jeden baner na sesję, poza Dane). Przełącznik „Synchronizuj automatycznie” per urządzenie (domyślnie włączony). Lżejsze pobieranie (indeks numerów, treść tylko nowych wierszy), zapis stanu tylko przy zmianie. Bez zmian: szyfrowanie, RLS, `reduce()`, model danych, historia. | 25.09.2026 |
 | D-085 | Chmura: **automatyczne pobieranie zmian** (decyzja użytkownika 25.09.2026; uzupełnia D-084): lekkie sprawdzanie „czy w chmurze jest nowszy wiersz niż kursor” (zwykły GET PostgREST — bez Realtime, WebSocketu i SDK), pełna runda tylko po wykryciu nieznanego wiersza. Interwał: komputer 30 s, telefon 60 s, po 5 min bez interakcji co 5 min; przy powrocie do okna (`focus`) od razu, najwyżej raz na 10 s. Wstrzymane w tle, offline, po wylogowaniu, przy wyłączonym przełączniku i przy błędach (wtedy działają ponowienia D-084). Osobny przełącznik „Automatyczne pobieranie zmian” per urządzenie, domyślnie włączony, aktywny tylko przy włączonej synchronizacji automatycznej. Koszt: ok. 1000 zapytań/dzień na widocznym komputerze, ~30 MB/mies.; serwer widzi czas sprawdzeń (kiedy aplikacja jest otwarta), treść nadal zaszyfrowana. Bez zmian: wysyłanie (D-084), model danych, szyfrowanie, RLS, ochrona wpisywania. | 25.09.2026 |
+| D-086 | **Plan CFA „MASTER SCHEDULE FINAL” i start planu 25.09.2026** (decyzja użytkownika 25.09.2026; zastępuje D-006, zmienia D-004 w zakresie 12:13–13:30, D-017, D-019/D-036 i I-9): źródło harmonogramu CFA — obiekt `D` z `PLAN_NAUKI_CFA_LEVEL_I.html` (zgodny pole po polu z `MASTER_SCHEDULE_CFA.csv`): **432 bloki, 48 dni × 9 bloków po 53 min (25.09–11.11.2026)**, 381,60 h netto + 34 sesje recall o 22:00 (30,03 h; bez piątków i sobót); first pass do 04.11; 4 mocki bez zmian (26.10, 30.10, 03.11, 07.11: S1 08:00–10:15, S2 10:45–13:00, analiza G–I i nazajutrz A–C); nowy tryb PRACTICE (16 bloków mixed practice). **Plan dnia:** długa przerwa 12:13–13:30 i spacer regeneracyjny usunięte; 12:13–12:20 przerwa kognitywna, 12:20–13:13 CFA blok E (druga kawa 12:20), 13:13–13:30 przerwa na lunch (lunch 13:20, bez zmian); kolejne bloki F 13:30, G 14:30, H 15:30, I 16:40; pozostałe godziny bez zmian. **Faza 0 od 25.09.2026** (F1 i F2 bez zmian). **Glukozamina, chondroityna, Boswellia od 25.09.2026 do 25.03.2027.** Dzień mocka: sesje w slotach A–E (E = kontynuacja sesji 2 do 13:00), F „Wolne”. Rekompozycja: fazy opisane datami (Faza 0 25.09–11.10, Faza 1 12.10–15.11, Faza 2 od 16.11) zamiast tygodni. Slot 13:13–13:30: „Przerwa na lunch” (potwierdzone) Postęp `cfa.done` według numeru bloku 1–432 (bloki 1–279 mają tę samą treść co w v3 — zmienia się tylko data i godzina) |
 | D-077 | Dane: synchronizacja (status niewysłanych zmian, ostatnie wysłanie/import, „Wyślij do iCloud”, „Pobierz z iCloud”) jako pierwsza sekcja; mechanizm, teksty rozróżniające kod/dane i format pliku bez zmian |
 | D-035 | **Treści wrażliwe: wariant 1** — „pakiet prywatny” importowany z pliku; nie trafia do repozytorium |
 
@@ -96,6 +96,7 @@
 |---|---|---|
 | D-002 | Termos: pakowanie 85 °C, drugi próg 63 °C | D-013 |
 | D-005 | Mock CFA jako wyjątek (ogólnie) | D-019 |
+| D-006 | Źródłem harmonogramu CFA są dane `D` z `Plan_nauki_CFA.html` v3 (22.09.2026); first pass kończy się 05.11 | D-086 |
 
 ## Interpretacje przyjęte (bez sprzeciwu użytkownika)
 
@@ -109,7 +110,7 @@
 | I-6 | Nazwy z PDF (Białko KFD, Skyr naturalny) zostają w PDF-ach jako aliasy; w aplikacji nazwy kanoniczne |
 | I-7 | Fazy liczone z kalendarza; daty faz trzymane jako dane konfiguracyjne |
 | I-8 | Notatki w ZAPASY „Świeże (limit zamrażarki / lodówki)” to etykiety kategorii trwałości, nie sprzeczność — bez zmian |
-| I-9 | Suplementy z D-015: stan na koniec 22.09, odliczanie od 23.09 (jak w D-027) → ostatni dzień przyjmowania **21.03.2027** (dokładnie 180 dni) |
+| I-9 | Suplementy z D-015: stan na koniec 22.09, odliczanie od 23.09 (jak w D-027) → ostatni dzień przyjmowania **21.03.2027** (dokładnie 180 dni). **Zmienione przez D-086 (decyzja użytkownika 25.09.2026):** przyjmowanie **od 25.09.2026 do 25.03.2027** (`validity.from` / `until`; przed 25.09 bez zużycia). Okres liczy 182 dni — przy stanie 180 / 180 / 360 z 22.09 model Zapasów pokazuje zapas do 23.03 (brak 2 glukozaminy, 2 Boswellii, 4 chondroityny na 24–25.03) |
 
 ## Specyfikacja synchronizacji A (D-033)
 

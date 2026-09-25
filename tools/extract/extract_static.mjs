@@ -1,5 +1,6 @@
-// Ekstrakcja: TRENING (EX, EX_ROM), CFA v3 (D), ZAPASY (katalog) -> src/data/*.json
+// Ekstrakcja: TRENING (EX, EX_ROM), CFA (D, plan D-086), ZAPASY (katalog) -> src/data/*.json
 // Uruchomienie: SOURCES_DIR=... node tools/extract/extract_static.mjs
+// Tylko wybrane części: ONLY=cfa (albo trening, katalog; kilka po przecinku).
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -12,9 +13,10 @@ const OUT = p => path.join(ROOT, 'src/data', p);
 const read = f => fs.readFileSync(path.join(SRC, f), 'utf8');
 const write = (f, o) => fs.writeFileSync(OUT(f), JSON.stringify(o, null, 1));
 const scripts = html => [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+const want = part => !process.env.ONLY || process.env.ONLY.split(',').includes(part);
 
 // ---------- TRENING ----------
-{
+if (want('trening')) {
   const js = scripts(read('TRENING.html')).join('\n');
   const grab = name => {
     const start = js.indexOf(`const ${name} =`);
@@ -41,16 +43,41 @@ const scripts = html => [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)]
   console.log('training.json:', Object.values(days).reduce((a, l) => a + l.length, 0), 'ćwiczeń');
 }
 
-// ---------- CFA v3 ----------
-{
-  const js = scripts(read('Plan_nauki_CFA.html'))[0].trim();
+// ---------- CFA (D-086: plan „MASTER SCHEDULE FINAL” od 25.09.2026; zastępuje v3 z D-006) ----------
+if (want('cfa')) {
+  const file = process.env.CFA_PLAN || 'PLAN_NAUKI_CFA_LEVEL_I.html';
+  const js = scripts(read(file))[0].trim();
   const D = JSON.parse(js.replace(/^const D\s*=\s*/, '').replace(/;\s*$/, ''));
-  write('cfa.json', { schema: 1, generated_from: 'Plan_nauki_CFA.html v3 (22.09.2026) — obiekt D', exam: '2026-11-12', D });
+  // Starszy plik (v3: 416 bloków od 21.09) nie może po cichu nadpisać planu D-086
+  if (D.bloki.length !== 432 || D.stat.start !== '2026-09-25' || D.stat.end !== '2026-11-11')
+    throw new Error(`${file}: oczekiwano planu D-086 (432 bloki, 25.09–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
+  // Kontrola krzyżowa z MASTER_SCHEDULE_CFA.csv (jeśli jest w SOURCES_DIR): te same bloki, pole po polu
+  const csvFile = process.env.CFA_CSV || 'MASTER_SCHEDULE_CFA.csv';
+  if (fs.existsSync(path.join(SRC, csvFile))) {
+    const rows = [], text = read(csvFile).replace(/^\uFEFF/, '');
+    let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) { if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; }
+      else if (c === '"') q = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    const [head, ...body] = rows.filter(r => r.some(x => x !== ''));
+    const diff = body.length !== D.bloki.length ? [`liczba wierszy ${body.length}`]
+      : body.flatMap((r, i) => head.filter((k, j) => String(D.bloki[i][k]) !== r[j]).map(k => `nr ${i + 1}: ${k}`));
+    if (diff.length) throw new Error(`${csvFile} ≠ ${file}: ${diff.slice(0, 5).join('; ')}`);
+    console.log(`cfa: ${csvFile} zgodny z ${file} (${body.length} wierszy)`);
+  }
+  write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL, 25.09.2026) — obiekt D (D-086)',
+    exam: '2026-11-12', D });
   console.log('cfa.json:', D.bloki.length, 'bloków');
 }
 
 // ---------- ZAPASY: katalog ----------
-{
+if (want('katalog')) {
   const html = read('ZAPASY_DIETA.html');
   const m = html.match(/const defaultProductsData\s*=\s*(\[[\s\S]*?\n\s*\]);/);
   const def = vm.runInNewContext(m[1]);
@@ -80,7 +107,7 @@ const scripts = html => [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)]
 }
 
 // ---------- TRENING: technika (INFO), wizualizacje (VIZ), rozgrzewka/schłodzenie, arkusze ----------
-{
+if (want('trening')) {
   const html = read('TRENING.html');
   const js = scripts(html).join('\n');
   const grabObj = name => {

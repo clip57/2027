@@ -134,7 +134,7 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 6. Brak błędów w konsoli przeglądarki (E2E zbiera `pageerror` i `console.error`).
 7. Zrzuty 375/390/1280/1440 px w motywie ciemnym i jasnym przejrzane; brak regresji wyglądu innych modułów.
 8. Żadne dane, dawki, gramatury, godziny ani teksty merytoryczne nie zmienione; D-041/D-064 zachowane
-   (w „Dziś” chondroityna widoczna dokładnie 2 razy dla dnia 2026-09-21).
+   (w „Dziś” chondroityna widoczna dokładnie 2 razy dla dnia 2026-09-25).
 9. Nowe style wyłącznie z tokenów; brak nowych kolorów wpisanych na sztywno.
 
 ## 4. Klasy CSS używane w selektorach testów (nie zmieniaj nazw)
@@ -146,7 +146,9 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .tm-clock .tm-man .topic .topline .gd-card .gd-rt .more-ic .more-n .mp-jump .prep-list .cfa-row .set:not(.set-h)
 .tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa
 .dt-next .dt-nav-n .dt-stock .dt-alerts .dt-stock-b a.dt-today .zp-hbar .zp-shop .zp-buy-n .zp-buy-b .zp-run .zp-run-s .zp-more .daycard
-.dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent .dn-cloud-auto .dn-cloud-auto-b .dn-cloud-pull-b .cloud-banner .inv-head .zp-more[open]`
+.dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent .dn-cloud-auto .dn-cloud-auto-b .dn-cloud-pull-b .cloud-banner .inv-head .zp-more[open]
+.kv .mode .m-pr`
+(plan D-086: identyfikatory slotów `slot.1213`, `slot.1220`, `slot.1313` i tytuły „Przerwa kognitywna”, „Przerwa na lunch”, „CFA blok A…I”)
 (chmura, Etap 2: etykiety pól „Project URL”, „Publishable Key”, „E-mail konta”, „Hasło konta”, „Hasło szyfrowania”, „Powtórz hasło
 szyfrowania”, przyciski „Zapisz konfigurację”, „Zaloguj”, „Odblokuj”, „Ustaw hasło szyfrowania”, „Synchronizuj teraz”, „Wyloguj”,
 „Odłącz to urządzenie”, „Synchronizuj automatycznie” i „Automatyczne pobieranie zmian” (`aria-pressed`), „Zamknij komunikat synchronizacji”, link „Przejdź do Dane”,
@@ -181,6 +183,10 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
    tryb samolotowy, wpisywanie podczas pobierania) — wykonana przez użytkownika 25.09.2026 (odstępstwo: brak pobierania na
    otwartym Macu → D-085). Automatyczne pobieranie zmian (D-085): kontrola ręczna §7.4 — **jeszcze niewykonana**.
 10. Zapasy na MacBooku (1280/1440 px): „Więcej” w pozycji — karta bez zwężenia, nazwa w jednej linii.
+11. Plan D-086 (po aktualizacji do nowej wersji, na każdym urządzeniu): „Dziś” 25.09 — 9 bloków CFA (A 08:00 … I 16:40), 12:13 „Przerwa
+   kognitywna”, 12:20 „CFA blok E” z „Druga kawa (12:20)”, 13:13 „Przerwa na lunch” z lunchem 13:20, bez spaceru; CFA → „Plan”:
+   „432 (48 dni × 9)”; Suplementacja: preparaty czasowe „do 2027-03-25”; Dieta: „Faza 0 · od 25.09”. Jeśli przed aktualizacją
+   odhaczone były bloki starego planu, pozostają odhaczone pod tymi samymi numerami (bloki 1–279 mają tę samą treść).
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 

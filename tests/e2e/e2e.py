@@ -32,7 +32,7 @@ else:
     DATA = {'label': ' (dane syntetyczne)', 'path': fixtures.write(_obj, 'zapasy_syntetyczne.json'), 'events': _n,
             'ban': _stocks['banan'], 'since': _dt.date.fromisoformat(_obj['lastSyncDate'])}
 BANAN = lambda: expected_stock(DATA['ban'], lambda d: 0 if d.weekday() == 3 else 120, DATA['since'])   # czwartek (NT) bez banana
-GLUKO = lambda: expected_stock(180, lambda d: 1 if d <= _dt.date(2027, 3, 21) else 0)
+GLUKO = lambda: expected_stock(180, lambda d: 1 if _dt.date(2026, 9, 25) <= d <= _dt.date(2027, 3, 25) else 0)   # D-086: przyjmowanie 25.09–25.03
 def ok(cond, msg): results.append((bool(cond), msg)); print(('OK  ' if cond else 'BŁĄD'), msg)
 skipped = []
 def skip(msg): skipped.append(msg); print('POMINIĘTO', msg)
@@ -67,13 +67,29 @@ async def run_variant(pw, name, url, mobile):
         ok(not bad, f'{tag} {r}: brak artefaktów tekstowych ({bad[:3]})')
     await pg.goto(url + '#/dzis?d=2026-10-26'); await pg.wait_for_selector('.slot')
     titles = await pg.eval_on_selector_all('.slot-title', 'e => e.map(x => x.textContent)')
-    ok(titles.count('Mock CFA — sesja 1') == 2 and titles.count('Wolne') >= 2, f'{tag} dzień mocka: sesje w A–D, E/F „Wolne” (D-036)')
+    ok(titles.count('Mock CFA — sesja 1') == 2 and titles.count('Mock CFA — sesja 2') == 3 and 'Wolne' in titles,
+       f'{tag} dzień mocka: sesje w A–E (E = kontynuacja sesji 2 do 13:00, D-086), F „Wolne” (D-036)')
+    ok(['CFA blok G', 'CFA blok H', 'CFA blok I'] == [t for t in titles if t.startswith('CFA blok')], f'{tag} dzień mocka: analiza w blokach G–I (D-086)')
     ok(any('Obiad (16:23)' in t for t in await pg.eval_on_selector_all('.slot-items li', 'e => e.map(x => x.textContent)')), f'{tag} obiad opisany jako 16:23 (D-037)')
-    await pg.goto(url + '#/dzis?d=2026-09-21'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis?d=2026-09-25'); await pg.wait_for_selector('.slot')
     main = await pg.inner_text('main')
     ok(main.lower().count('chondroityn') == 2, f'{tag} chondroityna tylko 2 razy (07:00 i 21:00) — brak dublowania (D-001)')
     ok('Pomiar wagi i ciśnienia na czczo po toalecie.' in main, f'{tag} pomiar wagi i ciśnienia (D-038)')
-    ok('Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)' in main, f'{tag} źródło i strony w bloku CFA (D-039)')
+    ok('Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)' in main, f'{tag} źródło i strony w bloku CFA (D-039) — pierwszy blok planu 25.09')
+    chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
+    ok('UPPER 2' in chips and 'Faza 0' in chips, f'{tag} nazwa treningu w nagłówku (D-040), Faza 0 od 25.09 (D-086): {chips}')
+    # D-086: 9 bloków CFA, 12:13–12:20 przerwa kognitywna, 12:20 blok E z drugą kawą, 13:13–13:30 lunch; bez spaceru
+    slots = await pg.eval_on_selector_all('.slot', "e => e.map(x => x.querySelector('time').textContent + ' ' + x.querySelector('.slot-title').firstChild.textContent)")   # bez znacznika „teraz”
+    ok(len(slots) == 34 and [s for s in slots if 'CFA blok' in s] == [f'{t} CFA blok {l}' for t, l in zip(
+        ('08:00', '09:10', '10:10', '11:20', '12:20', '13:30', '14:30', '15:30', '16:40'), 'ABCDEFGHI')], f'{tag} plan dnia: 9 bloków CFA A–I (D-086)')
+    ok('12:13 Przerwa kognitywna' in slots and '13:13 Przerwa na lunch' in slots,
+       f'{tag} plan dnia: przerwa 12:13–12:20 i przerwa na lunch 13:13–13:30 (D-086)')
+    e_items = await pg.inner_text('#slot\\.1220')
+    ok('Druga kawa (12:20)' in e_items and 'Lunch (13:20)' in await pg.inner_text('#slot\\.1313'), f'{tag} plan dnia: druga kawa w bloku E, lunch 13:20 (D-086)')
+    ok('Spacer' not in main and 'Długa przerwa' not in main, f'{tag} plan dnia: bez spaceru regeneracyjnego i długiej przerwy (D-086)')
+    await pg.goto(url + '#/dzis?d=2026-09-24'); await pg.wait_for_selector('.slot')
+    ok('przed startem planu' in await pg.inner_text('.topline') and 'Poza okresem planu nauki' in await pg.inner_text('main'), f'{tag} 24.09: przed startem planu (D-086)')
+    await pg.goto(url + '#/dzis?d=2026-09-21'); await pg.wait_for_selector('.slot')
     chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
     ok('UPPER 1 + sauna' in chips, f'{tag} nazwa treningu w nagłówku (D-040): {chips}')
     # --- Redesign (Faza 3–4): motyw, nawigacja, dashboard
@@ -102,9 +118,9 @@ async def run_variant(pw, name, url, mobile):
         await pg.reload(); await pg.wait_for_selector('.side')
         ok(await pg.locator('.side.is-min').count() == 1, f'{tag} Panel: zwinięcie zapamiętane')
         await pg.get_by_role('button', name='Rozwiń panel').click(); await pg.wait_for_timeout(200)
-    await pg.goto(url + '#/dzis?d=2026-09-21'); await pg.wait_for_selector('.dz-kpis')
+    await pg.goto(url + '#/dzis?d=2026-09-28'); await pg.wait_for_selector('.dz-kpis')
     kp = await pg.inner_text('.dz-kpis')
-    ok('2629 kcal' in kp and '/ 10' in kp and '/ 8 bloków' in kp, f'{tag} Dziś: kafle z danych (kcal, serie, bloki CFA)')
+    ok('2629 kcal' in kp and '/ 10' in kp and '/ 9 bloków' in kp and '477 min + 53 min recall' in kp, f'{tag} Dziś: kafle z danych (kcal, serie, bloki CFA)')
     ok(await pg.locator('.dz-aside .dz-card').count() >= 4 and 'Plan dnia' in await pg.inner_text('main'), f'{tag} Dziś: karty podsumowań i plan dnia')
     # --- Faza 5.0: regresje wykryte w audycie (nawigacja w obrębie strony, sygnatury modułów, zmienne CSS)
     await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
@@ -144,7 +160,7 @@ async def run_variant(pw, name, url, mobile):
     ok('Przyprawy' in txt and 'Zamienniki' in txt, f'{tag} Dieta: przyprawy i zamienniki')
     await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list')
     txt = await pg.inner_text('main')
-    ok('Tauryna' in txt and 'do 2027-03-21' in txt, f'{tag} Suplementacja: tauryna (D-014) i okres preparatów czasowych (D-015)')
+    ok('Tauryna' in txt and 'od 2026-09-25 do 2027-03-25' in txt and '2027-03-21' not in txt, f'{tag} Suplementacja: tauryna (D-014) i okres preparatów czasowych (D-015, D-086)')
     ok('Stan i prognoza pochodz' not in txt and 'Potem nie są kontynuowane' not in txt, f'{tag} Suplementacja: bez usuniętych podpisów')
     # najbliższy wtorek (test niezależny od dnia uruchomienia)
     tue = (_dt.date.today() + _dt.timedelta(days=(1 - _dt.date.today().weekday()) % 7)).isoformat()
@@ -236,17 +252,21 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/bezpieczenstwo?m=tabela'); await pg.wait_for_selector('.safety-table')
     ok(await pg.locator('.safety-table tbody tr').count() == 71 and await pg.locator('.safety-table th').count() == 12, f'{tag} Bezpieczeństwo: pełna tabela 12 kolumn')
     # --- Etap 5: CFA
-    await pg.goto(url + '#/cfa?v=dzien&d=2026-09-21'); await pg.wait_for_selector('.cfa-row')
-    ok(await pg.locator('.cfa-row').count() == 8, f'{tag} CFA: 8 bloków dnia')
+    await pg.goto(url + '#/cfa?v=dzien&d=2026-09-25'); await pg.wait_for_selector('.cfa-row')
+    ok(await pg.locator('.cfa-row').count() == 9, f'{tag} CFA: 9 bloków dnia (D-086)')
+    ok(await pg.locator('a:has-text("Poprzedni dzień")').count() == 0, f'{tag} CFA: 25.09 to pierwszy dzień planu')
     ok('Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)' in await pg.inner_text('main'), f'{tag} CFA: źródło i strony bloku')
     await pg.locator('.cfa-row .set-toggle').first.click(); await pg.wait_for_timeout(400)
     await pg.reload(); await pg.wait_for_selector('.cfa-row')
-    ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 416' in await pg.inner_text('.hero-cfa'),
+    ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 432' in await pg.inner_text('.hero-cfa'),
        f'{tag} CFA: postęp zapisany trwale')
     c = await pg.locator('.cfa-row .set-toggle').first.evaluate(CONTRAST)
     ok(c >= 4.5, f'{tag} CFA: kontrast odhaczonego bloku ≥ 4,5:1 ({c:.2f})')
     await pg.goto(url + '#/cfa?v=harmonogram&kat=Schweser'); await pg.wait_for_selector('.filters')
     ok('75 bloków' in await pg.inner_text('.filters'), f'{tag} CFA: filtr kategorii (Schweser = 75 bloków)')
+    ok(await pg.locator('.cfa-row.is-next').count() == 0, f'{tag} CFA: harmonogram bez fałszywego wyróżnienia „następny blok”')
+    await pg.goto(url + '#/cfa?v=harmonogram&tryb=PRACTICE'); await pg.wait_for_selector('.filters')
+    ok('16 bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row .mode.m-pr').count() == 16, f'{tag} CFA: tryb PRACTICE (mixed practice, 16 bloków) z oznaczeniem')
     await pg.goto(url + '#/cfa?v=kalendarz'); await pg.wait_for_selector('.cal')
     ok(await pg.locator('.cal-d.c-mock').count() == 4 and await pg.locator('.cal-d.c-exam').count() == 1, f'{tag} CFA: kalendarz z 4 mockami i egzaminem')
     await pg.goto(url + '#/cfa?v=log'); await pg.wait_for_selector('.form-grid')
@@ -269,6 +289,12 @@ async def run_variant(pw, name, url, mobile):
     ok(True, f'{tag} CFA: usunięcie wpisu')
     await pg.goto(url + '#/cfa?v=plan'); await pg.wait_for_selector('.topic')
     ok(await pg.locator('.topic').count() == 10, f'{tag} CFA: 10 działów w planie')
+    kv = await pg.inner_text('.kv')
+    ok('432 (48 dni × 9)' in kv and '381,6 h' in kv and '(34 sesji)' in kv, f'{tag} CFA: statystyki planu D-086 (432 bloki, 48 × 9, recall 34)')
+    await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
+    ok('od 25.09' in await pg.inner_text('main') and 'od 21.09' not in await pg.inner_text('main'), f'{tag} Dieta: Faza 0 od 25.09 (D-086)')
+    await pg.goto(url + '#/rekompozycja'); await pg.wait_for_selector('.rk-sec')
+    ok('punkt startowy 25.09.2026' in await pg.eval_on_selector('main .eyebrow', 'e => e.textContent'), f'{tag} Rekompozycja: punkt startowy 25.09.2026 (D-086)')
     if mobile:
         await pg.goto(url + '#/dane'); await pg.wait_for_selector('h1')
         small = await pg.evaluate('''[...document.querySelectorAll('button, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length''')
@@ -286,7 +312,7 @@ async def run_variant(pw, name, url, mobile):
     rows = await pg.eval_on_selector_all('table.data tbody tr', 'e => e.map(r => [...r.children].map(c => c.textContent))')
     by = {r[0]: r for r in rows}
     ok(by.get('Banan', [None, ''])[1].startswith(f'{BANAN():g} '), f'{tag} po przeładowaniu stan zachowany: Banan {by.get("Banan", ["", "?"])[1]} (oczekiwane {BANAN():g} g)')
-    ok(by.get('Glukozamina', [None, ''])[1].startswith(f'{GLUKO():g} '), f'{tag} glukozamina {GLUKO():g} kaps. (D-015, odliczanie od 23.09)')
+    ok(by.get('Glukozamina', [None, ''])[1].startswith(f'{GLUKO():g} '), f'{tag} glukozamina {GLUKO():g} kaps. (D-015, przyjmowanie od 25.09 — D-086)')
     ok(by.get('Cynk', ['', '', '', ''])[3] == 'Nieśledzony', f'{tag} cynk nieśledzony (D-016)')
     ok(len(rows) == 55, f'{tag} tabela kontroli: {len(rows)} pozycji')
     # --- eksport i ponowny import (idempotencja)
@@ -450,7 +476,7 @@ async def run_variant(pw, name, url, mobile):
     await b.close()
 
 # --- Faza 5 (Trening, CFA): funkcje zależne od bieżącej godziny — zegar przeglądarki ustawiony na poniedziałek
-# 28.09.2026 10:00 (UPPER 1, Faza 0; CFA: 7 dni planu przed „dziś”). Oczekiwania liczone z danych, nie z kodu aplikacji.
+# 28.09.2026 10:00 (UPPER 1, Faza 0; CFA: 3 dni planu przed „dziś” — start 25.09, D-086). Oczekiwania liczone z danych, nie z kodu aplikacji.
 CLOCK = _dt.datetime(2026, 9, 28, 10, 0, tzinfo=_dt.timezone(_dt.timedelta(hours=2)))
 CFA_D = json.loads((ROOT / 'src/data/cfa.json').read_text(encoding='utf8'))['D']
 def rest_left(t):  # '1:58' / '+0:13' -> sekundy do końca przerwy (ujemne po czasie)

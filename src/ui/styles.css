@@ -391,6 +391,7 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .mode.m-mo { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
 .mode.m-an { background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); }
 .mode.m-ar { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.mode.m-pr { background: color-mix(in srgb, var(--org) 14%, transparent); color: var(--org); }
 .filters { display: grid; gap: var(--s-2); }
 .filters input, .filters select, .form-grid input, .form-grid select, .form-grid textarea { padding: var(--s-2) var(--s-2); border: 1px solid var(--line); border-radius: var(--r-1); background: var(--paper); color: var(--ink); font: inherit; font-size: 16px; }
 .chk { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-sm); }

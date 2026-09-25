@@ -92,8 +92,10 @@
    "A": "S1",
    "B": "S1",
    "C": "S2",
-   "D": "S2"
+   "D": "S2",
+   "E": "S2"
   },
-  "free_when_no_block": "D-036"
+  "free_when_no_block": "D-036",
+  "replace_decision": "D-019, D-086 (E: kontynuacja sesji 2 do 13:00)"
  }
 }

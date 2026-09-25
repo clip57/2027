@@ -91,7 +91,7 @@ export function renderSuplementy(root, ctx) {
           return h('tr', { class: s.active ? null : 'is-off' },
             h('td', {}, h('strong', {}, s.name), h('span', { class: 'muted block' }, s.form)),
             h('td', {}, s.times.join(', '), !s.everyDay && h('span', { class: 'muted block' }, s.weekdays.map(w => DAYS[w - 1]).join(', ')),
-              s.validity && h('span', { class: 'muted block' }, `do ${s.validity.until}`)),
+              s.validity && h('span', { class: 'muted block' }, `${s.validity.from ? `od ${s.validity.from} ` : ''}do ${s.validity.until}`)),
             h('td', { class: 'num' }, s.daily ? `${fmt(s.daily, 2)} ${catalogById[s.id]?.unit || ''}` : '—'),
             h('td', {}, !s.tracked ? 'nieśledzony' : x?.st == null ? 'brak stanu' :
               [`${fmt(x.st, 1)} ${catalogById[s.id]?.unit || ''}${x.fc?.lastCovered ? ` · do ${x.fc.lastCovered}` : ''}`,

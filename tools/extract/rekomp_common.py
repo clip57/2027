@@ -35,7 +35,14 @@ REPLACE = [
      "jeśli kolano nie jest stabilnie zielone albo regeneracja siada w szczycie sesji egzaminacyjnej, zmiana dat faz wymaga Twojej decyzji.", "A4.1", 1),
     ("0,5–1 mg o 22:00", "1 mg o 22:00", "A2.4b", 1),
     ("melatonina 0,5–1 mg", "melatonina 1 mg", "A2.4c", 1),
-    ("Glukozamina · chondroityna · Boswellia", "Glukozamina · chondroityna · Boswellia — do wyczerpania zapasu (ostatni dzień 21.03.2027), potem niekontynuowane", "A2.1", 1),
+    ("Glukozamina · chondroityna · Boswellia", "Glukozamina · chondroityna · Boswellia — do wyczerpania zapasu (ostatni dzień 25.03.2027), potem niekontynuowane", "A2.1", 1),
+    # D-086 (P-2): start planu 25.09.2026 — Faza 0 trwa 17 dni; fazy opisane datami zamiast tygodni
+    ("Faza 0 (tygodnie 1–3)", "Faza 0 (25.09–11.10)", "D-086", 2),
+    ("Faza 1 (tygodnie 4–8)", "Faza 1 (12.10–15.11)", "D-086", 2),
+    ("Faza 2 (tygodnie 9+)", "Faza 2 (od 16.11)", "D-086", 2),
+    ("Sukces = ukończenie 3 tygodni bez objawów", "Sukces = ukończenie Fazy 0 bez objawów", "D-086", 1),
+    ("Ukończone 3 tygodnie · ≥80% sesji", "Ukończona Faza 0 · ≥80% sesji", "D-086", 1),
+    ("Tygodnie", "Okres", "D-086", 1),
 ]
 # A2.9 (akceptacja 23.09.2026, D-053): komórki tabel suplementów — (początek 1. kolumny wiersza, nr kolumny, stara, nowa)
 TABLE_CELLS = [
@@ -45,6 +52,9 @@ TABLE_CELLS = [
     ("Hydrolizat kolagenu", 2, "Codziennie. W dni treningowe 17:15 — dokładnie 60 min przed sesją. W dzień wolny dowolnie", "17:15 codziennie"),
     ("Melatonina", 1, "0,5–1 mg", "1 mg"),
     ("Cynk pikolinian", 2, "2 × w tygodniu czwartek i niedziela, ze śniadaniem", "07:00, na czczo, czwartek i niedziela"),
+    ("Faza 0 wejściowa", 1, "1–3", "25.09–11.10"),   # D-086 (P-2)
+    ("Faza 1 adaptacji", 1, "4–8", "12.10–15.11"),
+    ("Faza 2 docelowa", 1, "9+", "od 16.11"),
     ("L-tauryna", 2, "17:15, przedtreningowo", "17:15, codziennie (także w czwartek)"),
 ]
 # Zmiany w sekcjach prywatnych (s1, s21) — stosowane przez generator pakietu prywatnego
@@ -52,8 +62,8 @@ REPLACE_PRIVATE = [("Po odstawieniu suplementu cynku nie ma rutynowego wskazania
 # Zdania „Z posiłkiem, nie na czczo…” (A2.5) i uzasadnienie stacku (A2.3) -> sekcja „Pierwotne uzasadnienie” (D-050)
 ORIGINAL_ONLY = [re.compile(r"^Cynk odchodzi, bo podaż łączna"), re.compile(r"^Stack finalny:")]
 NOTE_BEFORE = {
-    "Cynk odchodzi, bo podaż łączna": "Obowiązuje decyzja użytkownika (D-001, D-015, D-016): cynk kontynuowany 2×/tydz. (07:00, na czczo, czw. i nd.); glukozamina, chondroityna i Boswellia do wyczerpania zapasu (21.03.2027); tauryna codziennie o 17:15.",
-    "Stack finalny:": "Plan dzienny: 17 dawek w 8 porach według SUPLEMENTACJI_2027. Cynk: czwartek i niedziela. Glukozamina, chondroityna, Boswellia: do 21.03.2027.",
+    "Cynk odchodzi, bo podaż łączna": "Obowiązuje decyzja użytkownika (D-001, D-015, D-016): cynk kontynuowany 2×/tydz. (07:00, na czczo, czw. i nd.); glukozamina, chondroityna i Boswellia do wyczerpania zapasu (25.03.2027); tauryna codziennie o 17:15.",
+    "Stack finalny:": "Plan dzienny: 17 dawek w 8 porach według SUPLEMENTACJI_2027. Cynk: czwartek i niedziela. Glukozamina, chondroityna, Boswellia: do 25.03.2027.",
 }
 
 norm = lambda t: re.sub(r"\s+", " ", t).strip()

@@ -1,6 +1,6 @@
 // Plan suplementacji: pogrupowany po godzinach, z obsługą dni tygodnia i okresu ważności (D-001, D-015, D-016).
 import { SRC, catalogById } from '../data.js';
-import { dosesFor } from '../resolver.js';
+import { dosesFor, inValidity } from '../resolver.js';
 import { weekday } from '../dates.js';
 
 export function scheduleFor(date) {
@@ -24,10 +24,10 @@ export function supplementOverview(date) {
       unit: catalogById[d.supp]?.unit || '', validity: null, tracked: catalogById[d.supp]?.tracked !== false };
     s.times.push(d.time);
     d.weekdays.forEach(w => s.weekdays.add(w));
-    if (d.weekdays.includes(wd) && (!d.validity || date <= d.validity.until)) s.daily += d.qty;
+    if (d.weekdays.includes(wd) && inValidity(d, date)) s.daily += d.qty;
     if (d.validity) s.validity = d.validity;
     map.set(d.supp, s);
   }
   return [...map.values()].map(s => ({ ...s, weekdays: [...s.weekdays].sort(),
-    everyDay: s.weekdays.size === 7, active: !s.validity || date <= s.validity.until }));
+    everyDay: s.weekdays.size === 7, active: inValidity(s, date) }));
 }

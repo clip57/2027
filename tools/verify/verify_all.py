@@ -52,8 +52,8 @@ check(4 in tau["weekdays"], "suplementy: tauryna także w czwartek (D-014)")
 zn = [d for d in sup["doses"] if d["supp"] == "cynk"][0]
 check(zn["weekdays"] == [4, 7], "suplementy: cynk czwartek i niedziela")
 for s_id in ("chondroityna", "boswellia", "glukozamina"):
-    check(all(d.get("validity", {}).get("until") == "2027-03-21" for d in sup["doses"] if d["supp"] == s_id),
-          f"suplementy: {s_id} do 21.03.2027 (D-015, I-9)")
+    check(all(d.get("validity", {}).get("until") == "2027-03-25" and d["validity"].get("from") == "2026-09-25" for d in sup["doses"] if d["supp"] == s_id),
+          f"suplementy: {s_id} 25.09.2026–25.03.2027 (D-015, D-086)")
 
 # ---------- zużycie F0/T vs ZAPASY v31 ----------
 cat = {c["id"]: c for c in D("catalog.json")["items"]}
@@ -105,10 +105,16 @@ check(sum(len(l) for l in tr.values()) == 32, "trening: 32 ćwiczenia")
 # ---------- CFA ----------
 cfa = D("cfa.json")["D"]
 B = cfa["bloki"]
-check(len(B) == 416 and [b["nr"] for b in B] == list(range(1, 417)), "CFA: 416 bloków 1–416")
-check(len({b["data"] for b in B}) == 52, "CFA: 52 dni")
-check(max(b["data"] for b in B if b["tryb"] == "FIRST PASS") == "2026-11-05", "CFA: first pass do 05.11 (D-006)")
+check(len(B) == 432 and [b["nr"] for b in B] == list(range(1, 433)), "CFA: 432 bloki 1–432 (D-086)")
+check(len({b["data"] for b in B}) == 48 and min(b["data"] for b in B) == "2026-09-25", "CFA: 48 dni od 25.09.2026 (D-086)")
+check(max(b["data"] for b in B if b["tryb"] == "FIRST PASS") == "2026-11-04", "CFA: first pass do 04.11 (D-086)")
 check(cfa["mockCFA"] == ["2026-10-26", "2026-10-30", "2026-11-03", "2026-11-07"], "CFA: 4 mocki")
+cfa_src = os.path.join(SRC, os.environ.get("CFA_PLAN", "PLAN_NAUKI_CFA_LEVEL_I.html"))
+if os.path.exists(cfa_src):
+    js = re.findall(r"<script[^>]*>([\s\S]*?)</script>", open(cfa_src, encoding="utf8").read())[0].strip()
+    check(json.loads(re.sub(r"^const D\s*=\s*", "", js).rstrip().rstrip(";")) == cfa, "CFA: cfa.json = obiekt D z PLAN_NAUKI_CFA_LEVEL_I.html (D-086)")
+else:
+    check(False, "CFA: brak PLAN_NAUKI_CFA_LEVEL_I.html w SOURCES_DIR (D-086)")
 
 # ---------- bezpieczeństwo ----------
 saf = D("safety.json")["rows"]
@@ -119,7 +125,9 @@ check(not any(re.search(r"\b8[05] ?°C|≥ ?75 ?°C", json.dumps(r, ensure_ascii
 
 # ---------- szablon ----------
 tpl = D("day_template.json")["slots"]
-check(len(tpl) == 32 and tpl[0]["from"] == "07:00" and tpl[-1]["from"] == "23:00", "szablon dnia: 32 sloty 07:00–23:00")
+check(len(tpl) == 34 and tpl[0]["from"] == "07:00" and tpl[-1]["from"] == "23:00", "szablon dnia: 34 sloty 07:00–23:00 (D-086)")
+check([s["from"] for s in tpl if s["role"] == "cfa"] == ["08:00", "09:10", "10:10", "11:20", "12:20", "13:30", "14:30", "15:30", "16:40"],
+      "szablon dnia: 9 slotów CFA A–I (D-086)")
 
 os.makedirs(os.path.join(ROOT, "docs"), exist_ok=True)
 with open(os.path.join(ROOT, "docs", "VERIFY.md"), "w", encoding="utf8") as fh:

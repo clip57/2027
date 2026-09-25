@@ -25,16 +25,19 @@ test('różnice między fazami: tylko gramatury węglowodanów', () => {
 });
 
 test('plan suplementów: godziny, czwartek, niedziela, koniec zapasu', () => {
-  const mon = scheduleFor('2026-09-21');
+  const mon = scheduleFor('2026-09-28');
   assert.deepEqual(mon.map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '20:15', '21:00', '22:00']);
   assert.deepEqual(mon[0].doses.map(d => d.name), ['Chondroityna']);
-  assert.deepEqual(scheduleFor('2026-09-24')[0].doses.map(d => d.name), ['Chondroityna', 'Cynk']);
+  assert.deepEqual(scheduleFor('2026-10-01')[0].doses.map(d => d.name), ['Chondroityna', 'Cynk']);
+  assert.deepEqual(scheduleFor('2026-09-24')[0].doses.map(d => d.name), ['Cynk'], 'suplementy czasowe dopiero od 25.09.2026 (D-086)');
+  assert.deepEqual(scheduleFor('2026-09-25')[0].doses.map(d => d.name), ['Chondroityna'], 'pierwszy dzień suplementów czasowych');
   assert.ok(scheduleFor('2026-09-24').find(g => g.time === '17:15').doses.some(d => d.name === 'Tauryna'), 'D-014');
-  assert.equal(scheduleFor('2027-03-22').find(g => g.time === '07:00'), undefined, 'po 21.03.2027 brak porannej chondroityny');
+  assert.ok(scheduleFor('2027-03-25').find(g => g.time === '07:00'), '25.03.2027 — ostatni dzień chondroityny (D-086)');
+  assert.equal(scheduleFor('2027-03-26').find(g => g.time === '07:00'), undefined, 'po 25.03.2027 brak porannej chondroityny');
 });
 
 test('przegląd preparatów: częstotliwość, okres, śledzenie stanu', () => {
-  const o = supplementOverview('2026-09-24');
+  const o = supplementOverview('2026-10-01');
   const cynk = o.find(x => x.id === 'cynk');
   assert.deepEqual(cynk.weekdays, [4, 7]);
   assert.equal(cynk.tracked, false); // D-016
@@ -42,7 +45,10 @@ test('przegląd preparatów: częstotliwość, okres, śledzenie stanu', () => {
   const chon = o.find(x => x.id === 'chondroityna');
   assert.equal(chon.daily, 2);
   assert.deepEqual(chon.times, ['07:00', '21:00']);
-  assert.equal(chon.validity.until, '2027-03-21');
-  assert.equal(supplementOverview('2027-03-22').find(x => x.id === 'chondroityna').active, false);
+  assert.deepEqual([chon.validity.from, chon.validity.until], ['2026-09-25', '2027-03-25']);
+  assert.equal(supplementOverview('2026-09-24').find(x => x.id === 'chondroityna').active, false);
+  assert.equal(supplementOverview('2026-09-24').find(x => x.id === 'chondroityna').daily, 0);
+  assert.equal(supplementOverview('2027-03-25').find(x => x.id === 'chondroityna').active, true);
+  assert.equal(supplementOverview('2027-03-26').find(x => x.id === 'chondroityna').active, false);
   assert.equal(o.find(x => x.id === 'witamina_c').times.length, 3);
 });

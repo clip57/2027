@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004)",
+ "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086)",
  "slots": [
   {
    "id": "slot.0700",
@@ -70,12 +70,13 @@
    "domain": "cfa",
    "title_src": "CFA BLOK A",
    "badges_src": [
-    "CFA Blok 1/8"
+    "CFA Blok 1/9"
    ],
    "desc_src": "",
    "role": "cfa",
    "key": "A",
-   "items": []
+   "items": [],
+   "decision": "D-086"
   },
   {
    "id": "slot.0853",
@@ -112,12 +113,13 @@
    "domain": "cfa",
    "title_src": "CFA BLOK B",
    "badges_src": [
-    "CFA Blok 2/8"
+    "CFA Blok 2/9"
    ],
    "desc_src": "",
    "role": "cfa",
    "key": "B",
-   "items": []
+   "items": [],
+   "decision": "D-086"
   },
   {
    "id": "slot.1003",
@@ -140,7 +142,7 @@
    "domain": "cfa",
    "title_src": "CFA BLOK C",
    "badges_src": [
-    "CFA Blok 3/8"
+    "CFA Blok 3/9"
    ],
    "desc_src": "· Kawa Mrożona (10:30) + L-teanina",
    "role": "cfa",
@@ -157,7 +159,8 @@
      "text": "+ L-teanina",
      "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
     }
-   ]
+   ],
+   "decision": "D-086"
   },
   {
    "id": "slot.1103",
@@ -188,36 +191,63 @@
    "domain": "cfa",
    "title_src": "CFA BLOK D",
    "badges_src": [
-    "CFA Blok 4/8"
+    "CFA Blok 4/9"
    ],
    "desc_src": "",
    "role": "cfa",
    "key": "D",
-   "items": []
+   "items": [],
+   "decision": "D-086"
   },
   {
    "id": "slot.1213",
    "from": "12:13",
-   "to": "13:30",
-   "domain": "diet",
-   "title_src": "Długa przerwa",
+   "to": "12:20",
+   "domain": "regen",
+   "title_src": "Przerwa kognitywna",
    "badges_src": [
-    "465 kcal"
+    "Regeneracja"
    ],
-   "desc_src": "· Druga Kawa (12:20) · Spacer regeneracyjny (12:30–13:20) · Lunch (13:20) · Siarczan glukozaminy",
-   "role": "meal",
-   "key": "lunch",
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": [],
+   "decision": "D-086"
+  },
+  {
+   "id": "slot.1220",
+   "from": "12:20",
+   "to": "13:13",
+   "domain": "cfa",
+   "title_src": "CFA BLOK E",
+   "badges_src": [
+    "CFA Blok 5/9"
+   ],
+   "desc_src": "· Druga Kawa (12:20)",
+   "role": "cfa",
+   "key": "E",
    "items": [
     {
      "kind": "task",
      "src": "Druga Kawa (12:20)",
      "text": "Druga kawa (12:20)"
-    },
-    {
-     "kind": "task",
-     "src": "Spacer regeneracyjny (12:30–13:20)",
-     "text": "Spacer regeneracyjny (12:30–13:20)"
-    },
+    }
+   ],
+   "decision": "D-086"
+  },
+  {
+   "id": "slot.1313",
+   "from": "13:13",
+   "to": "13:30",
+   "domain": "diet",
+   "title_src": "Przerwa na lunch",
+   "badges_src": [
+    "465 kcal"
+   ],
+   "desc_src": "· Lunch (13:20) · Siarczan glukozaminy",
+   "role": "meal",
+   "key": "lunch",
+   "items": [
     {
      "kind": "meal",
      "src": "Lunch (13:20)",
@@ -231,21 +261,23 @@
      "text": "Siarczan glukozaminy",
      "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
     }
-   ]
+   ],
+   "decision": "D-086"
   },
   {
    "id": "slot.1330",
    "from": "13:30",
    "to": "14:23",
    "domain": "cfa",
-   "title_src": "CFA BLOK E",
+   "title_src": "CFA BLOK F",
    "badges_src": [
-    "CFA Blok 5/8"
+    "CFA Blok 6/9"
    ],
    "desc_src": "",
    "role": "cfa",
-   "key": "E",
-   "items": []
+   "key": "F",
+   "items": [],
+   "decision": "D-086"
   },
   {
    "id": "slot.1423",
@@ -266,20 +298,21 @@
    "from": "14:30",
    "to": "15:23",
    "domain": "cfa",
-   "title_src": "CFA BLOK F",
+   "title_src": "CFA BLOK G",
    "badges_src": [
-    "CFA Blok 6/8"
+    "CFA Blok 7/9"
    ],
    "desc_src": "· Zielona Herbata (15:00)",
    "role": "cfa",
-   "key": "F",
+   "key": "G",
    "items": [
     {
      "kind": "task",
      "src": "Zielona Herbata (15:00)",
      "text": "Zielona herbata (15:00)"
     }
-   ]
+   ],
+   "decision": "D-086"
   },
   {
    "id": "slot.1523",
@@ -300,14 +333,15 @@
    "from": "15:30",
    "to": "16:23",
    "domain": "cfa",
-   "title_src": "CFA BLOK G",
+   "title_src": "CFA BLOK H",
    "badges_src": [
-    "CFA Blok 7/8"
+    "CFA Blok 8/9"
    ],
    "desc_src": "",
    "role": "cfa",
-   "key": "G",
-   "items": []
+   "key": "H",
+   "items": [],
+   "decision": "D-086"
   },
   {
    "id": "slot.1623",
@@ -336,13 +370,13 @@
    "from": "16:40",
    "to": "17:33",
    "domain": "cfa",
-   "title_src": "CFA BLOK H",
+   "title_src": "CFA BLOK I",
    "badges_src": [
-    "CFA Blok 8/8"
+    "CFA Blok 9/9"
    ],
    "desc_src": "· Pre-trening (17:15): Kolagen + Askorbinian sodu + Tauryna",
    "role": "cfa",
-   "key": "H",
+   "key": "I",
    "items": [
     {
      "kind": "supp",
@@ -350,7 +384,8 @@
      "text": "Pre-trening (17:15): Kolagen + Askorbinian sodu + Tauryna",
      "hidden_reason": "D-001: suplementy z SUPLEMENTACJI"
     }
-   ]
+   ],
+   "decision": "D-086"
   },
   {
    "id": "slot.1733",
@@ -655,5 +690,5 @@
    ]
   }
  ],
- "note": "Pola *_src to tekst źródłowy. Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."
+ "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."
 }

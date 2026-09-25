@@ -11,13 +11,17 @@ const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska
 export function phaseFor(date) {
   let ph = null;
   for (const p of SRC.phases.phases) if (date >= p.from) ph = p.phase;
-  return ph; // null = przed startem planu (21.09.2026)
+  return ph; // null = przed startem planu (25.09.2026, D-086)
 }
 
 export function dosesFor(date) {
   const wd = weekday(date);
   return SRC.supplements.doses.filter(d =>
-    d.weekdays.includes(wd) && (!d.validity || date <= d.validity.until));
+    d.weekdays.includes(wd) && inValidity(d, date));
+}
+// Okres przyjmowania preparatów czasowych (D-015; od 25.09.2026 — D-086). `from` opcjonalne.
+export function inValidity(d, date) {
+  return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
 }
 
 export function mealsFor(variant, phase) {
