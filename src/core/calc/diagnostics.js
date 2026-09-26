@@ -4,6 +4,8 @@ import { stockAt, allItems } from './inventory.js';
 import { SRC } from '../data.js';
 import { addDays } from '../dates.js';
 import { PLAN_START } from '../resolver.js';
+import { packStatus, markersIn } from '../private.js';
+import rekomp from '../../data/rekomp.json' with { type: 'json' };
 
 const STALE_DAYS = 14;
 
@@ -45,6 +47,16 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   const pre = Object.values(state.train || {}).filter(s => s.date < PLAN_START).length
     + Object.keys(state.trainSessions || {}).filter(d => d < PLAN_START).length;
   if (pre) push('pre-start', 'info', `Wpisy treningowe sprzed startu planu: ${pre}`, `Zachowane w dzienniku i w synchronizacji; statystyki i historia liczone od ${PLAN_START} (D-088).`);
+
+  // Pakiet prywatny (D-091): czy pasuje do danych aplikacji (znaczniki) i do bieżącej wersji planu
+  const pk = packStatus(state.privatePack, { start: PLAN_START, markers: { 'rek-priv': markersIn(rekomp), 'mp-why': markersIn(SRC.mealprep) } });
+  if (!pk.imported) push('private', 'info', 'Pakiet prywatny nie jest zaimportowany', 'Część treści Rekompozycji i Meal Prep jest ukryta — zaimportuj plik 2027-prywatne.json w tym module.');
+  else if (!pk.ok) push('private', 'warn', 'Pakiet prywatny nie pasuje do danych aplikacji',
+    [pk.missingSections.length && `brak sekcji: ${pk.missingSections.join(', ')}`, ...Object.entries(pk.missing).map(([id, l]) => `${id}: brak fragmentów ${l.join(', ')}`)]
+      .filter(Boolean).join('; ') + '. Wygeneruj pakiet ponownie ze źródeł (tools/extract/build_private_pack.py) i zaimportuj.', '#/rekompozycja');
+  else if (!pk.current) push('private', 'info', `Pakiet prywatny z wcześniejszej wersji planu${pk.created ? ` (utworzony ${pk.created})` : ''}`,
+    `Treść jest kompletna, ale pakiet nie ma oznaczenia planu od ${PLAN_START}. Zaktualizuj go: python3 tools/extract/private_pack_lib.py <stary.json> <nowy.json>, potem zaimportuj nowy plik (zastąpi poprzedni).`);
+  else push('private', 'ok', `Pakiet prywatny aktualny (plan od ${pk.planStart})`);
 
   // Chmura: zmiany czekające na wysłanie ponad dobę
   if (cloud?.config) {

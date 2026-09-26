@@ -495,6 +495,10 @@ async def run_variant(pw, name, url, mobile):
     await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano 1 zmian')
     has = await pg.evaluate('''new Promise(r => { const q = indexedDB.open('p2027'); q.onsuccess = () => { const g = q.result.transaction('events').objectStore('events').getAll(); g.onsuccess = () => r(g.result.some(e => e.t === 'private.pack' && e.d.pack.sections.length === 4)); }; })''')
     ok(has, f'{tag} pakiet prywatny zapisany w bazie')
+    if not real_pack:   # D-091: pakiet dla bieżącej wersji planu — podgląd importu i Diagnostyka
+        ok('dla planu od 2026-09-27 (bieżący)' in txt, f'{tag} podgląd importu: pakiet dla bieżącego planu (D-091)')
+        await pg.goto(url + '#/dzis'); await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-diag')
+        ok('Pakiet prywatny aktualny (plan od 2026-09-27)' in await pg.inner_text('.dn-diag'), f'{tag} Diagnostyka: pakiet prywatny aktualny (D-091)')
     await pg.goto(url + '#/rekompozycja?s=s13'); await pg.wait_for_selector('.rk-sec')
     want = 30 if real_pack else fixtures.rekomp_marker_uses()
     ok(await pg.locator('.priv-in').count() == want and await pg.locator('.priv-miss').count() == 0, f'{tag} Rekompozycja: {want} fragmentów z pakietu prywatnego wstawionych, nic ukrytego')

@@ -125,6 +125,10 @@ export async function renderDane(root, ctx) {
     const close = () => dlg.close();
     add(dlg, h('h2', { id: 'pv-h' }, pv.ok ? 'Podgląd importu' : 'Nie można zaimportować'),
       h('p', { class: 'muted' }, `${name} · ${KIND[pv.kind] || 'nierozpoznany'}`),
+      // D-091: pakiet prywatny — czy przygotowany dla bieżącej wersji planu
+      pv.kind === 'private' && (() => { const p = pv.fresh[0]?.d?.pack; return p && h('p', { class: 'muted' }, p.plan?.start
+        ? `Pakiet przygotowany dla planu od ${p.plan.start}${p.plan.start === PLAN_START ? ' (bieżący)' : ` — bieżący plan zaczyna się ${PLAN_START}`}.`
+        : `Pakiet bez oznaczenia wersji planu${p.created ? ` (utworzony ${p.created})` : ''} — zaktualizuj go skryptem private_pack_lib.py (Diagnostyka danych).`); })(),
       pv.file && h('p', {}, `Plik wyeksportowany ${when(pv.file.exportedAt)} na urządzeniu ${pv.file.device || '—'}${pv.file.device === store.device ? ' (to urządzenie)' : ''}.`),
       pv.file?.exportedAt && meta.imp?.file?.exportedAt && pv.file.exportedAt < meta.imp.file.exportedAt &&
         h('div', { class: 'banner warn' }, `Ten plik jest STARSZY niż ostatnio wczytany (${when(meta.imp.file.exportedAt)}). W iCloud Drive może być nowsza kopia, np. „2027-sync 2.json”.`),

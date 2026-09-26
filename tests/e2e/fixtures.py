@@ -48,7 +48,9 @@ def rekomp_marker_uses():
 def synthetic_private_pack():
     """Pakiet prywatny o poprawnej strukturze, z neutralnymi tekstami zastępczymi (bez danych osobowych/medycznych)."""
     t = lambda s: f'[DANE TESTOWE] {s}'
+    plan = json.loads((ROOT / 'src/data/phases.json').read_text(encoding='utf8'))
     return {'format': '2027-private', 'schema': 1, 'created': '2026-01-01', 'decision': 'D-035', 'source': 'tests/e2e/fixtures.py',
+            'plan': {'start': plan['start'], 'decision': 'D-091'},   # metadane wersji planu (jak w generatorze, D-091)
             'sections': [
                 {'id': 'rek-s1', 'title': t('sekcja 1'), 'blocks': [{'type': 'h', 'text': t('nagłówek')}, {'type': 'p', 'text': t('akapit')},
                                                                      {'type': 'list', 'items': [t('punkt 1'), t('punkt 2')]},

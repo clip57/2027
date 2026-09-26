@@ -39,7 +39,9 @@ zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchroniza
 „Wymaga uwagi” (I2), Tydzień (I3), wyszukiwanie ⌘K (I4), skróty (I5), paragon tekstem (I7), recall jako `setting` `cfa.recall:<data>` (I11).
 Etap 4 (P1, P2, D2, I9, I12) **wstrzymany** — nie wdrażaj bez decyzji użytkownika. Okna: zawsze `sheet()` z `components.js`;
 komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-090).
+**Pakiet prywatny (D-091):** aktualizacja istniejącego pakietu `tools/extract/private_pack_lib.py <stary> <nowy>` (poza repozytorium),
+stan w Diagnostyce; instrukcja `docs/PAKIET_PRYWATNY.md`. Po zmianie planu: zaktualizuj `UPGRADE` w `private_pack_lib.py`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-091).
 
 ---
 
