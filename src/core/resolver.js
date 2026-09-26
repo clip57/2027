@@ -8,13 +8,19 @@ const MOCKS = new Set(SRC.cfa.D.mockCFA);
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
+// Start planu (D-088): 25.09.2026. Dni wcześniejsze są poza planem — bez treningu, dawek, bloków CFA i zużycia w Zapasach.
+// Zdarzenia z tych dni zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
+export const PLAN_START = SRC.phases.start;
+export const inPlan = date => date >= PLAN_START;
+
 export function phaseFor(date) {
   let ph = null;
   for (const p of SRC.phases.phases) if (date >= p.from) ph = p.phase;
-  return ph; // null = przed startem planu (Faza 0 od 26.09.2026, D-087)
+  return ph; // null = przed Fazą 0 (Faza 0 od 26.09.2026, D-087; start planu 25.09.2026, D-088)
 }
 
 export function dosesFor(date) {
+  if (!inPlan(date)) return [];   // suplementacja zaczyna się razem z planem (D-088)
   const wd = weekday(date);
   return SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
@@ -27,6 +33,8 @@ export function inValidity(d, date) {
 // Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087: 25–27.09.2026) — trening, sauna, dieta, recall.
 export function dayPlan(date) {
   const w = SRC.week.days[String(weekday(date))];
+  if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: false, variant: null,
+    outside: true, note: null, decision: 'D-088' };
   const x = SRC.week.exceptions?.[date];
   return x ? { ...w, ...x } : w;
 }
@@ -105,7 +113,7 @@ export function resolveDay(date) {
   });
 
   return {
-    date, weekday: wd, dayName: dayName(date), phase, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
+    date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
     note: w.note || null, exception: w.decision || null,
     sauna: w.sauna, dietVariant: w.diet, kcal: p.total.kcal, meals: mealsFor(w.diet, effPhase),
     doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall }, slots,

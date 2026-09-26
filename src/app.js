@@ -9,6 +9,7 @@ import { setCustomItems } from './core/calc/inventory.js';
 import { MODULES, GROUPS, byId } from './modules/registry.js';
 import { icon } from './ui/icons.js';
 import { THEMES, themePref, applyTheme, setTheme, sideCollapsed, setSideCollapsed } from './ui/prefs.js';
+import { setupShortcuts, searchButton } from './ui/search.js';
 import { renderDzis } from './modules/dzis.js';
 import { renderDane } from './modules/dane.js';
 import { renderDieta } from './modules/dieta.js';
@@ -23,7 +24,41 @@ import { renderPlaceholder } from './modules/placeholder.js';
 
 const RENDER = { dzis: renderDzis, dane: renderDane, dieta: renderDieta, suplementy: renderSuplementy, zapasy: renderZapasy, mealprep: renderMealPrep, trening: renderTrening, cfa: renderCFA, bezpieczenstwo: renderBezpieczenstwo, rekompozycja: renderRekompozycja };
 const ctx = { store: null, storeError: null, update: { state: 'idle', check: async () => {}, apply: () => {} }, cloudAuto: null };
-let flash = null; // komunikat, który ma przetrwać ponowne wyrenderowanie widoku
+// Komunikaty po akcji (B4): stały obszar nad dolnym paskiem, poza przerysowywanym <main> — widoczny także przy przewiniętej
+// stronie. Region aria-live istnieje od startu, więc czytniki ekranu odczytują każdy komunikat. Znika po 6 s.
+let toastTimer = null;
+function toastBox() {
+  let box = document.getElementById('toast');
+  if (!box) { box = h('div', { id: 'toast', class: 'toast', role: 'status', 'aria-live': 'polite' }); document.body.append(box); }
+  return box;
+}
+function toast(text, cls = 'warn') {
+  const box = toastBox();
+  clearTimeout(toastTimer);
+  clear(box).append(h('div', { class: `banner ${cls}` }, text));
+  toastTimer = setTimeout(() => clear(box), 6000);
+}
+
+// Fokus po przerysowaniu (B5): zapis przerysowuje cały widok, więc element z fokusem jest zastępowany nowym. Klucz elementu:
+// najbliższy przodek z `id` + znacznik i pierwsza klasa + numer wśród takich elementów w przodku (etykieta może się zmienić,
+// np. „Seria 1 do wykonania” → „wykonana”). Przywrócenie bez przewijania; tylko przy przerysowaniu tej samej trasy.
+function focusKey() {
+  const el = document.activeElement, app = document.getElementById('app');
+  if (!el || el === document.body || !app?.contains(el)) return null;
+  if (el.id) return { id: el.id };
+  const host = el.parentElement?.closest('[id]');
+  const sel = el.tagName.toLowerCase() + (el.classList[0] ? `.${CSS.escape(el.classList[0])}` : '') + (el.getAttribute('type') ? `[type="${el.getAttribute('type')}"]` : '');
+  return { host: host && app.contains(host) ? host.id : null, sel, idx: [...(host || app).querySelectorAll(sel)].indexOf(el) };
+}
+function restoreFocus(k) {
+  if (!k) return;
+  let el = k.id ? document.getElementById(k.id) : null;
+  if (!el && k.sel) { const host = k.host ? document.getElementById(k.host) : document.getElementById('app'); el = host?.querySelectorAll(k.sel)[k.idx] || null; }
+  if (el && el !== document.activeElement) {
+    el.focus({ preventScroll: true });
+    if (el.tagName === 'INPUT' && ['search', 'text'].includes(el.type)) el.setSelectionRange(el.value.length, el.value.length);   // kursor na końcu wpisu
+  }
+}
 const chan = 'BroadcastChannel' in globalThis ? new BroadcastChannel('p2027') : null;
 const cloudUi = { dismissed: false, stale: false, shown: '' };   // baner synchronizacji: zamknięty w tej sesji / zaległość > 24 h
 
@@ -42,7 +77,7 @@ function softRender() {
   const go = () => {
     softTimer = null;
     if (document.body.classList.contains('kbd') || document.querySelector('dialog[open]')) { softTimer = setTimeout(go, 1000); return; }
-    render();
+    render(true);
   };
   softTimer = setTimeout(go, 0);
 }
@@ -74,7 +109,7 @@ function themeSwitch(compact = false) {
   const cur = themePref();
   return h('div', { class: `theme-switch${compact ? ' is-compact' : ''}`, role: 'group', 'aria-label': 'Motyw' },
     THEMES.map(([v, label, ic]) => h('button', { class: 'ts-b', 'aria-pressed': String(cur === v), 'aria-label': `Motyw: ${label}`, title: label,
-      onclick: () => { setTheme(v); render(); } }, icon(ic, { size: 18 }), !compact && h('span', {}, label))));
+      onclick: () => { setTheme(v); render(true); } }, icon(ic, { size: 18 }), !compact && h('span', {}, label))));
 }
 
 function nav(current) {
@@ -82,11 +117,13 @@ function nav(current) {
   const moreActive = !byId[current]?.tab;
   const collapsed = sideCollapsed();
   return [
+    h('a', { class: 'skip-link', href: '#main' }, 'Przejdź do treści'),   // U-i: pominięcie panelu nawigacji
     h('nav', { class: `side${collapsed ? ' is-min' : ''}`, 'aria-label': 'Moduły' },
       h('div', { class: 'side-top' },
         h('a', { class: 'brand', href: '#/dzis', 'aria-label': '2027 — Dziś' }, h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, '27'), h('span', { class: 'brand-t' }, '2027')),
         h('button', { class: 'side-toggle', 'aria-label': collapsed ? 'Rozwiń panel' : 'Zwiń panel', 'aria-expanded': String(!collapsed),
-          onclick: () => { setSideCollapsed(!collapsed); render(); } }, icon(collapsed ? 'panel-left-open' : 'panel-left-close', { size: 18 }))),
+          onclick: () => { setSideCollapsed(!collapsed); render(true); } }, icon(collapsed ? 'panel-left-open' : 'panel-left-close', { size: 18 }))),
+      searchButton(() => ctx.store?.state, 'side-search'),   // I4: globalne wyszukiwanie (⌘K)
       h('div', { class: 'side-groups' }, GROUPS.map(g => h('div', { class: 'side-group' },
         h('p', { class: 'side-gl' }, g),
         MODULES.filter(m => m.group === g).map(m => h('a', { href: `#/${m.id}`, class: 'side-a', 'aria-current': m.id === current ? 'page' : null,
@@ -99,8 +136,9 @@ function nav(current) {
   ];
 }
 
-async function render() {
+async function render(keepFocus = false) {
   const app = document.getElementById('app');
+  const focus = keepFocus === true ? focusKey() : null;
   const { id, params } = route();
   setCustomItems(ctx.store?.state?.catalogUser || []);
   const main = h('main', { class: 'main', id: 'main', tabindex: '-1' });
@@ -117,13 +155,12 @@ async function render() {
   const up = ctx.store?.state?.unprocessed;
   if (up?.count > 0) main.append(h('div', { class: 'banner warn', role: 'alert' },
     `Niepełne przetwarzanie danych: ${up.count} zdarzeń z nowszej wersji aplikacji (${Object.keys(up.types).join(', ')}) jest zachowanych, ale nie jest uwzględnianych w widokach. Zaktualizuj aplikację na tym urządzeniu.`));
-  if (flash) { main.append(h('div', { class: `banner ${flash.cls}`, role: 'status' }, flash.text)); flash = null; }
   const cloudText = id === 'dane' ? '' : cloudBannerText(ctx.cloudAuto?.state());
   if (cloudText) main.append(h('div', { class: 'banner warn cloud-banner', role: 'status' }, h('span', {}, cloudText),
     h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/dane' }, 'Przejdź do Dane'),
-      h('button', { 'aria-label': 'Zamknij komunikat synchronizacji', onclick: () => { cloudUi.dismissed = true; render(); } }, 'Zamknij'))));
+      h('button', { 'aria-label': 'Zamknij komunikat synchronizacji', onclick: () => { cloudUi.dismissed = true; render(true); } }, 'Zamknij'))));
   if (id === 'wiecej') {
-    add(main, h('h1', {}, 'Więcej'),
+    add(main, h('h1', {}, 'Więcej'), searchButton(() => ctx.store?.state, 'more-search'),
       GROUPS.map(g => { const list = MODULES.filter(m => m.group === g && !m.tab); return list.length ? h('section', { class: 'more-sec' },
         h('p', { class: 'side-gl' }, g),
         h('div', { class: 'more-list' }, list.map(m => h('a', { href: `#/${m.id}`, style: { '--dc': `var(--${m.domain})` } },
@@ -131,7 +168,7 @@ async function render() {
       h('section', { class: 'more-sec' }, h('p', { class: 'side-gl' }, 'Wygląd'), themeSwitch(false)));
   } else {
     const mod = byId[id];
-    const c = { ...ctx, params, today: today(), rerender: render, flash: (text, cls = 'warn') => { flash = { text, cls }; } };
+    const c = { ...ctx, params, today: today(), rerender: () => render(true), flash: (text, cls = 'warn') => toast(text, cls) };
     try { await (RENDER[id] || ((r) => renderPlaceholder(r, mod)))(main, c); }
     catch (e) { main.append(h('div', { class: 'banner err', role: 'alert' }, `Błąd modułu: ${e.message}`)); console.error(e); }
   }
@@ -141,6 +178,7 @@ async function render() {
     if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Obszar przewijany');
   });
   document.title = `${id === 'wiecej' ? 'Więcej' : byId[id].name} · 2027`;
+  restoreFocus(focus);
 }
 
 // Odnośniki w obrębie strony (#id, bez „/”): przewinięcie do elementu zamiast zmiany trasy. Router traktowałby
@@ -161,6 +199,8 @@ function inPageLink(e) {
 
 async function boot() {
   applyTheme();
+  toastBox();
+  setupShortcuts(() => ctx.store?.state);   // I5: skróty klawiaturowe (⌘K, /, ← →, g + litera, ?)
   document.addEventListener('click', inPageLink);
   // Klawiatura ekranowa (pole w fokusie) — chowamy dolny pasek, żeby nie „pływał” nad klawiaturą na iOS
   const isField = el => el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'range', 'button', 'file'].includes(el.type)));
@@ -171,8 +211,8 @@ async function boot() {
     ctx.store = attachStore(await new Store(new IdbAdapter()).open());
   } catch (e) { ctx.storeError = e.message; console.error(e); }
   // Inna karta/okno zmieniło dane -> przeładuj z bazy zamiast nadpisywać (ochrona przed równoległą edycją).
-  chan?.addEventListener('message', async () => { if (!ctx.store) return; ctx.store = attachStore(await new Store(new IdbAdapter()).open()); render(); });
-  addEventListener('hashchange', render);
+  chan?.addEventListener('message', async () => { if (!ctx.store) return; ctx.store = attachStore(await new Store(new IdbAdapter()).open()); render(true); });
+  addEventListener('hashchange', () => render());
   // Synchronizacja automatyczna w chmurze (D-084) i automatyczne pobieranie zmian (D-085): działają tylko po skonfigurowaniu
   // chmury i przy włączonych przełącznikach. Telefon (wskaźnik dotykowy) sprawdza zmiany rzadziej (60 s) niż komputer (30 s).
   const coarse = matchMedia('(pointer: coarse)');
@@ -198,7 +238,7 @@ async function boot() {
 function setupUpdates(reg) {
   let userAsked = false;
   // Pokazanie przycisku wymaga przerysowania widoku — nie w trakcie wpisywania (pole w fokusie), żeby nie stracić wpisu.
-  const show = () => (document.body.classList.contains('kbd') ? setTimeout(show, 1000) : render());
+  const show = () => (document.body.classList.contains('kbd') ? setTimeout(show, 1000) : render(true));
   const markReady = () => { if (reg.waiting && navigator.serviceWorker.controller && ctx.update.state !== 'ready') { ctx.update.state = 'ready'; show(); } };
   ctx.update = {
     state: 'idle',

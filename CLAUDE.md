@@ -30,7 +30,14 @@ kognitywna, 12:20 blok E, 13:13–13:30 przerwa na lunch, bez spaceru (`tools/ex
 (`dayPlan()` w `resolver.js` — zawsze przez nią, nie przez `SRC.week.days[weekday]`; `tools/extract/day_plan_d087.py`);
 Faza 0 od 26.09 (F1 12.10, F2 16.11 bez zmian); suplementy czasowe 25.09.2026–21.03.2027. Spójność planu:
 `tests/unit/plan-cfa.test.mjs`. Raporty: `docs/RAPORT_PLAN_CFA_D086.md`, `docs/RAPORT_PLAN_CFA_D087.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-087).
+**Start planu 25.09.2026 (D-088):** `phases.json` → `start`; dni wcześniejsze poza planem (`inPlan()`/`PLAN_START` w `resolver.js`:
+bez planu dnia, treningu, dawek, bloków i zużycia; serie sprzed startu poza statystykami — `TRAIN_FROM`). Zdarzenia z tych dni
+zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchronizacji). Dieta 25.09 NT. Raport: `docs/RAPORT_ETAPY_0_3.md`.
+**Audyt 25.09.2026 — Etapy 1–3 (D-089):** poprawki B1–B9, UX U-a…U-i, CSP w wariancie web (S1), Diagnostyka (I8), `.ics` (I1),
+„Wymaga uwagi” (I2), Tydzień (I3), wyszukiwanie ⌘K (I4), skróty (I5), paragon tekstem (I7), recall jako `setting` `cfa.recall:<data>` (I11).
+Etap 4 (P1, P2, D2, I9, I12) **wstrzymany** — nie wdrażaj bez decyzji użytkownika. Okna: zawsze `sheet()` z `components.js`;
+komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-089).
 
 ---
 
@@ -67,7 +74,7 @@ npm test                  # testy jednostkowe (node --test)
 npm run e2e               # testy w przeglądarce: Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
 npm run e2e:sync          # synchronizacja między 2 profilami + aktualizacja kodu za zgodą (kilka razy przebudowuje dist/)
 npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py)
-npm run a11y              # axe-core WCAG 2.1 A/AA: 21 widoków × 390/1280 px × jasny/ciemny + przewijanie w poziomie
+npm run a11y              # axe-core WCAG 2.1 A/AA: 26 widoków + 22 stany × 390/1280 px × jasny/ciemny + przewijanie w poziomie
 npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika, w tym PLAN_NAUKI_CFA_LEVEL_I.html), bez nich nie działa
 ```
 Zmienne opcjonalne: `SOURCES_DIR` (katalog z plikami źródłowymi, m.in. `zapasy_kopia_2026-09-22.json`),
@@ -154,3 +161,7 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Test zależny od prawdziwego kalendarza planu (np. lista zakupów od 22.09) | wyjątek daty zmienia oczekiwane zużycie | w testach ogólnej logiki używaj tygodni bez wyjątków (od 05.10.2026) |
 | Tytuł slotu w „Dziś” czytany w teście przez `textContent` | w dniu bieżącym dopisek „teraz” — test zależny od godziny | tytuł bez znacznika: `.slot-title` → `firstChild.textContent` |
 | Zmiana godzin planu dnia bez źródłowego `PLAN_DNIA.html` | ponowna ekstrakcja przywróciłaby stary rozkład | zmiana jako funkcja decyzji w `tools/extract/` (np. `day_plan_d086.py`) stosowana po odczycie źródła |
+| `wait_for_selector('.slot')` w „Dziś” dnia bieżącego | pierwszy slot jest w zwiniętych „Minionych punktach” (U-a) — test czeka do przekroczenia czasu | czekaj na `.dz-plan-h`; przed odczytem treści rozwiń `details.dz-past` |
+| `wait_for_function('…')` z tekstem predykatu / `add_script_tag` w wariancie web | CSP (S1, bez `'unsafe-eval'` i skryptów inline) blokuje narzędzie testowe | odpytywanie przez `evaluate` (`wait_js` w testach), axe przez CDP `Runtime.evaluate` |
+| Pole `type=search` w oknie | pierwszy Esc tylko czyści tekst, okno zostaje | obsłuż `Escape` w polu (zamknięcie okna — `search.js`) |
+| Dni sprzed startu planu w nowych widokach (D-088) | trening, dawki, bloki dla 21–24.09 | zawsze przez `resolveDay`/`dayPlan` (`outside`), statystyki od `TRAIN_FROM` |

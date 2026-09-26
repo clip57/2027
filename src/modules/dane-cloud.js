@@ -39,14 +39,15 @@ export async function cloudSection(ctx) {
   const st = store ? await cloudStatus(store) : { step: 'config', config: null, pending: 0 };
   const noteBox = h('div', { class: 'dn-cloud-msg', role: 'status', 'aria-live': 'polite' });
   const note = (text, cls = 'warn') => { noteBox.replaceChildren(h('div', { class: `banner ${cls}` }, text)); };
-  if (ui.note) { note(ui.note.text, ui.note.cls); ui.note = null; }
+  // Komunikat ostatniej akcji przetrwa przerysowanie w tle (np. po automatycznej synchronizacji tuż po odblokowaniu) — 10 s
+  if (ui.note && Date.now() - ui.note.at < 10000) note(ui.note.text, ui.note.cls); else ui.note = null;
   // Wynik akcji: komunikat zachowany na czas przerysowania widoku
-  const done = (text, cls = 'info', focus = null) => { ui.note = { text, cls }; ui.focus = focus; ctx.rerender(); };
+  const done = (text, cls = 'info', focus = null) => { ui.note = { text, cls, at: Date.now() }; ui.focus = focus; ctx.rerender(); };
   // Blokada przycisków na czas operacji sieciowej (bez podwójnych kliknięć)
   async function run(btn, label, fn, during) {
     if (ui.busy) return;
     ui.busy = true;
-    noteBox.replaceChildren();   // komunikat poprzedniej akcji nie może wyglądać na wynik bieżącej
+    noteBox.replaceChildren(); ui.note = null;   // komunikat poprzedniej akcji nie może wyglądać na wynik bieżącej
     const old = [...btn.childNodes];
     btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.replaceChildren(h('span', {}, label));
     try { await fn(); }

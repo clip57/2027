@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Store, StorageError } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
+import { stockAt } from '../../src/core/calc/inventory.js';
 
 const open = async (a = new MemoryAdapter()) => new Store(a).open();
 
@@ -64,4 +65,23 @@ test('LWW: późniejsza zmiana wygrywa, poprzednia zostaje w historii', async ()
   await s.record('cfa.done', { block: 3, done: false });
   assert.equal(s.state.cfaDone.has(3), false);
   assert.equal(s.state.superseded.length, 1);
+});
+
+test('recordMany (B8): te same zdarzenia co kolejne record(), jedna transakcja, jedno przeliczenie; błąd odrzuca całość', async () => {
+  const a = new MemoryAdapter();
+  const s = await new Store(a).open();
+  let puts = 0, emits = 0;
+  const put = a.putEvents.bind(a); a.putEvents = async l => { puts++; return put(l); };
+  s.on(() => emits++);
+  const evs = await s.recordMany([['inv.count', { prod: 'banan', qty: 240, date: '2026-09-26' }], ['inv.move', { prod: 'banan', qty: 120, date: '2026-09-26', kind: 'purchase' }]]);
+  assert.equal(evs.length, 2);
+  assert.deepEqual([puts, emits], [1, 1]);
+  assert.ok(evs[0].hlc < evs[1].hlc, 'kolejność HLC jak przy kolejnych zapisach');
+  assert.equal((await a.getAllEvents()).length, 2);
+  const seq = await new Store(new MemoryAdapter()).open();
+  for (const [t, d] of evs.map(e => [e.t, e.d])) await seq.record(t, d);
+  for (const d of ['2026-09-26', '2026-09-30']) assert.equal(stockAt(s.state.inv, 'banan', d), stockAt(seq.state.inv, 'banan', d), d);
+  await assert.rejects(() => s.recordMany([['inv.count', { prod: 'kefir', qty: 1, date: '2026-09-26' }], ['inv.count', { prod: 'kefir', qty: -1, date: '2026-09-26' }]]), /niepoprawne/);
+  assert.equal(s.events.size, 2, 'nic nie zapisano przy błędzie jednej treści');
+  assert.deepEqual(await s.recordMany([]), []);
 });

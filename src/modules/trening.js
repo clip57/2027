@@ -2,14 +2,14 @@
 // dziennik serii (wykonana, ciężar, powtórzenia, RIR) zapisywany trwale zdarzeniami train.set (D-008),
 // mapa mięśni z free-exercise-db (domena publiczna).
 import { h, clear, add, fmt, plural } from '../ui/dom.js';
-import { progressRing, segmented, section, statGrid, stat } from '../ui/components.js';
+import { progressRing, segmented, section, statGrid, stat, sheet } from '../ui/components.js';
 import { icon } from '../ui/icons.js';
 import { movementPlayer } from '../ui/movement.js';
 import { barChart, lineChart } from '../ui/charts.js';
-import { sessions, weekly, muscleSets, exerciseHistory, records, streakWeeks, weekStart, restSeconds, nextSet } from '../core/calc/training.js';
+import { sessions, weekly, muscleSets, exerciseHistory, records, streakWeeks, weekStart, restSeconds, nextSet, TRAIN_FROM } from '../core/calc/training.js';
 import { bodyMap, MUSCLE_PL } from '../ui/bodymap.js';
 import { SRC } from '../core/data.js';
-import { resolveDay, dayPlan } from '../core/resolver.js';
+import { resolveDay, dayPlan, PLAN_START } from '../core/resolver.js';
 import { addDays, weekday, longDate, shortDate } from '../core/dates.js';
 import muscles from '../data/muscles.json' with { type: 'json' };
 
@@ -85,13 +85,7 @@ function sessionTimer(store, date, ctx, msg) {
       h('label', { class: 'tm-man' }, h('span', {}, 'lub wpisz:'), minutes, h('span', {}, 'min'))));
 }
 
-function sheetDialog(title, ...body) {
-  const d = h('dialog', { class: 'sheet' });
-  const close = () => { d.close(); d.remove(); };
-  d.append(h('div', { class: 'sheet-head' }, h('h2', {}, title), h('button', { onclick: close, 'aria-label': 'Zamknij' }, '✕')),
-    h('div', { class: 'sheet-body' }, ...body.filter(Boolean)));
-  document.body.append(d); d.showModal();
-}
+const sheetDialog = sheet;   // wspólny arkusz: nazwa dostępna, usunięcie po Esc (B3)
 
 const muscleLegend = m => h('div', { class: 'bm-legend' },
   h('p', {}, h('span', { class: 'sw sw-p' }), h('strong', {}, 'Główne: '), m.primary.map(x => MUSCLE_PL[x] || x).join(', ') || '—'),
@@ -124,7 +118,7 @@ function lastResult(train, exId, before) {
   const byDate = {};
   for (const [k, v] of Object.entries(train)) {
     const [d, ex, set] = k.split('|');
-    if (ex === exId && d < before && (v.kg != null || v.reps != null)) (byDate[d] ||= []).push({ set: Number(set), ...v });
+    if (ex === exId && d < before && d >= TRAIN_FROM && (v.kg != null || v.reps != null)) (byDate[d] ||= []).push({ set: Number(set), ...v });
   }
   const d = Object.keys(byDate).sort().pop();
   return d ? { date: d, sets: byDate[d].sort((a, b) => a.set - b.set) } : null;
@@ -177,14 +171,14 @@ function renderSession(root, ctx) {
     TABS.map(([, lab, n]) => {
       const d = addDays(monday, n - 1), w = dayPlan(d);
       return h('a', { class: `ds${d === date ? ' is-on' : ''}${d === today ? ' is-today' : ''}`, href: `#/trening?d=${d}`, role: 'tab', 'aria-selected': String(d === date) },
-        h('span', { class: 'ds-d' }, lab), h('span', { class: 'ds-s' }, w.sessionName.replace('Bez treningu, ', '')));
+        h('span', { class: 'ds-d' }, lab), h('span', { class: 'ds-s' }, w.outside ? '—' : w.sessionName.replace('Bez treningu, ', '')));
     })),
     msg);
 
   // --- nagłówek sesji
   add(root, h('section', { class: 'hero-tr' },
     h('div', { class: 'hero-tr-main' },
-      h('p', { class: 'eyebrow' }, `${r.dayName}, ${longDate(date)} · Faza ${phase}`),
+      h('p', { class: 'eyebrow' }, `${r.dayName}, ${longDate(date)}${r.outside ? '' : ` · Faza ${phase}`}`),
       h('h1', {}, r.sessionLabel),
       r.note && h('p', {}, r.note),
       total > 0 && h('p', { class: 'muted' }, `${exercises.filter((_, i) => plan[i].n > 0).length} ćwiczeń · ${total} ${serie(total)}`),
@@ -201,13 +195,14 @@ function renderSession(root, ctx) {
         h('span', { class: 'tr-done-ic' }, icon('circle-check', { size: 22 })),
         h('div', {}, h('p', { class: 'tr-next-t' }, 'Sesja ukończona'),
           h('p', { class: 'muted' }, `${sessNow.sets} ${plural(sessNow.sets, 'seria', 'serie', 'serii')} · ${fmt(Math.round(sessNow.volume))} kg objętości · ${fmt(sessNow.reps)} powt.${sessNow.minutes ? ` · ${sessNow.minutes} min` : ' · czas nie zapisany'}`)))),
-    sessionTimer(store, date, ctx, msg),
+    !r.outside && sessionTimer(store, date, ctx, msg),
     total > 0 && h('div', { class: 'hero-tr-map' }, bodyMap(sessionMuscles, { size: 'md', title: 'Mięśnie w tej sesji' }), muscleLegend(sessionMuscles))));
 
   if (!exercises.length) {
     add(root, h('div', { class: 'panel' },
       h('p', {}, r.dayType === 'rest_sauna2' ? 'Dzień bez treningu. Dwie rundy sauny według protokołu (arkusz „Sauna”). Kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni.'
-        : r.dayType === 'swim' ? 'Basen 55 min.' : r.dayType === 'free' ? 'Dzień bez treningu.' : 'Brak zaplanowanych ćwiczeń.')));
+        : r.dayType === 'swim' ? 'Basen 55 min.' : r.outside ? `Poza planem — plan i treningi zaczynają się ${longDate(PLAN_START)}.`
+          : r.dayType === 'free' ? 'Dzień bez treningu.' : 'Brak zaplanowanych ćwiczeń.')));
     return;
   }
   // Ćwiczenie spoza aktywnej fazy: zapis dobrowolny, wyraźnie oznaczony (opt: true).

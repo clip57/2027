@@ -1,13 +1,13 @@
 """Testy E2E (Chromium, Playwright): oba warianty budowy, iPhone 390×844 i komputer 1280×800.
 Uruchomienie: python3 tests/e2e/e2e.py  (wymaga dist/ oraz opcjonalnie SOURCES_DIR z kopią ZAPASY)."""
-import asyncio, json, os, sys, threading, http.server, functools, tempfile, pathlib
+import asyncio, json, os, sys, time, threading, http.server, functools, tempfile, pathlib
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BACKUP = os.environ.get('SOURCES_DIR') and pathlib.Path(os.environ['SOURCES_DIR']) / 'zapasy_kopia_2026-09-22.json'
-ROUTES = ['#/bezpieczenstwo?m=poradnik', '#/rekompozycja', '#/rekompozycja?s=s6', '#/bezpieczenstwo', '#/bezpieczenstwo?m=tabela', '#/trening?v=stat', '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/dzis?d=2026-10-03', '#/trening', '#/trening?d=2026-09-24', '#/zapasy', '#/mealprep', '#/dieta?f=1&w=NT', '#/suplementy?d=2026-09-24', '#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-24', '#/dane', '#/wiecej', '#/dieta', '#/zapasy', '#/trening', '#/cfa', '#/suplementy', '#/bezpieczenstwo']
+ROUTES = ['#/bezpieczenstwo?m=poradnik', '#/rekompozycja', '#/rekompozycja?s=s6', '#/bezpieczenstwo', '#/bezpieczenstwo?m=tabela', '#/trening?v=stat', '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/dzis?d=2026-10-03', '#/trening', '#/trening?d=2026-09-21', '#/zapasy', '#/mealprep', '#/dieta?f=1&w=NT', '#/suplementy?d=2026-09-24', '#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-24', '#/dane', '#/wiecej', '#/dieta', '#/zapasy', '#/trening', '#/cfa', '#/suplementy', '#/bezpieczenstwo']
 results = []
 # Kontrast tekstu elementu względem jego własnego (nieprzezroczystego) tła — WCAG; stany, których axe nie widzi.
 CONTRAST = '''el => { const px = c => { const x = document.createElement('canvas').getContext('2d'); x.fillStyle = c; x.fillRect(0, 0, 1, 1); return [...x.getImageData(0, 0, 1, 1).data]; };
@@ -17,9 +17,13 @@ CONTRAST = '''el => { const px = c => { const x = document.createElement('canvas
 # Oczekiwany stan liczony niezależnie od kodu aplikacji (D-027: stan na koniec 22.09, odliczanie od 23.09).
 import datetime as _dt
 from zoneinfo import ZoneInfo
+# Start planu (D-088): zużycie wg planu dopiero od 25.09.2026; dieta dnia z wyjątkami dat (D-087, D-088: 25.09 i 27.09 — NT)
+PLAN_START = _dt.date.fromisoformat(json.loads((ROOT / 'src/data/phases.json').read_text(encoding='utf8'))['start'])
+WEEK = json.loads((ROOT / 'src/data/week.json').read_text(encoding='utf8'))
+def diet_of(d): return WEEK.get('exceptions', {}).get(d.isoformat(), {}).get('diet') or WEEK['days'][str(d.isoweekday())]['diet']
 def expected_stock(start, per_day, since=_dt.date(2026, 9, 22)):
     # „dziś” w strefie przeglądarki testowej (Europe/Warsaw), nie serwera (UTC) — inaczej między 22:00 a 24:00 UTC różnica 1 dnia
-    d, q, today = since + _dt.timedelta(days=1), start, _dt.datetime.now(ZoneInfo('Europe/Warsaw')).date()
+    d, q, today = max(since + _dt.timedelta(days=1), PLAN_START), start, _dt.datetime.now(ZoneInfo('Europe/Warsaw')).date()
     while d <= today:
         q -= per_day(d); d += _dt.timedelta(days=1)
     return q
@@ -31,8 +35,15 @@ else:
     _obj, _n, _stocks = fixtures.synthetic_zapasy()
     DATA = {'label': ' (dane syntetyczne)', 'path': fixtures.write(_obj, 'zapasy_syntetyczne.json'), 'events': _n,
             'ban': _stocks['banan'], 'since': _dt.date.fromisoformat(_obj['lastSyncDate'])}
-BANAN = lambda: expected_stock(DATA['ban'], lambda d: 0 if d.weekday() == 3 else 120, DATA['since'])   # czwartek (NT) bez banana
+BANAN = lambda: expected_stock(DATA['ban'], lambda d: 0 if diet_of(d) == 'NT' else 120, DATA['since'])   # dzień NT bez banana
 GLUKO = lambda: expected_stock(180, lambda d: 1 if _dt.date(2026, 9, 25) <= d <= _dt.date(2027, 3, 21) else 0)   # D-087: przyjmowanie 25.09–21.03
+async def wait_js(pg, fn, arg=None, timeout=15000):
+    # Zamiast wait_for_function (tekst predykatu wymaga 'unsafe-eval', blokowane przez CSP wariantu web — S1): odpytywanie przez evaluate
+    end = time.monotonic() + timeout / 1000
+    while not await pg.evaluate(fn, arg):
+        if time.monotonic() > end: raise TimeoutError(f'warunek niespełniony: {fn}')
+        await asyncio.sleep(0.1)
+
 def ok(cond, msg): results.append((bool(cond), msg)); print(('OK  ' if cond else 'BŁĄD'), msg)
 skipped = []
 def skip(msg): skipped.append(msg); print('POMINIĘTO', msg)
@@ -57,7 +68,7 @@ async def run_variant(pw, name, url, mobile):
     pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
     tag = f'{name} {vp["width"]}px'
-    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
     for r in ROUTES:
         await pg.goto(url + r); await pg.wait_for_timeout(250)
         sw = await pg.evaluate('document.documentElement.scrollWidth')
@@ -65,13 +76,13 @@ async def run_variant(pw, name, url, mobile):
         words = (await pg.evaluate("document.querySelector('main').textContent")).split()
         bad = [w for w in words if w in ('null', 'false', 'undefined', 'NaN') or w.startswith('[object')]
         ok(not bad, f'{tag} {r}: brak artefaktów tekstowych ({bad[:3]})')
-    await pg.goto(url + '#/dzis?d=2026-10-26'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis?d=2026-10-26'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     titles = await pg.eval_on_selector_all('.slot-title', 'e => e.map(x => x.textContent)')
     ok(titles.count('Mock CFA — sesja 1') == 2 and titles.count('Mock CFA — sesja 2') == 3 and 'Wolne' in titles,
        f'{tag} dzień mocka: sesje w A–E (E = kontynuacja sesji 2 do 13:00, D-086), F „Wolne” (D-036)')
     ok(['CFA blok G', 'CFA blok H', 'CFA blok I'] == [t for t in titles if t.startswith('CFA blok')], f'{tag} dzień mocka: analiza w blokach G–I (D-086)')
     ok(any('Obiad (16:23)' in t for t in await pg.eval_on_selector_all('.slot-items li', 'e => e.map(x => x.textContent)')), f'{tag} obiad opisany jako 16:23 (D-037)')
-    await pg.goto(url + '#/dzis?d=2026-09-25'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis?d=2026-09-25'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     main = await pg.inner_text('main')
     ok(main.lower().count('chondroityn') == 2, f'{tag} chondroityna tylko 2 razy (07:00 i 21:00) — brak dublowania (D-001)')
     ok('Pomiar wagi i ciśnienia na czczo po toalecie.' in main, f'{tag} pomiar wagi i ciśnienia (D-038)')
@@ -79,19 +90,20 @@ async def run_variant(pw, name, url, mobile):
     SLOTS = "e => e.map(x => x.querySelector('time').textContent + ' ' + x.querySelector('.slot-title').firstChild.textContent)"   # bez znacznika „teraz”
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
     chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
-    ok('Bez treningu' in chips and 'przed startem planu' in chips, f'{tag} 25.09: bez treningu, przed Fazą 0 (D-087): {chips}')
+    ok('Bez treningu' in chips and 'start planu · przed Fazą 0' in chips and '2332 kcal (NT)' in chips, f'{tag} 25.09: start planu, bez treningu, dieta NT, przed Fazą 0 (D-087, D-088): {chips}')
+    ok(await pg.locator('.daynav [aria-label="Poprzedni dzień"]').count() == 0, f'{tag} 25.09: pierwszy dzień planu — bez przejścia do dnia poprzedniego (D-088)')
     ok([s for s in slots if 'CFA blok' in s] == ['13:30 CFA blok F', '14:30 CFA blok G', '15:30 CFA blok H', '16:40 CFA blok I']
        and all(f'{t} Wolne' in slots for t in ('08:00', '09:10', '10:10', '11:20', '12:20')), f'{tag} 25.09: 4 bloki od 13:30, wcześniej wolne (D-087)')
     ok(all(f'{t} Wolne' in slots for t in ('17:45', '18:05', '18:15', '19:35', '19:45', '20:05')), f'{tag} 25.09: okno treningowe 17:45–20:15 „Wolne” (D-087)')
-    await pg.goto(url + '#/dzis?d=2026-09-26'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis?d=2026-09-26'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
     ok(len(slots) == 33 and '12:13 Zakupy' in slots and '13:13 Przerwa na lunch' in slots and not any(s.startswith('12:20') for s in slots)
        and 'Druga kawa (12:20)' in await pg.inner_text('#slot\\.1213z'), f'{tag} sobota: zakupy 12:13–13:13 z drugą kawą, bez bloku E, lunch bez zmian (D-087)')
     ok('kalibracyjny' in await pg.inner_text('#slot\\.1815') and 'Faza 0' in await pg.inner_text('.topline'), f'{tag} 26.09: LOWER 2 kalibracyjny, Faza 0 od 26.09 (D-087)')
-    await pg.goto(url + '#/dzis?d=2026-09-27'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis?d=2026-09-27'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     tl = await pg.inner_text('.topline')
     ok('Bez treningu, 2 × sauna' in tl and '2332 kcal (NT)' in tl and 'Posiłek po saunie' in await pg.inner_text('#slot\\.2015'), f'{tag} 27.09: dzień sauny, dieta NT (D-087): {tl}')
-    await pg.goto(url + '#/dzis?d=2026-09-28'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis?d=2026-09-28'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     main = await pg.inner_text('main')
     chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
     ok('UPPER 1 + sauna' in chips and 'Faza 0' in chips, f'{tag} nazwa treningu w nagłówku (D-040), Faza 0: {chips}')
@@ -104,11 +116,14 @@ async def run_variant(pw, name, url, mobile):
     e_items = await pg.inner_text('#slot\\.1220')
     ok('Druga kawa (12:20)' in e_items and 'Lunch (13:20)' in await pg.inner_text('#slot\\.1313'), f'{tag} plan dnia: druga kawa w bloku E, lunch 13:20 (D-086)')
     ok('Spacer' not in main and 'Długa przerwa' not in main, f'{tag} plan dnia: bez spaceru regeneracyjnego i długiej przerwy (D-086)')
-    await pg.goto(url + '#/dzis?d=2026-09-24'); await pg.wait_for_selector('.slot')
-    ok('przed startem planu' in await pg.inner_text('.topline') and 'Poza okresem planu nauki' in await pg.inner_text('main'), f'{tag} 24.09: przed startem planu (D-086)')
-    await pg.goto(url + '#/dzis?d=2026-09-21'); await pg.wait_for_selector('.slot')
-    chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
-    ok('UPPER 1 + sauna' in chips, f'{tag} nazwa treningu w nagłówku (D-040): {chips}')
+    # D-088: dni przed 25.09.2026 poza planem — bez planu dnia, z przejściem do pierwszego dnia planu
+    for d in ('2026-09-24', '2026-09-21'):
+        await pg.goto(url + f'#/dzis?d={d}'); await pg.wait_for_selector('.dz-outside')
+        ok(await pg.locator('.slot').count() == 0 and 'Plan zaczyna się 25 września 2026' in await pg.inner_text('.dz-outside')
+           and 'poza planem' in await pg.inner_text('.topline'), f'{tag} {d}: poza planem, bez planu dnia (D-088)')
+    await pg.locator('.dz-outside a').click(); await pg.wait_for_selector('.dz-plan-h')
+    ok('d=2026-09-25' in await pg.evaluate('location.hash'), f'{tag} poza planem: przejście do 25.09 (D-088)')
+    # (U-a) w dniu bieżącym minione punkty planu są zwinięte — przed odczytem treści dnia sekcja jest rozwijana
     # --- Redesign (Faza 3–4): motyw, nawigacja, dashboard
     th = await pg.evaluate("document.documentElement.getAttribute('data-theme')")
     ok(th == 'dark' or await pg.evaluate("localStorage.getItem('p2027.theme')") is not None, f'{tag} Motyw: domyślnie ciemny')
@@ -141,7 +156,7 @@ async def run_variant(pw, name, url, mobile):
     ok(await pg.locator('.dz-aside .dz-card').count() >= 4 and 'Plan dnia' in await pg.inner_text('main'), f'{tag} Dziś: karty podsumowań i plan dnia')
     # --- Faza 5.0: regresje wykryte w audycie (nawigacja w obrębie strony, sygnatury modułów, zmienne CSS)
     await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
-    await pg.locator('.mp-jump a').nth(1).click(); await pg.wait_for_timeout(700)
+    await pg.locator('.mp-jump a[href="#mp-ph-1"]').click(); await pg.wait_for_timeout(700)
     top = await pg.evaluate("document.getElementById('mp-ph-1').getBoundingClientRect().top")
     ok(await pg.evaluate('location.hash') == '#/mealprep' and await pg.locator('.prep-card').count() > 0 and -5 <= top < 200,
        f'{tag} Meal Prep: skrót fazy przewija do sekcji i zostaje w module (top {top:.0f}px)')
@@ -160,7 +175,7 @@ async def run_variant(pw, name, url, mobile):
     stats = await pg.inner_text('.stats')
     ok('kcal' in stats and 'bloków' in stats, f'{tag} Dziś: podsumowanie dnia (dieta, trening, CFA, sauna)')
     ok(await pg.locator('.nowcard').count() == 1, f'{tag} Dziś: karta „teraz” dla dzisiejszego dnia')
-    qy = await pg.locator('.quicklinks').bounding_box(); dy = await pg.locator('.day').bounding_box()
+    qy = await pg.locator('.quicklinks').bounding_box(); dy = await pg.locator('.dz-plan-h').bounding_box()
     ok(qy['y'] < dy['y'], f'{tag} Dziś: skróty do jadłospisu i suplementacji nad planem dnia')
     await pg.goto(url + '#/dzis?d=2026-10-03'); await pg.wait_for_selector('.stats')
     ok(await pg.locator('.nowcard').count() == 0, f'{tag} Dziś: brak karty „teraz” dla innego dnia')
@@ -183,10 +198,12 @@ async def run_variant(pw, name, url, mobile):
     tue = (_dt.date.today() + _dt.timedelta(days=(1 - _dt.date.today().weekday()) % 7)).isoformat()
     await pg.goto(url + f'#/suplementy?d={tue}'); await pg.wait_for_selector('.dose-list')
     ok('Cynk' not in (await pg.inner_text('main')).split('Preparaty')[0], f'{tag} Suplementacja: we wtorek bez cynku')
-    await pg.goto(url + '#/suplementy?d=2026-09-24'); await pg.wait_for_selector('.dose-list')
+    await pg.goto(url + '#/suplementy?d=2026-10-01'); await pg.wait_for_selector('.dose-list')
     ok('Cynk' in (await pg.inner_text('main')).split('Preparaty')[0], f'{tag} Suplementacja: czwartek z cynkiem')
+    await pg.goto(url + '#/suplementy?d=2026-09-24'); await pg.wait_for_selector('.sp-outside')
+    ok(await pg.locator('.dose-list').count() == 0 and '0 dawek' in await pg.inner_text('.topline'), f'{tag} Suplementacja: 24.09 poza planem — bez dawek (D-088)')
     # --- Etap 5: Trening
-    await pg.goto(url + '#/trening?d=2026-09-21'); await pg.wait_for_selector('.ex')
+    await pg.goto(url + '#/trening?d=2026-09-28'); await pg.wait_for_selector('.ex')
     SETS = '.set:not(.set-h)'
     ok(await pg.locator('.ex').count() == 9 and await pg.locator(SETS).count() == 10, f'{tag} Trening: UPPER 1 w Fazie 0 — 9 ćwiczeń, 10 serii')
     ok(await pg.locator('.hero-tr .bodymap').count() == 1 and await pg.locator('.ex-map .bodymap').count() == 9, f'{tag} Trening: mapa mięśni sesji i każdego ćwiczenia')
@@ -207,7 +224,7 @@ async def run_variant(pw, name, url, mobile):
     ok('Główne: Klatka piersiowa' in dtxt and 'free-exercise-db' in dtxt and await pg.locator('dialog .bm-p').count() > 0, f'{tag} Trening: mapa mięśni z podanym źródłem')
     await pg.locator('dialog .sheet-head button').click()
     # schemat ruchu (interaktywny)
-    await pg.goto(url + '#/trening?d=2026-09-21'); await pg.wait_for_selector('.ex')
+    await pg.goto(url + '#/trening?d=2026-09-28'); await pg.wait_for_selector('.ex')
     await pg.locator('.ex-tech').first.click(); await pg.wait_for_selector('dialog .fig-svg')
     ok(await pg.locator('dialog .fig-svg .fg-head').count() == 1, f'{tag} Trening: animowana postać w oknie techniki')
     arm0 = await pg.locator('dialog .fig-svg polyline').last.get_attribute('points')
@@ -239,8 +256,12 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/trening?v=historia'); await pg.wait_for_selector('.hist-item')
     hs = await pg.inner_text('.hist-list')
     ok('72 min' in hs and '1 opcjonalna' in hs, f'{tag} Historia: sesja z czasem i oznaczeniem serii opcjonalnej')
-    await pg.goto(url + '#/trening?d=2026-09-24'); await pg.wait_for_selector('h1')
+    await pg.goto(url + '#/trening?d=2026-10-01'); await pg.wait_for_selector('h1')
     ok('Dzień bez treningu' in await pg.inner_text('main'), f'{tag} Trening: czwartek bez ćwiczeń')
+    await pg.goto(url + '#/trening?d=2026-09-21'); await pg.wait_for_selector('h1')
+    tm = await pg.inner_text('main')
+    ok('Poza planem — plan i treningi zaczynają się 25 września 2026' in tm and await pg.locator('.ex').count() == 0 and await pg.locator('.tm').count() == 0,
+       f'{tag} Trening: 21.09 poza planem — bez ćwiczeń i licznika (D-088)')
     await pg.goto(url + '#/trening?d=2026-10-12'); await pg.wait_for_selector('.ex')
     ok(await pg.locator('.set:not(.set-h)').count() == 18, f'{tag} Trening: UPPER 1 w Fazie 1 — 18 serii')
     # --- Etap 6: Rekompozycja (bez pakietu prywatnego)
@@ -361,7 +382,7 @@ async def run_variant(pw, name, url, mobile):
     for lab in ['Dodaj', 'Zakupy', 'Paragon', 'Cofnij', 'Historia', 'Status AI', 'Kopia']:
         ok(await pg.locator('.actions').get_by_text(lab, exact=False).count() > 0, f'{tag} Zapasy: przycisk {lab}')
     ok(await pg.locator('.pills .pill-b').count() == 9, f'{tag} Zapasy: 9 kategorii')
-    ok(await pg.locator('.counters .counter').count() == 3, f'{tag} Zapasy: liczniki statusów')
+    ok(await pg.locator('.counters .counter').count() == 4 and await pg.locator('.counters .c-shop').count() == 1, f'{tag} Zapasy: liczniki statusów + „Do zakupów” (U-c)')
     tags = await pg.inner_text('.inv')
     ok('ŚWIEŻE (≤7D)' in tags and 'TRWAŁE (>7D)' in tags and 'SUPLEMENT' in tags, f'{tag} Zapasy: klasyfikacja wg terminu przydatności')
     ok(any(b in tags for b in ['🚨 < 2 dni', '⚠️ Niski (2-3.9d)', '🟢 OK (≥4d)', '⛔ BRAK (0)']), f'{tag} Zapasy: statusy świeżych wg progów 2/4 dni')
@@ -382,27 +403,27 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/zapasy?q=Płatki'); await pg.wait_for_selector('.inv-item')
     before = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
     await pg.locator('.inv-item').first.get_by_role('button', name='+ opakowanie', exact=False).click()
-    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
+    await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value !== v', before, timeout=8000)
     after = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
     ok(float(after) > float(before), f'{tag} Zapasy: zakup opakowania zwiększa stan ({before} → {after})')
     await pg.reload(); await pg.wait_for_selector('.inv-item')
     kept = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
     ok(kept == after, f'{tag} Zapasy: zmiana stanu zapisana trwale')
     await pg.get_by_role('button', name='Cofnij', exact=True).click()
-    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value === v', arg=before, timeout=8000)
+    await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', before, timeout=8000)
     ok(True, f'{tag} Zapasy: cofnięcie ostatniej zmiany przywraca stan')
     await pg.locator('.daycard > summary').click()   # korekta dnia — sekcja zwinięta (Faza 5)
     await pg.get_by_role('button', name='−1 dzień (odlicz)').click()
-    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value !== v', arg=before, timeout=8000)
+    await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value !== v', before, timeout=8000)
     ok(True, f'{tag} Zapasy: korekta dnia zmienia stany')
     ok(await pg.locator('.daycard[open]').count() == 1, f'{tag} Zapasy: sekcja korekty dnia pozostaje rozwinięta po zapisie')
     await pg.get_by_role('button', name='+1 dzień (cofnij zużycie)').click()
-    await pg.wait_for_function('v => document.querySelector(".inv-item input[type=number]").value === v', arg=before, timeout=8000)
+    await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', before, timeout=8000)
     ok(True, f'{tag} Zapasy: odwrotna korekta dnia wraca do stanu wyjściowego')
     await pg.get_by_role('button', name='Historia', exact=True).click(); await pg.wait_for_selector('dialog.sheet')
     ok('Historia i cofanie zmian' in await pg.inner_text('dialog') and await pg.locator('dialog .hist li').count() >= 4, f'{tag} Zapasy: historia z wpisami')
     pg.once('dialog', lambda d: asyncio.ensure_future(d.accept()))
-    await pg.locator('dialog .hist li').last.get_by_role('button', name='↩ Przywróć ten stan').click()
+    await pg.locator('dialog .hist li').last.get_by_role('button', name='Przywróć ten stan').click()
     await pg.wait_for_selector('text=Przywrócono stan', timeout=15000)
     ok(True, f'{tag} Zapasy: przywrócenie stanu z historii')
     ok('pozycj' in await pg.inner_text('.dash'), f'{tag} Zapasy: podsumowanie stanu magazynu na pulpicie')
@@ -488,12 +509,12 @@ async def run_variant(pw, name, url, mobile):
     if name == 'web':
         await pg.goto(url + '#/dzis')
         await pg.evaluate('navigator.serviceWorker.ready')
-        await pg.reload(); await pg.wait_for_function('navigator.serviceWorker.controller !== null')
+        await pg.reload(); await wait_js(pg, '() => navigator.serviceWorker.controller !== null')
         await ctx.set_offline(True)
-        await pg.reload(); await pg.wait_for_selector('.slot', timeout=8000)
+        await pg.reload(); await pg.wait_for_selector('.dz-plan-h', timeout=8000)
         ok(True, f'{tag} działa offline po przeładowaniu (service worker)')
         await ctx.set_offline(False)
-    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.slot')
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
     await pg.screenshot(path=str(ROOT / f'tests/e2e/shot-{name}-{vp["width"]}-dzis.png'))
     await pg.goto(url + '#/dane'); await pg.wait_for_selector('h1')
     await pg.screenshot(path=str(ROOT / f'tests/e2e/shot-{name}-{vp["width"]}-dane.png'), full_page=False)
@@ -600,6 +621,224 @@ async def run_features(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
 
+# --- Etap 1 (audyt 25.09.2026, B1–B7): zegar 11.10.2026 20:00 — wieczór przed startem Fazy 1 (12.10)
+CLOCK_B = _dt.datetime(2026, 10, 11, 20, 0, tzinfo=_dt.timezone(_dt.timedelta(hours=2)))
+async def run_audit_fixes(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [Etap 1, zegar 11.10 20:00]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=CLOCK_B)
+    # B1: Meal Prep — karty wieczorne liczone z planu na jutro, nawigacja dni, odhaczenia pod datą strony
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    k2 = await pg.inner_text('#mp-k2')
+    ok('płatki owsiane 85 g' in k2 and '12.10' in await pg.inner_text('.mp-eve') and 'Faza 1' in await pg.inner_text('.mp-eve'),
+       f'{tag} Meal Prep: wieczorem 11.10 overnight oats na jutro — 85 g (Faza 1)')
+    ids = await pg.eval_on_selector_all('.prep-phase', 'e => e.map(x => x.id)')
+    ok(ids[:4] == ['mp-ph-1', 'mp-ph-2', 'mp-ph-3', 'mp-ph-0'], f'{tag} Meal Prep: fazy w kolejności dnia, karty wieczorne po „Wieczorze” ({ids})')
+    await pg.get_by_role('link', name='Następny dzień').click(); await pg.wait_for_timeout(500)
+    ok('d=2026-10-12' in await pg.evaluate('location.hash') and '12 października 2026 · Faza 1' in await pg.text_content('.hero-tr-main .eyebrow'), f'{tag} Meal Prep: następny dzień (12.10, Faza 1)')
+    await pg.locator('#mp-k3 input[type=checkbox]').first.check(); await pg.wait_for_timeout(400)
+    await pg.reload(); await pg.wait_for_selector('.prep-card')
+    ok(await pg.locator('#mp-k3 input[type=checkbox]').first.is_checked(), f'{tag} Meal Prep: odhaczenie zapisane pod datą 12.10')
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-card')
+    ok(not await pg.locator('#mp-k3 input[type=checkbox]').first.is_checked(), f'{tag} Meal Prep: 11.10 bez odhaczeń z 12.10')
+    # B3: okna — nazwa dostępna, usunięcie po Esc; B2: błąd walidacji widoczny w oknie
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+    for _ in range(2):
+        await pg.locator('.zp-act', has_text='Dodaj').click(); await pg.wait_for_selector('dialog[open]')
+        await pg.keyboard.press('Escape'); await pg.wait_for_timeout(200)
+    ok(await pg.locator('dialog').count() == 0, f'{tag} Zapasy: okno usunięte po Esc (2 × otwarcie)')
+    await pg.locator('.zp-act', has_text='Dodaj').click(); await pg.wait_for_selector('dialog[open]')
+    ok(await pg.get_by_role('dialog', name='Dodaj nową pozycję').count() == 1, f'{tag} Zapasy: okno z nazwą dostępną')
+    await pg.get_by_role('button', name='Zapisz pozycję').click(); await pg.wait_for_timeout(200)
+    ok(await pg.locator('dialog .sheet-msg .banner.err').is_visible() and 'Podaj nazwę' in await pg.inner_text('dialog .sheet-msg'),
+       f'{tag} Zapasy: błąd „Podaj nazwę pozycji” widoczny w oknie')
+    await pg.keyboard.press('Escape'); await pg.wait_for_timeout(200)
+    # B5: fokus wraca na przycisk po zapisie; B4: potwierdzenie widoczne w oknie przeglądarki mimo przewinięcia
+    btn = pg.locator('.zp-pack').nth(6)
+    label = await btn.get_attribute('aria-label')
+    await btn.click(); await pg.wait_for_timeout(600)
+    ok(await pg.evaluate("document.activeElement.getAttribute('aria-label')") == label, f'{tag} Zapasy: fokus na „+ opakowanie” po zapisie')
+    r = await pg.evaluate("(() => { const b = document.querySelector('#toast .banner'); if (!b) return null; const x = b.getBoundingClientRect(); return [x.top, x.bottom, innerHeight, b.textContent]; })()")
+    ok(r and r[0] >= 0 and r[1] <= r[2] and ':' in r[3], f'{tag} Zapasy: potwierdzenie w obszarze komunikatów, w widoku ({r})')
+    ok(await pg.evaluate("document.querySelector('main').textContent.includes(document.querySelector('#toast').textContent)") is False,
+       f'{tag} komunikat poza przerysowywaną treścią')
+    await pg.clock.fast_forward(7000); await pg.wait_for_timeout(300)
+    ok(await pg.locator('#toast .banner').count() == 0, f'{tag} komunikat znika po 6 s')
+    await pg.goto(url + '#/trening?d=2026-10-12'); await pg.wait_for_selector('.ex')
+    t = pg.locator('.set:not(.set-h) .set-toggle').nth(2)
+    host = await t.evaluate("e => e.closest('.ex').id")
+    await t.click(); await pg.wait_for_timeout(600)
+    ok(await pg.evaluate("document.activeElement.classList.contains('set-toggle') && document.activeElement.closest('.ex').id") == host
+       and await pg.evaluate("document.activeElement.getAttribute('aria-pressed')") == 'true', f'{tag} Trening: fokus na odhaczonej serii po zapisie')
+    await pg.locator('.ex-tech').first.click(); await pg.wait_for_selector('dialog[open]')
+    await pg.keyboard.press('Escape'); await pg.wait_for_timeout(200)
+    ok(await pg.locator('dialog').count() == 0, f'{tag} Trening: okno techniki usunięte po Esc')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await b.close()
+    # B6: 320 px — brak przewijania w poziomie w żadnym widoku
+    if mobile:
+        b = await pw.chromium.launch()
+        pg = await (await b.new_context(viewport={'width': 320, 'height': 700}, is_mobile=True, has_touch=True, locale='pl-PL', timezone_id='Europe/Warsaw')).new_page()
+        await pg.clock.install(time=CLOCK_B)
+        wide = []
+        for r in ROUTES + ['#/trening?d=2026-10-12', '#/mealprep?d=2026-10-12']:
+            await pg.goto(url + r); await pg.wait_for_timeout(250)
+            sw = await pg.evaluate('document.documentElement.scrollWidth')
+            if sw > 320: wide.append((r, sw))
+        ok(not wide, f'{name} 320px: brak przewijania w poziomie ({wide})')
+        await b.close()
+
+# --- Etap 2 (audyt 25.09.2026, U-a…U-i, S1, I8): zegar 11.10.2026 20:00
+async def run_etap2(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [Etap 2, zegar 11.10 20:00]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=CLOCK_B)
+    # U-i: „Przejdź do treści” — pierwszy element w kolejności Tab, przenosi fokus do <main>
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    await pg.keyboard.press('Tab')
+    ok(await pg.evaluate("document.activeElement.className") == 'skip-link', f'{tag} U-i: „Przejdź do treści” pierwszy po Tab')
+    await pg.keyboard.press('Enter'); await pg.wait_for_timeout(300)
+    ok(await pg.evaluate("document.activeElement.id") == 'main', f'{tag} U-i: fokus w treści')
+    # U-a: minione punkty dnia zwinięte, bieżący widoczny
+    past = pg.locator('details.dz-past')
+    ok(await past.count() == 1 and await past.get_attribute('open') is None and 'Minione punkty' in await pg.inner_text('.dz-past > summary')
+       and await pg.locator('.dz-plan > .day .slot.is-now').count() == 1, f'{tag} U-a: minione punkty zwinięte, „teraz” w planie')
+    n_all = await pg.locator('.slot').count()
+    ok(n_all == 34, f'{tag} U-a: wszystkie 34 punkty w DOM ({n_all})')
+    # U-f: strzałki kart ≥ 44 px
+    sz = await pg.eval_on_selector('.dz-more', 'e => [e.getBoundingClientRect().width, e.getBoundingClientRect().height]')
+    ok(sz[0] >= 44 and sz[1] >= 44, f'{tag} U-f: .dz-more {sz}')
+    # U-e: najmniejszy tekst 12 px
+    fs = await pg.evaluate("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fs-2xs')) * 16")
+    ok(fs >= 12, f'{tag} U-e: --fs-2xs = {fs} px')
+    # U-b: harmonogram od dziś, minione dni zwinięte (budowane po rozwinięciu)
+    await pg.goto(url + '#/cfa?v=harmonogram'); await pg.wait_for_selector('.filters')
+    first = await pg.locator('main > section.panel .cfa-dh a').first.inner_text()
+    ok(await pg.locator('details.cf-past:not([open])').count() == 1 and await pg.locator('details.cf-past .cfa-row').count() == 0 and '11.10' in first,
+       f'{tag} U-b: harmonogram od dziś ({first}), minione zwinięte')
+    await pg.locator('details.cf-past > summary').click(); await pg.wait_for_timeout(300)
+    ok(await pg.locator('details.cf-past .cfa-row').count() > 100, f'{tag} U-b: minione dni po rozwinięciu')
+    # U-c: wyszukiwanie na bieżąco, filtr „Do zakupów”, edycja własnej pozycji, jednostki; U-g: podpowiedź „Stan”
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+    ok(await pg.locator('#zp-stan-hint').count() == 1 and await pg.locator('.inv-item input[aria-describedby="zp-stan-hint"]').count() > 0, f'{tag} U-g: podpowiedź „Stan na koniec dnia”')
+    await pg.locator('#zp-q').press_sequentially('płat', delay=30); await pg.wait_for_timeout(300)
+    vis = await pg.eval_on_selector_all('.inv-item:not([hidden]) h3', 'e => e.map(x => x.textContent)')
+    ok(vis and all('płat' in v.lower() for v in vis) and 'q=' in await pg.evaluate('location.hash') and await pg.evaluate('document.activeElement.id') == 'zp-q',
+       f'{tag} U-c: filtrowanie podczas pisania, fokus w polu ({vis})')
+    await pg.locator('#zp-q').fill(''); await pg.locator('#zp-q').press_sequentially('x', delay=30); await pg.wait_for_timeout(200)
+    await pg.locator('#zp-q').fill(''); await pg.locator('#zp-q').dispatch_event('input'); await pg.wait_for_timeout(300)
+    await pg.locator('.counters .c-shop').click(); await pg.wait_for_timeout(400)
+    ok('s=shop' in await pg.evaluate('location.hash'), f'{tag} U-c: filtr „Do zakupów”')
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+    await pg.locator('.zp-act', has_text='Dodaj').click(); await pg.wait_for_selector('dialog[open]')
+    await pg.locator('dialog input').first.fill('[TEST] Pozycja E2E'); await pg.get_by_role('button', name='Zapisz pozycję').click(); await pg.wait_for_timeout(500)
+    await pg.goto(url + '#/zapasy?q=%5BTEST%5D'); await pg.wait_for_selector('.inv-item')
+    await pg.locator('.inv-item .zp-more > summary').first.click()
+    ok('Opakowanie 1 g' in await pg.inner_text('.inv-item .zp-more'), f'{tag} U-c: jednostka ze spacją („Opakowanie 1 g”)')
+    await pg.get_by_role('button', name='Edytuj [TEST] Pozycja E2E').click(); await pg.wait_for_selector('dialog[open]')
+    await pg.locator('dialog input').first.fill('[TEST] Pozycja E2E zmieniona'); await pg.get_by_role('button', name='Zapisz zmiany').click(); await pg.wait_for_timeout(500)
+    ok('[TEST] Pozycja E2E zmieniona' in await pg.inner_text('.inv'), f'{tag} U-c: edycja własnej pozycji')
+    ok(not any(ord(c) > 0x2700 for c in await pg.inner_text('.actions')), f'{tag} U-d: przyciski Zapasów bez emoji')
+    # U-h, I8: Dane — ostrzeżenia i diagnostyka
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-diag')
+    ok(await pg.locator('.dn-diag-list li').count() >= 5 and 'Diagnostyka danych' in await pg.inner_text('.dn-diag'), f'{tag} I8: diagnostyka danych')
+    ok('nie jest szyfrowany' in await pg.inner_text('.dn-plain'), f'{tag} U-h: ostrzeżenie o jawnym pliku')
+    ok((await pg.locator('.dn-evict').count() == 1) == (name == 'web'), f'{tag} U-h: ostrzeżenie o karcie Safari tylko w karcie przeglądarki')
+    if name == 'web':
+        ok('Content-Security-Policy' in await pg.evaluate("document.querySelector('meta[http-equiv]')?.httpEquiv || ''"), f'{tag} S1: CSP w wariancie web')
+    ok(not errs, f'{tag} brak błędów konsoli, także naruszeń CSP ({errs[:2]})')
+    await b.close()
+
+# --- Etap 3 (audyt 25.09.2026, I1–I5, I7, I11; bez I6): zegar 11.10.2026 20:00
+async def run_etap3(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [Etap 3, zegar 11.10 20:00]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw', accept_downloads=True)
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+    await pg.clock.install(time=CLOCK_B)
+    due = [x for x in CFA_D['bloki'] if x['data'] < '2026-10-11']
+    # I2: „Wymaga uwagi” — zaległe bloki CFA zgodne z modułem CFA
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-attn')
+    at = await pg.inner_text('.dz-attn')
+    ok(f'Zaległe bloki CFA: {len(due)}' in at and await pg.locator('.dz-attn a[href="#/cfa?v=harmonogram&zal=1"]').count() == 1, f'{tag} I2: „Wymaga uwagi” — zaległe bloki ({len(due)})')
+    ok(await pg.locator('.dz-attn').count() == 1, f'{tag} I2: karta tylko dla dnia bieżącego')
+    # I3: Tydzień — 7 dni, sobota z zakupami, przejście do dnia
+    await pg.get_by_role('link', name='Tydzień').first.click(); await pg.wait_for_selector('.wk-grid')
+    days = await pg.eval_on_selector_all('.wk-day', 'e => e.map(x => x.textContent)')
+    ok(len(days) == 7 and 'Zakupy 12:13' in days[5] and 'UPPER 1' in days[0] and 'dziś' in days[6], f'{tag} I3: tydzień 05–11.10 z resolvera')
+    await pg.locator('.wk-day').nth(2).click(); await pg.wait_for_selector('.dz-plan-h')
+    ok('d=2026-10-07' in await pg.evaluate('location.hash'), f'{tag} I3: dzień z tygodnia otwiera plan dnia')
+    await pg.goto(url + '#/dzis?v=tydzien&d=2026-09-25'); await pg.wait_for_selector('.wk-grid')
+    ok(await pg.locator('.wk-day.is-out').count() == 4, f'{tag} I3: 21–24.09 poza planem (D-088)')
+    # I11: recall 22:00 odhaczany (ustawienie), widoczny w statystykach
+    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-05'); await pg.wait_for_selector('.cf-recall')
+    await pg.locator('.cf-recall .set-toggle').click(); await pg.wait_for_timeout(500)
+    ok(await pg.locator('.cf-recall .set-toggle').get_attribute('aria-pressed') == 'true' and 'Recall: 1 /' in await pg.inner_text('.hero-cfa'), f'{tag} I11: recall odhaczony')
+    await pg.goto(url + '#/cfa?v=plan'); await pg.wait_for_selector('.kv')
+    ok('wykonane 1 z 34 sesji' in await pg.inner_text('main'), f'{tag} I11: statystyka recall w planie')
+    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-09'); await pg.wait_for_selector('.cfa-dayhead')
+    ok(await pg.locator('.cf-recall').count() == 0, f'{tag} I11: piątek bez recall')
+    # I4 / I5: wyszukiwanie (Ctrl+K, „/”), skróty
+    if not mobile:
+        await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+        await pg.keyboard.press('Control+k'); await pg.wait_for_selector('dialog.gs-dialog')
+        await pg.keyboard.type('hypothesis testing'); await pg.wait_for_timeout(300)
+        ok(await pg.locator('.gs-hit').count() >= 1 and 'CFA' in await pg.inner_text('.gs-list'), f'{tag} I4: wyniki wyszukiwania (bloki CFA)')
+        await pg.keyboard.press('Enter'); await pg.wait_for_timeout(500)
+        ok('#/cfa?v=dzien&d=' in await pg.evaluate('location.hash') and await pg.locator('dialog').count() == 0, f'{tag} I4: Enter otwiera pierwszy wynik')
+        await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+        await pg.keyboard.press('/'); await pg.wait_for_selector('dialog.gs-dialog')
+        await pg.keyboard.type('płatki'); await pg.wait_for_timeout(300)
+        ok(any('Płatki' in t for t in await pg.eval_on_selector_all('.gs-t', 'e => e.map(x => x.textContent)')), f'{tag} I4: „/” i produkty Zapasów')
+        await pg.keyboard.press('Escape'); await pg.wait_for_timeout(200)
+        await pg.keyboard.press('g'); await pg.keyboard.press('z'); await pg.wait_for_timeout(400)
+        ok(await pg.evaluate('location.hash') == '#/zapasy', f'{tag} I5: g z → Zapasy')
+        await pg.goto(url + '#/dzis?d=2026-10-05'); await pg.wait_for_selector('.dz-plan-h')
+        await pg.locator('body').click(position={'x': 5, 'y': 5}); await pg.keyboard.press('ArrowRight'); await pg.wait_for_timeout(400)
+        ok('d=2026-10-06' in await pg.evaluate('location.hash'), f'{tag} I5: → następny dzień')
+        await pg.keyboard.press('?'); await pg.wait_for_selector('dialog.gs-help')
+        ok('g z' in await pg.inner_text('dialog.gs-help'), f'{tag} I5: lista skrótów'); await pg.keyboard.press('Escape')
+    else:
+        await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-search')
+        await pg.locator('.more-search').click(); await pg.wait_for_selector('dialog.gs-dialog')
+        await pg.locator('.gs-input').fill('skyr'); await pg.wait_for_timeout(300)
+        ok(await pg.locator('.gs-hit').count() >= 2, f'{tag} I4: wyszukiwanie z „Więcej” (telefon)')
+        await pg.keyboard.press('Escape')
+    # I7: paragon tekstem — podgląd, zapis
+    await pg.goto(url + '#/zapasy?q=Banan'); await pg.wait_for_selector('.inv-item')
+    await pg.locator('.zp-act', has_text='Paragon').click(); await pg.wait_for_selector('dialog[open]')
+    await pg.locator('dialog textarea').fill('banan 1,2 kg\nczekolada gorzka 100 g')
+    await pg.get_by_role('button', name='Sprawdź').click(); await pg.wait_for_timeout(300)
+    pvt = await pg.inner_text('.rc-preview')
+    ok('Banan' in pvt and '1200 g' in pvt.replace('\xa0', ' ') and 'czekolada' in pvt, f'{tag} I7: podgląd paragonu (rozpoznane i pominięte)')
+    await pg.get_by_role('button', name='Dodaj do zapasów').click(); await pg.wait_for_timeout(600)
+    ok(await pg.locator('dialog').count() == 0 and 'Paragon: 1 pozycji' in await pg.inner_text('#toast'), f'{tag} I7: zapis zakupów z paragonu')
+    # I1: plik .ics z alarmami
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-ics')
+    async with pg.expect_download() as dl:
+        await pg.get_by_role('button', name='Pobierz plik .ics').click()
+    d = await dl.value
+    ics = pathlib.Path(await d.path()).read_text(encoding='utf8')
+    ok(d.suggested_filename == '2027-plan-2026-10-11.ics' and ics.startswith('BEGIN:VCALENDAR') and ics.count('BEGIN:VEVENT') == ics.count('BEGIN:VALARM') > 50
+       and 'TZID:Europe/Warsaw' in ics, f'{tag} I1: plik .ics ({ics.count("BEGIN:VEVENT")} wydarzeń z alarmami)')
+    ok('wydarzeniami' in await pg.inner_text('.dn-ics'), f'{tag} I1: komunikat po eksporcie')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -608,6 +847,12 @@ async def main():
             await run_variant(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), mobile)
         await run_features(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_features(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_audit_fixes(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_audit_fixes(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_etap2(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_etap2(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_etap3(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_etap3(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

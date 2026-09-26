@@ -7,6 +7,11 @@ import { stockAt, forecast, status, allItems } from '../core/calc/inventory.js';
 import { shortDate } from '../core/dates.js';
 import { icon } from '../ui/icons.js';
 import { cloudSection } from './dane-cloud.js';
+import { diagnose } from '../core/calc/diagnostics.js';
+import { buildIcs, ICS_KINDS } from '../core/ics.js';
+import { addDays } from '../core/dates.js';
+import { PLAN_START } from '../core/resolver.js';
+import { cloudStatus } from '../core/sync/cloud-local.js';
 
 const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY v31', private: 'Pakiet prywatny',
   'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)' };
@@ -23,8 +28,8 @@ const when = iso => (iso ? new Date(iso).toLocaleString('pl-PL') : '—');
 
 const STATUS = { OK: 'OK', WARNING: 'Średni', CRITICAL: 'Pilne', UNKNOWN: 'Brak stanu', UNTRACKED: 'Nieśledzony' };
 
-async function shareOrDownload(text, name) {
-  const file = new File([text], name, { type: 'application/json' });
+async function shareOrDownload(text, name, type = 'application/json') {
+  const file = new File([text], name, { type });
   if (navigator.canShare?.({ files: [file] })) {
     try { await navigator.share({ files: [file], title: name }); return 'share'; }
     catch (e) { if (e.name === 'AbortError') return 'cancel'; }
@@ -55,7 +60,9 @@ export async function renderDane(root, ctx) {
         h('dt', {}, 'Zapis'), h('dd', { style: { color: health.ok ? 'var(--ok-ink)' : 'var(--err-ink)' } }, health.ok ? 'działa, każdy zapis sprawdzany odczytem' : (health.error || 'niedostępny')),
         h('dt', {}, 'Ochrona przed usunięciem'), h('dd', {}, health.persisted ? 'przyznana przez przeglądarkę' : 'nieprzyznana — eksportuj kopię regularnie'),
         h('dt', {}, 'Wersja aplikacji'), h('dd', {}, appVersion()),
-        h('dt', {}, 'Uruchomiono jako'), h('dd', {}, runMode(), h('span', { class: 'muted block' }, 'To miejsce ma własną, oddzielną bazę danych — dane z innych miejsc trafiają tu tylko przez import pliku 2027-sync.json albo synchronizację w chmurze.')),
+        h('dt', {}, 'Uruchomiono jako'), h('dd', {}, runMode(), h('span', { class: 'muted block' }, 'To miejsce ma własną, oddzielną bazę danych — dane z innych miejsc trafiają tu tylko przez import pliku 2027-sync.json albo synchronizację w chmurze.'),
+          // U-h: WebKit usuwa dane witryny w karcie Safari po 7 dniach bez otwierania; aplikacja z ekranu początkowego jest z tego wyłączona
+          runMode() === 'karta przeglądarki' && h('span', { class: 'banner warn dn-evict' }, 'Karta przeglądarki: Safari może usunąć dane tej witryny po 7 dniach bez jej otwierania. Na iPhonie używaj aplikacji z ekranu początkowego (Udostępnij → Do ekranu początkowego) i synchronizuj dane (plik lub chmura) po każdej pracy.')),
         h('dt', {}, 'To urządzenie'), h('dd', {}, store?.device || '—'),
         h('dt', {}, 'Zapisane zmiany'), h('dd', {}, store ? fmt(store.allEvents().length) : '—'),
         health.quarantined > 0 && [h('dt', {}, 'Kwarantanna'), h('dd', {}, `${health.quarantined} uszkodzonych wpisów odłożono przy otwarciu`)],
@@ -94,7 +101,10 @@ export async function renderDane(root, ctx) {
     h('p', { class: 'dn-sync-m' }, `Ostatnie wysłanie: ${meta.exp ? new Date(meta.exp.at).toLocaleString('pl-PL') : 'jeszcze nie'} · ostatni import: ${meta.imp ? new Date(meta.imp.at).toLocaleString('pl-PL') : 'jeszcze nie'}`),
     h('p', { class: 'muted' }, 'Po pracy na jednym urządzeniu wybierz „Wyślij do iCloud” i zapisz plik 2027-sync.json w iCloud Drive/2027. Na drugim urządzeniu wybierz „Pobierz z iCloud” i wskaż ten plik. Dane są scalane — nic nie jest nadpisywane, a ten sam plik możesz wczytać wiele razy.'),
     h('div', { class: 'row' }, sendBtn, pickBtn, input),
-    h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA oraz pakiet prywatny.')),
+    h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA oraz pakiet prywatny.'),
+    // U-h: plik synchronizacji jest jawnym tekstem (także pakiet prywatny) — w przeciwieństwie do chmury, która szyfruje zdarzenia
+    h('p', { class: `dn-plain${store?.state?.privatePack ? ' banner warn' : ' muted'}` }, icon('lock', { size: 16 }),
+      h('span', {}, `Plik 2027-sync.json nie jest szyfrowany${store?.state?.privatePack ? ' i zawiera zaimportowany pakiet prywatny' : ''}. Trzymaj go tylko w swoim iCloud Drive i włącz Zaawansowaną ochronę danych iCloud (Ustawienia → Twoje imię → iCloud). Synchronizacja w chmurze szyfruje dane na urządzeniu.`))),
     // Synchronizacja w chmurze (D-078, Etap 2) — niezależna od pliku; ręczna, przyciskiem
     await cloudSection(ctx));
 
@@ -151,6 +161,41 @@ export async function renderDane(root, ctx) {
             h('td', {}, r.it.name), h('td', { class: 'num' }, r.st == null ? '—' : `${fmt(r.st, 2)} ${r.it.unit}`),
             h('td', {}, r.fc?.lastCovered ? shortDate(r.fc.lastCovered) : (r.fc && r.fc.days === Infinity ? 'nie jest zużywana' : '—')),
             h('td', {}, STATUS[r.status]))))))));
+  }
+
+  // --- Przypomnienia w kalendarzu (I1): plik .ics z alarmami, generowany lokalnie z planu (bez serwera i bez kont)
+  {
+    const period = h('select', { 'aria-label': 'Okres' }, [[7, '7 dni'], [14, '14 dni'], [30, '30 dni'], [60, '60 dni']].map(([v, l]) => h('option', { value: String(v), selected: v === 14 || null }, l)));
+    const kinds = ICS_KINDS.map(([k, label]) => [k, h('input', { type: 'checkbox', checked: true, value: k })]);
+    const icsMsg = h('p', { class: 'muted', role: 'status', 'aria-live': 'polite' });
+    add(root, h('section', { class: 'panel dn-ics', 'aria-labelledby': 'h-ics' }, h('h2', { id: 'h-ics' }, icon('calendar-plus', { size: 18 }), 'Przypomnienia w kalendarzu'),
+      h('p', { class: 'muted' }, 'Plik .ics z alarmami do Kalendarza (iPhone, Mac, zegarek) — od dziś na wybrany okres. Po zmianie planu wyeksportuj ponownie: te same wydarzenia zostaną zaktualizowane, nie zdublowane.'),
+      h('div', { class: 'dn-ics-kinds', role: 'group', 'aria-label': 'Rodzaje przypomnień' },
+        kinds.map(([k, el]) => h('label', { class: 'chk' }, el, ` ${ICS_KINDS.find(x => x[0] === k)[1]}`))),
+      h('div', { class: 'row' }, h('label', { class: 'field' }, h('span', {}, 'Okres'), period),
+        h('button', { class: 'primary', onclick: async () => {
+          const chosen = kinds.filter(([, el]) => el.checked).map(([k]) => k);
+          if (!chosen.length) { icsMsg.textContent = 'Wybierz co najmniej jeden rodzaj przypomnień.'; return; }
+          const from = ctx.today < PLAN_START ? PLAN_START : ctx.today;
+          const { text, count } = buildIcs(from, Number(period.value), chosen);
+          const res = await shareOrDownload(text, `2027-plan-${from}.ics`, 'text/calendar');
+          icsMsg.textContent = res === 'cancel' ? 'Anulowano.' : `Plik z ${count} wydarzeniami (${from} – ${addDays(from, Number(period.value) - 1)}). Otwórz go w Kalendarzu i wybierz „Dodaj wszystkie”.`;
+        } }, icon('download', { size: 18 }), 'Pobierz plik .ics')),
+      icsMsg));
+  }
+
+  // --- Diagnostyka (I8): kontrola spójności danych, tylko odczyt
+  if (store) {
+    const cloud = await cloudStatus(store).catch(() => null);
+    const quarantined = (await store.adapter.getQuarantine().catch(() => [])).length;
+    const checks = diagnose(store.state, { today: ctx.today, custom: store.state.catalogUser || [], quarantined, health: store.health, cloud });
+    const bad = checks.filter(c => c.level === 'warn').length;
+    add(root, h('section', { class: 'panel dn-diag', 'aria-labelledby': 'h-diag' }, h('h2', { id: 'h-diag' }, icon('activity', { size: 18 }), 'Diagnostyka danych'),
+      h('p', { class: 'muted' }, bad ? `Do sprawdzenia: ${bad}. Kontrola tylko odczytuje dane — niczego nie zmienia.` : 'Nie wykryto problemów. Kontrola tylko odczytuje dane — niczego nie zmienia.'),
+      h('ul', { class: 'dn-diag-list' }, checks.map(c => h('li', { class: `dg-${c.level}` },
+        icon(c.level === 'ok' ? 'circle-check' : c.level === 'warn' ? 'triangle-alert' : 'info', { size: 18 }),
+        h('div', {}, h('p', { class: 'dg-t' }, c.title), c.detail && h('p', { class: 'muted' }, c.detail),
+          c.href && h('a', { href: c.href }, 'Przejdź')))))));
   }
 
   // --- Kopie automatyczne

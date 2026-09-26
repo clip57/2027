@@ -4,7 +4,7 @@ Zakres: A) ręczna synchronizacja danych 2027-sync.json w obu kierunkach + nieza
 B) zdarzenia z nowszej wersji (baner, brak utraty); C) aktualizacja KODU tylko za zgodą użytkownika;
 D) przejście ze starego service workera (wersja obecnie zainstalowana na urządzeniach).
 Uruchomienie: SOURCES_DIR=… python3 tests/e2e/sync_update.py   (wymaga Playwright + Chromium; buduje dist/ kilka razy)."""
-import asyncio, json, os, pathlib, shutil, subprocess, sys, tempfile, threading, http.server, datetime as dt
+import asyncio, json, os, pathlib, shutil, subprocess, sys, tempfile, threading, time, http.server, datetime as dt
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures
@@ -48,6 +48,13 @@ self.addEventListener('fetch', e => {
 async def stock(pg, name):
     await pg.goto(URL + '#/zapasy?q=' + name); await pg.wait_for_selector('.inv-item')
     return float(await pg.locator('.inv-item').first.locator('input[type=number]').input_value())
+
+async def wait_js(pg, fn, arg=None, timeout=15000):
+    # Zamiast wait_for_function (tekst predykatu wymaga 'unsafe-eval', blokowane przez CSP wariantu web — S1): odpytywanie przez evaluate
+    end = time.monotonic() + timeout / 1000
+    while not await pg.evaluate(fn, arg):
+        if time.monotonic() > end: raise TimeoutError(f'warunek niespełniony: {fn}')
+        await asyncio.sleep(0.1)
 
 async def export(pg):
     await pg.goto(URL + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
@@ -128,7 +135,7 @@ async def main():
 
         # ---------- C) aktualizacja kodu tylko za zgodą ----------
         upd = await (await b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True)).new_page()
-        await upd.goto(URL); await upd.wait_for_function('navigator.serviceWorker && navigator.serviceWorker.controller')
+        await upd.goto(URL); await wait_js(upd, '() => !!(navigator.serviceWorker && navigator.serviceWorker.controller)')
         await upd.goto(URL + '#/zapasy?q=Banan'); await upd.wait_for_selector('.inv-item')
         await upd.locator('.inv-item').first.locator('input[type=number]').fill('777'); await upd.locator('.inv-item').first.locator('input[type=number]').press('Tab'); await upd.wait_for_timeout(300)
         ver = lambda: upd.evaluate("document.querySelector('meta[name=app-version]').content")
@@ -157,7 +164,7 @@ async def main():
         # ---------- D) przejście ze starego service workera (obecny stan urządzeń) ----------
         deploy(legacy)
         old = await (await b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True)).new_page()
-        await old.goto(URL); await old.wait_for_function('navigator.serviceWorker && navigator.serviceWorker.controller')
+        await old.goto(URL); await wait_js(old, '() => !!(navigator.serviceWorker && navigator.serviceWorker.controller)')
         await old.goto(URL + '#/zapasy?q=Banan'); await old.wait_for_selector('.inv-item')
         await old.locator('.inv-item').first.locator('input[type=number]').fill('555'); await old.locator('.inv-item').first.locator('input[type=number]').press('Tab'); await old.wait_for_timeout(300)
         vold = lambda: old.evaluate("document.querySelector('meta[name=app-version]').content")
@@ -165,7 +172,7 @@ async def main():
         deploy(v2)
         await old.evaluate("navigator.serviceWorker.getRegistration().then(r => r.update())")
         # czekamy na AKTYWACJĘ nowego SW (usuwa starą pamięć podręczną), a nie tylko na instalację
-        await old.wait_for_function("caches.keys().then(k => k.some(x => x.startsWith('p2027-v2-')) && !k.includes('p2027-legacy'))", timeout=15000)
+        await wait_js(old, "() => caches.keys().then(k => k.some(x => x.startsWith('p2027-v2-')) && !k.includes('p2027-legacy'))", timeout=15000)
         await old.wait_for_timeout(1500)
         ok((await vold()).endswith('-legacy'), 'D: przejście ze starego SW bez przeładowania otwartej strony')
         await old.reload(); await old.wait_for_selector('main h1')

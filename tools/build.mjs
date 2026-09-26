@@ -36,7 +36,14 @@ for (const f of fs.readdirSync(P('public/fonts'))) fs.copyFileSync(P('public/fon
 fs.copyFileSync(P('public/manifest.webmanifest'), P('dist/web/manifest.webmanifest'));
 // Uwaga: podstawiamy funkcją, bo treść może zawierać wzorce $&, $` itp. (String.replace by je zinterpretował).
 const put = (text, mark, value) => text.replace(mark, () => value);
-fs.writeFileSync(P('dist/web/index.html'), put(put(tpl, '<!--HEAD-->',
+// S1: Content-Security-Policy (tylko wariant web; w 2027.html cały kod jest wbudowany). Skrypt motywu w <head> — przez skrót
+// SHA-256; skrypty i style wyłącznie z tego samego źródła (style ustawiane przez CSSOM w h() nie wymagają 'unsafe-inline');
+// połączenia: ta sama domena + projekt Supabase (plan bezpłatny = *.supabase.co) + lokalny serwer testowy (e2e:cloud).
+const themeJs = tpl.match(/<script>([\s\S]*?)<\/script>/)[1];
+const csp = ["default-src 'self'", `script-src 'self' 'sha256-${crypto.createHash('sha256').update(themeJs).digest('base64')}'`,
+  "style-src 'self'", "img-src 'self' data: blob:", "font-src 'self'", "connect-src 'self' https://*.supabase.co http://localhost:* http://127.0.0.1:*",
+  "manifest-src 'self'", "worker-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'"].join('; ');
+fs.writeFileSync(P('dist/web/index.html'), put(put(put(tpl, '<meta charset="utf-8">', `<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="${csp}">`), '<!--HEAD-->',
   `${stamp}\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n<link rel="icon" href="icons/icon-192.png">\n<link rel="stylesheet" href="${cssName}">`),
   '<!--BODY-->', `<script src="${jsName}" defer></script>`));
 const shell = ['./', 'index.html', jsName, cssName, ...FONTS.map(f => `fonts/${f}`), 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];

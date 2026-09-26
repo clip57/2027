@@ -10,8 +10,10 @@ const r1 = x => Math.round(x * 10) / 10;
 export const weekStart = d => addDays(d, 1 - weekday(d));
 
 // Serie „liczone”: odhaczone albo z wpisanym ciężarem/powtórzeniami (wpisane wartości = wykonana seria).
+// Tylko od startu planu (D-088): serie z wcześniejszych dni zostają w dzienniku, ale nie wchodzą do statystyk i historii.
+export const TRAIN_FROM = SRC.phases.start;
 export function sets(train) {
-  return Object.values(train).filter(s => s.done || s.kg != null || s.reps != null).map(s => {
+  return Object.values(train).filter(s => s.date >= TRAIN_FROM && (s.done || s.kg != null || s.reps != null)).map(s => {
     const ex = EX_BY_ID[s.ex];
     const name = ex?.name || s.ex;
     return { ...s, name, volume: (s.kg || 0) * (s.reps || 0), e1rm: e1rm(s.kg || 0, s.reps || 0) };
@@ -21,7 +23,7 @@ export function sets(train) {
 export function sessions(train, sess = {}) {
   const byDate = {};
   for (const s of sets(train)) (byDate[s.date] ||= []).push(s);
-  const dates = new Set([...Object.keys(byDate), ...Object.keys(sess).filter(d => sess[d]?.minutes > 0)]);
+  const dates = new Set([...Object.keys(byDate), ...Object.keys(sess).filter(d => d >= TRAIN_FROM && sess[d]?.minutes > 0)]);
   return [...dates].sort().map(date => {
     const list = byDate[date] || [];
     return { date, minutes: sess[date]?.minutes ?? null, sets: list.length, volume: r1(list.reduce((a, s) => a + s.volume, 0)),

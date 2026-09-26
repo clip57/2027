@@ -10,6 +10,7 @@ import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
 import { sha256 } from '../core/hash.js';
 import { cfaPace } from '../core/calc/cfa.js';
 import { icon } from '../ui/icons.js';
+import { recallDays, recallKey, recallDone, recallStats } from '../core/calc/recall.js';
 
 const D = SRC.cfa.D;
 const EXAM = SRC.cfa.exam;
@@ -37,6 +38,13 @@ export function renderCFA(root, ctx) {
   // Tempo względem harmonogramu (D-070): wyłącznie daty bloków z planu i dziennik cfa.done
   const pace = cfaPace(D.bloki, done, today);
   const late = pace.overdue.length;
+  // Recall 22:00 (I11): odhaczenie jako ustawienie `cfa.recall:<data>` (istniejący typ `setting`)
+  const settings = store?.state?.settings || {};
+  const rs = recallStats(settings, today);
+  const toggleRecall = async (date, value) => {
+    if (!store) return err(new Error('Baza danych jest niedostępna.'));
+    try { await store.record('setting', { key: recallKey(date), value }); ctx.rerender(); } catch (e) { err(e); }
+  };
 
   add(root, h('section', { class: 'hero-tr hero-cfa' },
     h('div', { class: 'hero-tr-main' },
@@ -47,7 +55,8 @@ export function renderCFA(root, ctx) {
         late ? h('a', { class: 'chip cf-late', href: `#/cfa?v=harmonogram&zal=1` }, icon('calendar-clock', { size: 16 }), `Zaległe: ${late} ${plural(late, 'blok', 'bloki', 'bloków')}`)
           : h('span', { class: 'chip cf-ok' }, icon('circle-check', { size: 16 }), 'Na bieżąco z planem'),
         h('span', { class: 'chip' }, `Plan do wczoraj: ${pace.doneDue} / ${pace.due}`),
-        pace.ahead > 0 && h('span', { class: 'chip' }, `Z wyprzedzeniem: ${pace.ahead}`))),
+        pace.ahead > 0 && h('span', { class: 'chip' }, `Z wyprzedzeniem: ${pace.ahead}`),
+        rs.due > 0 && h('span', { class: 'chip cf-recall-chip' }, `Recall: ${rs.doneDue} / ${rs.due}`))),
     h('div', { class: 'hero-tr-side' }, progressRing(doneCount, D.bloki.length, 'Wykonane bloki'))),
   msg,
   h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))));
@@ -67,7 +76,8 @@ export function renderCFA(root, ctx) {
     const blocks = cfaByDay[date] || [];
     const dDone = blocks.filter(b => done.has(b.nr)).length;
     const isMock = D.mockCFA.includes(date);
-    const recall = weekday(date) !== 5 && weekday(date) !== 6 && date >= first && date <= last;
+    const recall = recallDays().includes(date);
+    const rDone = recallDone(settings, date);
     const nextBlock = date === today ? blocks.find(b => !done.has(b.nr)) : null;
     add(root, h('div', { class: 'row daynav' },
       date > first && h('a', { class: 'btn dz-nav', href: link({ d: addDays(date, -1) }) }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
@@ -86,9 +96,15 @@ export function renderCFA(root, ctx) {
             nextBlock && h('p', { class: 'cf-next' }, `Następny: blok ${nextBlock.blok} · ${nextBlock.godz} · ${nextBlock.temat}`)),
           progressRing(dDone, blocks.length || 1, 'Bloki dnia')),
         blocks.length ? h('div', { class: 'cfa-list' }, blocks.map(b => blockRow(b, b === nextBlock))) : h('p', {}, 'Brak bloków w tym dniu (poza planem).'),
+        recall && h('div', { class: `cfa-row cf-recall${rDone ? ' is-done' : ''}` },
+          h('button', { class: 'set-toggle', 'aria-pressed': String(rDone), 'aria-label': `Recall 22:00 ${rDone ? 'wykonany' : 'do wykonania'}`,
+            onclick: () => toggleRecall(date, !rDone) }, rDone ? '✓' : 'R'),
+          h('div', { class: 'cfa-body' }, h('p', { class: 'cfa-topic' }, 'CFA Active Recall — sesja 53 min'),
+            h('p', { class: 'cfa-meta' }, h('span', { class: 'mode m-ar' }, 'ACTIVE RECALL'), h('span', { class: 'muted' }, '22:00–22:53')))),
         blocks.length > 0 && h('div', { class: 'row' },
-          h('button', { onclick: async () => { try { for (const b of blocks) if (!done.has(b.nr)) await store.record('cfa.done', { block: b.nr, done: true }); ctx.rerender(); } catch (e) { err(e); } } }, 'Oznacz cały dzień'),
-          h('button', { onclick: async () => { try { for (const b of blocks) if (done.has(b.nr)) await store.record('cfa.done', { block: b.nr, done: false }); ctx.rerender(); } catch (e) { err(e); } } }, 'Wyczyść dzień'))));
+          // Wszystkie bloki dnia jednym zapisem (B8)
+          h('button', { onclick: async () => { try { await store.recordMany(blocks.filter(b => !done.has(b.nr)).map(b => ['cfa.done', { block: b.nr, done: true }])); ctx.rerender(); } catch (e) { err(e); } } }, 'Oznacz cały dzień'),
+          h('button', { onclick: async () => { try { await store.recordMany(blocks.filter(b => done.has(b.nr)).map(b => ['cfa.done', { block: b.nr, done: false }])); ctx.rerender(); } catch (e) { err(e); } } }, 'Wyczyść dzień'))));
   }
 
   // ---------------- Harmonogram z filtrami
@@ -108,10 +124,21 @@ export function renderCFA(root, ctx) {
       h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: todo, onchange: e => go({ todo: e.target.checked ? '1' : '' }) }), ' tylko niewykonane'),
       h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: zal, onchange: e => go({ zal: e.target.checked ? '1' : '' }) }), ` tylko zaległe (przed dziś: ${late})`),
       h('p', { class: 'muted' }, `${list.length} ${plural(list.length, 'blok', 'bloki', 'bloków')} w ${Object.keys(byDay).length} ${plural(Object.keys(byDay).length, 'dniu', 'dniach', 'dniach')}`)),
-    Object.entries(byDay).map(([d, bl]) => h('section', { class: 'panel' },
+    null);
+    const dayPanel = ([d, bl]) => h('section', { class: 'panel' },
       h('h2', { class: 'cfa-dh' }, h('a', { href: `#/cfa?v=dzien&d=${d}` }, `${dayShort(d)} ${shortDate(d)}`),
         h('span', { class: 'muted' }, ` · ${bl.filter(b => done.has(b.nr)).length}/${bl.length}`)),
-      h('div', { class: 'cfa-list' }, bl.map(b => blockRow(b))))));   // bez indeksu jako „next”
+      h('div', { class: 'cfa-list' }, bl.map(b => blockRow(b))));   // bez indeksu jako „next”
+    // U-b: harmonogram zaczyna się od dziś; minione dni zwinięte i budowane dopiero po rozwinięciu (bez filtrów „zaległe” / wyszukiwania)
+    const days = Object.entries(byDay), past = zal || q ? [] : days.filter(([d]) => d < today);
+    if (past.length) {
+      const pb = past.flatMap(([, bl]) => bl), box = h('div', {});
+      add(root, h('details', { class: 'panel fold cf-past', open: harmoPast || null, ontoggle: e => {
+        harmoPast = e.target.open;
+        if (e.target.open && !box.firstChild) add(box, past.map(dayPanel));
+      } }, h('summary', {}, h('h2', {}, `Minione dni (${past.length}) · wykonane ${pb.filter(b => done.has(b.nr)).length} z ${pb.length} bloków`)), box));
+    }
+    add(root, days.filter(x => !past.includes(x)).map(dayPanel));
   }
 
   // ---------------- Kalendarz
@@ -222,6 +249,8 @@ export function renderCFA(root, ctx) {
       h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad || `${D.stat.dni} × ${D.stat.bloki / D.stat.dni}`})`),
       h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h + recall ${fmt(D.stat.recallH, 2)} h (${D.stat.recall} sesji)`),
       h('dt', {}, 'Tempo (do wczoraj)'), h('dd', {}, `${pace.doneDue} z ${pace.due} zaplanowanych · zaległe ${late} · z wyprzedzeniem ${pace.ahead}`),
+      h('dt', {}, 'Recall 22:00'), h('dd', {}, `wykonane ${rs.done} z ${rs.total} sesji · do wczoraj ${rs.doneDue} z ${rs.due}`),
       Object.entries(D.stat.tryb).map(([k, n]) => [h('dt', {}, k), h('dd', {}, `${n} ${plural(n, 'blok', 'bloki', 'bloków')} · wykonane ${D.bloki.filter(b => b.tryb === k && done.has(b.nr)).length}`)]))));
   }
 }
+let harmoPast = false;   // U-b: rozwinięcie minionych dni harmonogramu (pamięć modułu)

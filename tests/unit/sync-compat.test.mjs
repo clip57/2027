@@ -109,3 +109,24 @@ test('regresja: głęboko zagnieżdżony pakiet prywatny przechodzi walidację i
   assert.equal(s2.health.quarantined, 0);
   assert.deepEqual(s2.state.privatePack, deep);
 });
+
+test('D-088: zdarzenia z dni przed startem planu (21–24.09) zostają w dzienniku, pliku synchronizacji i stanie po imporcie', async () => {
+  const mac = await open();
+  await mac.record('train.set', { date: '2026-09-21', ex: 'x_e2e', set: 1, done: true, kg: 40, reps: 8 });
+  await mac.record('train.session', { date: '2026-09-22', minutes: 55 });
+  await mac.record('inv.count', { prod: 'banan', qty: 240, date: '2026-09-22' });
+  await mac.record('inv.move', { prod: 'banan', qty: 120, date: '2026-09-23', kind: 'purchase' });
+  const file = rt(await exportBundle(mac));
+  assert.equal(file.count, 4, 'eksport zawiera wszystkie zdarzenia sprzed startu');
+  const phone = await open();
+  const pv = await preview(phone, file);
+  assert.equal(pv.ok, true, pv.errors.join());
+  await apply(phone, pv);
+  assert.equal(phone.events.size, 4);
+  assert.deepEqual(phone.state.train, mac.state.train, 'stan treningu identyczny na obu urządzeniach');
+  assert.equal(phone.state.trainSessions['2026-09-22'].minutes, 55);
+  assert.equal(stockAt(phone.state.inv, 'banan', '2026-09-24'), 360, 'zakup 23.09 liczony, bez zużycia przed startem');
+  assert.equal(stockAt(phone.state.inv, 'banan', '2026-09-25'), 360 - (consumptionForDay('2026-09-25').banan || 0), 'odliczanie od 25.09');
+  await apply(phone, await preview(phone, file));
+  assert.equal(phone.events.size, 4, 'ponowny import idempotentny');
+});

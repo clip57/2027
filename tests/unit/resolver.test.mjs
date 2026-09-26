@@ -32,15 +32,16 @@ test('typy dni i dieta T/NT (D-018)', () => {
   const exp = { 1: ['strength_sauna', 'T'], 2: ['strength', 'T'], 3: ['cardio_sauna', 'T'], 4: ['rest_sauna2', 'NT'], 5: ['strength', 'T'], 6: ['strength_sauna', 'T'], 7: ['swim', 'T'] };
   for (const d of ALL) {
     const r = resolveDay(d);
-    if (EXC[d]?.dayType) assert.deepEqual([r.dayType, r.dietVariant], [EXC[d].dayType, EXC[d].diet || exp[r.weekday][1]], d);   // D-087
+    if (d < START) assert.deepEqual([r.outside, r.dayType, r.session, r.training], [true, 'free', null, null], d);   // D-088
+    else if (EXC[d]?.dayType) assert.deepEqual([r.dayType, r.dietVariant], [EXC[d].dayType, EXC[d].diet || exp[r.weekday][1]], d);   // D-087
     else assert.deepEqual([r.dayType, r.dietVariant], exp[r.weekday], d);
   }
 });
 
 test('kcal dnia = RAZEM z właściwego PDF', () => {
   assert.equal(resolveDay('2026-09-28').kcal, 2629); // pn F0 T
-  assert.equal(resolveDay('2026-09-21').kcal, 2629); // przed startem planu: jadłospis Fazy 0 (jak dotąd)
-  assert.equal(resolveDay('2026-09-24').kcal, 2332); // czw F0 NT
+  assert.equal(resolveDay('2026-09-25').kcal, 2332); // start planu, bez treningu — NT (D-088)
+  assert.equal(resolveDay('2026-10-01').kcal, 2332); // czw F0 NT
   assert.equal(resolveDay('2026-10-12').kcal, 2784); // pn F1 T
   assert.equal(resolveDay('2026-11-19').kcal, 2668); // czw F2 NT
   assert.equal(resolveDay('2026-11-16').kcal, 2965); // pn F2 T
@@ -48,24 +49,26 @@ test('kcal dnia = RAZEM z właściwego PDF', () => {
 
 test('slot sauny: czwartek i dni bez sauny = „Wolne” (D-018)', () => {
   const sauna = d => resolveDay(d).slots.find(s => s.id === 'slot.1945').title;
-  assert.equal(sauna('2026-09-21'), 'Sauna');
-  assert.equal(sauna('2026-09-22'), 'Wolne');
-  assert.equal(sauna('2026-09-23'), 'Sauna');
-  assert.equal(sauna('2026-09-24'), 'Wolne');
-  assert.equal(sauna('2026-09-27'), 'Wolne');
+  assert.equal(sauna('2026-09-28'), 'Sauna');
+  assert.equal(sauna('2026-09-29'), 'Wolne');
+  assert.equal(sauna('2026-09-30'), 'Sauna');
+  assert.equal(sauna('2026-10-01'), 'Wolne');
+  assert.equal(sauna('2026-10-04'), 'Wolne');
+  assert.equal(sauna('2026-09-21'), 'Wolne', 'poza planem (D-088)');
 });
 
 test('posiłek 20:15: czwartek „Posiłek po saunie”, 114 kcal; dni T 230 kcal', () => {
   const post = d => resolveDay(d).slots.find(s => s.id === 'slot.2015');
-  assert.equal(post('2026-09-24').mealName, 'Posiłek po saunie');
-  assert.equal(post('2026-09-24').kcal, 114);
-  assert.equal(post('2026-09-21').kcal, 230);
+  assert.equal(post('2026-10-01').mealName, 'Posiłek po saunie');
+  assert.equal(post('2026-10-01').kcal, 114);
+  assert.equal(post('2026-09-28').kcal, 230);
 });
 
 test('suplementy: tauryna codziennie (D-014), cynk czw+nd, D-015 25.09.2026–21.03.2027 (D-087)', () => {
   for (const d of ALL) {
     const r = resolveDay(d);
     const s = r.doses.map(x => x.supp);
+    if (d < START) { assert.deepEqual(s, [], `${d}: poza planem bez dawek (D-088)`); continue; }
     assert.ok(s.includes('tauryna'), d);
     assert.equal(s.includes('cynk'), r.weekday === 4 || r.weekday === 7, d);
     const on = d >= START && d <= '2027-03-21';
@@ -148,7 +151,7 @@ test('trening: liczba serii wg fazy', () => {
   assert.equal(s('2026-09-28'), 10); // UPPER 1 F0
   assert.equal(s('2026-10-12'), 18); // UPPER 1 F1
   assert.equal(s('2026-11-16'), 26); // UPPER 1 F2
-  assert.equal(resolveDay('2026-09-24').training, null);
+  assert.equal(resolveDay('2026-10-01').training, null);
 });
 
 // --- Poprawki po teście akceptacyjnym (D-038, D-039, D-040, D-001)
@@ -161,7 +164,7 @@ test('D-001: żaden widoczny podpunkt slotu nie powtarza suplementów (wszystkie
 });
 
 test('D-038: pomiar wagi i ciśnienia', () => {
-  const t = resolveDay('2026-09-22').slots[0].items.map(i => i.text);
+  const t = resolveDay('2026-09-29').slots[0].items.map(i => i.text);
   assert.ok(t.includes('Pomiar wagi i ciśnienia na czczo po toalecie.'));
   assert.ok(!t.includes('Pomiar wagi na czczo po toalecie.'));
 });
@@ -183,4 +186,18 @@ test('podpunkty posiłków: nazwa i kcal z właściwej fazy i wariantu', () => {
   assert.ok(lunch('2026-10-12').kcal > 465, 'Faza 1: większa porcja makaronu');
   const post = resolveDay('2026-09-24').slots.find(s => s.id === 'slot.2015').items[0];
   assert.deepEqual([post.text, post.kcal], ['Posiłek po saunie (20:15)', 114]);
+});
+
+test('D-088: dni przed 25.09.2026 poza planem — ciągłość dat bez treningu, dawek, bloków i recall; 25.09 pierwszym dniem planu', () => {
+  for (const d of range('2026-01-01', '2026-09-24')) {
+    const r = resolveDay(d);
+    assert.equal(r.outside, true, d);
+    assert.deepEqual([r.training, r.doses.length, r.cfa.blocks.length, r.cfa.recall, r.sauna, r.sessionName], [null, 0, 0, false, 0, 'Poza planem'], d);
+    assert.equal(r.slots.length, 34, d);                                   // szablon godzin bez zmian (ciągłość widoków)
+    assert.ok(r.slots.filter(s => s.domain === 'train').every(s => s.title === 'Wolne'), d);
+  }
+  const s = resolveDay('2026-09-25');
+  assert.deepEqual([s.outside, s.dietVariant, s.kcal, s.phase], [false, 'NT', 2332, null]);
+  assert.equal(phaseFor('2026-09-26'), 0);
+  assert.equal(SRC.phases.start, START);
 });

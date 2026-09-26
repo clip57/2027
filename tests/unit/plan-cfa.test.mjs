@@ -122,8 +122,8 @@ test('CFA: 4 mocki (6 bloków sesji + 3 analizy tego dnia + 3 nazajutrz), pokryc
   for (const d of D.mockCFA) assert.equal(D.mockCov[d], Math.round(cur.filter(b => b.data < d).length / cur.length * 1000) / 10, d);
 });
 
-test('Plan CFA od 25.09.2026, Faza 0 od 26.09.2026; Fazy 1 i 2 bez zmian (D-017, D-087)', () => {
-  assert.equal(SRC.phases.start, '2026-09-26');
+test('Start planu i CFA 25.09.2026, Faza 0 od 26.09.2026; Fazy 1 i 2 bez zmian (D-017, D-087, D-088)', () => {
+  assert.equal(SRC.phases.start, START);
   assert.deepEqual(SRC.phases.phases, [{ phase: 0, from: '2026-09-26' }, { phase: 1, from: '2026-10-12' }, { phase: 2, from: '2026-11-16' }]);
   assert.equal(D.stat.start, START);
 });
@@ -198,7 +198,8 @@ test('Soboty (D-087): 12:13–13:13 „Zakupy” zamiast przerwy i bloku E; lunc
   assert.deepEqual(v.replaces, ['slot.1213', 'slot.1220']);
   assert.equal(SRC.week.days['6'].variant, 'zakupy');
   for (const d of range('2026-09-19', '2027-03-27')) {
-    if (weekday(d) !== 6) { assert.equal(templateFor(d), SRC.dayTemplate.slots, d); continue; }
+    // przed startem planu (D-088) i w dni inne niż sobota — zwykły szablon
+    if (weekday(d) !== 6 || d < SRC.phases.start) { assert.equal(templateFor(d), SRC.dayTemplate.slots, d); continue; }
     const t = templateFor(d), mock = D.mockCFA.includes(d);
     t.forEach((s, i) => assert.equal(s.to, t[(i + 1) % t.length].from, `${d} ${s.id}`));
     if (mock) { assert.equal(t, SRC.dayTemplate.slots, `${d}: dzień mocka — układ zwykły`); continue; }

@@ -14,7 +14,7 @@
   /* Typografia (Inter lokalnie, podzbiór znaków aplikacji; awaryjnie font systemowy) */
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-round: var(--font);
-  --fs-2xs: .6875rem; --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.5rem; --fs-stat: var(--fs-xl);
+  --fs-2xs: .75rem;   /* U-e: min. 12 px (było 11 px) */ --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.5rem; --fs-stat: var(--fs-xl);
   /* Odstępy (siatka 4 px) */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
   /* Promienie (4 poziomy) */

@@ -1,4 +1,4 @@
-# REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0 i Fazie 5 (wszystkie moduły) — 24.09.2026
+# REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0, Fazie 5 (wszystkie moduły) i Etapach 0–3 audytu — 25.09.2026
 
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).
 **Stan repozytorium i wdrożenia (sprawdzone 24.09.2026):** `origin/main` = `69d5d94` (Etap 6) i to ten commit jest ostatnią publikacją
@@ -6,6 +6,8 @@ na GitHub Pages (workflow „Publikacja 2027”, przebieg 3). **Na `main` nie ma
 są w jednym commicie `b65b9fa` na gałęzi `redesign-faza4`; Faza 5.0 — zmiany robocze na tej samej gałęzi (bez commita).
 Wcześniejszy zapis „użytkownik potwierdził działanie wersji z naprawą synchronizacji” nie ma pokrycia w historii git ani w publikacjach
 Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie naprawy i redesignu razem (24.09.2026).
+**Stan 25.09.2026:** na `main` opublikowane są plan CFA D-086/D-087 (`0c768b1`) i — po zakończeniu regresji — Etapy 0–3 audytu
+(D-088 start planu 25.09, poprawki B1–B9, UX U-a…U-i, CSP, diagnostyka, funkcje I1–I5, I7, I11; raport `docs/RAPORT_ETAPY_0_3.md`).
 **Wersja opublikowana `4e68589` (Fazy 3–5, wszystkie moduły) sprawdzona ręcznie przez użytkownika na urządzeniach według
 `REDESIGN-TESTING.md` §5 — działa (24.09.2026).** Pozostaje Faza 7 z plikami użytkownika (`SOURCES_DIR`, `PRIVATE_PACK`).
 
@@ -23,6 +25,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | **Faza 5 (5–9)** | Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja, Dane (D-074–D-077) | `docs/RAPORT_REDESIGN_F5_POZOSTALE.md` |
 | Plan CFA D-086 (25.09.2026) | Nowy plan CFA (432 bloki, 48 dni × 9), plan dnia 12:13–13:30 bez spaceru, start planu i Fazy 0 25.09, suplementy czasowe do 25.03.2027 | `docs/RAPORT_PLAN_CFA_D086.md` |
 | Plan CFA D-087 (25.09.2026) | Plan CFA v5 (421 bloków), soboty z zakupami 12:13–13:13, wyjątki 25–27.09, Faza 0 od 26.09, suplementy czasowe 25.09–21.03.2027 | `docs/RAPORT_PLAN_CFA_D087.md` |
+| Audyt i Etapy 0–3 (25.09.2026) | D-088 (start planu 25.09, 21–24.09 poza planem, dieta 25.09 NT); Etap 1: poprawki B1–B9; Etap 2: UX U-a…U-i, CSP (S1), diagnostyka (I8); Etap 3: I1–I5, I7, I11 (bez I6); Etap 4 wstrzymany | `docs/RAPORT_ETAPY_0_3.md` |
 
 ## 2. Wykonane
 

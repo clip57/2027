@@ -16,6 +16,15 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 
 ## 2. Wyniki regresji
 
+### Audyt — Etapy 0–3 (D-088, D-089; 25–26.09.2026, konfiguracja B)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 179 testów: 178 zaliczonych, 1 pominięty (migracja ZAPASY — `SOURCES_DIR`); nowe: diagnostics, attention, week, recall, ics, search, receipt, `recordMany`, D-088 |
+| `npm run e2e` | 1171/1171 (nowe bloki `run_audit_fixes`, `run_etap2`, `run_etap3`; 320 px na wszystkich trasach) |
+| `npm run e2e:sync` | 21/21 (CSP: `wait_js` zamiast `wait_for_function`) |
+| `npm run e2e:cloud` | 100/100 (axe przez CDP) |
+| `npm run a11y` | 0 naruszeń, brak przewijania w poziomie (26 widoków + 22 stany × 2 szerokości × 2 motywy) |
+
 ### Synchronizacja automatyczna w chmurze — D-084 (25.09.2026, konfiguracja B — bez plików użytkownika, fałszywy serwer Supabase)
 | Zestaw | Wynik |
 |---|---|
@@ -147,7 +156,11 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .tr-next .tr-rest .tr-rest-t .tr-rest-n .tr-rest-next .cf-backlog .cf-search .cf-kinds .cfa-dayhead .hero-cfa
 .dt-next .dt-nav-n .dt-stock .dt-alerts .dt-stock-b a.dt-today .zp-hbar .zp-shop .zp-buy-n .zp-buy-b .zp-run .zp-run-s .zp-more .daycard
 .dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent .dn-cloud-auto .dn-cloud-auto-b .dn-cloud-pull-b .cloud-banner .inv-head .zp-more[open]
-.kv .mode .m-pr`
+.kv .mode .m-pr .dz-outside .sp-outside .dz-past .dz-plan-h .dz-attn .wk-grid .wk-day .is-out .cf-past .cf-recall .cf-recall-chip
+.mp-eve .mp-daynav .sheet-msg .toast #toast .skip-link .zp-empty .zp-hint #zp-q #zp-stan-hint .c-shop .inv-low .dn-diag .dn-diag-list
+.dn-plain .dn-evict .dn-ics .gs-dialog .gs-input .gs-list .gs-hit .gs-t .gs-help .more-search .side-search .rc-preview`
+(Etapy 1–3 audytu: przyciski „Sprawdź”, „Dodaj do zapasów”, „Zapisz pozycję”, „Zapisz zmiany”, „Edytuj <nazwa>”, „Pobierz plik .ics”,
+„Przywróć ten stan”, linki „Tydzień”, „Następny dzień” (Meal Prep), `aria-label` „Recall 22:00 …”, teksty „Minione punkty”, „Wymaga uwagi”)
 (plan D-086/D-087: identyfikatory slotów `slot.1213`, `slot.1220`, `slot.1313`, `slot.1213z` (sobota), `slot.1815`, `slot.2015` i tytuły „Przerwa kognitywna”, „Przerwa na lunch”, „Zakupy”, „CFA blok A…I”)
 (chmura, Etap 2: etykiety pól „Project URL”, „Publishable Key”, „E-mail konta”, „Hasło konta”, „Hasło szyfrowania”, „Powtórz hasło
 szyfrowania”, przyciski „Zapisz konfigurację”, „Zaloguj”, „Odblokuj”, „Ustaw hasło szyfrowania”, „Synchronizuj teraz”, „Wyloguj”,
@@ -188,6 +201,12 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
    „Trening kalibracyjny…”; 27.09 — „Bez treningu, 2 × sauna”, 2332 kcal (NT), „Posiłek po saunie”; 28.09 — 9 bloków A–I.
    CFA → „Plan”: „421 (48 dni: 41×9 + 6×8 + 1×4)”; Suplementacja: „od 2026-09-25 do 2027-03-21”; Dieta: „Faza 0 · od 26.09”.
    Bloki odhaczone w poprzedniej wersji pozostają odhaczone pod tymi samymi numerami (bloki 1–207 mają tę samą treść).
+
+12. Audyt — Etapy 0–3 (D-088, D-089), na każdym urządzeniu po aktualizacji: „Dziś” 22.09 — „Poza planem”; 25.09 — dieta NT 2332 kcal;
+   „Wymaga uwagi” i „Tydzień”; minione punkty dnia zwinięte; komunikat po „+ opakowanie” widoczny nad dolnym paskiem; Zapasy —
+   wyszukiwanie podczas pisania (klawiatura nie znika), „Do zakupów”, Paragon tekstem; Meal Prep wieczorem — ilości na jutro;
+   CFA — odhaczenie recall; Dane — Diagnostyka, ostrzeżenia, plik `.ics` → Kalendarz („Dodaj wszystkie”, alarmy). MacBook:
+   ⌘K, „/”, ← →, g + litera, „?”. Safari (karta i PWA) — brak błędów CSP, chmura działa. **Do wykonania przez użytkownika.**
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 

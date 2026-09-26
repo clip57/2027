@@ -3,7 +3,11 @@
 import { h, add, fmt, plural } from '../ui/dom.js';
 import { progressRing } from '../ui/components.js';
 import { icon } from '../ui/icons.js';
-import { resolveDay, cfaSourceLine } from '../core/resolver.js';
+import { recallDone } from '../core/calc/recall.js';
+import { attention } from '../core/calc/attention.js';
+import { weekSummary, mondayOf } from '../core/calc/week.js';
+import { cloudStatus } from '../core/sync/cloud-local.js';
+import { resolveDay, cfaSourceLine, PLAN_START } from '../core/resolver.js';
 import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.js';
 import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
@@ -84,9 +88,75 @@ function activityGrid(store, today) {
     h('p', { class: 'dz-foot' }, n ? `${n} ${plural(n, 'dzień', 'dni', 'dni')} z treningiem w 6 tygodni` : 'Brak zapisanych treningów — pojawią się po zapisaniu serii lub czasu.'));
 }
 
+// „Wymaga uwagi” (I2): sygnały z Zapasów, CFA, Suplementacji i synchronizacji w jednym miejscu (tylko dzień bieżący).
+// Część zależna od bazy (niewysłane zmiany, chmura) dopisywana po odczycie — bez opóźniania reszty widoku.
+function attentionCard(ctx) {
+  const st = ctx.store?.state;
+  const list = h('ul', { class: 'dz-attn-list' });
+  const empty = h('p', { class: 'muted' }, 'Nic nie wymaga uwagi.');
+  const box = h('section', { class: 'dz-attn', 'aria-labelledby': 'dz-attn-h' },
+    h('h2', { id: 'dz-attn-h' }, icon('bell', { size: 18 }), 'Wymaga uwagi'), list, empty);
+  const put = items => {
+    for (const x of items) list.append(h('li', { class: `at-${x.level}` }, icon(x.level === 'warn' ? 'triangle-alert' : 'info', { size: 16 }),
+      h('a', { href: x.href }, x.text)));
+    empty.hidden = list.childElementCount > 0;
+    box.classList.toggle('has-warn', !!list.querySelector('.at-warn'));
+  };
+  put(attention(st, { today: ctx.today, hour: new Date().getHours(), custom: st?.catalogUser || [] }));
+  if (ctx.store) (async () => {
+    const cloud = await cloudStatus(ctx.store).catch(() => null);
+    if (cloud?.config) {
+      if (cloud.pending && (!cloud.lastSync || Date.now() - Date.parse(cloud.lastSync) > 24 * 3600e3))
+        put([{ level: 'warn', text: `Chmura: ${cloud.pending} zmian czeka na wysłanie`, href: '#/dane' }]);
+      return;
+    }
+    const exp = await ctx.store.adapter.getMeta('lastExport').catch(() => null);
+    const own = ctx.store.allEvents().filter(e => e.dev === ctx.store.device && (!exp || e.hlc > exp.hlc)).length;
+    if (own && (!exp || Date.now() - Date.parse(exp.at) > 24 * 3600e3))
+      put([{ level: 'info', text: `Niewysłane zmiany z tego urządzenia: ${own} — wyślij plik synchronizacji`, href: '#/dane' }]);
+  })();
+  return box;
+}
+
+// Tydzień (I3): 7 dni z resolvera — trening, sauna, dieta, bloki CFA, recall, zakupy, wyjątki. Komputer: 7 kolumn; telefon: lista.
+function renderWeek(root, ctx, date) {
+  const week = weekSummary(date), mon = mondayOf(date), sun = addDays(mon, 6);
+  const wlink = d => `#/dzis?v=tydzien&d=${d}`;
+  add(root, h('header', { class: 'dz-head' },
+    h('div', {}, h('h1', {}, 'Tydzień'),
+      h('div', { class: 'topline' }, h('span', { class: 'date' }, `${shortDate(mon)} – ${longDate(sun)}`))),
+    h('div', { class: 'row daynav' },
+      mondayOf(PLAN_START) < mon && h('a', { class: 'btn dz-nav', href: wlink(addDays(mon, -7)), 'aria-label': 'Poprzedni tydzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni tydzień')),
+      h('a', { class: 'btn dz-nav', href: `#/dzis${date === ctx.today ? '' : `?d=${date < PLAN_START ? PLAN_START : date}`}` }, 'Dzień'),
+      h('a', { class: 'btn dz-nav', href: wlink(addDays(mon, 7)), 'aria-label': 'Następny tydzień' }, h('span', {}, 'Następny tydzień'), icon('chevron-right', { size: 18 })))),
+    h('ol', { class: 'wk-grid', 'aria-label': 'Dni tygodnia' }, week.map(x => h('li', {},
+      h('a', { class: `wk-day${x.date === ctx.today ? ' is-today' : ''}${x.outside ? ' is-out' : ''}`, href: `#/dzis?d=${x.date}`,
+        'aria-label': `${x.dayName}, ${longDate(x.date)}${x.date === ctx.today ? ' (dziś)' : ''}` },
+        h('span', { class: 'wk-d' }, h('strong', {}, dayShort(x.date)), ` ${shortDate(x.date)}`, x.date === ctx.today && h('span', { class: 'now-tag' }, 'dziś')),
+        x.outside ? h('span', { class: 'muted' }, 'poza planem') : [
+          h('span', { class: 'wk-l wk-train' }, icon('dumbbell', { size: 14 }), x.training),
+          h('span', { class: 'wk-l' }, icon('utensils', { size: 14 }), `${x.diet} · ${x.kcal} kcal`),
+          x.cfa > 0 && h('span', { class: 'wk-l' }, icon('graduation-cap', { size: 14 }), x.mock ? `Mock CFA · ${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}` : `${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}${x.recall ? ' + recall' : ''}`),
+          x.shopping && h('span', { class: 'wk-l' }, icon('shopping-cart', { size: 14 }), 'Zakupy 12:13'),
+          x.phase != null && x.date === mon && h('span', { class: 'wk-l muted' }, `Faza ${x.phase}`),
+          x.note && h('span', { class: 'wk-note' }, x.note)])))));
+}
+
 export function renderDzis(root, ctx) {
   const date = ctx.params.get('d') || ctx.today;
+  if (ctx.params.get('v') === 'tydzien') return renderWeek(root, ctx, date);
   const r = resolveDay(date);
+  // Dzień sprzed startu planu (D-088): bez planu dnia — tylko informacja i przejście do pierwszego dnia planu
+  if (r.outside) {
+    add(root, h('header', { class: 'dz-head' },
+      h('div', {}, h('h1', {}, r.dayName[0].toUpperCase() + r.dayName.slice(1)),
+        h('div', { class: 'topline' }, h('span', { class: 'date' }, `${r.dayName}, ${longDate(date)}`), h('span', { class: 'chip' }, 'poza planem'))),
+      h('div', { class: 'row daynav' }, h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'))),
+    h('section', { class: 'panel dz-outside' }, h('h2', {}, 'Poza planem'),
+      h('p', {}, `Plan zaczyna się ${longDate(PLAN_START)}. Dni wcześniejsze nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach.`),
+      h('a', { class: 'btn primary', href: `#/dzis?d=${PLAN_START}` }, `Przejdź do ${shortDate(PLAN_START)}`)));
+    return;
+  }
   const d = new Date();
   const hhmm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   const now = date === ctx.today ? currentSlot(r.slots, hhmm) : null;
@@ -107,18 +177,20 @@ export function renderDzis(root, ctx) {
         h('h1', {}, date === ctx.today ? 'Dziś' : r.dayName[0].toUpperCase() + r.dayName.slice(1)),
         h('div', { class: 'topline' },
           h('span', { class: 'date' }, `${r.dayName}, ${longDate(date)}`),
-          h('span', { class: 'chip' }, r.phase == null ? 'przed startem planu' : `Faza ${r.phase}`),
+          h('span', { class: 'chip' }, r.phase == null ? 'start planu · przed Fazą 0' : `Faza ${r.phase}`),
           h('span', { class: 'chip' }, r.sessionLabel),
           h('span', { class: 'chip' }, `${r.kcal} kcal (${r.dietVariant})`),
           r.cfa.isMock && h('span', { class: 'chip' }, 'Mock CFA'))),
-      h('div', { class: 'row daynav' }, nav(-1, 'Poprzedni dzień', 'chevron-left'),
+      h('div', { class: 'row daynav' }, date > PLAN_START && nav(-1, 'Poprzedni dzień', 'chevron-left'),
         date !== ctx.today && h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'), nav(1, 'Następny dzień', 'chevron-right'))),
     h('div', { class: 'row quicklinks' },
+      h('a', { class: 'btn ql', href: `#/dzis?v=tydzien&d=${date}` }, icon('calendar-range', { size: 18 }), h('span', {}, 'Tydzień')),
       h('a', { class: 'btn ql', href: `#/dieta?f=${r.phase ?? 0}&w=${r.dietVariant}` }, icon('utensils', { size: 18 }), h('span', {}, 'Jadłospis dnia')),
       h('a', { class: 'btn ql', href: `#/suplementy?d=${date}` }, icon('pill', { size: 18 }), h('span', {}, 'Suplementacja dnia')),
       r.training?.length > 0 && h('a', { class: 'btn ql', href: `#/trening?d=${date}` }, icon('dumbbell', { size: 18 }), h('span', {}, 'Trening dnia')),
       r.cfa.inPlan && h('a', { class: 'btn ql', href: `#/cfa?v=dzien&d=${date}` }, icon('graduation-cap', { size: 18 }), h('span', {}, 'Bloki CFA'))),
     h('div', { class: 'dz-grid' },
+      date === ctx.today && attentionCard(ctx),
       now && (now.current || now.next) ? h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz' },
         h('div', { class: 'dz-now-main' },
           h('p', { class: 'nowcard-l' }, now.current ? `Teraz · ${now.current.from}–${now.current.to}` : 'Za chwilę'),
@@ -133,7 +205,7 @@ export function renderDzis(root, ctx) {
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
           D.planned ? bar(D.done, D.planned, 'train') : null),
         kpi('CFA', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length} bloków` : 'poza planem',
-          r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ' + 53 min recall' : ' · bez recall'}` : null, r.cfa.inPlan ? bar(D.cfaToday, r.cfa.blocks.length, 'cfa') : null),
+          r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null, r.cfa.inPlan ? bar(D.cfaToday, r.cfa.blocks.length, 'cfa') : null),
         kpi('Zapasy', D.inv ? (D.inv.known ? `${D.inv.critical.length} ${plural(D.inv.critical.length, 'pilna', 'pilne', 'pilnych')}` : 'brak stanów') : '—',
           D.inv ? `zakupy ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)} · ${D.inv.toBuy} ${plural(D.inv.toBuy, 'pozycja', 'pozycje', 'pozycji')}` : null, null,
           D.inv?.critical.length ? 'is-alert' : '')),
@@ -154,5 +226,10 @@ export function renderDzis(root, ctx) {
         card('Aktywność treningowa', 'dumbbell', '#/trening?v=stat', activityGrid(ctx.store, ctx.today))),
       h('section', { class: 'dz-plan', 'aria-labelledby': 'dz-plan-h' },
         h('h2', { id: 'dz-plan-h', class: 'dz-plan-h' }, 'Plan dnia'),
-        h('div', { class: 'day' }, r.slots.map(s => slotView(s, now))))));
+        // U-a: w dniu bieżącym minione punkty planu zwinięte (plan zaczyna się od „teraz”); rozwinięcie pamiętane do przeładowania
+        slotIdx > 0 && h('details', { class: 'dz-past', open: pastOpen || null, ontoggle: e => { pastOpen = e.target.open; } },
+          h('summary', {}, icon('chevron-down', { size: 16 }), `Minione punkty (${slotIdx}) · ${r.slots[0].from}–${r.slots[slotIdx - 1].to}`),
+          h('div', { class: 'day' }, r.slots.slice(0, slotIdx).map(s => slotView(s, now)))),
+        h('div', { class: 'day' }, r.slots.slice(Math.max(0, slotIdx)).map(s => slotView(s, now))))));
 }
+let pastOpen = false;

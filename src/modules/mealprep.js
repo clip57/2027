@@ -3,7 +3,7 @@
 import { h, clear, fmt, add } from '../ui/dom.js';
 import { progressRing } from '../ui/components.js';
 import { SRC, plan, catalogById } from '../core/data.js';
-import { resolveDay } from '../core/resolver.js';
+import { resolveDay, PLAN_START } from '../core/resolver.js';
 import { longDate, addDays, dayShort, shortDate } from '../core/dates.js';
 import { coverage } from '../core/calc/inventory.js';
 import { icon } from '../ui/icons.js';
@@ -45,24 +45,37 @@ function timer(minutes, label) {
   return h('span', { class: 'timer', title: label }, out, btn);
 }
 
+// Fazy w kolejności dnia: „Wieczór poprzedniego dnia” (karty 21:45–21:55) wykonuje się wieczorem tego dnia na jutro,
+// więc jest po „Wieczorze”, a jej ilości pochodzą z planu jutra (B1: na granicy faz, np. 11.10 → 12.10, płatki 85 g).
+// Identyfikatory sekcji (`mp-ph-<nr>`) = numer fazy w MEAL_PREP.
+const EVE = 0;
+const ORDER = [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && SRC.mealprep.phases[i].cards.some(Boolean))
+  .concat(EVE, [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && !SRC.mealprep.phases[i].cards.some(Boolean)));
+const dietLabel = v => (v === 'T' ? 'dzień treningowy' : 'dzień nietreningowy');
+
 export function renderMealPrep(root, ctx) {
   const { store, today } = ctx;
-  const r = resolveDay(today);
+  const q = ctx.params?.get('d');
+  const date = q && q >= PLAN_START ? q : today;   // dzień wykonywania kroków (odhaczenia zapisane pod tą datą)
+  const r = resolveDay(date);
   const phase = r.phase ?? 0, variant = r.dietVariant;
+  const tomorrow = addDays(date, 1), rt = resolveDay(tomorrow);
   const pack = store?.state?.privatePack || null;
   const T = t => resolveText(t, phase, variant, pack);
+  const TN = t => resolveText(t, rt.phase ?? 0, rt.dietVariant, pack);   // karty wieczorne — na jutro
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const done = store?.state?.prep || {};
 
   // Postęp liczony lokalnie i aktualizowany na bieżąco (bez przeładowania widoku).
-  const state = Object.fromEntries(Object.entries(done).filter(([k]) => k.startsWith(`${today}|`)));
+  const state = Object.fromEntries(Object.entries(done).filter(([k]) => k.startsWith(`${date}|`)));
   const byId = Object.fromEntries(SRC.mealprep.cards.map(c => [c.id, c]));
-  const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${today}|${c.id}|${bi * 100 + i}`, text: it, card: c })));
-  const allSteps = SRC.mealprep.phases.flatMap(ph => ph.cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
-  // Składniki na jutro (D-074): stan na koniec dziś vs zużycie jutra wg planu — dla produktów używanych w kartach
-  const tomorrow = addDays(today, 1), rt = resolveDay(tomorrow);
+  const eveIds = new Set(SRC.mealprep.phases[EVE].cards);
+  const textOf = (c, t) => (eveIds.has(c.id) ? TN(t) : T(t));
+  const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${date}|${c.id}|${bi * 100 + i}`, text: it, card: c })));
+  const allSteps = ORDER.flatMap(i => SRC.mealprep.phases[i].cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
+  // Składniki na jutro (D-074): stan na koniec dnia vs zużycie jutra wg planu — dla produktów używanych w kartach
   const inv = store?.state?.inv;
-  const cover = inv ? coverage(inv, SRC.mealprep.cards.filter(c => c.id).flatMap(cardProds), today, tomorrow) : [];
+  const cover = inv ? coverage(inv, SRC.mealprep.cards.filter(c => c.id).flatMap(cardProds), date, tomorrow) : [];
   const known = cover.filter(x => x.stock != null), short = known.filter(x => x.short);
   const shortIds = new Set(short.map(x => x.prod));
   const unitOf = id => catalogById[id]?.unit || '';
@@ -77,8 +90,8 @@ export function renderMealPrep(root, ctx) {
     if (nx) document.getElementById(`mp-${nx.card.id}`)?.classList.add('is-next');
     nextBox.replaceChildren(nx
       ? h('div', {}, h('p', { class: 'eyebrow' }, `Następny krok · ${nx.card.title}${nx.card.time ? ` · ${nx.card.time}` : ''}`),
-          h('p', { class: 'mp-next-t' }, T(nx.text)), h('a', { class: 'btn', href: `#mp-${nx.card.id}` }, 'Przejdź do karty'))
-      : h('p', { class: 'mp-next-t' }, '✓ Wszystkie kroki na dziś wykonane'));
+          h('p', { class: 'mp-next-t' }, textOf(nx.card, nx.text)), h('a', { class: 'btn', href: `#mp-${nx.card.id}` }, 'Przejdź do karty'))
+      : h('p', { class: 'mp-next-t' }, `✓ Wszystkie kroki ${date === today ? 'na dziś' : 'tego dnia'} wykonane`));
     for (const [id, el] of Object.entries(cardBars)) {
       const st = stepsOf(byId[id]), k = st.filter(x => state[x.key]).length;
       el.fill.style.width = `${st.length ? (k / st.length) * 100 : 0}%`;
@@ -88,24 +101,28 @@ export function renderMealPrep(root, ctx) {
   };
   const toggle = async (card, idx, value) => {
     if (!store) return;
-    const key = `${today}|${card}|${idx}`;
+    const key = `${date}|${card}|${idx}`;
     state[key] = value; refresh();
-    try { await store.record('prep.step', { date: today, card, idx, done: value }); }
+    try { await store.record('prep.step', { date, card, idx, done: value }); }
     catch (e) { state[key] = !value; refresh(); clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
   };
 
   add(root, msg,
     h('section', { class: 'hero-tr' },
       h('div', { class: 'hero-tr-main' },
-        h('p', { class: 'eyebrow' }, `${longDate(today)} · Faza ${phase} · ${variant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'}`),
+        h('p', { class: 'eyebrow' }, `${longDate(date)} · Faza ${phase} · ${dietLabel(variant)}`),
         h('h1', {}, 'Meal Prep'),
-        h('p', { class: 'muted' }, 'Ilości wyliczone z jadłospisu na dziś.')),
+        h('p', { class: 'muted' }, `Ilości wyliczone z jadłospisu na ${date === today ? 'dziś' : `${dayShort(date)} ${shortDate(date)}`}; karty wieczorne (21:45–21:55) — z jadłospisu na jutro.`),
+        h('div', { class: 'row daynav mp-daynav' },
+          date > PLAN_START && h('a', { class: 'btn dz-nav', href: `#/mealprep?d=${addDays(date, -1)}` }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
+          date !== today && h('a', { class: 'btn dz-nav', href: '#/mealprep' }, 'Dziś'),
+          h('a', { class: 'btn dz-nav', href: `#/mealprep?d=${tomorrow}` }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 })))),
       h('div', { class: 'hero-tr-side' }, ringBox),
       h('div', { class: 'hero-tr-map' }, nextBox)),
-    h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, SRC.mealprep.phases.map((ph, i) => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, ph.title))),
+    h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, ORDER.map(i => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, SRC.mealprep.phases[i].title))),
     inv && h('section', { class: `mp-stock${short.length ? ' has-short' : ''}`, 'aria-labelledby': 'mp-stock-h' },
       h('div', { class: 'mp-stock-h' }, h('h2', { id: 'mp-stock-h' }, icon('package-check', { size: 18 }), 'Składniki na jutro'),
-        h('span', { class: 'muted' }, `${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${rt.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'}`)),
+        h('span', { class: 'muted' }, `${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${dietLabel(rt.dietVariant)}`)),
       !known.length ? h('p', { class: 'muted' }, 'Brak stanów składników — ustaw je w module Zapasy.')
         : short.length === 0 ? h('p', { class: 'mp-ok' }, icon('circle-check', { size: 16 }), `Wszystkie ${known.length} składniki kart wystarczą na jutro.`)
         : [h('ul', { class: 'mp-short-list' }, short.map(x => h('li', {},
@@ -114,8 +131,10 @@ export function renderMealPrep(root, ctx) {
           h('p', { class: 'muted' }, `Wystarczy: ${known.length - short.length} z ${known.length} składników.`),
           h('a', { class: 'btn', href: '#/zapasy?s=CRITICAL' }, icon('shopping-cart', { size: 18 }), 'Uzupełnij w Zapasach')]));
 
-  SRC.mealprep.phases.forEach((ph, pi) => {
-    add(root, h('h2', { class: 'prep-phase', id: `mp-ph-${pi}` }, ph.title));
+  ORDER.forEach(pi => {
+    const ph = SRC.mealprep.phases[pi];
+    add(root, h('h2', { class: 'prep-phase', id: `mp-ph-${pi}` }, ph.title),
+      pi === EVE && h('p', { class: 'muted mp-eve' }, `Wieczorem ${date === today ? 'dziś' : `${dayShort(date)} ${shortDate(date)}`} — ilości na jutro: ${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${dietLabel(rt.dietVariant)}.`));
     for (const id of ph.cards) {
       const c = byId[id];
       if (!c) continue;
@@ -129,15 +148,15 @@ export function renderMealPrep(root, ctx) {
         c.blocks.map((b, bi) => {
           if (b.items) {
             return h('ul', { class: `prep-list ${b.type}` }, b.items.map((it, i) => {
-              const key = `${today}|${c.id}|${bi * 100 + i}`;
+              const key = `${date}|${c.id}|${bi * 100 + i}`;
               const mins = timerMin(it);
               return h('li', {},
                 h('label', {}, h('input', { type: 'checkbox', checked: !!state[key], disabled: !store,
-                  onchange: e => toggle(c.id, bi * 100 + i, e.target.checked) }), h('span', {}, T(it))),
+                  onchange: e => toggle(c.id, bi * 100 + i, e.target.checked) }), h('span', {}, textOf(c, it))),
                 mins ? timer(mins, c.title) : null);
             }));
           }
-          return h('p', { class: `prep-note n-${b.type}` }, T(b.text));
+          return h('p', { class: `prep-note n-${b.type}` }, textOf(c, b.text));
         }));
       cardBars[c.id] = { fill, text, card };
       add(root, card);

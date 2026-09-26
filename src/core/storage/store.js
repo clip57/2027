@@ -114,6 +114,19 @@ export class Store {
     return e;
   }
 
+  // Zapis wielu zmian naraz ([[typ, treść], …]): te same zdarzenia co przy kolejnych `record()`, ale jedna transakcja,
+  // jedna weryfikacja i jedno przeliczenie stanu (B8). Wszystkie albo żadne — błąd walidacji dowolnej treści odrzuca całość.
+  async recordMany(list) {
+    if (!this.health.ok) throw new StorageError(this.health.error || 'Zapis wyłączony: baza nie jest dostępna');
+    if (!list.length) return [];
+    const evs = list.map(([t, d]) => this.makeEvent(t, d));
+    for (const e of evs) { const err = validateEvent(e); if (err) throw new StorageError(`Odrzucono niepoprawne dane: ${err}`); }
+    await this.writeVerified(evs);
+    for (const e of evs) this.events.set(e.id, e);
+    this.emit();
+    return evs;
+  }
+
   async writeVerified(list) {
     try {
       await this.adapter.putEvents(list);

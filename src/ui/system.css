@@ -95,10 +95,10 @@ dialog::backdrop { background: var(--scrim); }
 .side { display: none; }
 
 /* ---------- Pasek dolny (telefon): 4 sekcje + „Więcej” ---------- */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr);
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
   border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); transition: transform var(--dur-2) var(--ease); }
-.tabs a { position: relative; min-height: var(--tab-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+.tabs a { position: relative; min-width: 0; min-height: var(--tab-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   font-size: var(--fs-2xs); font-weight: 600; letter-spacing: .01em; color: var(--muted); text-decoration: none; }
 .tabs a[aria-current="page"] { color: var(--accent); }
 .tabs a[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 32%; right: 32%; height: 3px; border-radius: 0 0 var(--r-full) var(--r-full); background: var(--accent); }
@@ -201,7 +201,7 @@ body.kbd .tabs { transform: translateY(110%); }
 .dz-card-h { display: flex; align-items: center; gap: var(--s-2); }
 .dz-card-h h2 { margin: 0; font-size: var(--fs-sm); font-weight: 650; flex: 1 1 auto; }
 .dz-ic { width: 30px; height: 30px; border-radius: var(--r-sm); display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
-.dz-more { width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--r-sm); color: var(--muted); margin: -6px -6px -6px 0; }
+.dz-more { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-sm); color: var(--muted); margin: -10px -10px -10px 0; }   /* U-f: 44 px */
 .dz-more:hover { background: var(--sunken); color: var(--text); }
 .dz-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
 .dz-list li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s-2); align-items: baseline; font-size: var(--fs-sm); }
@@ -241,3 +241,132 @@ body.kbd .tabs { transform: translateY(110%); }
   .quicklinks .ql { flex: 0 0 auto; }
   .dz-now { grid-template-columns: minmax(0, 1fr) 72px; padding: var(--s-4); }
 }
+
+/* ---------- Etap 1 (audyt 25.09.2026) ---------- */
+/* B6: 320 px — etykiety paska dolnego i legenda mięśni nie wychodzą poza ekran */
+.tabs a > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 2px; }
+.bm-legend { min-width: 0; }
+.bm-legend p { overflow-wrap: anywhere; }
+/* B4: komunikaty po akcji — stały obszar nad dolnym paskiem (telefon) / w prawym dolnym rogu (komputer); nie blokuje dotyku */
+.toast { position: fixed; z-index: 20; left: var(--s-4); right: var(--s-4); bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + var(--s-3));
+  display: grid; justify-items: center; pointer-events: none; }
+.toast:empty { display: none; }
+.toast .banner { margin: 0; max-width: 32rem; box-shadow: var(--e2); animation: toast-in var(--dur-2) var(--ease); }
+body.kbd .toast { bottom: var(--s-3); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .toast .banner { animation: none; } }
+@media (min-width: 900px) { .toast { left: auto; right: var(--s-6); bottom: var(--s-6); justify-items: end; } }
+/* B2: komunikat błędu w oknie (arkuszu) */
+.sheet-msg:empty { display: none; }
+.sheet-msg .banner { margin: 0 0 var(--s-3); }
+/* B1: nawigacja dni w Meal Prep */
+.mp-daynav { margin-top: var(--s-3); flex-wrap: wrap; }
+.mp-eve { margin: calc(-1 * var(--s-2)) 0 var(--s-3); }
+.inv-sum .inv-ok.inv-low { color: var(--warning); }   /* B7: wystarczy do zakupów, ale zapas krótki */
+/* B6: przełącznik motywu w „Więcej” przy 320 px — etykiety skracane, bez rozpychania strony */
+.ts-b { min-width: 0; }
+.ts-b > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* ---------- Etap 2 (audyt 25.09.2026) ---------- */
+/* U-i: odnośnik „Przejdź do treści” — widoczny dopiero po fokusie z klawiatury */
+.skip-link { position: fixed; top: var(--s-2); left: var(--s-2); z-index: 30; padding: var(--s-2) var(--s-4); border-radius: var(--r-md);
+  background: var(--accent); color: var(--accent-ink); font-weight: 700; text-decoration: none; transform: translateY(-200%); }
+.skip-link:focus { transform: none; }
+/* U-f: cele dotykowe ≥ 44 px na telefonie (odnośniki dni w harmonogramie i mockach, spis treści, kalendarz, 7 dni w Suplementacji) */
+.cfa-dh a, .rk-toc-a, .tech-list li > a[href^="#/cfa"] { display: inline-flex; align-items: center; min-height: 44px; }
+.cal-d { min-height: 48px; min-width: 44px; }
+.sp-days .seg-b { min-width: 44px; }
+.prep-list input[type=checkbox], .filters input[type=checkbox] { width: 22px; height: 22px; }
+.prep-list label, .filters label { min-height: 44px; }
+/* U-a: minione punkty planu dnia (zwinięte) */
+.dz-past { margin-bottom: var(--s-3); }
+.dz-past > summary { display: flex; align-items: center; gap: var(--s-2); min-height: 44px; padding: 0 var(--s-3); cursor: pointer; list-style: none;
+  color: var(--text-2); font-size: var(--fs-sm); font-weight: 600; border: 1px dashed var(--border); border-radius: var(--r-md); }
+.dz-past > summary::-webkit-details-marker { display: none; }
+.dz-past[open] > summary .ico { transform: rotate(180deg); }
+.dz-past[open] > summary { margin-bottom: var(--s-3); }
+.inv-item[hidden], .zp-empty[hidden] { display: none; }
+.counter.c-shop .ico { color: var(--accent); }
+.zp-hint { display: flex; gap: var(--s-2); align-items: flex-start; margin: 0 0 var(--s-3); font-size: var(--fs-sm); }
+.zp-hint .ico { flex: none; margin-top: 3px; }
+/* U-h, I8: Dane — ostrzeżenia i diagnostyka */
+.dn-evict { display: block; margin-top: var(--s-2); }
+.dn-plain { display: flex; gap: var(--s-2); align-items: flex-start; margin-top: var(--s-3); }
+.dn-plain .ico { flex: none; margin-top: 2px; }
+.dn-diag h2 { display: flex; align-items: center; gap: var(--s-2); }
+.dn-diag-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.dn-diag-list li { display: flex; gap: var(--s-3); align-items: flex-start; padding: var(--s-2) 0; border-top: 1px solid var(--border); }
+.dn-diag-list li:first-child { border-top: 0; }
+.dn-diag-list .ico { flex: none; margin-top: 2px; }
+.dn-diag-list p { margin: 0; }
+.dn-diag-list a { display: inline-flex; align-items: center; min-height: 44px; }
+.dg-t { font-weight: 600; }
+.dg-ok .ico { color: var(--success); }
+.dg-warn .ico { color: var(--warning); }
+.dg-info .ico { color: var(--text-2); }
+/* ---------- Etap 3 (audyt 25.09.2026) ---------- */
+/* I2: „Wymaga uwagi” w Dziś */
+.dz-attn { padding: var(--s-4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--e1); }
+.dz-attn.has-warn { border-color: color-mix(in srgb, var(--warning) 50%, var(--border)); }
+.dz-attn h2 { display: flex; align-items: center; gap: var(--s-2); margin: 0 0 var(--s-2); font-size: var(--fs-md); }
+.dz-attn p { margin: 0; }
+.dz-attn-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.dz-attn-list li { display: flex; align-items: center; gap: var(--s-2); }
+.dz-attn-list .ico { flex: none; }
+.dz-attn-list a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); }
+.at-warn .ico { color: var(--warning); }
+.at-info .ico { color: var(--text-2); }
+.dz-attn [hidden] { display: none; }
+@media (min-width: 1100px) {
+  .dz-grid:has(> .dz-attn) { grid-template-areas: "attn aside" "now aside" "kpis aside" "plan aside"; }
+  .dz-attn { grid-area: attn; }
+}
+/* I3: widok tygodnia */
+.wk-grid { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: grid; gap: var(--s-2); grid-template-columns: minmax(0, 1fr); }
+.wk-day { display: grid; gap: 4px; align-content: start; height: 100%; padding: var(--s-3); border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface); color: var(--text); text-decoration: none; min-height: 44px; }
+.wk-day:hover { border-color: var(--border-strong); }
+.wk-day.is-today { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.wk-day.is-out { background: transparent; border-style: dashed; }
+.wk-d { font-size: var(--fs-sm); }
+.wk-d .now-tag { margin-left: var(--s-2); }
+.wk-l { display: flex; gap: 6px; align-items: center; font-size: var(--fs-sm); color: var(--text-2); overflow-wrap: anywhere; }
+.wk-l .ico { flex: none; }
+.wk-train { color: var(--text); font-weight: 600; }
+.wk-note { font-size: var(--fs-xs); color: var(--text-2); border-top: 1px solid var(--border); padding-top: 4px; }
+@media (min-width: 1100px) { .wk-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+/* I1: przypomnienia .ics */
+.dn-ics h2 { display: flex; align-items: center; gap: var(--s-2); }
+.dn-ics-kinds { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); margin: var(--s-2) 0 var(--s-3); }
+.dn-ics-kinds .chk { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.dn-ics .row { align-items: flex-end; }
+/* I4: wyszukiwanie globalne */
+.gs-open { display: flex; align-items: center; gap: var(--s-2); width: 100%; min-height: 44px; padding: 0 var(--s-3); justify-content: flex-start;
+  background: var(--sunken); color: var(--text-2); border: 1px solid var(--border); border-radius: var(--r-md); font-size: var(--fs-sm); }
+.gs-open .gs-kbd { margin-left: auto; font-size: var(--fs-xs); color: var(--text-2); font-family: inherit; }   /* na --sunken: --text-2 (kontrast AA) */
+.side.is-min .gs-open span, .side.is-min .gs-open .gs-kbd { display: none; }
+.side.is-min .gs-open { justify-content: center; padding: 0; }
+.more-search { margin: 0 0 var(--s-5); }
+.more-search .gs-kbd { display: none; }
+.gs-input { width: 100%; }
+.gs-info { margin: var(--s-2) 0; }
+.gs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 60vh; overflow-y: auto; }
+.gs-hit { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px var(--s-3); align-items: baseline; min-height: 44px; padding: var(--s-2);
+  border-radius: var(--r-sm); color: var(--text); text-decoration: none; }
+.gs-hit:hover, .gs-hit:focus-visible { background: var(--sunken); }
+.gs-kind { grid-row: span 2; font-size: var(--fs-xs); font-weight: 700; color: var(--text-2); min-width: 7.5em; }
+.gs-t { font-weight: 600; overflow-wrap: anywhere; }
+.gs-s { grid-column: 2; font-size: var(--fs-xs); color: var(--text-2); overflow-wrap: anywhere; }   /* także na --sunken (wyróżnienie) */
+.gs-keys { font-size: var(--fs-xs); margin-top: var(--s-3); }
+.gs-help-list kbd { font-family: inherit; font-size: var(--fs-sm); padding: 2px 6px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--sunken); }
+@media (pointer: coarse) { .gs-keys, .gs-open .gs-kbd { display: none; } }
+/* I7: podgląd paragonu */
+.rc-preview { margin: var(--s-3) 0; }
+.rc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rc-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 var(--s-3); padding: var(--s-2) 0; border-bottom: 1px solid var(--border); }
+.rc-list .muted { grid-column: 1 / -1; font-size: var(--fs-xs); }
+.rc-n { overflow-wrap: anywhere; }
+/* U-d, I1, I7: przyciski z ikoną Lucide w oknach i sekcjach — ikona obok tekstu */
+.sheet-body .row > button, .sheet-body > button, .sheet-body .row > .btn, .dn-ics .row > button, .zp-more .row > button, .dn-diag a {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2); }
+/* U-c: filtr „Do zakupów” — pełna szerokość pod licznikami statusów */
+.counters .counter.c-shop { grid-column: 1 / -1; justify-content: center; }

@@ -7,7 +7,7 @@ haśle, ponowne otwarcie i powrót do aplikacji, powrót sieci, konflikt, dwie k
 wpisywania, lekkie pobieranie (transfer), baner wstrzymanej synchronizacji, brak treści jawnej na serwerze, wygasły token,
 pamięć kluczy, wylogowanie, odłączenie, wariant jednoplikowy (file://), axe-core i cele dotykowe w każdym kroku.
 Uruchomienie: npm run build && python3 tests/e2e/cloud_sync.py"""
-import asyncio, os, pathlib, sys, threading, http.server
+import asyncio, time, os, pathlib, sys, threading, http.server
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures
@@ -46,14 +46,21 @@ async def dane(pg, url):
     await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-cloud')
 
 async def msg(pg, text, timeout=20000):
-    await pg.wait_for_function("s => (document.querySelector('.dn-cloud-msg')?.textContent || '').includes(s)", arg=text, timeout=timeout)
+    # Przy CSP wariantu web (S1: bez 'unsafe-eval') wait_for_function z tekstem jest blokowane — odpytywanie przez evaluate (CDP)
+    end = time.monotonic() + timeout / 1000
+    while True:
+        t = await pg.evaluate("() => document.querySelector('.dn-cloud-msg')?.textContent || ''")
+        if text in t: break
+        if time.monotonic() > end: raise TimeoutError(f'brak komunikatu „{text}” (jest: „{t[:160]}”)')
+        await asyncio.sleep(0.1)
     return await pg.inner_text('.dn-cloud-msg')
 
 async def status(pg): return await pg.inner_text('.dn-cloud .dn-sync-s')
 
 async def audit(pg, label):
     """axe-core (WCAG 2.1 A/AA), przewijanie w poziomie i cele dotykowe ≥ 44 px w sekcji chmury."""
-    await pg.add_script_tag(content=AXE)
+    # axe wstrzykiwany przez CDP (skrypt z DevTools nie podlega CSP strony; add_script_tag = skrypt inline, blokowany przez CSP)
+    cdp = await pg.context.new_cdp_session(pg); await cdp.send('Runtime.evaluate', {'expression': AXE}); await cdp.detach()
     res = await pg.evaluate("axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a','wcag2aa','wcag21a','wcag21aa']}, resultTypes: ['violations']})")
     v = [f"{x['id']} {x['nodes'][0]['target'][0]}" for x in res['violations']]
     axe_found.extend(f'{label}: {x}' for x in v)

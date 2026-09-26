@@ -8,7 +8,7 @@ import { scheduleFor, supplementOverview } from '../core/calc/supplements.js';
 import { addDays, longDate, weekday, dayShort, shortDate } from '../core/dates.js';
 import { stockAt, forecast, statusInfo, runway, nextShopping } from '../core/calc/inventory.js';
 import { catalogById } from '../core/data.js';
-import { dayPlan } from '../core/resolver.js';
+import { dayPlan, inPlan, PLAN_START } from '../core/resolver.js';
 
 const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
 
@@ -57,6 +57,7 @@ export function renderSuplementy(root, ctx) {
     h('div', { class: 'controls sp-days' }, segmented('Dzień', week, date, go)));
 
   // Oś dnia: dla dzisiejszego dnia pory minione przygaszone, następna wyróżniona (godzina z SUPLEMENTACJI)
+  if (!inPlan(date)) add(root, h('p', { class: 'panel sp-outside' }, `Poza planem — suplementacja zaczyna się ${longDate(PLAN_START)}.`));
   for (const g of groups) {
     const past = isToday && g.time < hhmm, next = g.time === nextTime;
     add(root, h('article', { class: `tl-item${past ? ' is-past' : ''}${next ? ' is-next' : ''}` },

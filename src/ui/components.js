@@ -1,5 +1,5 @@
 // Wspólne komponenty interfejsu. Bez innerHTML, z obsługą klawiatury i czytników ekranu.
-import { h } from './dom.js';
+import { h, clear } from './dom.js';
 
 // Przełącznik segmentowy (faza, wariant, dzień). options: [{value, label, hint}]
 export function segmented(label, options, value, onChange) {
@@ -38,4 +38,18 @@ export function progressRing(done, total, label = '') {
   t.textContent = `${Math.round(pct * 100)}%`;
   svg.append(t);
   return svg;
+}
+
+// Arkusz (okno modalne): nazwa dostępna z tytułu (aria-labelledby), własny obszar komunikatów (błąd widoczny w oknie,
+// nie pod nim) i usunięcie z DOM po każdym zamknięciu — także klawiszem Esc (B2, B3).
+let sheetSeq = 0;
+export function sheet(title, ...body) {
+  const id = `sheet-h-${++sheetSeq}`;
+  const msg = h('div', { class: 'sheet-msg', role: 'alert' });
+  const d = h('dialog', { class: 'sheet', 'aria-labelledby': id, onclose: () => d.remove() });
+  const close = () => { if (d.open) d.close(); d.remove(); };
+  d.append(h('div', { class: 'sheet-head' }, h('h2', { id }, title), h('button', { onclick: close, 'aria-label': 'Zamknij' }, '✕')),
+    h('div', { class: 'sheet-body' }, msg, ...body.filter(Boolean)));
+  document.body.append(d); d.showModal();
+  return { el: d, close, error: e => { clear(msg).append(h('div', { class: 'banner err' }, e?.message || String(e))); msg.scrollIntoView?.({ block: 'nearest' }); } };
 }

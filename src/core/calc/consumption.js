@@ -1,11 +1,13 @@
 // Zużycie dzienne magazynu wyliczane z planu (D-003): dieta (faza × wariant) + suplementy (D-001) + dodatki (D-021).
 import { plan, catalogById, EXTRA_DAILY } from '../data.js';
-import { phaseFor, dosesFor, dayPlan } from '../resolver.js';
+import { phaseFor, dosesFor, dayPlan, inPlan } from '../resolver.js';
 
 const cache = new Map();
 
 export function consumptionForDay(date) {
   if (cache.has(date)) return cache.get(date);
+  // Przed startem planu (D-088) brak zużycia wg planu — inwentaryzacja sprzed startu jest odliczana od 25.09.2026
+  if (!inPlan(date)) { const none = Object.freeze({}); cache.set(date, none); return none; }
   const variant = dayPlan(date).diet;   // z wyjątkami dat (D-087)
   const p = plan(variant, phaseFor(date) ?? 0);
   const use = {};
