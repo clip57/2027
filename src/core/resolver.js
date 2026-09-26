@@ -8,7 +8,7 @@ const MOCKS = new Set(SRC.cfa.D.mockCFA);
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Start planu (D-088): 25.09.2026. Dni wcześniejsze są poza planem — bez treningu, dawek, bloków CFA i zużycia w Zapasach.
+// Start planu (D-088, D-090): 27.09.2026 (`phases.json` → `start`). Dni wcześniejsze są poza planem — bez treningu, dawek, bloków CFA i zużycia w Zapasach.
 // Zdarzenia z tych dni zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
 export const inPlan = date => date >= PLAN_START;
@@ -16,7 +16,7 @@ export const inPlan = date => date >= PLAN_START;
 export function phaseFor(date) {
   let ph = null;
   for (const p of SRC.phases.phases) if (date >= p.from) ph = p.phase;
-  return ph; // null = przed Fazą 0 (Faza 0 od 26.09.2026, D-087; start planu 25.09.2026, D-088)
+  return ph; // null = przed Fazą 0 (start planu i Faza 0 od 27.09.2026 — D-088, D-090)
 }
 
 export function dosesFor(date) {
@@ -25,7 +25,7 @@ export function dosesFor(date) {
   return SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
 }
-// Okres przyjmowania preparatów czasowych (D-015; 25.09.2026–21.03.2027 — D-087). `from` opcjonalne.
+// Okres przyjmowania preparatów czasowych (D-015; 27.09.2026–21.03.2027 — D-087, D-090). `from` opcjonalne.
 export function inValidity(d, date) {
   return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
 }

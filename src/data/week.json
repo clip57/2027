@@ -106,19 +106,6 @@
  },
  "variant_decision": "D-087: soboty — 12:13–13:13 zakupy (bez bloku E); nie dotyczy dnia mocka",
  "exceptions": {
-  "2026-09-25": {
-   "decision": "D-087, D-088",
-   "dayType": "free",
-   "session": null,
-   "sessionName": "Bez treningu",
-   "sauna": 0,
-   "diet": "NT",
-   "note": "Wyjątek 25.09.2026: bez treningu — okno 17:45–20:15 wolne, dieta NT"
-  },
-  "2026-09-26": {
-   "decision": "D-087",
-   "note": "Trening kalibracyjny: technika i obciążenie wszystkich nowych ćwiczeń na nogi"
-  },
   "2026-09-27": {
    "decision": "D-087",
    "dayType": "rest_sauna2",

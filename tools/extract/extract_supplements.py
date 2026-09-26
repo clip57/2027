@@ -56,10 +56,10 @@ NOTES = {  # uwagi ze źródła przypięte do dawek
     ("20:15", "kreatyna"): "z węglowodanami z banana — lepsza retencja",
 }
 THURSDAY_NOTE = {("20:15", "kreatyna"): {"decision": "D-030", "note": "w czwartek bez banana (dieta NT)"}}
-VALID = {  # D-015: do wyczerpania zapasu; przyjmowanie 25.09.2026–21.03.2027 (D-087; koniec jak w I-9)
-    "chondroityna": {"from": "2026-09-25", "until": "2027-03-21", "decision": "D-015"},
-    "boswellia": {"from": "2026-09-25", "until": "2027-03-21", "decision": "D-015"},
-    "glukozamina": {"from": "2026-09-25", "until": "2027-03-21", "decision": "D-015"},
+VALID = {  # D-015: do wyczerpania zapasu; przyjmowanie 27.09.2026–21.03.2027 (D-090; koniec jak w I-9, D-087)
+    "chondroityna": {"from": "2026-09-27", "until": "2027-03-21", "decision": "D-015"},
+    "boswellia": {"from": "2026-09-27", "until": "2027-03-21", "decision": "D-015"},
+    "glukozamina": {"from": "2026-09-27", "until": "2027-03-21", "decision": "D-015"},
 }
 OTHER_ROWS = [  # wiersze bez suplementów, zachowane dla pełności harmonogramu
     ("11:15", "Przekąska — kefir 1,5% + siemię + ostropest + kakao + orzech brazylijski"),
@@ -99,7 +99,7 @@ for t, sit, sid, qty, label, days, ev in D:
 out = {"schema": 1, "generated_from": "SUPLEMENTACJA_2027 (D-001)", "supplements": SUPPS,
        "doses": doses, "other_rows": [{"time": t, "text": s} for t, s in OTHER_ROWS],
        "decisions": {"D-014": "tauryna codziennie, także w czwartek",
-                     "D-015": "chondroityna, boswellia, glukozamina od 25.09.2026 do 21.03.2027 (D-087; I-9)",
+                     "D-015": "chondroityna, boswellia, glukozamina od 27.09.2026 do 21.03.2027 (D-087, D-090; I-9)",
                      "D-016": "cynk kontynuowany; stan nieśledzony"}}
 json.dump(out, open(OUT, "w", encoding="utf8"), ensure_ascii=False, indent=1)
 print("supplements.json:", len(doses), "dawek,", len(SUPPS), "preparatów — wszystkie fragmenty potwierdzone w źródle")

@@ -19,7 +19,7 @@ test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (12 t
     });
   }
   const first = weekSummary('2026-09-25');
-  assert.deepEqual(first.map(x => x.outside), [true, true, true, true, false, false, false], 'D-088: 21–24.09 poza planem');
-  assert.equal(first[4].diet, 'NT');
-  assert.equal(first[4].exception, 'D-087, D-088');
+  assert.deepEqual(first.map(x => x.outside), [true, true, true, true, true, true, false], 'D-088, D-090: 21–26.09 poza planem');
+  assert.equal(first[6].diet, 'NT');
+  assert.equal(first[6].exception, 'D-087');
 });

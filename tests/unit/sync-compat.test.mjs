@@ -126,7 +126,7 @@ test('D-088: zdarzenia z dni przed startem planu (21–24.09) zostają w dzienni
   assert.deepEqual(phone.state.train, mac.state.train, 'stan treningu identyczny na obu urządzeniach');
   assert.equal(phone.state.trainSessions['2026-09-22'].minutes, 55);
   assert.equal(stockAt(phone.state.inv, 'banan', '2026-09-24'), 360, 'zakup 23.09 liczony, bez zużycia przed startem');
-  assert.equal(stockAt(phone.state.inv, 'banan', '2026-09-25'), 360 - (consumptionForDay('2026-09-25').banan || 0), 'odliczanie od 25.09');
+  assert.equal(stockAt(phone.state.inv, 'banan', '2026-09-28'), 360 - (consumptionForDay('2026-09-27').banan || 0) - consumptionForDay('2026-09-28').banan, 'odliczanie od 27.09 (D-090)');
   await apply(phone, await preview(phone, file));
   assert.equal(phone.events.size, 4, 'ponowny import idempotentny');
 });

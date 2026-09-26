@@ -27,11 +27,11 @@ test('migracja kopii ZAPASY z 22.09: stany 1:1, odliczanie od następnego dnia p
     assert.equal(stockAt(s.state.inv, id, '2026-09-23'), exp, id);
   }
   assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-22'), 180);
-  // D-087: przyjmowanie od 25.09.2026 do 21.03.2027 (178 dni) przy stanie 180 / 360 z 22.09 — zostaje 2 / 4 kaps.
-  assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-24'), 180, 'przed 25.09 bez zużycia');
-  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-21'), 2);
-  assert.equal(stockAt(s.state.inv, 'chondroityna', '2027-03-21'), 4);
-  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-31'), 2, 'po 21.03 bez zużycia');
+  // D-090: przyjmowanie od 27.09.2026 do 21.03.2027 (176 dni) przy stanie 180 / 360 z 22.09 — zostaje 4 / 8 kaps.
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2026-09-26'), 180, 'przed 27.09 bez zużycia');
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-21'), 4);
+  assert.equal(stockAt(s.state.inv, 'chondroityna', '2027-03-21'), 8);
+  assert.equal(stockAt(s.state.inv, 'glukozamina', '2027-03-31'), 4, 'po 21.03 bez zużycia');
   assert.equal(stockAt(s.state.inv, 'cynk', '2026-09-23'), null, 'cynk nieśledzony');
   assert.equal((await preview(s, backup)).fresh.length, 0, 'ponowny import niczego nie dodaje');
 });
@@ -52,20 +52,20 @@ test('prognoza uwzględnia czwartki i fazy', async () => {
   assert.equal(fc.lastCovered, '2026-10-09', '07.10 i 09.10 po 120 g, 08.10 (czw) bez banana');
   assert.equal(fc.runOut, '2026-10-10');
   assert.equal(fc.days, 3);
-  const oats = forecast('platki_owsiane', 70 * 17, '2026-09-24');
+  const oats = forecast('platki_owsiane', 70 * 15, '2026-09-24');   // 27.09–11.10: 15 dni × 70 g (D-090)
   assert.equal(oats.runOut, '2026-10-12', 'od 12.10 porcja 85 g');
   assert.equal(oats.lastCovered, '2026-10-11');
 });
 
-test('start planu 25.09.2026 (D-088): brak zużycia przed startem; wyjątki 25.09 i 27.09 (dieta NT) bez banana', async () => {
+test('start planu 27.09.2026 (D-088, D-090): brak zużycia przed startem; 27.09 (dieta NT) bez banana', async () => {
   const fc = forecast('banan', 240, '2026-09-22');
-  assert.equal(fc.lastCovered, '2026-09-28', '23–24.09 poza planem, 25.09 i 27.09 NT, 26.09 i 28.09 po 120 g');
-  assert.equal(fc.runOut, '2026-09-29');
+  assert.equal(fc.lastCovered, '2026-09-29', '23–26.09 poza planem, 27.09 NT, 28.09 i 29.09 po 120 g');
+  assert.equal(fc.runOut, '2026-09-30');
   const s = await new Store(new MemoryAdapter()).open();
   await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-09-22' });
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-24'), 1000, 'inwentaryzacja z 22.09 bez odliczeń do 24.09');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-25'), 1000, '25.09 — dieta NT bez kefiru');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-26'), 800);
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-26'), 1000, 'inwentaryzacja z 22.09 bez odliczeń do 26.09');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-27'), 1000, '27.09 — dieta NT bez kefiru');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-28'), 800);
 });
 
 test('statusy — klasyfikacja wg terminu przydatności (v31)', () => {

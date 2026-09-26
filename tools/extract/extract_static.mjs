@@ -43,14 +43,14 @@ if (want('trening')) {
   console.log('training.json:', Object.values(days).reduce((a, l) => a + l.length, 0), 'ćwiczeń');
 }
 
-// ---------- CFA (D-086/D-087: plan „MASTER SCHEDULE FINAL” od 25.09.2026, v5: 421 bloków; zastępuje v3 z D-006) ----------
+// ---------- CFA (D-086/D-087/D-090: plan „MASTER SCHEDULE FINAL” od 27.09.2026, v7: 409 bloków; zastępuje v3 z D-006) ----------
 if (want('cfa')) {
   const file = process.env.CFA_PLAN || 'PLAN_NAUKI_CFA_LEVEL_I.html';
   const js = scripts(read(file))[0].trim();
   const D = JSON.parse(js.replace(/^const D\s*=\s*/, '').replace(/;\s*$/, ''));
-  // Starszy plik (v3: 416 bloków od 21.09; v4: 432 bloki) nie może po cichu nadpisać planu D-087
-  if (D.bloki.length !== 421 || D.stat.start !== '2026-09-25' || D.stat.end !== '2026-11-11')
-    throw new Error(`${file}: oczekiwano planu D-087 (421 bloków, 25.09–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
+  // Starszy plik (v3: 416 bloków od 21.09; v4: 432; v5: 421 od 25.09) nie może po cichu nadpisać planu D-090
+  if (D.bloki.length !== 409 || D.stat.start !== '2026-09-27' || D.stat.end !== '2026-11-11')
+    throw new Error(`${file}: oczekiwano planu D-090 (409 bloków, 27.09–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
   // Kontrola krzyżowa z MASTER_SCHEDULE_CFA.csv (jeśli jest w SOURCES_DIR): te same bloki, pole po polu
   const csvFile = process.env.CFA_CSV || 'MASTER_SCHEDULE_CFA.csv';
   if (fs.existsSync(path.join(SRC, csvFile))) {
@@ -71,7 +71,7 @@ if (want('cfa')) {
     if (diff.length) throw new Error(`${csvFile} ≠ ${file}: ${diff.slice(0, 5).join('; ')}`);
     console.log(`cfa: ${csvFile} zgodny z ${file} (${body.length} wierszy)`);
   }
-  write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v5, 25.09.2026) — obiekt D (D-086, D-087)',
+  write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v7, 27.09.2026) — obiekt D (D-086, D-087, D-090)',
     exam: '2026-11-12', D });
   console.log('cfa.json:', D.bloki.length, 'bloków');
 }

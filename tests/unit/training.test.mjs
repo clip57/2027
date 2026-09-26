@@ -49,10 +49,10 @@ test('seria tygodni z treningiem', () => {
   assert.equal(streakWeeks(T, {}, '2026-11-03'), 0);
 });
 
-test('serie sprzed startu planu (25.09.2026) zostają w dzienniku, ale nie wchodzą do statystyk (D-088)', () => {
+test('serie sprzed startu planu (27.09.2026) zostają w dzienniku, ale nie wchodzą do statystyk (D-088, D-090)', () => {
   const pre = { ...T, [`2026-09-21|${bench}|1`]: { date: '2026-09-21', ex: bench, set: 1, done: true, kg: 100, reps: 5, rir: 0 } };
   assert.equal(sets(pre).length, sets(T).length);
-  assert.ok(!sessions(pre, { '2026-09-22': { minutes: 60 } }).some(x => x.date < '2026-09-25'));
+  assert.ok(!sessions(pre, { '2026-09-26': { minutes: 60 } }).some(x => x.date < '2026-09-27'));
   assert.equal(records(pre).find(x => x.name === 'Wyciskanie sztangi leżąc').kg.value, 50);
-  assert.equal(sets({ [`2026-09-25|${bench}|1`]: { date: '2026-09-25', ex: bench, set: 1, done: true, kg: 40, reps: 8 } }).length, 1, 'dzień startu liczony');
+  assert.equal(sets({ [`2026-09-27|${bench}|1`]: { date: '2026-09-27', ex: bench, set: 1, done: true, kg: 40, reps: 8 } }).length, 1, 'dzień startu liczony');
 });

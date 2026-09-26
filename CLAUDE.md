@@ -30,14 +30,16 @@ kognitywna, 12:20 blok E, 13:13–13:30 przerwa na lunch, bez spaceru (`tools/ex
 (`dayPlan()` w `resolver.js` — zawsze przez nią, nie przez `SRC.week.days[weekday]`; `tools/extract/day_plan_d087.py`);
 Faza 0 od 26.09 (F1 12.10, F2 16.11 bez zmian); suplementy czasowe 25.09.2026–21.03.2027. Spójność planu:
 `tests/unit/plan-cfa.test.mjs`. Raporty: `docs/RAPORT_PLAN_CFA_D086.md`, `docs/RAPORT_PLAN_CFA_D087.md`.
-**Start planu 25.09.2026 (D-088):** `phases.json` → `start`; dni wcześniejsze poza planem (`inPlan()`/`PLAN_START` w `resolver.js`:
+**Plan CFA v7 i start planu 27.09.2026 (D-090):** 409 bloków (41 × 9 + 5 sobót × 8, 27.09–11.11), start planu i Faza 0 od 27.09,
+25–26.09 poza planem (wyjątki usunięte), suplementy czasowe 27.09.2026–21.03.2027. Raport: `docs/RAPORT_PLAN_CFA_D090.md`.
+**Start planu (D-088, data wg D-090):** `phases.json` → `start`; dni wcześniejsze poza planem (`inPlan()`/`PLAN_START` w `resolver.js`:
 bez planu dnia, treningu, dawek, bloków i zużycia; serie sprzed startu poza statystykami — `TRAIN_FROM`). Zdarzenia z tych dni
-zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchronizacji). Dieta 25.09 NT. Raport: `docs/RAPORT_ETAPY_0_3.md`.
+zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchronizacji). Raport: `docs/RAPORT_ETAPY_0_3.md`.
 **Audyt 25.09.2026 — Etapy 1–3 (D-089):** poprawki B1–B9, UX U-a…U-i, CSP w wariancie web (S1), Diagnostyka (I8), `.ics` (I1),
 „Wymaga uwagi” (I2), Tydzień (I3), wyszukiwanie ⌘K (I4), skróty (I5), paragon tekstem (I7), recall jako `setting` `cfa.recall:<data>` (I11).
 Etap 4 (P1, P2, D2, I9, I12) **wstrzymany** — nie wdrażaj bez decyzji użytkownika. Okna: zawsze `sheet()` z `components.js`;
 komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-089).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-090).
 
 ---
 

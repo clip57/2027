@@ -1,11 +1,11 @@
 {
  "schema": 1,
- "decision": "D-017, D-087, D-088 (start planu 25.09.2026 — dni wcześniejsze poza planem; Faza 0 od 26.09.2026)",
- "start": "2026-09-25",
+ "decision": "D-017, D-087, D-090 (start planu i Faza 0 od 27.09.2026 — dni wcześniejsze poza planem, D-088)",
+ "start": "2026-09-27",
  "phases": [
   {
    "phase": 0,
-   "from": "2026-09-26"
+   "from": "2026-09-27"
   },
   {
    "phase": 1,

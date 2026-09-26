@@ -5,14 +5,14 @@ import fixtures
 from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 AXE = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
-ROUTES = ['#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-26', '#/dzis?d=2026-09-24', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-09-28', '#/trening?v=stat',
+ROUTES = ['#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-10-03', '#/dzis?d=2026-09-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-09-28', '#/trening?v=stat',
   '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/bezpieczenstwo',
   '#/bezpieczenstwo?m=tabela', '#/bezpieczenstwo?m=poradnik', '#/rekompozycja?s=s6', '#/dane', '#/wiecej',
   '#/dzis?v=tydzien', '#/dzis?v=tydzien&d=2026-09-25', '#/mealprep?d=2026-10-11', '#/cfa?v=dzien&d=2026-09-28']   # Etapy 1–3 audytu
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.
 OPEN_ALL = "document.querySelectorAll('details').forEach(d => d.open = true)"
 STATES = [('#/trening?d=2026-09-28', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),
-  ('#/cfa?v=dzien&d=2026-09-25', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
+  ('#/cfa?v=dzien&d=2026-09-27', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
   ('#/mealprep', "document.querySelector('.prep-list input[type=checkbox]').click()", 'odhaczony krok'),
   ('#/bezpieczenstwo?m=poradnik', OPEN_ALL, 'rozwinięte sekcje'), ('#/rekompozycja', OPEN_ALL, 'rozwinięte sekcje'),
   ('#/dieta', OPEN_ALL, 'rozwinięte posiłki'), ('#/trening?d=2026-09-28', "document.querySelector('.ex-tech').click()", 'okno techniki'),

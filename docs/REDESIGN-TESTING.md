@@ -16,6 +16,15 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 
 ## 2. Wyniki regresji
 
+### Plan CFA v7 i start 27.09.2026 (D-090; 26–27.09.2026, konfiguracja B)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 180 testów: 179 zaliczonych, 1 pominięty (migracja ZAPASY — `SOURCES_DIR`) |
+| `npm run e2e` | 1167/1167 |
+| `npm run e2e:sync` | 21/21 |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
+
 ### Audyt — Etapy 0–3 (D-088, D-089; 25–26.09.2026, konfiguracja B)
 | Zestaw | Wynik |
 |---|---|
@@ -196,13 +205,10 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
    tryb samolotowy, wpisywanie podczas pobierania) — wykonana przez użytkownika 25.09.2026 (odstępstwo: brak pobierania na
    otwartym Macu → D-085). Automatyczne pobieranie zmian (D-085): kontrola ręczna §7.4 — **jeszcze niewykonana**.
 10. Zapasy na MacBooku (1280/1440 px): „Więcej” w pozycji — karta bez zwężenia, nazwa w jednej linii.
-11. Plan D-087 (po aktualizacji do nowej wersji, na każdym urządzeniu): „Dziś” 25.09 — bloki CFA F–I od 13:30, wcześniej „Wolne”,
-   okno 17:45–20:15 „Wolne”; 26.09 (sobota) — 12:13 „Zakupy” z drugą kawą, bez bloku E, lunch 13:13, trening „LOWER 2” z opisem
-   „Trening kalibracyjny…”; 27.09 — „Bez treningu, 2 × sauna”, 2332 kcal (NT), „Posiłek po saunie”; 28.09 — 9 bloków A–I.
-   CFA → „Plan”: „421 (48 dni: 41×9 + 6×8 + 1×4)”; Suplementacja: „od 2026-09-25 do 2027-03-21”; Dieta: „Faza 0 · od 26.09”.
-   Bloki odhaczone w poprzedniej wersji pozostają odhaczone pod tymi samymi numerami (bloki 1–207 mają tę samą treść).
-
-12. Audyt — Etapy 0–3 (D-088, D-089), na każdym urządzeniu po aktualizacji: „Dziś” 22.09 — „Poza planem”; 25.09 — dieta NT 2332 kcal;
+11. Plan D-090 (po aktualizacji do nowej wersji, na każdym urządzeniu): „Dziś” 25.09 i 26.09 — „Poza planem”; 27.09 — 9 bloków A–I od 08:00,
+   „Bez treningu, 2 × sauna”, 2332 kcal (NT), Faza 0; soboty (np. 03.10) — 12:13 „Zakupy”, bez bloku E. CFA → „Plan”: „409 (46 dni: 41×9 + 5×8)”;
+   Suplementacja: „od 2026-09-27 do 2027-03-21”; Dieta: „Faza 0 · od 27.09”. Bloki odhaczone w poprzedniej wersji (1–35) pozostają odhaczone.
+12. Audyt — Etapy 0–3 (D-088, D-089), na każdym urządzeniu po aktualizacji: „Dziś” 22.09 — „Poza planem”; 27.09 — dieta NT 2332 kcal (D-090);
    „Wymaga uwagi” i „Tydzień”; minione punkty dnia zwinięte; komunikat po „+ opakowanie” widoczny nad dolnym paskiem; Zapasy —
    wyszukiwanie podczas pisania (klawiatura nie znika), „Do zakupów”, Paragon tekstem; Meal Prep wieczorem — ilości na jutro;
    CFA — odhaczenie recall; Dane — Diagnostyka, ostrzeżenia, plik `.ics` → Kalendarz („Dodaj wszystkie”, alarmy). MacBook:

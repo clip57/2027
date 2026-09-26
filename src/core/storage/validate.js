@@ -3,7 +3,7 @@
 import { isValidDay } from '../dates.js';
 
 export const SCHEMA = 1;
-// Najwyższy dopuszczalny numer bloku CFA: 432 (plan D-086; v3: 416, v5 z D-087: 421 bloków). Limitu nie zmniejszamy —
+// Najwyższy dopuszczalny numer bloku CFA: 432 (plan D-086; v3: 416, v5 z D-087: 421, v7 z D-090: 409 bloków). Limitu nie zmniejszamy —
 // zdarzenia zapisane przy dłuższym planie nie mogą trafić do kwarantanny. Test: plan z cfa.json mieści się w limicie.
 export const CFA_BLOCKS = 432;
 const isStr = v => typeof v === 'string' && v.length > 0 && v.length < 5000;

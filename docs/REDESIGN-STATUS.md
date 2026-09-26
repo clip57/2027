@@ -26,6 +26,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | Plan CFA D-086 (25.09.2026) | Nowy plan CFA (432 bloki, 48 dni × 9), plan dnia 12:13–13:30 bez spaceru, start planu i Fazy 0 25.09, suplementy czasowe do 25.03.2027 | `docs/RAPORT_PLAN_CFA_D086.md` |
 | Plan CFA D-087 (25.09.2026) | Plan CFA v5 (421 bloków), soboty z zakupami 12:13–13:13, wyjątki 25–27.09, Faza 0 od 26.09, suplementy czasowe 25.09–21.03.2027 | `docs/RAPORT_PLAN_CFA_D087.md` |
 | Audyt i Etapy 0–3 (25.09.2026) | D-088 (start planu 25.09, 21–24.09 poza planem, dieta 25.09 NT); Etap 1: poprawki B1–B9; Etap 2: UX U-a…U-i, CSP (S1), diagnostyka (I8); Etap 3: I1–I5, I7, I11 (bez I6); Etap 4 wstrzymany | `docs/RAPORT_ETAPY_0_3.md` |
+| Plan CFA D-090 (26.09.2026) | Plan CFA v7 (409 bloków, 46 dni 27.09–11.11), start planu i Faza 0 od 27.09, 25–26.09 poza planem, suplementy czasowe 27.09–21.03.2027 | `docs/RAPORT_PLAN_CFA_D090.md` |
 
 ## 2. Wykonane
 

@@ -1,8 +1,7 @@
 """D-087 (decyzja użytkownika 25.09.2026): plan CFA v5 (421 bloków) i wyjątki dni.
 - Soboty (poza sobotą z mockiem, 07.11): blok E 12:20–13:13 wolny; w planie dnia 12:13–13:13 „Zakupy” (wg listy w Zapasach)
   zamiast przerwy kognitywnej 12:13–12:20 i bloku E. Druga kawa (12:20) bez zmian; przerwa na lunch 13:13–13:30 bez zmian.
-- 25.09.2026 (piątek): bez treningu — okno 17:45–20:15 „Wolne”, dieta NT (D-088); bloki CFA dopiero od 13:30 (wynika z planu CFA).
-- 26.09.2026 (sobota): LOWER 2 jako trening kalibracyjny (technika i obciążenie nowych ćwiczeń na nogi).
+- 25.09 i 26.09.2026 — wyjątki usunięte (D-090, 26.09.2026): plan zaczyna się 27.09.2026, dni wcześniejsze są poza planem (D-088).
 - 27.09.2026 (niedziela): zamiast basenu dzień sauny jak czwartek — bez treningu, 2 × sauna, dieta NT.
 Funkcje działają na danych po D-086 (extract_schedule_safety.py)."""
 
@@ -23,14 +22,10 @@ def saturday_variant(slots):
                        "items": [{"kind": "task", "src": task, "text": task, "decision": "D-087"}, *coffee], "decision": "D-087"}]}
 
 
-# Typ dnia „wolny” (25.09.2026): okno treningowe bez zajęć
+# Typ dnia „wolny”: okno treningowe bez zajęć (dni poza planem, D-088; dawniej 25.09.2026)
 ACTIVITY_FREE = {"warmup": "Wolne", "main": "Wolne", "sauna": "Wolne"}
 
 EXCEPTIONS = {
-    "2026-09-25": {"decision": "D-087, D-088", "dayType": "free", "session": None, "sessionName": "Bez treningu", "sauna": 0, "diet": "NT",
-                   "note": "Wyjątek 25.09.2026: bez treningu — okno 17:45–20:15 wolne, dieta NT"},
-    "2026-09-26": {"decision": "D-087",
-                   "note": "Trening kalibracyjny: technika i obciążenie wszystkich nowych ćwiczeń na nogi"},
     "2026-09-27": {"decision": "D-087", "dayType": "rest_sauna2", "session": None, "sessionName": "Bez treningu, 2 × sauna",
                    "sauna": 2, "diet": "NT", "note": "Wyjątek 27.09.2026: zamiast basenu dzień sauny (bez treningu, dieta NT)"},
 }

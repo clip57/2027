@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_from": "PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v5, 25.09.2026) — obiekt D (D-086, D-087)",
+ "generated_from": "PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v7, 27.09.2026) — obiekt D (D-086, D-087, D-090)",
  "exam": "2026-11-12",
  "D": {
   "cfa": [
@@ -17,8 +17,8 @@
     "koniec": 341,
     "lm": 12,
     "luki": 0,
-    "start": "2026-09-25",
-    "koniecd": "2026-09-29"
+    "start": "2026-09-27",
+    "koniecd": "2026-09-30"
    },
    {
     "kol": 2,
@@ -33,8 +33,8 @@
     "koniec": 500,
     "lm": 12,
     "luki": 0,
-    "start": "2026-09-30",
-    "koniecd": "2026-10-05"
+    "start": "2026-10-01",
+    "koniecd": "2026-10-06"
    },
    {
     "kol": 3,
@@ -49,8 +49,8 @@
     "koniec": 532,
     "lm": 19,
     "luki": 0,
-    "start": "2026-10-07",
-    "koniecd": "2026-10-13"
+    "start": "2026-10-08",
+    "koniecd": "2026-10-14"
    },
    {
     "kol": 4,
@@ -168,23 +168,23 @@
   "schweser": [
    {
     "book": "Book 1",
-    "bloki": 16,
+    "bloki": 15,
     "readings": 26,
-    "pary": 10,
+    "pary": 11,
     "zakres": "R1–R26"
    },
    {
     "book": "Book 2",
-    "bloki": 20,
+    "bloki": 19,
     "readings": 20,
-    "pary": 0,
+    "pary": 1,
     "zakres": "R27–R46"
    },
    {
     "book": "Book 3",
-    "bloki": 29,
+    "bloki": 27,
     "readings": 29,
-    "pary": 0,
+    "pary": 2,
     "zakres": "R47–R75"
    },
    {
@@ -196,29 +196,33 @@
    }
   ],
   "stat": {
-   "bloki": 421,
-   "dni": 48,
-   "godziny": 371.88,
-   "cfa": 421,
+   "bloki": 409,
+   "dni": 46,
+   "godziny": 361.28,
+   "cfa": 409,
    "mpw": 0,
    "kat": {
     "CFA Curriculum": 290,
-    "Schweser": 75,
-    "Practice CFA": 56
+    "Schweser": 71,
+    "Practice CFA": 48
    },
    "tryb": {
     "FIRST PASS": 290,
-    "CONSOLIDATION": 75,
+    "CONSOLIDATION": 71,
     "MOCK": 24,
-    "ANALIZA BŁĘDÓW": 24,
-    "PRACTICE": 5,
-    "ACTIVE RECALL": 3
+    "ANALIZA BŁĘDÓW": 24
    },
    "recall": 34,
    "recallH": 30.03,
-   "start": "2026-09-25",
+   "start": "2026-09-27",
    "end": "2026-11-11",
-   "uklad": "41×9 + 6×8 + 1×4"
+   "uklad": "41×9 + 5×8",
+   "d1": {
+    "n": 9,
+    "bloki": "A–I",
+    "od": "08:00",
+    "do": "17:33"
+   }
   },
   "mockCFA": [
    "2026-10-26",
@@ -235,13 +239,13 @@
   "fpEnd": "2026-11-05",
   "faza": {
    "f1": {
-    "od": "2026-09-25",
+    "od": "2026-09-27",
     "do": "2026-11-05",
-    "dni": 42,
-    "bl": 367,
+    "dni": 40,
+    "bl": 355,
     "kat": {
      "CFA Curriculum": 290,
-     "Schweser": 41,
+     "Schweser": 29,
      "Practice CFA": 36
     }
    },
@@ -251,25 +255,33 @@
     "dni": 6,
     "bl": 54,
     "kat": {
-     "Schweser": 34,
-     "Practice CFA": 20
+     "Schweser": 42,
+     "Practice CFA": 12
     },
-    "fp": 0
+    "fp": 0,
+    "schTopics": [
+     "Fixed Income",
+     "Equity Investments",
+     "Portfolio Management",
+     "Ethical and Professional Standards",
+     "Corporate Issuers",
+     "Alternative Investments",
+     "Derivatives",
+     "Economics"
+    ]
    }
   },
   "prac": {
    "Mocki — sesje egzaminacyjne": 24,
-   "Analiza błędów po mockach": 24,
-   "Mixed practice — pytania mieszane": 5,
-   "Ethics i wzory — finalne utrwalenie": 3
+   "Analiza błędów po mockach": 24
   },
   "bloki": [
    {
     "nr": 1,
-    "data": "2026-09-25",
-    "dzien": "piątek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -282,10 +294,10 @@
    },
    {
     "nr": 2,
-    "data": "2026-09-25",
-    "dzien": "piątek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -298,10 +310,10 @@
    },
    {
     "nr": 3,
-    "data": "2026-09-25",
-    "dzien": "piątek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -314,10 +326,10 @@
    },
    {
     "nr": 4,
-    "data": "2026-09-25",
-    "dzien": "piątek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -330,10 +342,10 @@
    },
    {
     "nr": 5,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -346,10 +358,10 @@
    },
    {
     "nr": 6,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -362,10 +374,10 @@
    },
    {
     "nr": 7,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -378,10 +390,10 @@
    },
    {
     "nr": 8,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -394,10 +406,10 @@
    },
    {
     "nr": 9,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "data": "2026-09-27",
+    "dzien": "niedziela",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -410,10 +422,10 @@
    },
    {
     "nr": 10,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -426,10 +438,10 @@
    },
    {
     "nr": 11,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -442,10 +454,10 @@
    },
    {
     "nr": 12,
-    "data": "2026-09-26",
-    "dzien": "sobota",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -458,10 +470,10 @@
    },
    {
     "nr": 13,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -474,10 +486,10 @@
    },
    {
     "nr": 14,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -490,10 +502,10 @@
    },
    {
     "nr": 15,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -506,10 +518,10 @@
    },
    {
     "nr": 16,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -522,10 +534,10 @@
    },
    {
     "nr": 17,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -538,10 +550,10 @@
    },
    {
     "nr": 18,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "data": "2026-09-28",
+    "dzien": "poniedziałek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -554,10 +566,10 @@
    },
    {
     "nr": 19,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -570,10 +582,10 @@
    },
    {
     "nr": 20,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -586,10 +598,10 @@
    },
    {
     "nr": 21,
-    "data": "2026-09-27",
-    "dzien": "niedziela",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -602,10 +614,10 @@
    },
    {
     "nr": 22,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -618,10 +630,10 @@
    },
    {
     "nr": 23,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -634,10 +646,10 @@
    },
    {
     "nr": 24,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -650,10 +662,10 @@
    },
    {
     "nr": 25,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -666,10 +678,10 @@
    },
    {
     "nr": 26,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -682,10 +694,10 @@
    },
    {
     "nr": 27,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "data": "2026-09-29",
+    "dzien": "wtorek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -698,10 +710,10 @@
    },
    {
     "nr": 28,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -714,10 +726,10 @@
    },
    {
     "nr": 29,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -730,10 +742,10 @@
    },
    {
     "nr": 30,
-    "data": "2026-09-28",
-    "dzien": "poniedziałek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -746,10 +758,10 @@
    },
    {
     "nr": 31,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -762,10 +774,10 @@
    },
    {
     "nr": 32,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -778,10 +790,10 @@
    },
    {
     "nr": 33,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -794,10 +806,10 @@
    },
    {
     "nr": 34,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -810,10 +822,10 @@
    },
    {
     "nr": 35,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -826,42 +838,26 @@
    },
    {
     "nr": 36,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "data": "2026-09-30",
+    "dzien": "środa",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
     "zrodlo": "SchweserNotes 2025 Book 1",
-    "do_przeczytania": "READING 3",
+    "do_przeczytania": "READING 3–4",
     "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Quantitative Methods — konsolidacja po Curriculum (READING 3)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 3"
+    "temat": "Quantitative Methods — konsolidacja po Curriculum (READING 3–4)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 3–4"
    },
    {
     "nr": 37,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "G",
-    "godz": "14:30–15:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 1",
-    "do_przeczytania": "READING 4",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Quantitative Methods — konsolidacja po Curriculum (READING 4)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 4"
-   },
-   {
-    "nr": 38,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -873,11 +869,11 @@
     "zakres": "READING 5"
    },
    {
-    "nr": 39,
-    "data": "2026-09-29",
-    "dzien": "wtorek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 38,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -889,11 +885,11 @@
     "zakres": "READING 6–7"
    },
    {
-    "nr": 40,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 39,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -905,11 +901,11 @@
     "zakres": "READING 8–9"
    },
    {
-    "nr": 41,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 40,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -921,11 +917,11 @@
     "zakres": "READING 10–11"
    },
    {
-    "nr": 42,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 41,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -937,11 +933,11 @@
     "zakres": "s. 3–13 (11 s.)"
    },
    {
-    "nr": 43,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 42,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -953,11 +949,11 @@
     "zakres": "s. 14–24 (11 s.)"
    },
    {
-    "nr": 44,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 43,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -969,11 +965,11 @@
     "zakres": "s. 25–35 (11 s.)"
    },
    {
-    "nr": 45,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 44,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -985,11 +981,11 @@
     "zakres": "s. 36–46 (11 s.)"
    },
    {
-    "nr": 46,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 45,
+    "data": "2026-10-01",
+    "dzien": "czwartek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1001,11 +997,11 @@
     "zakres": "s. 47–57 (11 s.)"
    },
    {
-    "nr": 47,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 46,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1017,11 +1013,11 @@
     "zakres": "s. 58–68 (11 s.)"
    },
    {
-    "nr": 48,
-    "data": "2026-09-30",
-    "dzien": "środa",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 47,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1033,11 +1029,11 @@
     "zakres": "s. 69–79 (11 s.)"
    },
    {
-    "nr": 49,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 48,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1049,11 +1045,11 @@
     "zakres": "s. 80–90 (11 s.)"
    },
    {
-    "nr": 50,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 49,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1065,11 +1061,11 @@
     "zakres": "s. 91–100 (10 s.)"
    },
    {
-    "nr": 51,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 50,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1081,11 +1077,11 @@
     "zakres": "s. 101–110 (10 s.)"
    },
    {
-    "nr": 52,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 51,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1097,11 +1093,11 @@
     "zakres": "s. 111–120 (10 s.)"
    },
    {
-    "nr": 53,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 52,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1113,11 +1109,11 @@
     "zakres": "s. 121–130 (10 s.)"
    },
    {
-    "nr": 54,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 53,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1129,11 +1125,11 @@
     "zakres": "s. 131–140 (10 s.)"
    },
    {
-    "nr": 55,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 54,
+    "data": "2026-10-02",
+    "dzien": "piątek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1145,11 +1141,11 @@
     "zakres": "s. 141–150 (10 s.)"
    },
    {
-    "nr": 56,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 55,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1161,11 +1157,11 @@
     "zakres": "s. 151–160 (10 s.)"
    },
    {
-    "nr": 57,
-    "data": "2026-10-01",
-    "dzien": "czwartek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 56,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1177,11 +1173,11 @@
     "zakres": "s. 161–170 (10 s.)"
    },
    {
-    "nr": 58,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 57,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1193,11 +1189,11 @@
     "zakres": "s. 171–180 (10 s.)"
    },
    {
-    "nr": 59,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 58,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1209,11 +1205,11 @@
     "zakres": "s. 181–190 (10 s.)"
    },
    {
-    "nr": 60,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 59,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1225,11 +1221,11 @@
     "zakres": "s. 191–200 (10 s.)"
    },
    {
-    "nr": 61,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 60,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1241,11 +1237,11 @@
     "zakres": "s. 201–210 (10 s.)"
    },
    {
-    "nr": 62,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 61,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1257,11 +1253,11 @@
     "zakres": "s. 211–220 (10 s.)"
    },
    {
-    "nr": 63,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 62,
+    "data": "2026-10-03",
+    "dzien": "sobota",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1273,11 +1269,11 @@
     "zakres": "s. 221–230 (10 s.)"
    },
    {
-    "nr": 64,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 63,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1289,11 +1285,11 @@
     "zakres": "s. 231–240 (10 s.)"
    },
    {
-    "nr": 65,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 64,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1305,11 +1301,11 @@
     "zakres": "s. 241–250 (10 s.)"
    },
    {
-    "nr": 66,
-    "data": "2026-10-02",
-    "dzien": "piątek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 65,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1321,11 +1317,11 @@
     "zakres": "s. 251–260 (10 s.)"
    },
    {
-    "nr": 67,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 66,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1337,11 +1333,11 @@
     "zakres": "s. 261–270 (10 s.)"
    },
    {
-    "nr": 68,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 67,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1353,11 +1349,11 @@
     "zakres": "s. 271–280 (10 s.)"
    },
    {
-    "nr": 69,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 68,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1369,11 +1365,11 @@
     "zakres": "s. 281–290 (10 s.)"
    },
    {
-    "nr": 70,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 69,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1385,11 +1381,11 @@
     "zakres": "s. 291–300 (10 s.)"
    },
    {
-    "nr": 71,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 70,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1401,11 +1397,11 @@
     "zakres": "s. 301–310 (10 s.)"
    },
    {
-    "nr": 72,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 71,
+    "data": "2026-10-04",
+    "dzien": "niedziela",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1417,11 +1413,11 @@
     "zakres": "s. 311–320 (10 s.)"
    },
    {
-    "nr": 73,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 72,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1433,11 +1429,11 @@
     "zakres": "s. 321–330 (10 s.)"
    },
    {
-    "nr": 74,
-    "data": "2026-10-03",
-    "dzien": "sobota",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 73,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1449,11 +1445,11 @@
     "zakres": "s. 331–340 (10 s.)"
    },
    {
-    "nr": 75,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 74,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1465,11 +1461,11 @@
     "zakres": "s. 341–350 (10 s.)"
    },
    {
-    "nr": 76,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 75,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1481,11 +1477,11 @@
     "zakres": "s. 351–360 (10 s.)"
    },
    {
-    "nr": 77,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 76,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1497,11 +1493,11 @@
     "zakres": "s. 361–370 (10 s.)"
    },
    {
-    "nr": 78,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 77,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1513,11 +1509,11 @@
     "zakres": "s. 371–380 (10 s.)"
    },
    {
-    "nr": 79,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 78,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1529,11 +1525,11 @@
     "zakres": "s. 381–390 (10 s.)"
    },
    {
-    "nr": 80,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 79,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1545,11 +1541,11 @@
     "zakres": "s. 391–400 (10 s.)"
    },
    {
-    "nr": 81,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 80,
+    "data": "2026-10-05",
+    "dzien": "poniedziałek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1561,11 +1557,11 @@
     "zakres": "s. 401–410 (10 s.)"
    },
    {
-    "nr": 82,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 81,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1577,11 +1573,11 @@
     "zakres": "s. 411–420 (10 s.)"
    },
    {
-    "nr": 83,
-    "data": "2026-10-04",
-    "dzien": "niedziela",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 82,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1593,11 +1589,11 @@
     "zakres": "s. 421–430 (10 s.)"
    },
    {
-    "nr": 84,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 83,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1609,11 +1605,11 @@
     "zakres": "s. 431–440 (10 s.)"
    },
    {
-    "nr": 85,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 84,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1625,11 +1621,11 @@
     "zakres": "s. 441–450 (10 s.)"
    },
    {
-    "nr": 86,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 85,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1641,11 +1637,11 @@
     "zakres": "s. 451–460 (10 s.)"
    },
    {
-    "nr": 87,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 86,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1657,11 +1653,11 @@
     "zakres": "s. 461–470 (10 s.)"
    },
    {
-    "nr": 88,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 87,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1673,11 +1669,11 @@
     "zakres": "s. 471–480 (10 s.)"
    },
    {
-    "nr": 89,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 88,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1689,11 +1685,11 @@
     "zakres": "s. 481–490 (10 s.)"
    },
    {
-    "nr": 90,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 89,
+    "data": "2026-10-06",
+    "dzien": "wtorek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1705,11 +1701,11 @@
     "zakres": "s. 491–500 (10 s.)"
    },
    {
-    "nr": 91,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 90,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1721,11 +1717,11 @@
     "zakres": "READING 27"
    },
    {
-    "nr": 92,
-    "data": "2026-10-05",
-    "dzien": "poniedziałek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 91,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1737,11 +1733,11 @@
     "zakres": "READING 28"
    },
    {
-    "nr": 93,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 92,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1753,11 +1749,11 @@
     "zakres": "READING 29"
    },
    {
-    "nr": 94,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 93,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1769,11 +1765,11 @@
     "zakres": "READING 30"
    },
    {
-    "nr": 95,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 94,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1785,11 +1781,11 @@
     "zakres": "READING 31"
    },
    {
-    "nr": 96,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 95,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1801,11 +1797,11 @@
     "zakres": "READING 32"
    },
    {
-    "nr": 97,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 96,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1817,11 +1813,11 @@
     "zakres": "READING 33"
    },
    {
-    "nr": 98,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 97,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1833,11 +1829,11 @@
     "zakres": "READING 34"
    },
    {
-    "nr": 99,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 98,
+    "data": "2026-10-07",
+    "dzien": "środa",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1849,11 +1845,11 @@
     "zakres": "READING 35"
    },
    {
-    "nr": 100,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 99,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1865,11 +1861,11 @@
     "zakres": "READING 36"
    },
    {
-    "nr": 101,
-    "data": "2026-10-06",
-    "dzien": "wtorek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 100,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1881,11 +1877,11 @@
     "zakres": "READING 37"
    },
    {
-    "nr": 102,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 101,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -1897,11 +1893,11 @@
     "zakres": "READING 38"
    },
    {
-    "nr": 103,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 102,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1913,11 +1909,11 @@
     "zakres": "s. 3–13 (11 s.)"
    },
    {
-    "nr": 104,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 103,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1929,11 +1925,11 @@
     "zakres": "s. 14–24 (11 s.)"
    },
    {
-    "nr": 105,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 104,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1945,11 +1941,11 @@
     "zakres": "s. 25–34 (10 s.)"
    },
    {
-    "nr": 106,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 105,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1961,11 +1957,11 @@
     "zakres": "s. 35–44 (10 s.)"
    },
    {
-    "nr": 107,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 106,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1977,11 +1973,11 @@
     "zakres": "s. 45–54 (10 s.)"
    },
    {
-    "nr": 108,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 107,
+    "data": "2026-10-08",
+    "dzien": "czwartek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -1993,11 +1989,11 @@
     "zakres": "s. 55–64 (10 s.)"
    },
    {
-    "nr": 109,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 108,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2009,11 +2005,11 @@
     "zakres": "s. 65–74 (10 s.)"
    },
    {
-    "nr": 110,
-    "data": "2026-10-07",
-    "dzien": "środa",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 109,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2025,11 +2021,11 @@
     "zakres": "s. 75–84 (10 s.)"
    },
    {
-    "nr": 111,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 110,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2041,11 +2037,11 @@
     "zakres": "s. 85–94 (10 s.)"
    },
    {
-    "nr": 112,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 111,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2057,11 +2053,11 @@
     "zakres": "s. 95–104 (10 s.)"
    },
    {
-    "nr": 113,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 112,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2073,11 +2069,11 @@
     "zakres": "s. 105–114 (10 s.)"
    },
    {
-    "nr": 114,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 113,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2089,11 +2085,11 @@
     "zakres": "s. 115–124 (10 s.)"
    },
    {
-    "nr": 115,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 114,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2105,11 +2101,11 @@
     "zakres": "s. 125–134 (10 s.)"
    },
    {
-    "nr": 116,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 115,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2121,11 +2117,11 @@
     "zakres": "s. 135–144 (10 s.)"
    },
    {
-    "nr": 117,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 116,
+    "data": "2026-10-09",
+    "dzien": "piątek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2137,11 +2133,11 @@
     "zakres": "s. 145–154 (10 s.)"
    },
    {
-    "nr": 118,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 117,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2153,11 +2149,11 @@
     "zakres": "s. 155–164 (10 s.)"
    },
    {
-    "nr": 119,
-    "data": "2026-10-08",
-    "dzien": "czwartek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 118,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2169,11 +2165,11 @@
     "zakres": "s. 165–174 (10 s.)"
    },
    {
-    "nr": 120,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 119,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2185,11 +2181,11 @@
     "zakres": "s. 175–184 (10 s.)"
    },
    {
-    "nr": 121,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 120,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2201,11 +2197,11 @@
     "zakres": "s. 185–194 (10 s.)"
    },
    {
-    "nr": 122,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 121,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2217,11 +2213,11 @@
     "zakres": "s. 195–204 (10 s.)"
    },
    {
-    "nr": 123,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 122,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2233,11 +2229,11 @@
     "zakres": "s. 205–214 (10 s.)"
    },
    {
-    "nr": 124,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 123,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2249,11 +2245,11 @@
     "zakres": "s. 215–224 (10 s.)"
    },
    {
-    "nr": 125,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 124,
+    "data": "2026-10-10",
+    "dzien": "sobota",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2265,11 +2261,11 @@
     "zakres": "s. 225–234 (10 s.)"
    },
    {
-    "nr": 126,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 125,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2281,11 +2277,11 @@
     "zakres": "s. 235–244 (10 s.)"
    },
    {
-    "nr": 127,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 126,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2297,11 +2293,11 @@
     "zakres": "s. 245–254 (10 s.)"
    },
    {
-    "nr": 128,
-    "data": "2026-10-09",
-    "dzien": "piątek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 127,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2313,11 +2309,11 @@
     "zakres": "s. 255–264 (10 s.)"
    },
    {
-    "nr": 129,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 128,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2329,11 +2325,11 @@
     "zakres": "s. 265–274 (10 s.)"
    },
    {
-    "nr": 130,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 129,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2345,11 +2341,11 @@
     "zakres": "s. 275–284 (10 s.)"
    },
    {
-    "nr": 131,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 130,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2361,11 +2357,11 @@
     "zakres": "s. 285–294 (10 s.)"
    },
    {
-    "nr": 132,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 131,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2377,11 +2373,11 @@
     "zakres": "s. 295–304 (10 s.)"
    },
    {
-    "nr": 133,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 132,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2393,11 +2389,11 @@
     "zakres": "s. 305–314 (10 s.)"
    },
    {
-    "nr": 134,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 133,
+    "data": "2026-10-11",
+    "dzien": "niedziela",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2409,11 +2405,11 @@
     "zakres": "s. 315–324 (10 s.)"
    },
    {
-    "nr": 135,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 134,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2425,11 +2421,11 @@
     "zakres": "s. 325–334 (10 s.)"
    },
    {
-    "nr": 136,
-    "data": "2026-10-10",
-    "dzien": "sobota",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 135,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2441,11 +2437,11 @@
     "zakres": "s. 335–344 (10 s.)"
    },
    {
-    "nr": 137,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 136,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2457,11 +2453,11 @@
     "zakres": "s. 345–354 (10 s.)"
    },
    {
-    "nr": 138,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 137,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2473,11 +2469,11 @@
     "zakres": "s. 355–364 (10 s.)"
    },
    {
-    "nr": 139,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 138,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2489,11 +2485,11 @@
     "zakres": "s. 365–374 (10 s.)"
    },
    {
-    "nr": 140,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 139,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2505,11 +2501,11 @@
     "zakres": "s. 375–384 (10 s.)"
    },
    {
-    "nr": 141,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 140,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2521,11 +2517,11 @@
     "zakres": "s. 385–394 (10 s.)"
    },
    {
-    "nr": 142,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 141,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2537,11 +2533,11 @@
     "zakres": "s. 395–404 (10 s.)"
    },
    {
-    "nr": 143,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 142,
+    "data": "2026-10-12",
+    "dzien": "poniedziałek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2553,11 +2549,11 @@
     "zakres": "s. 405–414 (10 s.)"
    },
    {
-    "nr": 144,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 143,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2569,11 +2565,11 @@
     "zakres": "s. 415–424 (10 s.)"
    },
    {
-    "nr": 145,
-    "data": "2026-10-11",
-    "dzien": "niedziela",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 144,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2585,11 +2581,11 @@
     "zakres": "s. 425–434 (10 s.)"
    },
    {
-    "nr": 146,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 145,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2601,11 +2597,11 @@
     "zakres": "s. 435–444 (10 s.)"
    },
    {
-    "nr": 147,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 146,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2617,11 +2613,11 @@
     "zakres": "s. 445–454 (10 s.)"
    },
    {
-    "nr": 148,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 147,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2633,11 +2629,11 @@
     "zakres": "s. 455–464 (10 s.)"
    },
    {
-    "nr": 149,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 148,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2649,11 +2645,11 @@
     "zakres": "s. 465–474 (10 s.)"
    },
    {
-    "nr": 150,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 149,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2665,11 +2661,11 @@
     "zakres": "s. 475–484 (10 s.)"
    },
    {
-    "nr": 151,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 150,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2681,11 +2677,11 @@
     "zakres": "s. 485–494 (10 s.)"
    },
    {
-    "nr": 152,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 151,
+    "data": "2026-10-13",
+    "dzien": "wtorek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2697,11 +2693,11 @@
     "zakres": "s. 495–504 (10 s.)"
    },
    {
-    "nr": 153,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 152,
+    "data": "2026-10-14",
+    "dzien": "środa",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2713,11 +2709,11 @@
     "zakres": "s. 505–514 (10 s.)"
    },
    {
-    "nr": 154,
-    "data": "2026-10-12",
-    "dzien": "poniedziałek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 153,
+    "data": "2026-10-14",
+    "dzien": "środa",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2729,11 +2725,11 @@
     "zakres": "s. 515–523 (9 s.)"
    },
    {
-    "nr": 155,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "nr": 154,
+    "data": "2026-10-14",
+    "dzien": "środa",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -2745,73 +2741,41 @@
     "zakres": "s. 524–532 (9 s.)"
    },
    {
-    "nr": 156,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
-    "blok": "B",
-    "godz": "09:10–10:03",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 47",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 47)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 47"
-   },
-   {
-    "nr": 157,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
-    "blok": "C",
-    "godz": "10:10–11:03",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 48",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 48)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 48"
-   },
-   {
-    "nr": 158,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
+    "nr": 155,
+    "data": "2026-10-14",
+    "dzien": "środa",
     "blok": "D",
     "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
     "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 49",
+    "do_przeczytania": "READING 47–48",
     "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 49)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 49"
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 47–48)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 47–48"
    },
    {
-    "nr": 159,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
+    "nr": 156,
+    "data": "2026-10-14",
+    "dzien": "środa",
     "blok": "E",
     "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
     "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 50",
+    "do_przeczytania": "READING 49–50",
     "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 50)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 50"
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 49–50)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 49–50"
    },
    {
-    "nr": 160,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
+    "nr": 157,
+    "data": "2026-10-14",
+    "dzien": "środa",
     "blok": "F",
     "godz": "13:30–14:23",
     "egzamin": "CFA",
@@ -2825,9 +2789,9 @@
     "zakres": "READING 51"
    },
    {
-    "nr": 161,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
+    "nr": 158,
+    "data": "2026-10-14",
+    "dzien": "środa",
     "blok": "G",
     "godz": "14:30–15:23",
     "egzamin": "CFA",
@@ -2841,9 +2805,9 @@
     "zakres": "READING 52"
    },
    {
-    "nr": 162,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
+    "nr": 159,
+    "data": "2026-10-14",
+    "dzien": "środa",
     "blok": "H",
     "godz": "15:30–16:23",
     "egzamin": "CFA",
@@ -2857,9 +2821,9 @@
     "zakres": "READING 53"
    },
    {
-    "nr": 163,
-    "data": "2026-10-13",
-    "dzien": "wtorek",
+    "nr": 160,
+    "data": "2026-10-14",
+    "dzien": "środa",
     "blok": "I",
     "godz": "16:40–17:33",
     "egzamin": "CFA",
@@ -2873,9 +2837,9 @@
     "zakres": "READING 54"
    },
    {
-    "nr": 164,
-    "data": "2026-10-14",
-    "dzien": "środa",
+    "nr": 161,
+    "data": "2026-10-15",
+    "dzien": "czwartek",
     "blok": "A",
     "godz": "08:00–08:53",
     "egzamin": "CFA",
@@ -2889,9 +2853,9 @@
     "zakres": "READING 55"
    },
    {
-    "nr": 165,
-    "data": "2026-10-14",
-    "dzien": "środa",
+    "nr": 162,
+    "data": "2026-10-15",
+    "dzien": "czwartek",
     "blok": "B",
     "godz": "09:10–10:03",
     "egzamin": "CFA",
@@ -2905,9 +2869,9 @@
     "zakres": "READING 56"
    },
    {
-    "nr": 166,
-    "data": "2026-10-14",
-    "dzien": "środa",
+    "nr": 163,
+    "data": "2026-10-15",
+    "dzien": "czwartek",
     "blok": "C",
     "godz": "10:10–11:03",
     "egzamin": "CFA",
@@ -2921,9 +2885,9 @@
     "zakres": "READING 57"
    },
    {
-    "nr": 167,
-    "data": "2026-10-14",
-    "dzien": "środa",
+    "nr": 164,
+    "data": "2026-10-15",
+    "dzien": "czwartek",
     "blok": "D",
     "godz": "11:20–12:13",
     "egzamin": "CFA",
@@ -2937,123 +2901,11 @@
     "zakres": "READING 58"
    },
    {
-    "nr": 168,
-    "data": "2026-10-14",
-    "dzien": "środa",
+    "nr": 165,
+    "data": "2026-10-15",
+    "dzien": "czwartek",
     "blok": "E",
     "godz": "12:20–13:13",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 59",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 59)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 59"
-   },
-   {
-    "nr": 169,
-    "data": "2026-10-14",
-    "dzien": "środa",
-    "blok": "F",
-    "godz": "13:30–14:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 60",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 60)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 60"
-   },
-   {
-    "nr": 170,
-    "data": "2026-10-14",
-    "dzien": "środa",
-    "blok": "G",
-    "godz": "14:30–15:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 61",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 61)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 61"
-   },
-   {
-    "nr": 171,
-    "data": "2026-10-14",
-    "dzien": "środa",
-    "blok": "H",
-    "godz": "15:30–16:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 62",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 62)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 62"
-   },
-   {
-    "nr": 172,
-    "data": "2026-10-14",
-    "dzien": "środa",
-    "blok": "I",
-    "godz": "16:40–17:33",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 63",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 63)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 63"
-   },
-   {
-    "nr": 173,
-    "data": "2026-10-15",
-    "dzien": "czwartek",
-    "blok": "A",
-    "godz": "08:00–08:53",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 64",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 64)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 64"
-   },
-   {
-    "nr": 174,
-    "data": "2026-10-15",
-    "dzien": "czwartek",
-    "blok": "B",
-    "godz": "09:10–10:03",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 3",
-    "do_przeczytania": "READING 65",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Fixed Income — konsolidacja po Curriculum (READING 65)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 65"
-   },
-   {
-    "nr": 175,
-    "data": "2026-10-15",
-    "dzien": "czwartek",
-    "blok": "C",
-    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3065,11 +2917,11 @@
     "zakres": "s. 3–14 (12 s.)"
    },
    {
-    "nr": 176,
+    "nr": 166,
     "data": "2026-10-15",
     "dzien": "czwartek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3081,11 +2933,11 @@
     "zakres": "s. 15–26 (12 s.)"
    },
    {
-    "nr": 177,
+    "nr": 167,
     "data": "2026-10-15",
     "dzien": "czwartek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3097,11 +2949,11 @@
     "zakres": "s. 27–38 (12 s.)"
    },
    {
-    "nr": 178,
+    "nr": 168,
     "data": "2026-10-15",
     "dzien": "czwartek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3113,11 +2965,11 @@
     "zakres": "s. 39–50 (12 s.)"
    },
    {
-    "nr": 179,
+    "nr": 169,
     "data": "2026-10-15",
     "dzien": "czwartek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3129,11 +2981,11 @@
     "zakres": "s. 51–62 (12 s.)"
    },
    {
-    "nr": 180,
-    "data": "2026-10-15",
-    "dzien": "czwartek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 170,
+    "data": "2026-10-16",
+    "dzien": "piątek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3145,11 +2997,11 @@
     "zakres": "s. 63–74 (12 s.)"
    },
    {
-    "nr": 181,
-    "data": "2026-10-15",
-    "dzien": "czwartek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 171,
+    "data": "2026-10-16",
+    "dzien": "piątek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3161,11 +3013,11 @@
     "zakres": "s. 75–86 (12 s.)"
    },
    {
-    "nr": 182,
+    "nr": 172,
     "data": "2026-10-16",
     "dzien": "piątek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3177,11 +3029,11 @@
     "zakres": "s. 87–98 (12 s.)"
    },
    {
-    "nr": 183,
+    "nr": 173,
     "data": "2026-10-16",
     "dzien": "piątek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3193,11 +3045,11 @@
     "zakres": "s. 99–110 (12 s.)"
    },
    {
-    "nr": 184,
+    "nr": 174,
     "data": "2026-10-16",
     "dzien": "piątek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3209,39 +3061,7 @@
     "zakres": "s. 111–122 (12 s.)"
    },
    {
-    "nr": 185,
-    "data": "2026-10-16",
-    "dzien": "piątek",
-    "blok": "D",
-    "godz": "11:20–12:13",
-    "egzamin": "CFA",
-    "kategoria": "CFA Curriculum",
-    "tryb": "FIRST PASS",
-    "zrodlo": "Curriculum 2026 Vol 5 (EQ)",
-    "do_przeczytania": "s. 123–134 (12 s.)",
-    "objetosc_zrodla": "cały tom: 385 s.",
-    "temat": "LM 3: Market E!ciency",
-    "zadania": "12 s./53 min (limit 13, 🟡 mieszany) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
-    "zakres": "s. 123–134 (12 s.)"
-   },
-   {
-    "nr": 186,
-    "data": "2026-10-16",
-    "dzien": "piątek",
-    "blok": "E",
-    "godz": "12:20–13:13",
-    "egzamin": "CFA",
-    "kategoria": "CFA Curriculum",
-    "tryb": "FIRST PASS",
-    "zrodlo": "Curriculum 2026 Vol 5 (EQ)",
-    "do_przeczytania": "s. 135–146 (12 s.)",
-    "objetosc_zrodla": "cały tom: 385 s.",
-    "temat": "LM 3: Market E!ciency",
-    "zadania": "12 s./53 min (limit 13, 🟡 mieszany) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
-    "zakres": "s. 135–146 (12 s.)"
-   },
-   {
-    "nr": 187,
+    "nr": 175,
     "data": "2026-10-16",
     "dzien": "piątek",
     "blok": "F",
@@ -3250,18 +3070,50 @@
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
     "zrodlo": "Curriculum 2026 Vol 5 (EQ)",
-    "do_przeczytania": "s. 147–158 (12 s.)",
+    "do_przeczytania": "s. 123–134 (12 s.)",
     "objetosc_zrodla": "cały tom: 385 s.",
-    "temat": "LM 3: Market E!ciency",
+    "temat": "LM 3: Market Efficiency",
     "zadania": "12 s./53 min (limit 13, 🟡 mieszany) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
-    "zakres": "s. 147–158 (12 s.)"
+    "zakres": "s. 123–134 (12 s.)"
    },
    {
-    "nr": 188,
+    "nr": 176,
     "data": "2026-10-16",
     "dzien": "piątek",
     "blok": "G",
     "godz": "14:30–15:23",
+    "egzamin": "CFA",
+    "kategoria": "CFA Curriculum",
+    "tryb": "FIRST PASS",
+    "zrodlo": "Curriculum 2026 Vol 5 (EQ)",
+    "do_przeczytania": "s. 135–146 (12 s.)",
+    "objetosc_zrodla": "cały tom: 385 s.",
+    "temat": "LM 3: Market Efficiency",
+    "zadania": "12 s./53 min (limit 13, 🟡 mieszany) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
+    "zakres": "s. 135–146 (12 s.)"
+   },
+   {
+    "nr": 177,
+    "data": "2026-10-16",
+    "dzien": "piątek",
+    "blok": "H",
+    "godz": "15:30–16:23",
+    "egzamin": "CFA",
+    "kategoria": "CFA Curriculum",
+    "tryb": "FIRST PASS",
+    "zrodlo": "Curriculum 2026 Vol 5 (EQ)",
+    "do_przeczytania": "s. 147–158 (12 s.)",
+    "objetosc_zrodla": "cały tom: 385 s.",
+    "temat": "LM 3: Market Efficiency",
+    "zadania": "12 s./53 min (limit 13, 🟡 mieszany) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
+    "zakres": "s. 147–158 (12 s.)"
+   },
+   {
+    "nr": 178,
+    "data": "2026-10-16",
+    "dzien": "piątek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3273,11 +3125,11 @@
     "zakres": "s. 159–171 (13 s.)"
    },
    {
-    "nr": 189,
-    "data": "2026-10-16",
-    "dzien": "piątek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 179,
+    "data": "2026-10-17",
+    "dzien": "sobota",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3289,11 +3141,11 @@
     "zakres": "s. 172–184 (13 s.)"
    },
    {
-    "nr": 190,
-    "data": "2026-10-16",
-    "dzien": "piątek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 180,
+    "data": "2026-10-17",
+    "dzien": "sobota",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3305,11 +3157,11 @@
     "zakres": "s. 185–196 (12 s.)"
    },
    {
-    "nr": 191,
+    "nr": 181,
     "data": "2026-10-17",
     "dzien": "sobota",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3321,11 +3173,11 @@
     "zakres": "s. 197–209 (13 s.)"
    },
    {
-    "nr": 192,
+    "nr": 182,
     "data": "2026-10-17",
     "dzien": "sobota",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3337,11 +3189,11 @@
     "zakres": "s. 210–222 (13 s.)"
    },
    {
-    "nr": 193,
+    "nr": 183,
     "data": "2026-10-17",
     "dzien": "sobota",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3353,11 +3205,11 @@
     "zakres": "s. 223–235 (13 s.)"
    },
    {
-    "nr": 194,
+    "nr": 184,
     "data": "2026-10-17",
     "dzien": "sobota",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3369,11 +3221,11 @@
     "zakres": "s. 236–248 (13 s.)"
    },
    {
-    "nr": 195,
+    "nr": 185,
     "data": "2026-10-17",
     "dzien": "sobota",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3385,11 +3237,11 @@
     "zakres": "s. 249–261 (13 s.)"
    },
    {
-    "nr": 196,
+    "nr": 186,
     "data": "2026-10-17",
     "dzien": "sobota",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3401,11 +3253,11 @@
     "zakres": "s. 262–274 (13 s.)"
    },
    {
-    "nr": 197,
-    "data": "2026-10-17",
-    "dzien": "sobota",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 187,
+    "data": "2026-10-18",
+    "dzien": "niedziela",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3417,11 +3269,11 @@
     "zakres": "s. 275–287 (13 s.)"
    },
    {
-    "nr": 198,
-    "data": "2026-10-17",
-    "dzien": "sobota",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 188,
+    "data": "2026-10-18",
+    "dzien": "niedziela",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3433,11 +3285,11 @@
     "zakres": "s. 288–300 (13 s.)"
    },
    {
-    "nr": 199,
+    "nr": 189,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3449,11 +3301,11 @@
     "zakres": "s. 301–313 (13 s.)"
    },
    {
-    "nr": 200,
+    "nr": 190,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3465,11 +3317,11 @@
     "zakres": "s. 314–325 (12 s.)"
    },
    {
-    "nr": 201,
+    "nr": 191,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3481,11 +3333,11 @@
     "zakres": "s. 326–337 (12 s.)"
    },
    {
-    "nr": 202,
+    "nr": 192,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3497,11 +3349,11 @@
     "zakres": "s. 338–349 (12 s.)"
    },
    {
-    "nr": 203,
+    "nr": 193,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3513,11 +3365,11 @@
     "zakres": "s. 350–361 (12 s.)"
    },
    {
-    "nr": 204,
+    "nr": 194,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3529,11 +3381,11 @@
     "zakres": "s. 362–373 (12 s.)"
    },
    {
-    "nr": 205,
+    "nr": 195,
     "data": "2026-10-18",
     "dzien": "niedziela",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "CFA Curriculum",
     "tryb": "FIRST PASS",
@@ -3545,39 +3397,7 @@
     "zakres": "s. 374–385 (12 s.)"
    },
    {
-    "nr": 206,
-    "data": "2026-10-18",
-    "dzien": "niedziela",
-    "blok": "H",
-    "godz": "15:30–16:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 39",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 39)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 39"
-   },
-   {
-    "nr": 207,
-    "data": "2026-10-18",
-    "dzien": "niedziela",
-    "blok": "I",
-    "godz": "16:40–17:33",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 40",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 40)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 40"
-   },
-   {
-    "nr": 208,
+    "nr": 196,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "A",
@@ -3593,7 +3413,7 @@
     "zakres": "s. 3–14 (12 s.)"
    },
    {
-    "nr": 209,
+    "nr": 197,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "B",
@@ -3609,7 +3429,7 @@
     "zakres": "s. 15–26 (12 s.)"
    },
    {
-    "nr": 210,
+    "nr": 198,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "C",
@@ -3625,7 +3445,7 @@
     "zakres": "s. 27–38 (12 s.)"
    },
    {
-    "nr": 211,
+    "nr": 199,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "D",
@@ -3641,7 +3461,7 @@
     "zakres": "s. 39–50 (12 s.)"
    },
    {
-    "nr": 212,
+    "nr": 200,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "E",
@@ -3657,7 +3477,7 @@
     "zakres": "s. 51–62 (12 s.)"
    },
    {
-    "nr": 213,
+    "nr": 201,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "F",
@@ -3673,7 +3493,7 @@
     "zakres": "s. 63–74 (12 s.)"
    },
    {
-    "nr": 214,
+    "nr": 202,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "G",
@@ -3689,7 +3509,7 @@
     "zakres": "s. 75–86 (12 s.)"
    },
    {
-    "nr": 215,
+    "nr": 203,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "H",
@@ -3705,7 +3525,7 @@
     "zakres": "s. 87–98 (12 s.)"
    },
    {
-    "nr": 216,
+    "nr": 204,
     "data": "2026-10-19",
     "dzien": "poniedziałek",
     "blok": "I",
@@ -3721,7 +3541,7 @@
     "zakres": "s. 99–109 (11 s.)"
    },
    {
-    "nr": 217,
+    "nr": 205,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "A",
@@ -3737,7 +3557,7 @@
     "zakres": "s. 110–120 (11 s.)"
    },
    {
-    "nr": 218,
+    "nr": 206,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "B",
@@ -3753,7 +3573,7 @@
     "zakres": "s. 121–133 (13 s.)"
    },
    {
-    "nr": 219,
+    "nr": 207,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "C",
@@ -3769,7 +3589,7 @@
     "zakres": "s. 134–146 (13 s.)"
    },
    {
-    "nr": 220,
+    "nr": 208,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "D",
@@ -3785,7 +3605,7 @@
     "zakres": "s. 147–159 (13 s.)"
    },
    {
-    "nr": 221,
+    "nr": 209,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "E",
@@ -3801,7 +3621,7 @@
     "zakres": "s. 160–172 (13 s.)"
    },
    {
-    "nr": 222,
+    "nr": 210,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "F",
@@ -3817,7 +3637,7 @@
     "zakres": "s. 173–185 (13 s.)"
    },
    {
-    "nr": 223,
+    "nr": 211,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "G",
@@ -3833,7 +3653,7 @@
     "zakres": "s. 186–198 (13 s.)"
    },
    {
-    "nr": 224,
+    "nr": 212,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "H",
@@ -3849,7 +3669,7 @@
     "zakres": "s. 199–211 (13 s.)"
    },
    {
-    "nr": 225,
+    "nr": 213,
     "data": "2026-10-20",
     "dzien": "wtorek",
     "blok": "I",
@@ -3865,7 +3685,7 @@
     "zakres": "s. 212–224 (13 s.)"
    },
    {
-    "nr": 226,
+    "nr": 214,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "A",
@@ -3881,7 +3701,7 @@
     "zakres": "s. 225–237 (13 s.)"
    },
    {
-    "nr": 227,
+    "nr": 215,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "B",
@@ -3897,7 +3717,7 @@
     "zakres": "s. 238–250 (13 s.)"
    },
    {
-    "nr": 228,
+    "nr": 216,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "C",
@@ -3913,7 +3733,7 @@
     "zakres": "s. 251–263 (13 s.)"
    },
    {
-    "nr": 229,
+    "nr": 217,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "D",
@@ -3929,7 +3749,7 @@
     "zakres": "s. 264–276 (13 s.)"
    },
    {
-    "nr": 230,
+    "nr": 218,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "E",
@@ -3945,7 +3765,7 @@
     "zakres": "s. 277–288 (12 s.)"
    },
    {
-    "nr": 231,
+    "nr": 219,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "F",
@@ -3961,7 +3781,7 @@
     "zakres": "s. 3–15 (13 s.)"
    },
    {
-    "nr": 232,
+    "nr": 220,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "G",
@@ -3977,7 +3797,7 @@
     "zakres": "s. 16–28 (13 s.)"
    },
    {
-    "nr": 233,
+    "nr": 221,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "H",
@@ -3993,7 +3813,7 @@
     "zakres": "s. 29–41 (13 s.)"
    },
    {
-    "nr": 234,
+    "nr": 222,
     "data": "2026-10-21",
     "dzien": "środa",
     "blok": "I",
@@ -4009,7 +3829,7 @@
     "zakres": "s. 42–54 (13 s.)"
    },
    {
-    "nr": 235,
+    "nr": 223,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "A",
@@ -4025,7 +3845,7 @@
     "zakres": "s. 55–67 (13 s.)"
    },
    {
-    "nr": 236,
+    "nr": 224,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "B",
@@ -4041,7 +3861,7 @@
     "zakres": "s. 68–80 (13 s.)"
    },
    {
-    "nr": 237,
+    "nr": 225,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "C",
@@ -4057,7 +3877,7 @@
     "zakres": "s. 81–93 (13 s.)"
    },
    {
-    "nr": 238,
+    "nr": 226,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "D",
@@ -4073,7 +3893,7 @@
     "zakres": "s. 94–106 (13 s.)"
    },
    {
-    "nr": 239,
+    "nr": 227,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "E",
@@ -4089,7 +3909,7 @@
     "zakres": "s. 107–118 (12 s.)"
    },
    {
-    "nr": 240,
+    "nr": 228,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "F",
@@ -4105,7 +3925,7 @@
     "zakres": "s. 119–130 (12 s.)"
    },
    {
-    "nr": 241,
+    "nr": 229,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "G",
@@ -4121,7 +3941,7 @@
     "zakres": "s. 131–142 (12 s.)"
    },
    {
-    "nr": 242,
+    "nr": 230,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "H",
@@ -4137,7 +3957,7 @@
     "zakres": "s. 143–154 (12 s.)"
    },
    {
-    "nr": 243,
+    "nr": 231,
     "data": "2026-10-22",
     "dzien": "czwartek",
     "blok": "I",
@@ -4153,7 +3973,7 @@
     "zakres": "s. 155–166 (12 s.)"
    },
    {
-    "nr": 244,
+    "nr": 232,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "A",
@@ -4169,7 +3989,7 @@
     "zakres": "s. 167–178 (12 s.)"
    },
    {
-    "nr": 245,
+    "nr": 233,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "B",
@@ -4185,7 +4005,7 @@
     "zakres": "s. 179–190 (12 s.)"
    },
    {
-    "nr": 246,
+    "nr": 234,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "C",
@@ -4201,7 +4021,7 @@
     "zakres": "s. 191–202 (12 s.)"
    },
    {
-    "nr": 247,
+    "nr": 235,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "D",
@@ -4217,7 +4037,7 @@
     "zakres": "s. 203–214 (12 s.)"
    },
    {
-    "nr": 248,
+    "nr": 236,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "E",
@@ -4233,7 +4053,7 @@
     "zakres": "s. 215–226 (12 s.)"
    },
    {
-    "nr": 249,
+    "nr": 237,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "F",
@@ -4249,7 +4069,7 @@
     "zakres": "s. 227–238 (12 s.)"
    },
    {
-    "nr": 250,
+    "nr": 238,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "G",
@@ -4265,7 +4085,7 @@
     "zakres": "s. 239–250 (12 s.)"
    },
    {
-    "nr": 251,
+    "nr": 239,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "H",
@@ -4281,7 +4101,7 @@
     "zakres": "s. 251–262 (12 s.)"
    },
    {
-    "nr": 252,
+    "nr": 240,
     "data": "2026-10-23",
     "dzien": "piątek",
     "blok": "I",
@@ -4297,7 +4117,7 @@
     "zakres": "s. 263–274 (12 s.)"
    },
    {
-    "nr": 253,
+    "nr": 241,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "A",
@@ -4313,7 +4133,7 @@
     "zakres": "s. 275–286 (12 s.)"
    },
    {
-    "nr": 254,
+    "nr": 242,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "B",
@@ -4329,7 +4149,7 @@
     "zakres": "s. 3–17 (15 s.)"
    },
    {
-    "nr": 255,
+    "nr": 243,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "C",
@@ -4345,7 +4165,7 @@
     "zakres": "s. 18–31 (14 s.)"
    },
    {
-    "nr": 256,
+    "nr": 244,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "D",
@@ -4361,7 +4181,7 @@
     "zakres": "s. 32–45 (14 s.)"
    },
    {
-    "nr": 257,
+    "nr": 245,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "F",
@@ -4377,7 +4197,7 @@
     "zakres": "s. 46–59 (14 s.)"
    },
    {
-    "nr": 258,
+    "nr": 246,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "G",
@@ -4388,12 +4208,12 @@
     "zrodlo": "Curriculum 2026 Vol 3 (CI)",
     "do_przeczytania": "s. 60–73 (14 s.)",
     "objetosc_zrodla": "cały tom: 241 s.",
-    "temat": "LM 2: Investors and Other Stakeholders + LM 3: Corporate Governance: Con!icts, Mechanisms, Risks, and Bene\"ts",
+    "temat": "LM 2: Investors and Other Stakeholders + LM 3: Corporate Governance: Conflicts, Mechanisms, Risks, and Bene\"ts",
     "zadania": "14 s./53 min (limit 15, 🟢 opisowy) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
     "zakres": "s. 60–73 (14 s.)"
    },
    {
-    "nr": 259,
+    "nr": 247,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "H",
@@ -4404,12 +4224,12 @@
     "zrodlo": "Curriculum 2026 Vol 3 (CI)",
     "do_przeczytania": "s. 74–87 (14 s.)",
     "objetosc_zrodla": "cały tom: 241 s.",
-    "temat": "LM 3: Corporate Governance: Con!icts, Mechanisms, Risks, and Bene\"ts",
+    "temat": "LM 3: Corporate Governance: Conflicts, Mechanisms, Risks, and Bene\"ts",
     "zadania": "14 s./53 min (limit 15, 🟢 opisowy) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
     "zakres": "s. 74–87 (14 s.)"
    },
    {
-    "nr": 260,
+    "nr": 248,
     "data": "2026-10-24",
     "dzien": "sobota",
     "blok": "I",
@@ -4420,12 +4240,12 @@
     "zrodlo": "Curriculum 2026 Vol 3 (CI)",
     "do_przeczytania": "s. 88–101 (14 s.)",
     "objetosc_zrodla": "cały tom: 241 s.",
-    "temat": "LM 3: Corporate Governance: Con!icts, Mechanisms, Risks, and Bene\"ts + LM 4: Working Capital and Liquidity",
+    "temat": "LM 3: Corporate Governance: Conflicts, Mechanisms, Risks, and Bene\"ts + LM 4: Working Capital and Liquidity",
     "zadania": "14 s./53 min (limit 15, 🟢 opisowy) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
     "zakres": "s. 88–101 (14 s.)"
    },
    {
-    "nr": 261,
+    "nr": 249,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "A",
@@ -4441,7 +4261,7 @@
     "zakres": "s. 102–115 (14 s.)"
    },
    {
-    "nr": 262,
+    "nr": 250,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "B",
@@ -4457,7 +4277,7 @@
     "zakres": "s. 116–129 (14 s.)"
    },
    {
-    "nr": 263,
+    "nr": 251,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "C",
@@ -4473,7 +4293,7 @@
     "zakres": "s. 130–143 (14 s.)"
    },
    {
-    "nr": 264,
+    "nr": 252,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "D",
@@ -4489,7 +4309,7 @@
     "zakres": "s. 144–157 (14 s.)"
    },
    {
-    "nr": 265,
+    "nr": 253,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "E",
@@ -4505,7 +4325,7 @@
     "zakres": "s. 158–171 (14 s.)"
    },
    {
-    "nr": 266,
+    "nr": 254,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "F",
@@ -4521,7 +4341,7 @@
     "zakres": "s. 172–185 (14 s.)"
    },
    {
-    "nr": 267,
+    "nr": 255,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "G",
@@ -4537,7 +4357,7 @@
     "zakres": "s. 186–199 (14 s.)"
    },
    {
-    "nr": 268,
+    "nr": 256,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "H",
@@ -4553,7 +4373,7 @@
     "zakres": "s. 200–213 (14 s.)"
    },
    {
-    "nr": 269,
+    "nr": 257,
     "data": "2026-10-25",
     "dzien": "niedziela",
     "blok": "I",
@@ -4569,7 +4389,7 @@
     "zakres": "s. 214–227 (14 s.)"
    },
    {
-    "nr": 270,
+    "nr": 258,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "S1",
@@ -4585,7 +4405,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 271,
+    "nr": 259,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "S1",
@@ -4601,7 +4421,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 272,
+    "nr": 260,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "S1",
@@ -4617,7 +4437,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 273,
+    "nr": 261,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "S2",
@@ -4633,7 +4453,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 274,
+    "nr": 262,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "S2",
@@ -4649,7 +4469,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 275,
+    "nr": 263,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "S2",
@@ -4665,7 +4485,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 276,
+    "nr": 264,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "G",
@@ -4681,7 +4501,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 277,
+    "nr": 265,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "H",
@@ -4697,7 +4517,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 278,
+    "nr": 266,
     "data": "2026-10-26",
     "dzien": "poniedziałek",
     "blok": "I",
@@ -4713,7 +4533,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 279,
+    "nr": 267,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "A",
@@ -4729,7 +4549,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 280,
+    "nr": 268,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "B",
@@ -4745,7 +4565,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 281,
+    "nr": 269,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "C",
@@ -4761,7 +4581,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 282,
+    "nr": 270,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "D",
@@ -4777,7 +4597,7 @@
     "zakres": "s. 228–241 (14 s.)"
    },
    {
-    "nr": 283,
+    "nr": 271,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "E",
@@ -4793,7 +4613,7 @@
     "zakres": "s. 3–16 (14 s.)"
    },
    {
-    "nr": 284,
+    "nr": 272,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "F",
@@ -4809,7 +4629,7 @@
     "zakres": "s. 17–30 (14 s.)"
    },
    {
-    "nr": 285,
+    "nr": 273,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "G",
@@ -4825,7 +4645,7 @@
     "zakres": "s. 31–44 (14 s.)"
    },
    {
-    "nr": 286,
+    "nr": 274,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "H",
@@ -4841,7 +4661,7 @@
     "zakres": "s. 45–58 (14 s.)"
    },
    {
-    "nr": 287,
+    "nr": 275,
     "data": "2026-10-27",
     "dzien": "wtorek",
     "blok": "I",
@@ -4857,7 +4677,7 @@
     "zakres": "s. 59–72 (14 s.)"
    },
    {
-    "nr": 288,
+    "nr": 276,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "A",
@@ -4873,7 +4693,7 @@
     "zakres": "s. 73–86 (14 s.)"
    },
    {
-    "nr": 289,
+    "nr": 277,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "B",
@@ -4889,7 +4709,7 @@
     "zakres": "s. 87–100 (14 s.)"
    },
    {
-    "nr": 290,
+    "nr": 278,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "C",
@@ -4905,7 +4725,7 @@
     "zakres": "s. 101–114 (14 s.)"
    },
    {
-    "nr": 291,
+    "nr": 279,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "D",
@@ -4921,7 +4741,7 @@
     "zakres": "s. 115–128 (14 s.)"
    },
    {
-    "nr": 292,
+    "nr": 280,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "E",
@@ -4937,7 +4757,7 @@
     "zakres": "s. 129–142 (14 s.)"
    },
    {
-    "nr": 293,
+    "nr": 281,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "F",
@@ -4953,7 +4773,7 @@
     "zakres": "s. 143–156 (14 s.)"
    },
    {
-    "nr": 294,
+    "nr": 282,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "G",
@@ -4969,7 +4789,7 @@
     "zakres": "s. 157–170 (14 s.)"
    },
    {
-    "nr": 295,
+    "nr": 283,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "H",
@@ -4985,7 +4805,7 @@
     "zakres": "s. 171–184 (14 s.)"
    },
    {
-    "nr": 296,
+    "nr": 284,
     "data": "2026-10-28",
     "dzien": "środa",
     "blok": "I",
@@ -5001,7 +4821,7 @@
     "zakres": "s. 185–198 (14 s.)"
    },
    {
-    "nr": 297,
+    "nr": 285,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "A",
@@ -5017,7 +4837,7 @@
     "zakres": "s. 199–211 (13 s.)"
    },
    {
-    "nr": 298,
+    "nr": 286,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "B",
@@ -5033,7 +4853,7 @@
     "zakres": "s. 3–12 (10 s.)"
    },
    {
-    "nr": 299,
+    "nr": 287,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "C",
@@ -5049,7 +4869,7 @@
     "zakres": "s. 13–22 (10 s.)"
    },
    {
-    "nr": 300,
+    "nr": 288,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "D",
@@ -5065,7 +4885,7 @@
     "zakres": "s. 23–32 (10 s.)"
    },
    {
-    "nr": 301,
+    "nr": 289,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "E",
@@ -5081,7 +4901,7 @@
     "zakres": "s. 33–42 (10 s.)"
    },
    {
-    "nr": 302,
+    "nr": 290,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "F",
@@ -5097,7 +4917,7 @@
     "zakres": "s. 43–52 (10 s.)"
    },
    {
-    "nr": 303,
+    "nr": 291,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "G",
@@ -5108,12 +4928,12 @@
     "zrodlo": "Curriculum 2026 Vol 7 (DER)",
     "do_przeczytania": "s. 53–62 (10 s.)",
     "objetosc_zrodla": "cały tom: 237 s.",
-    "temat": "LM 3: Derivative Bene!ts, Risks, and Issuer and Investor Uses",
+    "temat": "LM 3: Derivative Benefits, Risks, and Issuer and Investor Uses",
     "zadania": "10 s./53 min (limit 12, 🔴 matematyczny) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
     "zakres": "s. 53–62 (10 s.)"
    },
    {
-    "nr": 304,
+    "nr": 292,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "H",
@@ -5124,12 +4944,12 @@
     "zrodlo": "Curriculum 2026 Vol 7 (DER)",
     "do_przeczytania": "s. 63–72 (10 s.)",
     "objetosc_zrodla": "cały tom: 237 s.",
-    "temat": "LM 3: Derivative Bene!ts, Risks, and Issuer and Investor Uses",
+    "temat": "LM 3: Derivative Benefits, Risks, and Issuer and Investor Uses",
     "zadania": "10 s./53 min (limit 12, 🔴 matematyczny) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
     "zakres": "s. 63–72 (10 s.)"
    },
    {
-    "nr": 305,
+    "nr": 293,
     "data": "2026-10-29",
     "dzien": "czwartek",
     "blok": "I",
@@ -5140,12 +4960,12 @@
     "zrodlo": "Curriculum 2026 Vol 7 (DER)",
     "do_przeczytania": "s. 73–82 (10 s.)",
     "objetosc_zrodla": "cały tom: 237 s.",
-    "temat": "LM 3: Derivative Bene!ts, Risks, and Issuer and Investor Uses + LM 4: Arbitrage, Replication, and the Cost of Carry in Pricing Derivatives",
+    "temat": "LM 3: Derivative Benefits, Risks, and Issuer and Investor Uses + LM 4: Arbitrage, Replication, and the Cost of Carry in Pricing Derivatives",
     "zadania": "10 s./53 min (limit 12, 🔴 matematyczny) · czas po lekturze → 1) odtworzenie pojęć i wzorów, 2) Practice Problems, 3) analiza błędów, 4) dopiero na końcu dodatkowe strony",
     "zakres": "s. 73–82 (10 s.)"
    },
    {
-    "nr": 306,
+    "nr": 294,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "S1",
@@ -5161,7 +4981,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 307,
+    "nr": 295,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "S1",
@@ -5177,7 +4997,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 308,
+    "nr": 296,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "S1",
@@ -5193,7 +5013,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 309,
+    "nr": 297,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "S2",
@@ -5209,7 +5029,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 310,
+    "nr": 298,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "S2",
@@ -5225,7 +5045,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 311,
+    "nr": 299,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "S2",
@@ -5241,7 +5061,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 312,
+    "nr": 300,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "G",
@@ -5257,7 +5077,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 313,
+    "nr": 301,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "H",
@@ -5273,7 +5093,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 314,
+    "nr": 302,
     "data": "2026-10-30",
     "dzien": "piątek",
     "blok": "I",
@@ -5289,7 +5109,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 315,
+    "nr": 303,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "A",
@@ -5305,7 +5125,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 316,
+    "nr": 304,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "B",
@@ -5321,7 +5141,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 317,
+    "nr": 305,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "C",
@@ -5337,7 +5157,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 318,
+    "nr": 306,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "D",
@@ -5353,7 +5173,7 @@
     "zakres": "s. 83–92 (10 s.)"
    },
    {
-    "nr": 319,
+    "nr": 307,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "F",
@@ -5369,7 +5189,7 @@
     "zakres": "s. 93–102 (10 s.)"
    },
    {
-    "nr": 320,
+    "nr": 308,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "G",
@@ -5385,7 +5205,7 @@
     "zakres": "s. 103–112 (10 s.)"
    },
    {
-    "nr": 321,
+    "nr": 309,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "H",
@@ -5401,7 +5221,7 @@
     "zakres": "s. 113–122 (10 s.)"
    },
    {
-    "nr": 322,
+    "nr": 310,
     "data": "2026-10-31",
     "dzien": "sobota",
     "blok": "I",
@@ -5417,7 +5237,7 @@
     "zakres": "s. 123–132 (10 s.)"
    },
    {
-    "nr": 323,
+    "nr": 311,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "A",
@@ -5433,7 +5253,7 @@
     "zakres": "s. 133–142 (10 s.)"
    },
    {
-    "nr": 324,
+    "nr": 312,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "B",
@@ -5449,7 +5269,7 @@
     "zakres": "s. 143–152 (10 s.)"
    },
    {
-    "nr": 325,
+    "nr": 313,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "C",
@@ -5465,7 +5285,7 @@
     "zakres": "s. 153–162 (10 s.)"
    },
    {
-    "nr": 326,
+    "nr": 314,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "D",
@@ -5481,7 +5301,7 @@
     "zakres": "s. 163–172 (10 s.)"
    },
    {
-    "nr": 327,
+    "nr": 315,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "E",
@@ -5497,7 +5317,7 @@
     "zakres": "s. 173–182 (10 s.)"
    },
    {
-    "nr": 328,
+    "nr": 316,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "F",
@@ -5513,7 +5333,7 @@
     "zakres": "s. 183–192 (10 s.)"
    },
    {
-    "nr": 329,
+    "nr": 317,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "G",
@@ -5529,7 +5349,7 @@
     "zakres": "s. 193–201 (9 s.)"
    },
    {
-    "nr": 330,
+    "nr": 318,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "H",
@@ -5545,7 +5365,7 @@
     "zakres": "s. 202–210 (9 s.)"
    },
    {
-    "nr": 331,
+    "nr": 319,
     "data": "2026-11-01",
     "dzien": "niedziela",
     "blok": "I",
@@ -5561,7 +5381,7 @@
     "zakres": "s. 211–219 (9 s.)"
    },
    {
-    "nr": 332,
+    "nr": 320,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "A",
@@ -5577,7 +5397,7 @@
     "zakres": "s. 220–228 (9 s.)"
    },
    {
-    "nr": 333,
+    "nr": 321,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "B",
@@ -5593,7 +5413,7 @@
     "zakres": "s. 229–237 (9 s.)"
    },
    {
-    "nr": 334,
+    "nr": 322,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "C",
@@ -5609,7 +5429,7 @@
     "zakres": "s. 3–15 (13 s.)"
    },
    {
-    "nr": 335,
+    "nr": 323,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "D",
@@ -5625,7 +5445,7 @@
     "zakres": "s. 16–28 (13 s.)"
    },
    {
-    "nr": 336,
+    "nr": 324,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "E",
@@ -5641,7 +5461,7 @@
     "zakres": "s. 29–40 (12 s.)"
    },
    {
-    "nr": 337,
+    "nr": 325,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "F",
@@ -5657,7 +5477,7 @@
     "zakres": "s. 41–52 (12 s.)"
    },
    {
-    "nr": 338,
+    "nr": 326,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "G",
@@ -5673,7 +5493,7 @@
     "zakres": "s. 53–64 (12 s.)"
    },
    {
-    "nr": 339,
+    "nr": 327,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "H",
@@ -5689,7 +5509,7 @@
     "zakres": "s. 65–76 (12 s.)"
    },
    {
-    "nr": 340,
+    "nr": 328,
     "data": "2026-11-02",
     "dzien": "poniedziałek",
     "blok": "I",
@@ -5705,7 +5525,7 @@
     "zakres": "s. 77–88 (12 s.)"
    },
    {
-    "nr": 341,
+    "nr": 329,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "S1",
@@ -5721,7 +5541,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 342,
+    "nr": 330,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "S1",
@@ -5737,7 +5557,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 343,
+    "nr": 331,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "S1",
@@ -5753,7 +5573,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 344,
+    "nr": 332,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "S2",
@@ -5769,7 +5589,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 345,
+    "nr": 333,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "S2",
@@ -5785,7 +5605,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 346,
+    "nr": 334,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "S2",
@@ -5801,7 +5621,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 347,
+    "nr": 335,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "G",
@@ -5817,7 +5637,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 348,
+    "nr": 336,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "H",
@@ -5833,7 +5653,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 349,
+    "nr": 337,
     "data": "2026-11-03",
     "dzien": "wtorek",
     "blok": "I",
@@ -5849,7 +5669,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 350,
+    "nr": 338,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "A",
@@ -5865,7 +5685,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 351,
+    "nr": 339,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "B",
@@ -5881,7 +5701,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 352,
+    "nr": 340,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "C",
@@ -5897,7 +5717,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 353,
+    "nr": 341,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "D",
@@ -5913,7 +5733,7 @@
     "zakres": "s. 89–100 (12 s.)"
    },
    {
-    "nr": 354,
+    "nr": 342,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "E",
@@ -5929,7 +5749,7 @@
     "zakres": "s. 101–112 (12 s.)"
    },
    {
-    "nr": 355,
+    "nr": 343,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "F",
@@ -5945,7 +5765,7 @@
     "zakres": "s. 113–124 (12 s.)"
    },
    {
-    "nr": 356,
+    "nr": 344,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "G",
@@ -5961,7 +5781,7 @@
     "zakres": "s. 125–136 (12 s.)"
    },
    {
-    "nr": 357,
+    "nr": 345,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "H",
@@ -5977,7 +5797,7 @@
     "zakres": "s. 137–148 (12 s.)"
    },
    {
-    "nr": 358,
+    "nr": 346,
     "data": "2026-11-04",
     "dzien": "środa",
     "blok": "I",
@@ -5993,7 +5813,7 @@
     "zakres": "s. 149–160 (12 s.)"
    },
    {
-    "nr": 359,
+    "nr": 347,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "A",
@@ -6009,7 +5829,7 @@
     "zakres": "s. 161–172 (12 s.)"
    },
    {
-    "nr": 360,
+    "nr": 348,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "B",
@@ -6025,7 +5845,7 @@
     "zakres": "s. 173–184 (12 s.)"
    },
    {
-    "nr": 361,
+    "nr": 349,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "C",
@@ -6041,7 +5861,7 @@
     "zakres": "s. 185–196 (12 s.)"
    },
    {
-    "nr": 362,
+    "nr": 350,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "D",
@@ -6057,7 +5877,7 @@
     "zakres": "s. 197–208 (12 s.)"
    },
    {
-    "nr": 363,
+    "nr": 351,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "E",
@@ -6073,7 +5893,7 @@
     "zakres": "s. 209–220 (12 s.)"
    },
    {
-    "nr": 364,
+    "nr": 352,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "F",
@@ -6089,7 +5909,7 @@
     "zakres": "s. 221–232 (12 s.)"
    },
    {
-    "nr": 365,
+    "nr": 353,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "G",
@@ -6105,7 +5925,7 @@
     "zakres": "s. 233–244 (12 s.)"
    },
    {
-    "nr": 366,
+    "nr": 354,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "H",
@@ -6121,7 +5941,7 @@
     "zakres": "s. 245–256 (12 s.)"
    },
    {
-    "nr": 367,
+    "nr": 355,
     "data": "2026-11-05",
     "dzien": "czwartek",
     "blok": "I",
@@ -6137,11 +5957,139 @@
     "zakres": "s. 257–268 (12 s.)"
    },
    {
-    "nr": 368,
+    "nr": 356,
     "data": "2026-11-06",
     "dzien": "piątek",
     "blok": "A",
     "godz": "08:00–08:53",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 59",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 59)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 59"
+   },
+   {
+    "nr": 357,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "B",
+    "godz": "09:10–10:03",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 60",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 60)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 60"
+   },
+   {
+    "nr": 358,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "C",
+    "godz": "10:10–11:03",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 61",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 61)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 61"
+   },
+   {
+    "nr": 359,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "D",
+    "godz": "11:20–12:13",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 62",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 62)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 62"
+   },
+   {
+    "nr": 360,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "E",
+    "godz": "12:20–13:13",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 63",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 63)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 63"
+   },
+   {
+    "nr": 361,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "F",
+    "godz": "13:30–14:23",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 64",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 64)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 64"
+   },
+   {
+    "nr": 362,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "G",
+    "godz": "14:30–15:23",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 3",
+    "do_przeczytania": "READING 65",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Fixed Income — konsolidacja po Curriculum (READING 65)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 65"
+   },
+   {
+    "nr": 363,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "H",
+    "godz": "15:30–16:23",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 2",
+    "do_przeczytania": "READING 39–40",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Equity Investments — konsolidacja po Curriculum (READING 39–40)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 39–40"
+   },
+   {
+    "nr": 364,
+    "data": "2026-11-06",
+    "dzien": "piątek",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6153,135 +6101,7 @@
     "zakres": "READING 41"
    },
    {
-    "nr": 369,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "B",
-    "godz": "09:10–10:03",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 42",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 42)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 42"
-   },
-   {
-    "nr": 370,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "C",
-    "godz": "10:10–11:03",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 43",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 43)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 43"
-   },
-   {
-    "nr": 371,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "D",
-    "godz": "11:20–12:13",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 44",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 44)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 44"
-   },
-   {
-    "nr": 372,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "E",
-    "godz": "12:20–13:13",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 45",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 45)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 45"
-   },
-   {
-    "nr": 373,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "F",
-    "godz": "13:30–14:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 2",
-    "do_przeczytania": "READING 46",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Equity Investments — konsolidacja po Curriculum (READING 46)",
-    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 46"
-   },
-   {
-    "nr": 374,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "G",
-    "godz": "14:30–15:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 4",
-    "do_przeczytania": "READING 83–84",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Portfolio Management — konsolidacja po Curriculum (READING 83–84)",
-    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 83–84"
-   },
-   {
-    "nr": 375,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "H",
-    "godz": "15:30–16:23",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 4",
-    "do_przeczytania": "READING 85–86",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Portfolio Management — konsolidacja po Curriculum (READING 85–86)",
-    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 85–86"
-   },
-   {
-    "nr": 376,
-    "data": "2026-11-06",
-    "dzien": "piątek",
-    "blok": "I",
-    "godz": "16:40–17:33",
-    "egzamin": "CFA",
-    "kategoria": "Schweser",
-    "tryb": "CONSOLIDATION",
-    "zrodlo": "SchweserNotes 2025 Book 4",
-    "do_przeczytania": "READING 87–88",
-    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
-    "temat": "Portfolio Management — konsolidacja po Curriculum (READING 87–88)",
-    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
-    "zakres": "READING 87–88"
-   },
-   {
-    "nr": 377,
+    "nr": 365,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "S1",
@@ -6297,7 +6117,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 378,
+    "nr": 366,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "S1",
@@ -6313,7 +6133,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 379,
+    "nr": 367,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "S1",
@@ -6329,7 +6149,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 380,
+    "nr": 368,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "S2",
@@ -6345,7 +6165,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 381,
+    "nr": 369,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "S2",
@@ -6361,7 +6181,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 382,
+    "nr": 370,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "S2",
@@ -6377,7 +6197,7 @@
     "zakres": "90 pytań · 135 min ciągłych"
    },
    {
-    "nr": 383,
+    "nr": 371,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "G",
@@ -6393,7 +6213,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 384,
+    "nr": 372,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "H",
@@ -6409,7 +6229,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 385,
+    "nr": 373,
     "data": "2026-11-07",
     "dzien": "sobota",
     "blok": "I",
@@ -6425,7 +6245,7 @@
     "zakres": "Przegląd odpowiedzi + error log"
    },
    {
-    "nr": 386,
+    "nr": 374,
     "data": "2026-11-08",
     "dzien": "niedziela",
     "blok": "A",
@@ -6441,7 +6261,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 387,
+    "nr": 375,
     "data": "2026-11-08",
     "dzien": "niedziela",
     "blok": "B",
@@ -6457,7 +6277,7 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 388,
+    "nr": 376,
     "data": "2026-11-08",
     "dzien": "niedziela",
     "blok": "C",
@@ -6473,11 +6293,139 @@
     "zakres": "Analiza pogłębiona + drill słabych pytań"
    },
    {
-    "nr": 389,
+    "nr": 377,
     "data": "2026-11-08",
     "dzien": "niedziela",
     "blok": "D",
     "godz": "11:20–12:13",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 2",
+    "do_przeczytania": "READING 42",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Equity Investments — konsolidacja po Curriculum (READING 42)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 42"
+   },
+   {
+    "nr": 378,
+    "data": "2026-11-08",
+    "dzien": "niedziela",
+    "blok": "E",
+    "godz": "12:20–13:13",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 2",
+    "do_przeczytania": "READING 43",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Equity Investments — konsolidacja po Curriculum (READING 43)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 43"
+   },
+   {
+    "nr": 379,
+    "data": "2026-11-08",
+    "dzien": "niedziela",
+    "blok": "F",
+    "godz": "13:30–14:23",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 2",
+    "do_przeczytania": "READING 44",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Equity Investments — konsolidacja po Curriculum (READING 44)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 44"
+   },
+   {
+    "nr": 380,
+    "data": "2026-11-08",
+    "dzien": "niedziela",
+    "blok": "G",
+    "godz": "14:30–15:23",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 2",
+    "do_przeczytania": "READING 45",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Equity Investments — konsolidacja po Curriculum (READING 45)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 45"
+   },
+   {
+    "nr": 381,
+    "data": "2026-11-08",
+    "dzien": "niedziela",
+    "blok": "H",
+    "godz": "15:30–16:23",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 2",
+    "do_przeczytania": "READING 46",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Equity Investments — konsolidacja po Curriculum (READING 46)",
+    "zadania": "Key Concepts + Module Quiz + Topic Quiz · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 46"
+   },
+   {
+    "nr": 382,
+    "data": "2026-11-08",
+    "dzien": "niedziela",
+    "blok": "I",
+    "godz": "16:40–17:33",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 4",
+    "do_przeczytania": "READING 83–84",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Portfolio Management — konsolidacja po Curriculum (READING 83–84)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 83–84"
+   },
+   {
+    "nr": 383,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "A",
+    "godz": "08:00–08:53",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 4",
+    "do_przeczytania": "READING 85–86",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Portfolio Management — konsolidacja po Curriculum (READING 85–86)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 85–86"
+   },
+   {
+    "nr": 384,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "B",
+    "godz": "09:10–10:03",
+    "egzamin": "CFA",
+    "kategoria": "Schweser",
+    "tryb": "CONSOLIDATION",
+    "zrodlo": "SchweserNotes 2025 Book 4",
+    "do_przeczytania": "READING 87–88",
+    "objetosc_zrodla": "SchweserNotes 2025 · 93 readings",
+    "temat": "Portfolio Management — konsolidacja po Curriculum (READING 87–88)",
+    "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
+    "zakres": "READING 87–88"
+   },
+   {
+    "nr": 385,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6489,11 +6437,11 @@
     "zakres": "READING 89–90"
    },
    {
-    "nr": 390,
-    "data": "2026-11-08",
-    "dzien": "niedziela",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 386,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6505,11 +6453,11 @@
     "zakres": "READING 91–92"
    },
    {
-    "nr": 391,
-    "data": "2026-11-08",
-    "dzien": "niedziela",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 387,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6521,11 +6469,11 @@
     "zakres": "READING 93"
    },
    {
-    "nr": 392,
-    "data": "2026-11-08",
-    "dzien": "niedziela",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 388,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6537,11 +6485,11 @@
     "zakres": "READING 20–21"
    },
    {
-    "nr": 393,
-    "data": "2026-11-08",
-    "dzien": "niedziela",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 389,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6553,11 +6501,11 @@
     "zakres": "READING 22–23"
    },
    {
-    "nr": 394,
-    "data": "2026-11-08",
-    "dzien": "niedziela",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 390,
+    "data": "2026-11-09",
+    "dzien": "poniedziałek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6569,11 +6517,11 @@
     "zakres": "READING 24–25"
    },
    {
-    "nr": 395,
+    "nr": 391,
     "data": "2026-11-09",
     "dzien": "poniedziałek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6585,11 +6533,11 @@
     "zakres": "READING 26"
    },
    {
-    "nr": 396,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 392,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6601,11 +6549,11 @@
     "zakres": "READING 76–77"
    },
    {
-    "nr": 397,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 393,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6617,11 +6565,11 @@
     "zakres": "READING 78–79"
    },
    {
-    "nr": 398,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 394,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6633,11 +6581,11 @@
     "zakres": "READING 80–81"
    },
    {
-    "nr": 399,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 395,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6649,11 +6597,11 @@
     "zakres": "READING 82"
    },
    {
-    "nr": 400,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 396,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6665,11 +6613,11 @@
     "zakres": "READING 66"
    },
    {
-    "nr": 401,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 397,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6681,11 +6629,11 @@
     "zakres": "READING 67"
    },
    {
-    "nr": 402,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 398,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6697,11 +6645,11 @@
     "zakres": "READING 68"
    },
    {
-    "nr": 403,
-    "data": "2026-11-09",
-    "dzien": "poniedziałek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 399,
+    "data": "2026-11-10",
+    "dzien": "wtorek",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6713,11 +6661,11 @@
     "zakres": "READING 69"
    },
    {
-    "nr": 404,
+    "nr": 400,
     "data": "2026-11-10",
     "dzien": "wtorek",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6729,11 +6677,11 @@
     "zakres": "READING 70"
    },
    {
-    "nr": 405,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "B",
-    "godz": "09:10–10:03",
+    "nr": 401,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "A",
+    "godz": "08:00–08:53",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6745,11 +6693,11 @@
     "zakres": "READING 71"
    },
    {
-    "nr": 406,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "C",
-    "godz": "10:10–11:03",
+    "nr": 402,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "B",
+    "godz": "09:10–10:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6761,11 +6709,11 @@
     "zakres": "READING 72"
    },
    {
-    "nr": 407,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "D",
-    "godz": "11:20–12:13",
+    "nr": 403,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "C",
+    "godz": "10:10–11:03",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6777,11 +6725,11 @@
     "zakres": "READING 73"
    },
    {
-    "nr": 408,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "E",
-    "godz": "12:20–13:13",
+    "nr": 404,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "D",
+    "godz": "11:20–12:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6793,11 +6741,11 @@
     "zakres": "READING 74"
    },
    {
-    "nr": 409,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "F",
-    "godz": "13:30–14:23",
+    "nr": 405,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "E",
+    "godz": "12:20–13:13",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6809,11 +6757,11 @@
     "zakres": "READING 75"
    },
    {
-    "nr": 410,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "G",
-    "godz": "14:30–15:23",
+    "nr": 406,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "F",
+    "godz": "13:30–14:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6825,11 +6773,11 @@
     "zakres": "READING 12–13"
    },
    {
-    "nr": 411,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "H",
-    "godz": "15:30–16:23",
+    "nr": 407,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "G",
+    "godz": "14:30–15:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6841,11 +6789,11 @@
     "zakres": "READING 14–15"
    },
    {
-    "nr": 412,
-    "data": "2026-11-10",
-    "dzien": "wtorek",
-    "blok": "I",
-    "godz": "16:40–17:33",
+    "nr": 408,
+    "data": "2026-11-11",
+    "dzien": "środa",
+    "blok": "H",
+    "godz": "15:30–16:23",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6857,11 +6805,11 @@
     "zakres": "READING 16–17"
    },
    {
-    "nr": 413,
+    "nr": 409,
     "data": "2026-11-11",
     "dzien": "środa",
-    "blok": "A",
-    "godz": "08:00–08:53",
+    "blok": "I",
+    "godz": "16:40–17:33",
     "egzamin": "CFA",
     "kategoria": "Schweser",
     "tryb": "CONSOLIDATION",
@@ -6871,134 +6819,6 @@
     "temat": "Economics — konsolidacja po Curriculum (READING 18–19)",
     "zadania": "2 łatwe readingi w jednym bloku · Key Concepts + Module Quiz obu readingów · aktywne odtworzenie, nie ponowne czytanie",
     "zakres": "READING 18–19"
-   },
-   {
-    "nr": 414,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "B",
-    "godz": "09:10–10:03",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "PRACTICE",
-    "zrodlo": "Bank pytań CFA — pytania mieszane",
-    "do_przeczytania": "Losowe pytania z wielu działów",
-    "objetosc_zrodla": "—",
-    "temat": "Mixed practice — symulacja losowości egzaminu",
-    "zadania": "cz. 1/5 · interleaving: pytania z różnych działów wymieszane · po każdej serii klasyfikuj błędy do error logu",
-    "zakres": "Losowe pytania z wielu działów"
-   },
-   {
-    "nr": 415,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "C",
-    "godz": "10:10–11:03",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "PRACTICE",
-    "zrodlo": "Bank pytań CFA — pytania mieszane",
-    "do_przeczytania": "Losowe pytania z wielu działów",
-    "objetosc_zrodla": "—",
-    "temat": "Mixed practice — symulacja losowości egzaminu",
-    "zadania": "cz. 2/5 · interleaving: pytania z różnych działów wymieszane · po każdej serii klasyfikuj błędy do error logu",
-    "zakres": "Losowe pytania z wielu działów"
-   },
-   {
-    "nr": 416,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "D",
-    "godz": "11:20–12:13",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "PRACTICE",
-    "zrodlo": "Bank pytań CFA — pytania mieszane",
-    "do_przeczytania": "Losowe pytania z wielu działów",
-    "objetosc_zrodla": "—",
-    "temat": "Mixed practice — symulacja losowości egzaminu",
-    "zadania": "cz. 3/5 · interleaving: pytania z różnych działów wymieszane · po każdej serii klasyfikuj błędy do error logu",
-    "zakres": "Losowe pytania z wielu działów"
-   },
-   {
-    "nr": 417,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "E",
-    "godz": "12:20–13:13",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "PRACTICE",
-    "zrodlo": "Bank pytań CFA — pytania mieszane",
-    "do_przeczytania": "Losowe pytania z wielu działów",
-    "objetosc_zrodla": "—",
-    "temat": "Mixed practice — symulacja losowości egzaminu",
-    "zadania": "cz. 4/5 · interleaving: pytania z różnych działów wymieszane · po każdej serii klasyfikuj błędy do error logu",
-    "zakres": "Losowe pytania z wielu działów"
-   },
-   {
-    "nr": 418,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "F",
-    "godz": "13:30–14:23",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "PRACTICE",
-    "zrodlo": "Bank pytań CFA — pytania mieszane",
-    "do_przeczytania": "Losowe pytania z wielu działów",
-    "objetosc_zrodla": "—",
-    "temat": "Mixed practice — symulacja losowości egzaminu",
-    "zadania": "cz. 5/5 · interleaving: pytania z różnych działów wymieszane · po każdej serii klasyfikuj błędy do error logu",
-    "zakres": "Losowe pytania z wielu działów"
-   },
-   {
-    "nr": 419,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "G",
-    "godz": "14:30–15:23",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "ACTIVE RECALL",
-    "zrodlo": "Ethics + arkusz wzorów",
-    "do_przeczytania": "Standards of Practice + wzory kluczowe",
-    "objetosc_zrodla": "—",
-    "temat": "Ethics i wzory — finalne utrwalenie",
-    "zadania": "cz. 1/3 · ostatnie bloki przed egzaminem · Ethics ma najwyższą wagę (15–20%) i działa jako tie-breaker przy wyniku granicznym · wzory: TVM, duration, WACC, CAPM, wskaźniki · bez nowego materiału",
-    "zakres": "Standards of Practice + wzory kluczowe"
-   },
-   {
-    "nr": 420,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "H",
-    "godz": "15:30–16:23",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "ACTIVE RECALL",
-    "zrodlo": "Ethics + arkusz wzorów",
-    "do_przeczytania": "Standards of Practice + wzory kluczowe",
-    "objetosc_zrodla": "—",
-    "temat": "Ethics i wzory — finalne utrwalenie",
-    "zadania": "cz. 2/3 · ostatnie bloki przed egzaminem · Ethics ma najwyższą wagę (15–20%) i działa jako tie-breaker przy wyniku granicznym · wzory: TVM, duration, WACC, CAPM, wskaźniki · bez nowego materiału",
-    "zakres": "Standards of Practice + wzory kluczowe"
-   },
-   {
-    "nr": 421,
-    "data": "2026-11-11",
-    "dzien": "środa",
-    "blok": "I",
-    "godz": "16:40–17:33",
-    "egzamin": "CFA",
-    "kategoria": "Practice CFA",
-    "tryb": "ACTIVE RECALL",
-    "zrodlo": "Ethics + arkusz wzorów",
-    "do_przeczytania": "Standards of Practice + wzory kluczowe",
-    "objetosc_zrodla": "—",
-    "temat": "Ethics i wzory — finalne utrwalenie",
-    "zadania": "cz. 3/3 · ostatnie bloki przed egzaminem · Ethics ma najwyższą wagę (15–20%) i działa jako tie-breaker przy wyniku granicznym · wzory: TVM, duration, WACC, CAPM, wskaźniki · bez nowego materiału",
-    "zakres": "Standards of Practice + wzory kluczowe"
    }
   ]
  }
