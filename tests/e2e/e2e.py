@@ -840,6 +840,91 @@ async def run_etap3(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
 
+# P2 (D-092): punktowe odświeżanie po najczęstszych akcjach — wynik identyczny z pełnym przerysowaniem tego samego widoku
+# (tekst, stany przycisków, klasy i kolejność kart, wartości pól), fokus zostaje na przycisku, widok nie jest budowany od nowa.
+SNAP = '''() => { const m = document.querySelector('main');
+  return { text: m.innerText.replace(/\\s+/g, ' ').trim(),
+    pressed: [...m.querySelectorAll('[aria-pressed]')].map(b => `${b.getAttribute('aria-pressed')}|${b.getAttribute('aria-label') || b.textContent}`),
+    cards: [...m.querySelectorAll('.cfa-row, .inv-item, .ex, .set, .cfa-dh, .dash, .zp-shop, .counters')].map(e => `${e.className}#${e.id}`),
+    values: [...m.querySelectorAll('input')].map(i => i.type === 'checkbox' ? String(i.checked) : i.value) }; }'''
+def p2_events():
+    """Syntetyczne (fikcyjne) stany zapasów: dzienne zużycie z katalogu × umowna liczba dni (jak fixtures.synthetic_zapasy)."""
+    items = [i for i in fixtures._catalog() if i.get('tracked') is not False]
+    ev = []
+    for n, it in enumerate(items):
+        qty = round((it.get('daily_v31') or 1) * fixtures.CYCLE[n % len(fixtures.CYCLE)], 2)
+        ev.append({'id': f'inv.count:p2-{n}', 'hlc': f'{1790000000000 + n:013d}:0000:dp2test', 'dev': 'dp2test', 't': 'inv.count',
+                   'd': {'prod': it['id'], 'qty': qty, 'date': '2026-10-10'}, 'at': '2026-10-10T20:00:00Z', 'v': 1})
+    return ev
+SEED_IDB = '''async evs => { const db = await new Promise((res, rej) => { const r = indexedDB.open('p2027', 1); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const tx = db.transaction('events', 'readwrite'); for (const e of evs) tx.objectStore('events').put(e);
+  await new Promise(r => { tx.oncomplete = r; }); db.close(); return evs.length; }'''
+MAIN_TEXT = '() => document.querySelector("main").innerText.replace(/\\s+/g, " ").trim()'
+
+async def run_p2(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [P2, zegar 11.10 20:00]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=CLOCK_B)
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    await pg.evaluate(SEED_IDB, p2_events()); await pg.reload(); await pg.wait_for_selector('.dz-plan-h')
+
+    async def open_route(route, ready):
+        await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
+        await pg.goto(url + route); await pg.wait_for_selector(ready, state='attached'); await pg.wait_for_timeout(150)
+
+    async def check(route, act, label, ready='main h1', focus='.set-toggle'):
+        await open_route(route, ready)
+        await pg.evaluate("document.querySelector('main').dataset.p2 = '1'")
+        before = await pg.evaluate(MAIN_TEXT)
+        await act()
+        end = time.monotonic() + 10
+        while await pg.evaluate(MAIN_TEXT) == before and time.monotonic() < end: await asyncio.sleep(0.05)
+        await pg.wait_for_timeout(250)
+        point = await pg.evaluate(SNAP)
+        kept = await pg.evaluate("!!document.querySelector('main[data-p2]')")
+        foc = await pg.evaluate("s => !!document.activeElement?.matches(s) && document.querySelector('main').contains(document.activeElement)", focus) if focus else True
+        await open_route(route, ready)
+        full = await pg.evaluate(SNAP)
+        diff = [k for k in full if full[k] != point[k]]
+        for k in diff[:1]:
+            a, c = point[k], full[k]
+            i = next((j for j in range(min(len(a), len(c))) if a[j] != c[j]), min(len(a), len(c)))
+            print('   różnica', k, repr(a[max(0, i - 2):i + 3] if isinstance(a, list) else a[max(0, i - 60):i + 80]), '<>',
+                  repr(c[max(0, i - 2):i + 3] if isinstance(c, list) else c[max(0, i - 60):i + 80]))
+        ok(kept and not diff and foc, f'{tag} {label}: punktowo = pełne przerysowanie (widok zachowany: {kept}, różnice: {diff}, fokus: {foc})')
+
+    click = lambda sel: (lambda: pg.locator(sel).first.click())
+    # CFA: widok dnia bieżącego (zaległe + dzień), recall, cały dzień, harmonogram (dzień przyszły i miniony)
+    await check('#/cfa?v=dzien&d=2026-10-11', click('.cf-backlog .set-toggle'), 'CFA zaległy blok (dziś)', '.cf-backlog')
+    await check('#/cfa?v=dzien&d=2026-10-11', click('.cfa-dayhead ~ .cfa-list .set-toggle[aria-pressed="false"]'), 'CFA blok dnia', '.cfa-dayhead')
+    await check('#/cfa?v=dzien&d=2026-10-11', click('.cfa-dayhead ~ .cfa-list .set-toggle[aria-pressed="true"]'), 'CFA cofnięcie odhaczenia', '.cfa-dayhead')
+    await check('#/cfa?v=dzien&d=2026-10-05', click('.cf-recall .set-toggle'), 'CFA recall 22:00', '.cf-recall')
+    await check('#/cfa?v=dzien&d=2026-10-06', lambda: pg.get_by_role('button', name='Oznacz cały dzień').click(), 'CFA cały dzień', '.cfa-dayhead', focus=None)
+    await check('#/cfa?v=harmonogram', click('main > section.panel .set-toggle[aria-pressed="false"]'), 'CFA harmonogram (dzień przyszły)', '.cfa-dh')
+    async def past():
+        await pg.locator('details.cf-past summary').click(); await pg.wait_for_selector('details.cf-past .set-toggle')
+        await pg.locator('details.cf-past .set-toggle[aria-pressed="false"]').first.click()
+    await check('#/cfa?v=harmonogram', past, 'CFA harmonogram (dzień miniony)', '.cfa-dh')
+    # Trening: odhaczenie i cofnięcie serii (dzień inny niż dziś — bez licznika przerwy zależnego od sekund)
+    await check('#/trening?d=2026-10-12', click('.ex .sets .set-toggle[aria-pressed="false"]'), 'Trening seria', '.ex')
+    await check('#/trening?d=2026-10-12', click('.ex .sets .set-toggle[aria-pressed="true"]'), 'Trening cofnięcie serii', '.ex')
+    # Zapasy: + opakowanie (zmiana kolejności), stan pozycji, „Kupione”, filtr statusu (karta znika), sortowanie A–Z
+    await check('#/zapasy', click('.inv-item .zp-pack'), 'Zapasy + opakowanie', '.inv-item', focus='.zp-pack')
+    async def stan():
+        inp = pg.locator('.inv-item .inv-set input').nth(2)
+        await inp.fill('7'); await inp.press('Tab')
+    await check('#/zapasy', stan, 'Zapasy stan pozycji', '.inv-item', focus=None)
+    await check('#/zapasy', click('.zp-buy-b'), 'Zapasy „Kupione”', '.zp-buy-b', focus=None)
+    await check('#/zapasy?s=CRITICAL', click('.inv-item .zp-pack'), 'Zapasy filtr „Pilne” + opakowanie', '.inv-item', focus=None)
+    await check('#/zapasy?sort=name', click('.inv-item .zp-pack'), 'Zapasy sortowanie A–Z + opakowanie', '.inv-item', focus='.zp-pack')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -854,6 +939,8 @@ async def main():
         await run_etap2(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_etap3(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_etap3(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_p2(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_p2(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

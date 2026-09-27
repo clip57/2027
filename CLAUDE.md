@@ -37,11 +37,12 @@ bez planu dnia, treningu, dawek, bloków i zużycia; serie sprzed startu poza st
 zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchronizacji). Raport: `docs/RAPORT_ETAPY_0_3.md`.
 **Audyt 25.09.2026 — Etapy 1–3 (D-089):** poprawki B1–B9, UX U-a…U-i, CSP w wariancie web (S1), Diagnostyka (I8), `.ics` (I1),
 „Wymaga uwagi” (I2), Tydzień (I3), wyszukiwanie ⌘K (I4), skróty (I5), paragon tekstem (I7), recall jako `setting` `cfa.recall:<data>` (I11).
-Etap 4 (P1, P2, D2, I9, I12) **wstrzymany** — nie wdrażaj bez decyzji użytkownika. Okna: zawsze `sheet()` z `components.js`;
+Etap 4: **P1 i P2 wdrożone (D-092)** — przyrostowe przeliczanie stanu (`Reducer` w `store.js`) i punktowe odświeżanie (`ui/patch.js`)
+w CFA, Treningu i Zapasach; raport `docs/RAPORT_P1_P2.md`. **D2, I9, I12 — nie wdrażaj bez decyzji użytkownika.** Okna: zawsze `sheet()` z `components.js`;
 komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
 **Pakiet prywatny (D-091):** aktualizacja istniejącego pakietu `tools/extract/private_pack_lib.py <stary> <nowy>` (poza repozytorium),
 stan w Diagnostyce; instrukcja `docs/PAKIET_PRYWATNY.md`. Po zmianie planu: zaktualizuj `UPGRADE` w `private_pack_lib.py`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-091).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-092).
 
 ---
 
@@ -52,7 +53,7 @@ Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-091).
 | Wejście, router, nawigacja | `src/app.js`, `src/index.html` | router na `location.hash` (`#/modul?param=…`), każdy moduł renderuje do `<main>` przy każdej zmianie; strona `#/wiecej` generowana w `app.js` |
 | Rejestr modułów | `src/modules/registry.js` | `GROUPS` (Dzień/Trening/Dieta/Nauka/System), `MODULES` (id, name, group, icon, domain, tab) |
 | Moduły widoków | `src/modules/*.js` | `dzis, dieta, suplementy, zapasy, mealprep, trening, cfa, bezpieczenstwo, rekompozycja, dane` (+ `placeholder.js`) |
-| UI — helpery | `src/ui/dom.js` | `h()` (tworzenie DOM **bez innerHTML**), `add()` (dołączanie z pominięciem null/false/undefined), `clear`, `fmt`, `plural` |
+| UI — helpery | `src/ui/dom.js`, `src/ui/patch.js` | `h()` (tworzenie DOM **bez innerHTML**), `add()` (dołączanie z pominięciem null/false/undefined), `clear`, `fmt`, `plural`; `region()`/`swap()`/`holdFocus()` — punktowe odświeżanie z zachowaniem fokusu (P2) |
 | UI — komponenty | `src/ui/components.js`, `icons.js`, `prefs.js`, `charts.js`, `bodymap.js`, `figure.js`, `movement.js` | `segmented, stat, statGrid, section, macroChips, progressRing`; ikony Lucide `icon(name,{size,label})`; preferencje per urządzenie |
 | Style | `src/ui/tokens.css` → `src/ui/styles.css` → `src/ui/system.css` | sklejane w tej kolejności przez `tools/build.mjs`. **Tokeny tylko w `tokens.css`** |
 | Dane źródłowe | `src/data/*.json` | generowane skryptami `tools/extract/*` z plików źródłowych użytkownika (NIE w repozytorium); traktuj jako tylko do odczytu |
@@ -62,7 +63,7 @@ Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-091).
 | Fonty | `public/fonts/inter-latin*.woff2` | podzbiór Inter (OFL); **brak skryptu podzbioru w repo** — zob. REDESIGN-STATUS „znane ograniczenia” |
 
 Stan aplikacji = **dziennik zdarzeń w IndexedDB** (`p2027`, wersja 1; magazyny `events`, `meta`, `quarantine`, `backups`)
-przeliczany funkcją `reduce()` w `src/core/storage/store.js`. Moduły czytają `ctx.store.state` i zapisują przez
+przeliczany funkcją `reduce()` w `src/core/storage/store.js` (akumulator `Reducer`: zapis lokalny dokłada zdarzenia przyrostowo, import i synchronizacja — pełne przeliczenie; P1, D-092). Moduły czytają `ctx.store.state` i zapisują przez
 `ctx.store.record(type, data)`. Po zapisie zwykle `ctx.rerender()` lub lokalna aktualizacja DOM.
 
 Typy zdarzeń (walidacja w `src/core/storage/validate.js`, `SCHEMA = 1`):
@@ -169,3 +170,6 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | `wait_for_function('…')` z tekstem predykatu / `add_script_tag` w wariancie web | CSP (S1, bez `'unsafe-eval'` i skryptów inline) blokuje narzędzie testowe | odpytywanie przez `evaluate` (`wait_js` w testach), axe przez CDP `Runtime.evaluate` |
 | Pole `type=search` w oknie | pierwszy Esc tylko czyści tekst, okno zostaje | obsłuż `Escape` w polu (zamknięcie okna — `search.js`) |
 | Dni sprzed startu planu w nowych widokach (D-088) | trening, dawki, bloki dla 21–24.09 | zawsze przez `resolveDay`/`dayPlan` (`outside`), statystyki od `TRAIN_FROM` |
+| Stan pochodny jako `const` w module z punktowym odświeżaniem (P2) | przyciski w niezmienionych fragmentach działają na starym stanie (np. „Oznacz cały dzień” pomija odhaczone w międzyczasie) | stan pochodny w zmiennych `let` przeliczanych przed odświeżeniem (`derive()`/`compute()`); przyciski czytają zmienne, nie kopie z chwili renderu |
+| Zmiana `reduce()` / akumulatora `Reducer` | stan przyrostowy różny od pełnego — rozjazd widoków po zapisie i po ponownym otwarciu | jeden kod dla obu ścieżek; test `reduce-incremental.test.mjs` (kopia wzorcowa `reduce()` sprzed P1) musi przechodzić |
+| Nowa akcja w module z punktowym odświeżaniem | fragment zależny od zmiany nieodświeżony | dopisz go do `update`/`refresh` modułu albo użyj `ctx.rerender()`; przypadek do `run_p2` w `e2e.py` (porównanie z pełnym przerysowaniem) |

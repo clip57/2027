@@ -14,6 +14,7 @@ import { SRC, catalogById } from '../core/data.js';
 const SAFE = new Set(SRC.safety.rows.map(r => r.Produkt));
 import { addDays, dayShort, longDate, shortDate, diffDays } from '../core/dates.js';
 import { resolveDay } from '../core/resolver.js';
+import { region, holdFocus } from '../ui/patch.js';
 
 const CATS = ['Wszystko', 'Śniadanie', 'Lunch', 'Przekąska', 'Po treningu', 'Obiad', 'Kolacja', 'Napoje', 'Suplementy'];
 const SORTS = [['days', 'Najmniej dni'], ['urgent', 'Najpilniejsze'], ['shop', 'Do zakupów'],
@@ -44,8 +45,12 @@ export function renderZapasy(root, ctx) {
   };
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const err = e => clear(msg).append(h('div', { class: 'banner err' }, e.message || String(e)));
+  // Zmiana stanu jednej pozycji (stan, zakup, korekta) — punktowe odświeżanie (P2); pozostałe zapisy — pełne przerysowanie
   const save = async (type, data, text) => {
-    try { await store.record(type, data); if (text) ctx.flash(text); ctx.rerender(); } catch (e) { err(e); }
+    try {
+      await store.record(type, data); if (text) ctx.flash(text);
+      if ((type === 'inv.count' || type === 'inv.move') && data.prod) refresh([data.prod]); else ctx.rerender();
+    } catch (e) { err(e); }
   };
   // Wiele zmian naraz (operacje zbiorcze, plan zakupów, paragon, przywrócenie stanu): jedna transakcja i jedno przeliczenie (B8)
   const many = list => store.recordMany(list);
@@ -53,26 +58,42 @@ export function renderZapasy(root, ctx) {
   const items = [...allItems(), ...(store.state.catalogUser || [])];
   const day = resolveDay(today);
   const shop = nextShopping(today, new Date().getHours(), store.state.settings.shopWeekday ?? 6);
-  const rows = items.map(it => {
-    const st = stockAt(store.state.inv, it.id, today);
-    const fc = forecast(it.id, st, today);
-    const daily = consumptionForDay(today)[it.id] ?? it.daily_v31 ?? 0;
-    const info = statusInfo(it, st, fc);
-    return { it, st, fc, daily, info, status: info.code };
-  });
-  const list = shoppingList(store.state.inv, today, items);
-  const shopIds = new Set(list.map(x => x.id));
-  const counts = rows.reduce((m, r) => ((m[r.status] = (m[r.status] || 0) + 1), m), {});
-  const soonest = rows.filter(r => r.fc?.runOut).sort((a, b) => (a.fc.runOut < b.fc.runOut ? -1 : 1))[0];
-
-  const undoable = store.allEvents().filter(e => ['inv.count', 'inv.move', 'inv.dayshift'].includes(e.t))
-    .sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
-  const last = undoable[undoable.length - 1];
-  const packs = list.reduce((n, x) => n + x.packs, 0);
-  const known = rows.filter(r => r.st != null && r.it.tracked !== false).length;
-  // Kolejność listy zakupów wg pilności (najwcześniejszy brak najpierw) — ta sama lista co w oknie planu zakupów
-  const runOut = id => rows.find(r => r.it.id === id)?.fc?.runOut || '9999-12-31';
-  const byNeed = list.slice().sort((a, b) => (runOut(a.id) < runOut(b.id) ? -1 : runOut(a.id) > runOut(b.id) ? 1 : a.name.localeCompare(b.name, 'pl')));
+  const INV_T = ['inv.count', 'inv.move', 'inv.dayshift'];
+  const undoable = () => store.allEvents().filter(e => INV_T.includes(e.t)).sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
+  const days = r => (r.fc ? r.fc.days : Infinity);
+  const cmp = { days: (a, b) => days(a) - days(b), most: (a, b) => days(b) - days(a),
+    urgent: (a, b) => rank[a.status] - rank[b.status] || days(a) - days(b),
+    shop: (a, b) => (shopIds.has(b.it.id) - shopIds.has(a.it.id)) || days(a) - days(b),
+    name: (a, b) => a.it.name.localeCompare(b.it.name, 'pl'),
+    cat: (a, b) => (a.it.category || '').localeCompare(b.it.category || '', 'pl') || a.it.name.localeCompare(b.it.name, 'pl') };
+  // Stan pochodny — zmienne (nie stałe): po punktowym odświeżeniu (P2) przyciski i okna czytają bieżące wartości
+  let rows, list, shopIds, counts, soonest, last, packs, known, byNeed, visible;
+  const compute = () => {
+    rows = items.map(it => {
+      const st = stockAt(store.state.inv, it.id, today);
+      const fc = forecast(it.id, st, today);
+      const daily = consumptionForDay(today)[it.id] ?? it.daily_v31 ?? 0;
+      const info = statusInfo(it, st, fc);
+      return { it, st, fc, daily, info, status: info.code };
+    });
+    list = shoppingList(store.state.inv, today, items);
+    shopIds = new Set(list.map(x => x.id));
+    counts = rows.reduce((m, r) => ((m[r.status] = (m[r.status] || 0) + 1), m), {});
+    soonest = rows.filter(r => r.fc?.runOut).sort((a, b) => (a.fc.runOut < b.fc.runOut ? -1 : 1))[0];
+    // Ostatnia zmiana zapasów (do „Cofnij”) = zdarzenie o najwyższym HLC — bez sortowania całego dziennika
+    last = undefined;
+    for (const e of store.allEvents()) if (INV_T.includes(e.t) && (!last || e.hlc > last.hlc)) last = e;
+    packs = list.reduce((n, x) => n + x.packs, 0);
+    known = rows.filter(r => r.st != null && r.it.tracked !== false).length;
+    // Kolejność listy zakupów wg pilności (najwcześniejszy brak najpierw) — ta sama lista co w oknie planu zakupów
+    const runOut = id => rows.find(r => r.it.id === id)?.fc?.runOut || '9999-12-31';
+    byNeed = list.slice().sort((a, b) => (runOut(a.id) < runOut(b.id) ? -1 : runOut(a.id) > runOut(b.id) ? 1 : a.name.localeCompare(b.name, 'pl')));
+    visible = rows.filter(r => (cat === 'Wszystko' || r.it.category === cat)
+      && (filter === 'all' || (filter === 'shop' ? shopIds.has(r.it.id) : r.status === filter))
+      && (!query || r.it.name.toLowerCase().includes(query.toLowerCase())));
+    visible = visible.sort(cmp[sort] || cmp.days);
+  };
+  compute();
 
   // ---------- nagłówek
   add(root, h('header', { class: 'zp-head' }, h('h1', {}, 'Zapasy'),
@@ -81,7 +102,7 @@ export function renderZapasy(root, ctx) {
 
   // ---------- przegląd: zdrowie magazynu (pasek z liczników statusów) i najbliższe zakupy (D-072)
   const seg = k => (counts[k] || 0) / (rows.length || 1) * 100;
-  add(root, h('section', { class: 'dash', 'aria-label': 'Przegląd zapasów' },
+  const dash = region(() => h('section', { class: 'dash', 'aria-label': 'Przegląd zapasów' },
     h('div', { class: 'dash-box zp-health' }, h('p', { class: 'dash-l' }, 'Stan magazynu'),
       h('p', { class: 'dash-v' }, `${rows.length} pozycji`),
       h('span', { class: 'zp-hbar', role: 'img', 'aria-label': `Pilne ${counts.CRITICAL || 0}, średnie ${counts.WARNING || 0}, wystarczające ${counts.OK || 0}, bez stanu ${counts.UNKNOWN || 0}` },
@@ -90,10 +111,11 @@ export function renderZapasy(root, ctx) {
         [['CRITICAL', 'pilne'], ['WARNING', 'średnie'], ['OK', 'OK'], ['UNKNOWN', 'bez stanu']].filter(([k]) => counts[k]).map(([k, l]) =>
           h('span', {}, h('span', { class: `dot-s s-${k}`, 'aria-hidden': 'true' }), `${counts[k]} ${l}`))),
       soonest && h('p', { class: 'muted' }, `Najbliższy brak: ${soonest.it.name} (${dayShort(soonest.fc.runOut)} ${shortDate(soonest.fc.runOut)})`))));
+  add(root, dash.el);
 
   // ---------- akcje: zwarta siatka ikon (wszystkie funkcje D-046 bez zmian)
   const act = (ic, label, onclick, extra = {}) => h('button', { class: 'zp-act', onclick, ...extra }, icon(ic, { size: 20 }), h('span', {}, label));
-  add(root, h('div', { class: 'actions', role: 'group', 'aria-label': 'Narzędzia zapasów' },
+  const actions = region(() => h('div', { class: 'actions', role: 'group', 'aria-label': 'Narzędzia zapasów' },
     act('shopping-cart', 'Zakupy', () => shopDialog(), { class: 'zp-act primary' }),
     act('plus', 'Dodaj', () => addDialog()),
     act('receipt', 'Paragon', () => receiptDialog()),
@@ -101,9 +123,10 @@ export function renderZapasy(root, ctx) {
     act('history', 'Historia', () => historyDialog()),
     act('bot', 'Status AI', () => aiStatus()),
     act('save', 'Kopia', () => backupDialog())));
+  add(root, actions.el);
 
   // ---------- do kupienia: najpilniejsze pozycje z listy zakupów, „Kupione” jednym dotknięciem (D-072)
-  const shopCard = h('section', { class: 'zp-shop', 'aria-labelledby': 'zp-shop-h' },
+  const shopCard = region(() => h('section', { class: 'zp-shop', 'aria-labelledby': 'zp-shop-h' },
     h('div', { class: 'zp-shop-h' }, h('h2', { id: 'zp-shop-h' }, icon('shopping-cart', { size: 18 }), 'Do kupienia'),
       h('span', { class: 'zp-shop-d' }, `${dayShort(shop.date)} ${shortDate(shop.date)} · ${shop.inDays === 0 ? 'dzisiaj' : `za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}`}`)),
     h('p', { class: 'muted' }, `Następne zakupy: ${list.length} ${plural(list.length, 'pozycja', 'pozycje', 'pozycji')} · ${packs} ${plural(packs, 'opakowanie', 'opakowania', 'opakowań')}. Najpilniejsze:`),
@@ -113,7 +136,7 @@ export function renderZapasy(root, ctx) {
         h('button', { class: 'zp-buy-b', 'aria-label': `Kupione: ${x.name}, +${fmt(x.toBuy)} ${x.unit}`,
           onclick: () => save('inv.move', { prod: x.id, qty: x.toBuy, date: today, kind: 'purchase' }, `${x.name}: +${fmt(x.toBuy)} ${x.unit} (kupione)`) },
           icon('check', { size: 16 }), h('span', {}, `+${fmt(x.toBuy)} ${x.unit}`))))),
-    list.length > 5 && h('button', { class: 'zp-more-b', onclick: () => shopDialog() }, `Pełny plan zakupów (${list.length})`));
+    list.length > 5 && h('button', { class: 'zp-more-b', onclick: () => shopDialog() }, `Pełny plan zakupów (${list.length})`)));
 
   // ---------- korekta zużycia dnia (rzadko) — zwinięta
   const dayFix = h('details', { class: 'daycard', ...keepOpen('dayfix') },
@@ -126,13 +149,14 @@ export function renderZapasy(root, ctx) {
 
   // ---------- filtry, wyszukiwarka, sortowanie, kategorie
   const zmain = h('div', { class: 'zp-main' });
-  add(zmain, h('div', { class: 'counters', role: 'group', 'aria-label': 'Filtr statusu' },
+  const counters = region(() => h('div', { class: 'counters', role: 'group', 'aria-label': 'Filtr statusu' },
     [['CRITICAL', 'Pilne'], ['WARNING', 'Średnie'], ['OK', 'OK']].map(([k, lab]) =>
       h('button', { class: `counter c-${k}${filter === k ? ' is-on' : ''}`, 'aria-pressed': String(filter === k),
         onclick: () => goto({ s: filter === k ? 'all' : k }) }, h('span', { class: `dot-s s-${k}`, 'aria-hidden': 'true' }), h('strong', {}, String(counts[k] || 0)), h('span', {}, lab))),
     // U-c: filtr „Do zakupów” (pozycje z listy najbliższych zakupów) — był w logice (s=shop), bez przycisku
     h('button', { class: `counter c-shop${filter === 'shop' ? ' is-on' : ''}`, 'aria-pressed': String(filter === 'shop'),
-      onclick: () => goto({ s: filter === 'shop' ? 'all' : 'shop' }) }, icon('shopping-cart', { size: 14 }), h('strong', {}, String(list.length)), h('span', {}, 'Do zakupów'))),
+      onclick: () => goto({ s: filter === 'shop' ? 'all' : 'shop' }) }, icon('shopping-cart', { size: 14 }), h('strong', {}, String(list.length)), h('span', {}, 'Do zakupów'))));
+  add(zmain, counters.el,
     h('div', { class: 'toolbar' },
       // U-c: filtrowanie na bieżąco podczas pisania (bez przerysowania widoku — fokus i klawiatura zostają); adres aktualizowany bez zdarzenia
       h('input', { type: 'search', id: 'zp-q', value: query, placeholder: 'Szukaj pozycji…', 'aria-label': 'Szukaj pozycji',
@@ -143,16 +167,6 @@ export function renderZapasy(root, ctx) {
       onclick: () => goto({ c }) }, c))));
 
   // ---------- lista pozycji
-  let visible = rows.filter(r => (cat === 'Wszystko' || r.it.category === cat)
-    && (filter === 'all' || (filter === 'shop' ? shopIds.has(r.it.id) : r.status === filter))
-    && (!query || r.it.name.toLowerCase().includes(query.toLowerCase())));
-  const days = r => (r.fc ? r.fc.days : Infinity);
-  const cmp = { days: (a, b) => days(a) - days(b), most: (a, b) => days(b) - days(a),
-    urgent: (a, b) => rank[a.status] - rank[b.status] || days(a) - days(b),
-    shop: (a, b) => (shopIds.has(b.it.id) - shopIds.has(a.it.id)) || days(a) - days(b),
-    name: (a, b) => a.it.name.localeCompare(b.it.name, 'pl'),
-    cat: (a, b) => (a.it.category || '').localeCompare(b.it.category || '', 'pl') || a.it.name.localeCompare(b.it.name, 'pl') };
-  visible = visible.sort(cmp[sort] || cmp.days);
 
   // U-c: wyszukiwanie na bieżąco — zawężanie ukrywa pozycje już wyświetlone; poszerzenie poza zapytanie z adresu przerysowuje widok
   const empty = h('p', { class: 'muted zp-empty', hidden: true }, 'Brak pozycji pasujących do wyszukiwania.');
@@ -163,6 +177,9 @@ export function renderZapasy(root, ctx) {
     if (t) p.set('q', v.trim()); else p.delete('q');
     history.replaceState(history.state, '', `#/zapasy${p.toString() ? `?${p}` : ''}`);
     if (query && !t.includes(query.toLowerCase())) { clearTimeout(searchTimer); searchTimer = setTimeout(() => ctx.rerender(), 300); return; }
+    narrow(t);
+  }
+  function narrow(t) {
     let n = 0;
     zmain.querySelectorAll('.inv-item').forEach(el => { const hit = !t || el.querySelector('h3').textContent.toLowerCase().includes(t); el.hidden = !hit; n += hit; });
     empty.hidden = n > 0 || visible.length === 0;
@@ -171,8 +188,7 @@ export function renderZapasy(root, ctx) {
     // U-g: znaczenie pola „Stan” (D-027 — inwentaryzacja na koniec dnia; od następnego dnia odliczane zużycie z planu)
     h('p', { class: 'muted zp-hint', id: 'zp-stan-hint' }, icon('info', { size: 14 }),
       'Pole „Stan” to ilość na koniec dzisiejszego dnia — wpisz, ile zostanie po dzisiejszych posiłkach. Od jutra aplikacja odlicza zużycie z planu.'));
-  add(zmain, h('div', { class: 'inv' }, visible.length === 0 ? h('p', { class: 'muted' }, 'Brak pozycji dla tego widoku.') :
-    visible.map(r => {
+  const itemEl = r => {
       const it = r.it;
       const runsOutBeforeShopping = r.fc?.runOut && r.fc.runOut <= shop.date;
       const lowAfter = ['CRITICAL', 'WARNING'].includes(r.status);
@@ -226,7 +242,30 @@ export function renderZapasy(root, ctx) {
             String(it.id).startsWith('custom_') && h('button', { 'aria-label': `Edytuj ${it.name}`, onclick: () => addDialog(it) }, icon('pencil', { size: 16 }), 'Edytuj'),
             String(it.id).startsWith('custom_') && h('button', { class: 'danger', 'aria-label': `Usuń ${it.name}`,
               onclick: () => confirm(`Usunąć pozycję „${it.name}”?`) && save('cat.delete', { id: it.id }, `Usunięto ${it.name}.`) }, 'Usuń pozycję'))); }
-    })));
+  };
+  const artOf = new Map();
+  const invList = h('div', { class: 'inv' }, visible.length === 0 ? h('p', { class: 'muted' }, 'Brak pozycji dla tego widoku.') :
+    visible.map(r => { const el = itemEl(r); artOf.set(r.it.id, el); return el; }));
+  add(zmain, invList);
+
+  // P2: po zmianie stanu pozycji — przegląd, „Do kupienia”, liczniki, „Cofnij” i karta tej pozycji; skład i kolejność listy
+  // (filtr statusu, sortowanie) jak po pełnym przerysowaniu, ale przez przestawienie istniejących kart zamiast budowania ich od nowa.
+  function refresh(prods) {
+    compute();
+    if (!visible.length || !artOf.size) return ctx.rerender();   // pusta lista przed lub po zmianie — pełne przerysowanie
+    dash.refresh(); actions.refresh(); shopCard.refresh(); counters.refresh();
+    const rowOf = new Map(visible.map(r => [r.it.id, r]));
+    // Karty zmienionych pozycji — zbudowane od nowa i wstawione we właściwe miejsce; pozostałe karty zachowują wzajemną
+    // kolejność (ich klucze sortowania i filtra się nie zmieniły), więc nie są przenoszone.
+    const back = [];
+    for (const id of prods) { const el = artOf.get(id); if (el) { back.push([id, holdFocus(el)]); el.remove(); artOf.delete(id); } }
+    for (const [id, el] of artOf) if (!rowOf.has(id)) { el.remove(); artOf.delete(id); }
+    for (const [id, r] of rowOf) if (!artOf.has(id)) artOf.set(id, itemEl(r));
+    let next = null;
+    for (let i = visible.length - 1; i >= 0; i--) { const el = artOf.get(visible[i].it.id); if (el.parentNode !== invList) invList.insertBefore(el, next); next = el; }
+    for (const [id, restore] of back) restore(artOf.get(id));
+    narrow((document.getElementById('zp-q')?.value || '').trim().toLowerCase());
+  }
 
   // ---------- operacje zbiorcze (rzadkie, nieodwracalne bez historii) — zwinięte
   add(zmain, h('details', { class: 'zp-bulk' }, h('summary', {}, 'Operacje zbiorcze'), h('div', { class: 'row bulk' },
@@ -244,7 +283,7 @@ export function renderZapasy(root, ctx) {
     } }, 'Fabryczna lista'))));
 
   // Układ: telefon — przegląd, zakupy, akcje, lista; komputer — lista + przyklejona kolumna zakupów (D-072)
-  add(root, h('div', { class: 'zp-layout' }, zmain, h('aside', { class: 'zp-aside', 'aria-label': 'Zakupy i korekty' }, shopCard, dayFix)));
+  add(root, h('div', { class: 'zp-layout' }, zmain, h('aside', { class: 'zp-aside', 'aria-label': 'Zakupy i korekty' }, shopCard.el, dayFix)));
 
   // ================= okna =================
   function undo(ev) {
@@ -383,7 +422,7 @@ export function renderZapasy(root, ctx) {
       : `korekta dnia ${e.d.date} (${e.d.dir > 0 ? 'cofnięcie zużycia' : 'odliczenie dnia'})`;
     const hidden = new Set(store.state.settings['zapasy.hidden'] || []);
     const clearedAt = store.state.settings['zapasy.clearedAt'] || '';
-    const evs = undoable.filter(e => !hidden.has(e.id) && e.hlc > clearedAt).slice(-120).reverse();
+    const evs = undoable().filter(e => !hidden.has(e.id) && e.hlc > clearedAt).slice(-120).reverse();
     const restore = async e => {
       if (!confirm(`⚠️ PEŁNE PRZYWRÓCENIE STANU\n\nMagazyn wróci do stanu z chwili: ${new Date(e.at).toLocaleString('pl-PL')}.\nZmiany wprowadzone później zostaną zastąpione.\n(Możesz to cofnąć przyciskiem „↩ Cofnij”).\n\nKontynuować?`)) return;
       const past = reduce(store.allEvents().filter(x => x.hlc <= e.hlc));

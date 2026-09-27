@@ -12,6 +12,7 @@ import { SRC } from '../core/data.js';
 import { resolveDay, dayPlan, PLAN_START } from '../core/resolver.js';
 import { addDays, weekday, longDate, shortDate } from '../core/dates.js';
 import muscles from '../data/muscles.json' with { type: 'json' };
+import { region, swap } from '../ui/patch.js';
 
 const T = SRC.training;
 const M = muscles.exercises;
@@ -142,7 +143,7 @@ function renderSession(root, ctx) {
   const key = r.session;   // sesja dnia z planu tygodnia i wyjątków dat (D-087); null = bez treningu
   const phase = r.phase ?? 0;
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
-  const log = store?.state?.train || {};
+  let log = store?.state?.train || {};
   // Zapisy szeregowane w kolejce: kolejny zapis tej samej serii widzi wynik poprzedniego.
   let queue = Promise.resolve();
   const save = (ex, set, patch, rerender = false) => (queue = queue.then(() => saveNow(ex, set, patch, rerender)));
@@ -152,19 +153,31 @@ function renderSession(root, ctx) {
     const cur = store.state.train[`${date}|${ex}|${set}`] || { done: false, kg: null, reps: null, rir: null };
     try {
       await store.record('train.set', { date, ex, set, done: cur.done, kg: cur.kg ?? null, reps: cur.reps ?? null, rir: cur.rir ?? null, ...patch });
-      if (rerender) ctx.rerender();
+      if (rerender === 'point') refresh(ex); else if (rerender) ctx.rerender();
     } catch (e) { clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
   };
   const exercises = T.days[key] || [];
   const plan = exercises.map(e => ({ e, n: e.series[String(phase)] }));
   const total = plan.reduce((a, x) => a + x.n, 0);
-  const done = plan.reduce((a, x) => a + [...Array(x.n)].filter((_, i) => log[`${date}|${x.e.id}|${i + 1}`]?.done).length, 0);
+  // Stan pochodny serii — przeliczany po odhaczeniu serii (P2: punktowe odświeżanie zamiast przerysowania widoku)
+  let done, nx, sessNow;
+  const derive = () => {
+    done = plan.reduce((a, x) => a + [...Array(x.n)].filter((_, i) => log[`${date}|${x.e.id}|${i + 1}`]?.done).length, 0);
+    nx = nextSet(plan, log, date);
+    // Podsumowanie sesji tylko z wpisów tego dnia (ten sam wynik co z całego dziennika, bez przeglądania go w całości)
+    const dayLog = {};
+    for (const k in log) if (k.startsWith(`${date}|`)) dayLog[k] = log[k];
+    const sess = store?.state?.trainSessions?.[date];
+    sessNow = sessions(dayLog, sess ? { [date]: sess } : {}).find(x => x.date === date);
+  };
+  derive();
   const sessionMuscles = { primary: [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.primary || []))] };
   sessionMuscles.secondary = [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.secondary || []))].filter(m => !sessionMuscles.primary.includes(m));
   const sheets = T.sheets.filter(s => s.length > 5);
-  const nx = nextSet(plan, log, date);
-  const sessNow = sessions(log, store?.state?.trainSessions || {}).find(x => x.date === date);
-  const lastLine = e => { const l = lastResult(log, e.id, date); return l ? ` · ostatnio ${l.sets.map(x => `${x.kg ?? '–'} kg × ${x.reps ?? '–'}`).join(', ')}` : ''; };
+  // „Ostatnio” = wyniki z dni wcześniejszych niż ten dzień — zapisy tego dnia ich nie zmieniają, więc liczone raz na widok (P2)
+  const lastMemo = new Map();
+  const lastOf = exId => { if (!lastMemo.has(exId)) lastMemo.set(exId, lastResult(log, exId, date)); return lastMemo.get(exId); };
+  const lastLine = e => { const l = lastOf(e.id); return l ? ` · ostatnio ${l.sets.map(x => `${x.kg ?? '–'} kg × ${x.reps ?? '–'}`).join(', ')}` : ''; };
 
   // --- pasek dni z nazwami sesji
   add(root, h('div', { class: 'day-strip', role: 'tablist', 'aria-label': 'Dzień tygodnia' },
@@ -176,7 +189,7 @@ function renderSession(root, ctx) {
     msg);
 
   // --- nagłówek sesji
-  add(root, h('section', { class: 'hero-tr' },
+  const hero = region(() => h('section', { class: 'hero-tr' },
     h('div', { class: 'hero-tr-main' },
       h('p', { class: 'eyebrow' }, `${r.dayName}, ${longDate(date)}${r.outside ? '' : ` · Faza ${phase}`}`),
       h('h1', {}, r.sessionLabel),
@@ -197,6 +210,7 @@ function renderSession(root, ctx) {
           h('p', { class: 'muted' }, `${sessNow.sets} ${plural(sessNow.sets, 'seria', 'serie', 'serii')} · ${fmt(Math.round(sessNow.volume))} kg objętości · ${fmt(sessNow.reps)} powt.${sessNow.minutes ? ` · ${sessNow.minutes} min` : ' · czas nie zapisany'}`)))),
     !r.outside && sessionTimer(store, date, ctx, msg),
     total > 0 && h('div', { class: 'hero-tr-map' }, bodyMap(sessionMuscles, { size: 'md', title: 'Mięśnie w tej sesji' }), muscleLegend(sessionMuscles))));
+  add(root, hero.el);
 
   if (!exercises.length) {
     add(root, h('div', { class: 'panel' },
@@ -223,10 +237,10 @@ function renderSession(root, ctx) {
     h('div', { class: 'why-body' }, h('p', {}, text.replace(/^(Rozgrzewka|Schłodzenie) 10 min ▾\s*/, ''))));
   add(root, phaseBlock('🔥 Rozgrzewka · 10 min', T.warmup[key]));
 
-  add(root, h('div', { class: 'ex-list' }, plan.map(({ e, n }, idx) => {
+  const article = ({ e, n }, idx) => {
     const rom = e.raw ? spec(e) : null;
     const { reps, rir, rest: pause } = spec(e);
-    const last = lastResult(log, e.id, date);
+    const last = lastOf(e.id);
     const exDone = [...Array(n)].filter((_, i) => log[`${date}|${e.id}|${i + 1}`]?.done).length;
     const sets = [...Array(n)].map((_, i) => {
       const s = i + 1, v = log[`${date}|${e.id}|${s}`] || {}, prev = log[`${date}|${e.id}|${s - 1}`];
@@ -239,7 +253,7 @@ function renderSession(root, ctx) {
             const key = `${date}|${e.id}|${s}`;
             if (!v.done && date === ctx.today) startRest(e, s, n, date, nextSet(plan, { ...store?.state?.train, [key]: { done: true } }, date));
             else if (v.done && rest?.key === key) rest = null;
-            save(e.id, s, { done: !v.done }, true);
+            save(e.id, s, { done: !v.done }, 'point');
           } }, v.done ? '✓' : String(s)),
         num('kg', 'kg', '0.5'), num('reps', 'powt.', '1'), num('rir', 'RIR', '1'),
         s > 1 && prev && (prev.kg != null || prev.reps != null) && !v.kg && !v.reps
@@ -263,8 +277,21 @@ function renderSession(root, ctx) {
         M[e.name] && h('button', { class: 'ex-map', onclick: () => techniqueDialog(e.name), 'aria-label': `Mapa mięśni: ${e.name}` }, bodyMap(M[e.name], { size: 'sm' }))),
       n === 0 ? optionalSets(e) :
         h('div', { class: 'sets' }, h('div', { class: 'set set-h' }, h('span', {}, 'Seria'), h('span', {}, 'kg'), h('span', {}, 'powt.'), h('span', {}, 'RIR'), h('span', {})), sets));
-  })));
-  add(root, phaseBlock('❄️ Schłodzenie · 10 min', T.cooldown[key]), rest?.date === date ? restBar() : null);
+  };
+  const arts = new Map();
+  add(root, h('div', { class: 'ex-list' }, plan.map((x, idx) => { const el = article(x, idx); arts.set(x.e.id, { el, x, idx }); return el; })));
+  const restBox = region(() => (rest?.date === date ? restBar() : null));
+  add(root, phaseBlock('❄️ Schłodzenie · 10 min', T.cooldown[key]), restBox.el);
+  // P2: po odhaczeniu serii — nagłówek sesji, karta tego ćwiczenia, wyróżnienie następnego ćwiczenia i licznik przerwy
+  function refresh(exId) {
+    log = store.state.train;
+    derive();
+    hero.refresh();
+    const a = arts.get(exId);
+    if (a) a.el = swap(a.el, article(a.x, a.idx));
+    for (const [id, o] of arts) o.el.classList?.toggle('is-next', nx?.e.id === id);
+    restBox.refresh();
+  }
 }
 
 // ---------------- Statystyki (styl Hevy) ----------------

@@ -25,6 +25,15 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 | `npm run e2e:cloud` | 100/100 |
 | `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
 
+### Etap 4: P1, P2 (D-092; 27.09.2026)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 188 testów: 187 zaliczonych, 1 pominięty; nowy `reduce-incremental.test.mjs` (równoważność z `reduce()` sprzed P1) |
+| `npm run e2e` | 1205/1205 (nowy blok `run_p2`: punktowe odświeżanie = pełne przerysowanie, fokus) |
+| `npm run e2e:sync` | 21/21 |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
+
 ### Audyt — Etapy 0–3 (D-088, D-089; 25–26.09.2026, konfiguracja B)
 | Zestaw | Wynik |
 |---|---|

@@ -24,40 +24,108 @@ export function lwwKey(e) {
   }
 }
 
-export function reduce(events) {
-  const sorted = [...events].sort((a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0));
-  const st = { inv: { counts: {}, moves: {}, shifts: [] }, lww: new Map(), superseded: [], archive: [] };
-  const unprocessed = { count: 0, types: {} };
-  for (const e of sorted) {
+// Stan z dziennika: zdarzenia w kolejności HLC; LWW dla rekordów, sumowanie dla zapasów i archiwum.
+// Akumulator (P1, D-092): ten sam kod dla pełnego przeliczenia i dla dołożenia zdarzeń nowszych niż wszystkie dotychczasowe.
+// Grupa LWW = przedrostek klucza (część przed „:”) — kolejność wpisów w grupie jest taka sama jak w jednej wspólnej mapie,
+// więc wynik jest identyczny z pełnym `reduce()` (test równoważności w tests/unit/reduce-incremental.test.mjs).
+const group = k => { const i = k.indexOf(':'); return i < 0 ? k : k.slice(0, i); };
+const vals = m => [...(m?.values() || [])];
+// Grupy mapowane na obiekt (klucz rekordu → wartość): klucz obiektu odpowiada 1:1 kluczowi LWW, więc przy dołożeniu zdarzeń
+// wystarczy kopia poprzedniego obiektu z podmienionymi kluczami (nowy klucz na końcu — jak w mapie LWW).
+const OBJ = {
+  train: ['train', e => `${e.d.date}|${e.d.ex}|${e.d.set}`, e => e.d],
+  setting: ['settings', e => e.d.key, e => e.d.value],
+  trainsess: ['trainSessions', e => e.d.date, e => e.d],
+  prep: ['prep', e => `${e.d.date}|${e.d.card}|${e.d.idx}`, e => e.d.done],
+  preptest: ['prepTests', e => e.d.id, e => e.d],
+};
+const DERIVE = {
+  'cfa.done': m => ({ cfaDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),
+  'cfa.err': m => ({ cfaErrors: vals(m).filter(e => e.t === 'cfa.err.put').map(e => ({ id: e.d.id, ...e.d.data })) }),
+  ...Object.fromEntries(Object.entries(OBJ).map(([g, [field, key, val]]) => [g, m => ({ [field]: Object.fromEntries(vals(m).map(e => [key(e), val(e)])) })])),
+  'private.pack': m => ({ privatePack: m?.get('private.pack')?.d.pack || null }),
+  cat: m => ({ catalogUser: vals(m).filter(e => e.t === 'cat.upsert').map(e => e.d.item) }),
+};
+const INV = { 'inv.count': 'counts', 'inv.move': 'moves' };
+
+export class Reducer {
+  constructor() {
+    this.counts = {}; this.moves = {}; this.shifts = []; this.archive = []; this.superseded = [];
+    this.groups = new Map(); this.unprocessed = { count: 0, types: {} }; this.max = '';
+    this.state = null; this.dirty = new Set(); this.dirtyProds = { counts: new Set(), moves: new Set() }; this.touched = new Map();
+  }
+
+  // Zdarzenia MUSZĄ przychodzić w kolejności HLC (pełne przeliczenie sortuje; `append` sprawdza).
+  add(e) {
+    if (e.hlc > this.max) this.max = e.hlc;
     // Zdarzenie z nowszej wersji aplikacji: zachowane w bazie i w eksporcie, ale nie wpływa na stan (jawnie raportowane).
-    if (!isKnownType(e.t)) { unprocessed.count++; unprocessed.types[e.t] = (unprocessed.types[e.t] || 0) + 1; continue; }
-    if (e.t === 'inv.count') (st.inv.counts[e.d.prod] ||= []).push({ id: e.id, qty: e.d.qty, date: e.d.date, hlc: e.hlc });
-    else if (e.t === 'inv.move') (st.inv.moves[e.d.prod] ||= []).push({ id: e.id, qty: e.d.qty, date: e.d.date, kind: e.d.kind, hlc: e.hlc, note: e.d.note });
-    else if (e.t === 'inv.dayshift') st.inv.shifts.push({ id: e.id, date: e.d.date, dir: e.d.dir, hlc: e.hlc });
-    else if (e.t === 'archive') st.archive.push(e);
+    if (!isKnownType(e.t)) { this.unprocessed.count++; this.unprocessed.types[e.t] = (this.unprocessed.types[e.t] || 0) + 1; this.dirty.add('unprocessed'); return; }
+    const inv = INV[e.t];
+    if (inv) {
+      const row = e.t === 'inv.count' ? { id: e.id, qty: e.d.qty, date: e.d.date, hlc: e.hlc }
+        : { id: e.id, qty: e.d.qty, date: e.d.date, kind: e.d.kind, hlc: e.hlc, note: e.d.note };
+      (this[inv][e.d.prod] ||= []).push(row); this.dirtyProds[inv].add(e.d.prod); this.dirty.add('inv');
+    } else if (e.t === 'inv.dayshift') { this.shifts.push({ id: e.id, date: e.d.date, dir: e.d.dir, hlc: e.hlc }); this.dirty.add('inv'); }
+    else if (e.t === 'archive') { this.archive.push(e); this.dirty.add('archive'); }
     else {
-      const k = lwwKey(e);
-      if (st.lww.has(k)) st.superseded.push(st.lww.get(k));
-      st.lww.set(k, e);
+      const k = lwwKey(e), g = group(k);
+      let m = this.groups.get(g);
+      if (!m) this.groups.set(g, m = new Map());
+      if (m.has(k)) { this.superseded.push(m.get(k)); this.dirty.add('superseded'); }
+      m.set(k, e); this.dirty.add(g);
+      if (this.state && OBJ[g]) (this.touched.get(g) || this.touched.set(g, []).get(g)).push(e);
     }
   }
-  const pick = prefix => [...st.lww.entries()].filter(([k]) => k.startsWith(prefix)).map(([, e]) => e);
-  return {
-    inv: st.inv,
-    cfaDone: new Set(pick('cfa.done:').filter(e => e.d.done).map(e => e.d.block)),
-    cfaErrors: pick('cfa.err:').filter(e => e.t === 'cfa.err.put').map(e => ({ id: e.d.id, ...e.d.data })),
-    train: Object.fromEntries(pick('train:').map(e => [`${e.d.date}|${e.d.ex}|${e.d.set}`, e.d])),
-    settings: Object.fromEntries(pick('setting:').map(e => [e.d.key, e.d.value])),
-    trainSessions: Object.fromEntries(pick('trainsess:').map(e => [e.d.date, e.d])),
-    prep: Object.fromEntries(pick('prep:').map(e => [`${e.d.date}|${e.d.card}|${e.d.idx}`, e.d.done])),
-    prepTests: Object.fromEntries(pick('preptest:').map(e => [e.d.id, e.d])),
-    privatePack: st.lww.get('private.pack')?.d.pack || null,
-    catalogUser: pick('cat:').filter(e => e.t === 'cat.upsert').map(e => e.d.item),
-    archive: st.archive,
-    superseded: st.superseded,
-    unprocessed,
-  };
+
+  // Nowy obiekt stanu; przeliczane są tylko zmienione części, pozostałe przechodzą bez zmian z poprzedniego stanu.
+  // Tablice i obiekty stanu nie są współdzielone z akumulatorem — wcześniejszy stan nie zmienia się po kolejnym zapisie.
+  snapshot() {
+    const prev = this.state, full = !prev, d = this.dirty, out = { ...prev };
+    if (full || d.has('inv')) {
+      const part = (key) => {
+        const o = full ? {} : { ...prev.inv[key] };
+        for (const p of full ? Object.keys(this[key]) : this.dirtyProds[key]) o[p] = this[key][p].slice();
+        return o;
+      };
+      out.inv = { counts: part('counts'), moves: part('moves'), shifts: this.shifts.slice() };
+    }
+    for (const [g, fn] of Object.entries(DERIVE)) {
+      if (!full && !d.has(g)) continue;
+      const t = !full && OBJ[g] && this.touched.get(g);
+      if (t) { const [field, key, val] = OBJ[g], o = { ...prev[field] }; for (const e of t) o[key(e)] = val(e); out[field] = o; }
+      else Object.assign(out, fn(this.groups.get(g)));
+    }
+    if (full || d.has('archive')) out.archive = this.archive.slice();
+    if (full || d.has('superseded')) out.superseded = this.superseded.slice();
+    if (full || d.has('unprocessed')) out.unprocessed = { count: this.unprocessed.count, types: { ...this.unprocessed.types } };
+    this.dirty = new Set(); this.dirtyProds = { counts: new Set(), moves: new Set() }; this.touched = new Map();
+    return (this.state = full ? order(out) : out);
+  }
+
+  // Dołożenie zdarzeń bez pełnego przeliczenia — tylko gdy każde jest nowsze od wszystkich dotychczasowych
+  // (zapis lokalny: zegar HLC po `observe` zawsze idzie naprzód). W przeciwnym razie `false` — potrzebne pełne przeliczenie.
+  append(list) {
+    const sorted = [...list].sort(byHlc);
+    if (!this.state || (sorted.length && sorted[0].hlc <= this.max)) return false;
+    for (const e of sorted) this.add(e);
+    this.snapshot();
+    return true;
+  }
 }
+
+const byHlc = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
+// Kolejność pól stanu jak dotąd (czytelność w narzędziach deweloperskich)
+const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed'];
+const order = s => Object.fromEntries(FIELDS.map(f => [f, s[f]]));
+
+export function reduceInto(events) {
+  const r = new Reducer();
+  for (const e of [...events].sort(byHlc)) r.add(e);
+  r.snapshot();
+  return r;
+}
+
+export function reduce(events) { return reduceInto(events).state; }
 
 export class Store {
   constructor(adapter) { this.adapter = adapter; this.events = new Map(); this.listeners = new Set();
@@ -91,12 +159,19 @@ export class Store {
       this.health = { ok: false, persisted: false, error: `Nie można otworzyć bazy danych: ${err.message}`, quarantined: 0 };
       throw new StorageError(this.health.error, err);
     }
-    this.state = reduce(this.events.values());
+    this.rebuild();
     return this;
   }
 
   on(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
-  emit() { this.state = reduce(this.events.values()); this.listeners.forEach(f => f(this.state)); }
+  // Pełne przeliczenie stanu z całego dziennika (otwarcie, import, synchronizacja, zdarzenia starsze od najnowszego).
+  rebuild() { this.reducer = reduceInto(this.events.values()); this.state = this.reducer.state; }
+  // `fresh` — zdarzenia właśnie dopisane lokalnie: przyrostowo, gdy wszystkie są najnowsze (P1); inaczej pełne przeliczenie.
+  emit(fresh) {
+    if (fresh && this.reducer?.append(fresh)) this.state = this.reducer.state;
+    else this.rebuild();
+    this.listeners.forEach(f => f(this.state));
+  }
 
   makeEvent(t, d, id) {
     return { id: id || `${t}:${randomId(12)}`, hlc: hlc(this.device), dev: this.device, t, d, at: new Date().toISOString(), v: SCHEMA };
@@ -110,7 +185,7 @@ export class Store {
     if (err) throw new StorageError(`Odrzucono niepoprawne dane: ${err}`);
     await this.writeVerified([e]);
     this.events.set(e.id, e);
-    this.emit();
+    this.emit([e]);
     return e;
   }
 
@@ -123,7 +198,7 @@ export class Store {
     for (const e of evs) { const err = validateEvent(e); if (err) throw new StorageError(`Odrzucono niepoprawne dane: ${err}`); }
     await this.writeVerified(evs);
     for (const e of evs) this.events.set(e.id, e);
-    this.emit();
+    this.emit(evs);
     return evs;
   }
 
