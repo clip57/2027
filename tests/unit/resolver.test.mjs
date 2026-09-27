@@ -92,21 +92,22 @@ test('suplementy przypięte do slotów wg godziny', () => {
   assert.equal(total, r.doses.length, 'każda dawka w dokładnie jednym slocie');
 });
 
-test('CFA: 9 bloków dziennie, soboty 8 (bez E, zakupy); mock w A–E, F wolne (D-019, D-036, D-086, D-087, D-090)', () => {
+test('CFA: 9 bloków dziennie, soboty 8 (bez E, zakupy); mock w A–E, F wolne (D-019, D-036, D-086, D-087, D-090, D-093)', () => {
+  const CFA0 = SRC.cfa.D.stat.start;   // plan CFA od 28.09 (D-093); start całego planu 27.09 — 27.09 bez bloków
   for (const d of ALL) {
     const r = resolveDay(d);
     const mock = SRC.cfa.D.mockCFA.includes(d), sat = r.weekday === 6 && !mock && d >= START;
     const cfaSlots = r.slots.filter(s => s.role === 'cfa');
     assert.deepEqual(cfaSlots.map(s => s.from), ['08:00', '09:10', '10:10', '11:20', '12:20', '13:30', '14:30', '15:30', '16:40'].filter(t => !sat || t !== '12:20'), d);
     const n = cfaSlots.reduce((a, s) => a + s.cfa.length, 0);
-    if (d >= START && d <= '2026-11-11') assert.equal(n, sat ? 8 : 9, d); else assert.equal(n, 0, d);
-    if (d < START) assert.ok(cfaSlots.every(s => s.title === 'Brak bloku CFA'), d);
+    if (d >= CFA0 && d <= '2026-11-11') assert.equal(n, sat ? 8 : 9, d); else assert.equal(n, 0, d);
+    if (d < CFA0) assert.ok(cfaSlots.every(s => s.title === 'Brak bloku CFA'), d);
     if (SRC.cfa.D.mockCFA.includes(d)) {
       assert.deepEqual(cfaSlots.slice(0, 4).map(s => s.title), ['Mock CFA — sesja 1', 'Mock CFA — sesja 1', 'Mock CFA — sesja 2', 'Mock CFA — sesja 2']);
       // E (12:20–13:13) = kontynuacja sesji 2 do 13:00 (D-086), F wolne (D-036)
       assert.deepEqual(cfaSlots.slice(4, 6).map(s => [s.title, s.desc]), [['Mock CFA — sesja 2', 'Kontynuacja sesji (10:45–13:00)'], ['Wolne', 'Dzień mocka — brak bloku w planie (D-036)']]);
       assert.deepEqual(cfaSlots.slice(6).map(s => s.title), ['CFA blok G', 'CFA blok H', 'CFA blok I']);
-    } else if (d >= START && d <= '2026-11-11') {
+    } else if (d >= CFA0 && d <= '2026-11-11') {
       assert.deepEqual(cfaSlots.map(s => s.title), [...(sat ? 'ABCDFGHI' : 'ABCDEFGHI')].map(l => `CFA blok ${l}`), d);
     }
   }
@@ -127,19 +128,19 @@ test('CFA: każdy blok w slocie o godzinach z planu (D-086); sesje mocka w pierw
 });
 
 test('posiłki i suplementy w dniu mocka bez zmian godzin (D-019)', () => {
-  const a = resolveDay('2026-10-26'), b = resolveDay('2026-10-19');
+  const a = resolveDay('2026-10-30'), b = resolveDay('2026-10-23');   // piątek z mockiem (D-093) i zwykły piątek
   const meals = r => r.slots.filter(s => s.role === 'meal').map(s => `${s.from}:${s.kcal}`).join();
   assert.equal(meals(a), meals(b));
   assert.deepEqual(a.doses.map(d => d.time + d.supp), b.doses.map(d => d.time + d.supp));
 });
 
-test('recall: brak w pt i sob, przed 27.09 i po 11.11; 34 sesje w planie (D-086, D-090)', () => {
+test('recall: brak w pt i sob, przed 28.09 i po 11.11; 33 sesje w planie (D-086, D-090, D-093)', () => {
   let n = 0;
   for (const d of ALL) {
     const r = resolveDay(d); if (r.cfa.recall) n++;
-    if (r.weekday === 5 || r.weekday === 6 || d < START || d > '2026-11-11') assert.equal(r.cfa.recall, false, d);
+    if (r.weekday === 5 || r.weekday === 6 || d < SRC.cfa.D.stat.start || d > '2026-11-11') assert.equal(r.cfa.recall, false, d);
   }
-  assert.equal(n, 34);
+  assert.equal(n, 33);
   assert.equal(n, SRC.cfa.D.stat.recall);
 });
 
@@ -173,7 +174,7 @@ test('D-040: nazwa treningu w nagłówku dnia', () => {
 });
 
 test('D-039: linia źródła bloku CFA', () => {
-  const a = resolveDay('2026-09-27').slots.find(s => s.id === 'slot.0800').cfa[0];   // pierwszy blok planu: 27.09, 08:00 (D-090)
+  const a = resolveDay('2026-09-28').slots.find(s => s.id === 'slot.0800').cfa[0];   // pierwszy blok planu CFA: 28.09, 08:00 (D-093)
   assert.equal(cfaSourceLine(a), 'Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)');
 });
 

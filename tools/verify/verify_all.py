@@ -105,14 +105,14 @@ check(sum(len(l) for l in tr.values()) == 32, "trening: 32 ćwiczenia")
 # ---------- CFA ----------
 cfa = D("cfa.json")["D"]
 B = cfa["bloki"]
-check(len(B) == 409 and [b["nr"] for b in B] == list(range(1, 410)), "CFA: 409 bloków 1–409 (D-090)")
-check(len({b["data"] for b in B}) == 46 and min(b["data"] for b in B) == "2026-09-27", "CFA: 46 dni od 27.09.2026 (D-090)")
-check(max(b["data"] for b in B if b["tryb"] == "FIRST PASS") == "2026-11-05", "CFA: first pass do 05.11 (D-087, D-090)")
-check(cfa["mockCFA"] == ["2026-10-26", "2026-10-30", "2026-11-03", "2026-11-07"], "CFA: 4 mocki")
+check(len(B) == 400 and [b["nr"] for b in B] == list(range(1, 401)), "CFA: 400 bloków 1–400 (D-093)")
+check(len({b["data"] for b in B}) == 45 and min(b["data"] for b in B) == "2026-09-28", "CFA: 45 dni od 28.09.2026 (D-093)")
+check(max(b["data"] for b in B if b["tryb"] == "FIRST PASS") == "2026-11-05", "CFA: first pass do 05.11 (D-087, D-090, D-093)")
+check(cfa["mockCFA"] == ["2026-10-30", "2026-11-03", "2026-11-07"], "CFA: 3 mocki; 26.10 — mixed practice (D-093)")
 cfa_src = os.path.join(SRC, os.environ.get("CFA_PLAN", "PLAN_NAUKI_CFA_LEVEL_I.html"))
 if os.path.exists(cfa_src):
     js = re.findall(r"<script[^>]*>([\s\S]*?)</script>", open(cfa_src, encoding="utf8").read())[0].strip()
-    check(json.loads(re.sub(r"^const D\s*=\s*", "", js).rstrip().rstrip(";")) == cfa, "CFA: cfa.json = obiekt D z PLAN_NAUKI_CFA_LEVEL_I.html (D-090)")
+    check(json.loads(re.sub(r"^const D\s*=\s*", "", js).rstrip().rstrip(";")) == cfa, "CFA: cfa.json = obiekt D z PLAN_NAUKI_CFA_LEVEL_I.html (D-093)")
 else:
     check(False, "CFA: brak PLAN_NAUKI_CFA_LEVEL_I.html w SOURCES_DIR (D-086)")
 

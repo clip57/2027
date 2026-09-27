@@ -32,6 +32,8 @@ Faza 0 od 26.09 (F1 12.10, F2 16.11 bez zmian); suplementy czasowe 25.09.2026–
 `tests/unit/plan-cfa.test.mjs`. Raporty: `docs/RAPORT_PLAN_CFA_D086.md`, `docs/RAPORT_PLAN_CFA_D087.md`.
 **Plan CFA v7 i start planu 27.09.2026 (D-090):** 409 bloków (41 × 9 + 5 sobót × 8, 27.09–11.11), start planu i Faza 0 od 27.09,
 25–26.09 poza planem (wyjątki usunięte), suplementy czasowe 27.09.2026–21.03.2027. Raport: `docs/RAPORT_PLAN_CFA_D090.md`.
+**Plan CFA v9 (D-093):** 400 bloków (40 × 9 + 5 sobót × 8), **28.09–11.11**; 3 mocki (30.10, 03.11, 07.11), mixed practice 26–27.10
+(tryb PRACTICE), 33 sesje recall. **Start całego planu bez zmian: 27.09** — 27.09 to dzień planu bez bloków CFA. Raport: `docs/RAPORT_PLAN_CFA_D093.md`.
 **Start planu (D-088, data wg D-090):** `phases.json` → `start`; dni wcześniejsze poza planem (`inPlan()`/`PLAN_START` w `resolver.js`:
 bez planu dnia, treningu, dawek, bloków i zużycia; serie sprzed startu poza statystykami — `TRAIN_FROM`). Zdarzenia z tych dni
 zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchronizacji). Raport: `docs/RAPORT_ETAPY_0_3.md`.
@@ -42,7 +44,7 @@ w CFA, Treningu i Zapasach; raport `docs/RAPORT_P1_P2.md`. **D2, I9, I12 — nie
 komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
 **Pakiet prywatny (D-091):** aktualizacja istniejącego pakietu `tools/extract/private_pack_lib.py <stary> <nowy>` (poza repozytorium),
 stan w Diagnostyce; instrukcja `docs/PAKIET_PRYWATNY.md`. Po zmianie planu: zaktualizuj `UPGRADE` w `private_pack_lib.py`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-092).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-093).
 
 ---
 
