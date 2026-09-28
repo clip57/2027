@@ -39,7 +39,7 @@
   --e-raise: 0 1px 3px rgb(20 20 30 / .14);               /* aktywny element toru (segment, motyw) */
   --scrim: rgb(5 6 10 / .45);                              /* tło pod oknem */
   /* domeny (sygnatura modułu — ikona, pasek, kropka) */
-  --cfa: #1e40af; --train: #8a3324; --regen: #6b21a8;
+  --cfa: #1e40af; --train: #8a3324; --regen: #6b21a8; --care: #0e6660;
   --p-col: #1d4ed8; --c-col: #92400e; --f-col: #5b21b6; --org: #0b5f75;
   --warn-bg: #fff4d6; --warn-ink: #6b4a00; --err-bg: #fde4e4; --ok-ink: #15603a;
 }
@@ -54,7 +54,7 @@
   --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
   --on-success: #0d0f13; --e-raise: 0 1px 3px rgb(0 0 0 / .5); --scrim: rgb(5 6 10 / .6);
   --e1: 0 0 0 transparent; --e2: 0 16px 40px rgb(0 0 0 / .5);
-  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff;
+  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff; --care: #6fd6c9;
   --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
   --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --ok-ink: #8fe0b0;
 }
@@ -67,7 +67,7 @@
   --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
   --on-success: #0d0f13; --e-raise: 0 1px 3px rgb(0 0 0 / .5); --scrim: rgb(5 6 10 / .6);
   --e1: 0 0 0 transparent; --e2: 0 16px 40px rgb(0 0 0 / .5);
-  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff;
+  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff; --care: #6fd6c9;
   --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
   --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --ok-ink: #8fe0b0; } }
 

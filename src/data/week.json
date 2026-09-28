@@ -57,7 +57,8 @@
    "sessionName": "Basen",
    "sauna": 0,
    "diet": "T",
-   "recall": true
+   "recall": true,
+   "variant": "basen"
   }
  },
  "activity": {
@@ -104,7 +105,7 @@
   "free_when_no_block": "D-036",
   "replace_decision": "D-019, D-086 (E: kontynuacja sesji 2 do 13:00)"
  },
- "variant_decision": "D-087: soboty — 12:13–13:13 zakupy (bez bloku E); nie dotyczy dnia mocka",
+ "variant_decision": "D-087: soboty — 12:13–13:13 zakupy (bez bloku E); D-094: niedziele — basen 18:15–19:30, posiłek 19:30, relaks, prysznic całego ciała 20:15–20:45; nie dotyczy dnia mocka",
  "exceptions": {
   "2026-09-27": {
    "decision": "D-087",
@@ -113,7 +114,8 @@
    "sessionName": "Bez treningu, 2 × sauna",
    "sauna": 2,
    "diet": "NT",
-   "note": "Wyjątek 27.09.2026: zamiast basenu dzień sauny (bez treningu, dieta NT)"
+   "note": "Wyjątek 27.09.2026: zamiast basenu dzień sauny (bez treningu, dieta NT)",
+   "variant": null
   }
  }
 }

@@ -43,6 +43,17 @@ function legacyReduce(events) {
   };
 }
 
+// Pielęgnacja (D-094): wzorzec nowych pól stanu liczony niezależnie (LWW w kolejności HLC, kolejność pierwszego pojawienia się)
+const byHlc0 = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
+function legacy(events) {
+  const out = legacyReduce(events), defs = new Map(), done = {};
+  for (const e of [...events].sort(byHlc0)) {
+    if (e.t === 'care.def') defs.set(e.d.id, e);
+    if (e.t === 'care.done') done[`${e.d.date}|${e.d.step}`] = e.d.done;
+  }
+  return { ...out, careDefs: [...defs.values()].filter(e => !e.d.deleted).map(e => ({ ...e.d.data, id: e.d.id, kind: e.d.kind })), careDone: done };
+}
+
 // Deterministyczny generator liczb losowych (powtarzalne przypadki)
 const rng = seed => () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
 const DEV = ['dmac', 'dphone', 'dweb'];
@@ -65,6 +76,8 @@ function randomEvent(r, i, ms) {
     () => ['cat.upsert', { item: { id: pick(['custom_a', 'custom_b']), name: 'Pozycja', unit: 'g', n: i } }],
     () => ['cat.delete', { id: pick(['custom_a', 'custom_b']) }],
     () => ['archive', { kind: 'test', data: { i } }],
+    () => ['care.def', { id: pick(['s1', 's2', 'p1']), kind: pick(['step', 'product']), data: { text: 'krok', n: i }, deleted: r() < 0.15 ? true : undefined }],
+    () => ['care.done', { date: day, step: pick(['s1', 's2']), done: r() < 0.7 }],
     () => ['future.type', { cokolwiek: [1, { a: 2 }] }],
   ];
   const [t, d] = pick(kinds)();
@@ -83,8 +96,8 @@ const byHlc = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
 test('reduce() po P1 = reduce() sprzed P1 (200 losowych dzienników, także nieuporządkowanych)', () => {
   for (let seed = 1; seed <= 200; seed++) {
     const log = randomLog(seed, 20 + (seed % 7) * 40);
-    same(reduce(log), legacyReduce(log), `dziennik ${seed}`);
-    same(reduce([...log].reverse()), legacyReduce([...log].reverse()), `dziennik ${seed} odwrócony`);
+    same(reduce(log), legacy(log), `dziennik ${seed}`);
+    same(reduce([...log].reverse()), legacy([...log].reverse()), `dziennik ${seed} odwrócony`);
   }
 });
 
@@ -100,7 +113,7 @@ test('dokładanie zdarzeń najnowszych = pełne przeliczenie; wcześniejsze stan
       const k = 1 + Math.floor(r() * 4);
       assert.equal(acc.append(uniq.slice(at, at + k)), true, 'zdarzenia najnowsze — ścieżka przyrostowa');
       at += k;
-      same(acc.state, legacyReduce(uniq.slice(0, at)), `dziennik ${seed}, po ${at} zdarzeniach`);
+      same(acc.state, legacy(uniq.slice(0, at)), `dziennik ${seed}, po ${at} zdarzeniach`);
       snaps.push([acc.state, canon(acc.state), at]);
     }
     for (const [st, c, n] of snaps) assert.equal(canon(st), c, `stan po ${n} zdarzeniach zmienił się po kolejnych zapisach`);
@@ -119,7 +132,7 @@ test('zdarzenie starsze od najnowszego lub z tym samym HLC — odmowa ścieżki 
 test('Store: record/recordMany przyrostowo, appendMany (import) i zdarzenia starsze — stan zawsze = reduce(wszystkich)', async () => {
   const a = new MemoryAdapter();
   const s = await new Store(a).open();
-  const check = msg => same(s.state, legacyReduce(s.allEvents()), msg);
+  const check = msg => same(s.state, legacy(s.allEvents()), msg);
   let full = 0; const orig = s.rebuild.bind(s); s.rebuild = () => { full++; orig(); };
   await s.record('inv.count', { prod: 'jaja', qty: 10, date: '2026-10-05' }); check('inv.count');
   await s.record('train.set', { date: '2026-10-05', ex: 'przysiad', set: 1, done: true, kg: 60, reps: 8, rir: 2 }); check('train.set');
@@ -144,8 +157,8 @@ test('wydajność: zapis przy dużym dzienniku bez pełnego przeliczenia (30 tys
   let t = performance.now();
   for (let i = log.length - 50; i < log.length; i++) acc.append([log[i]]);
   const inc = (performance.now() - t) / 50;
-  t = performance.now(); legacyReduce(log); const fullMs = performance.now() - t;
-  same(acc.state, legacyReduce(log));
+  t = performance.now(); legacy(log); const fullMs = performance.now() - t;
+  same(acc.state, legacy(log));
   assert.ok(inc < fullMs, `przyrostowo ${inc.toFixed(2)} ms < pełne ${fullMs.toFixed(2)} ms`);
   console.log(`# 30 tys. zdarzeń: pełne przeliczenie ${fullMs.toFixed(1)} ms, dołożenie jednego zdarzenia ${inc.toFixed(2)} ms`);
 });

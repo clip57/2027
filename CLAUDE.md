@@ -44,7 +44,11 @@ w CFA, Treningu i Zapasach; raport `docs/RAPORT_P1_P2.md`. **D2, I9, I12 — nie
 komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
 **Pakiet prywatny (D-091):** aktualizacja istniejącego pakietu `tools/extract/private_pack_lib.py <stary> <nowy>` (poza repozytorium),
 stan w Diagnostyce; instrukcja `docs/PAKIET_PRYWATNY.md`. Po zmianie planu: zaktualizuj `UPGRADE` w `private_pack_lib.py`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-093).
+**Moduł „Pielęgnacja” (D-094):** plan pielęgnacji **wyłącznie w danych użytkownika** (import `2027-pielegnacja.json` w Dane, edycja w module;
+typy `care.def`, `care.done`; logika `src/core/calc/care.js`) — **nigdy nie dodawaj treści planu (produkty, leki, kroki) do repozytorium,
+testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. Niedziela z basenem: wariant planu dnia „basen” i kreatyna o 19:30 (`day_plan_d094.py`).
+Raport: `docs/RAPORT_PIELEGNACJA_D094.md`. Imię i nazwisko użytkownika nie mogą pojawić się nigdzie (także w plikach prywatnych).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-094).
 
 ---
 
@@ -54,7 +58,7 @@ Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-093).
 |---|---|---|
 | Wejście, router, nawigacja | `src/app.js`, `src/index.html` | router na `location.hash` (`#/modul?param=…`), każdy moduł renderuje do `<main>` przy każdej zmianie; strona `#/wiecej` generowana w `app.js` |
 | Rejestr modułów | `src/modules/registry.js` | `GROUPS` (Dzień/Trening/Dieta/Nauka/System), `MODULES` (id, name, group, icon, domain, tab) |
-| Moduły widoków | `src/modules/*.js` | `dzis, dieta, suplementy, zapasy, mealprep, trening, cfa, bezpieczenstwo, rekompozycja, dane` (+ `placeholder.js`) |
+| Moduły widoków | `src/modules/*.js` | `dzis, pielegnacja, dieta, suplementy, zapasy, mealprep, trening, cfa, bezpieczenstwo, rekompozycja, dane` (+ `placeholder.js`) |
 | UI — helpery | `src/ui/dom.js`, `src/ui/patch.js` | `h()` (tworzenie DOM **bez innerHTML**), `add()` (dołączanie z pominięciem null/false/undefined), `clear`, `fmt`, `plural`; `region()`/`swap()`/`holdFocus()` — punktowe odświeżanie z zachowaniem fokusu (P2) |
 | UI — komponenty | `src/ui/components.js`, `icons.js`, `prefs.js`, `charts.js`, `bodymap.js`, `figure.js`, `movement.js` | `segmented, stat, statGrid, section, macroChips, progressRing`; ikony Lucide `icon(name,{size,label})`; preferencje per urządzenie |
 | Style | `src/ui/tokens.css` → `src/ui/styles.css` → `src/ui/system.css` | sklejane w tej kolejności przez `tools/build.mjs`. **Tokeny tylko w `tokens.css`** |
@@ -70,7 +74,7 @@ przeliczany funkcją `reduce()` w `src/core/storage/store.js` (akumulator `Reduc
 
 Typy zdarzeń (walidacja w `src/core/storage/validate.js`, `SCHEMA = 1`):
 `inv.count, inv.dayshift, inv.move, cat.upsert, cat.delete, cfa.done, cfa.err.put, cfa.err.del, train.set, setting,
-train.session, prep.step, prep.test, private.pack, archive`.
+train.session, prep.step, prep.test, private.pack, archive, care.def, care.done` (dwa ostatnie — D-094).
 
 ## 2. Komendy
 
@@ -175,3 +179,4 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Stan pochodny jako `const` w module z punktowym odświeżaniem (P2) | przyciski w niezmienionych fragmentach działają na starym stanie (np. „Oznacz cały dzień” pomija odhaczone w międzyczasie) | stan pochodny w zmiennych `let` przeliczanych przed odświeżeniem (`derive()`/`compute()`); przyciski czytają zmienne, nie kopie z chwili renderu |
 | Zmiana `reduce()` / akumulatora `Reducer` | stan przyrostowy różny od pełnego — rozjazd widoków po zapisie i po ponownym otwarciu | jeden kod dla obu ścieżek; test `reduce-incremental.test.mjs` (kopia wzorcowa `reduce()` sprzed P1) musi przechodzić |
 | Nowa akcja w module z punktowym odświeżaniem | fragment zależny od zmiany nieodświeżony | dopisz go do `update`/`refresh` modułu albo użyj `ctx.rerender()`; przypadek do `run_p2` w `e2e.py` (porównanie z pełnym przerysowaniem) |
+| Stałe (`const`) zdefiniowane w module po `return <widok>()` | `ReferenceError` przy kliknięciu (okno edycji Pielęgnacji się nie otwierało) | pomocnicze stałe i fragmenty (`region`) przed wyborem widoku; funkcje (`function`) mogą być niżej |

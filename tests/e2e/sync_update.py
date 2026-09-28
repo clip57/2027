@@ -122,6 +122,22 @@ async def main():
         txt = await import_file(phone, fd, expect_new=False)
         ok('Scal dane' not in txt, 'A: ponowny import tego samego pliku — brak nowych zmian (bez duplikatów)')
 
+        # Pielęgnacja (D-094): plan (care.def) i odhaczenia (care.done) w pliku synchronizacji — w obu kierunkach
+        await import_file(desk, fixtures.write(fixtures.synthetic_care_plan(), 'pielegnacja_syntetyczna.json'))
+        await desk.goto(URL + '#/pielegnacja'); await desk.wait_for_selector('.pg-check input')
+        await desk.locator('.pg-check input').first.check(); await desk.wait_for_timeout(400)
+        hero = await desk.inner_text('.pg-hero')
+        await import_file(phone, await export(desk))
+        await phone.goto(URL + '#/pielegnacja'); await phone.wait_for_selector('.pg-pora')
+        ok(await phone.locator('.pg-step.is-done').count() == 1 and (await phone.inner_text('.pg-hero')).split('\n')[1] == hero.split('\n')[1],
+           'A: pielęgnacja — plan i odhaczenie z komputera na telefonie')
+        await phone.goto(URL + '#/pielegnacja?v=produkty'); await phone.wait_for_selector('.pg-prod-card')
+        await phone.get_by_role('button', name='Edytuj produkt: [DANE TESTOWE] Produkt A').click(); await phone.wait_for_selector('dialog[open]')
+        await phone.select_option('dialog select >> nth=1', 'skonczony'); await phone.get_by_role('button', name='Zapisz zmiany').click(); await phone.wait_for_timeout(400)
+        await import_file(desk, await export(phone))
+        await desk.goto(URL + '#/pielegnacja?v=produkty'); await desk.wait_for_selector('.pg-prod-card')
+        ok('Skończony' in await desk.inner_text('#pg-p-p\\.t1'), 'A: pielęgnacja — zmiana produktu z telefonu na komputerze')
+
         # ---------- B) zdarzenie z nowszej wersji ----------
         await phone.evaluate("""() => new Promise(r => { const q = indexedDB.open('p2027'); q.onsuccess = () => { const tx = q.result.transaction('events', 'readwrite');
           tx.objectStore('events').put({ id: 'x.future:e2e', hlc: '1790000000000:0000:dfut', dev: 'dfut', t: 'x.future', d: { a: 1 }, at: '2026-09-23T10:00:00Z', v: 1 });

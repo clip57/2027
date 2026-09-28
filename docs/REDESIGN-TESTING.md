@@ -25,6 +25,15 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 | `npm run e2e:cloud` | 100/100 |
 | `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
 
+### Moduł Pielęgnacja i niedziela z basenem (D-094; 28.09.2026)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 194 testy: 193 zaliczone, 1 pominięty; nowy `care.test.mjs` |
+| `npm run e2e` | 1306/1306 (nowy blok `run_care`) |
+| `npm run e2e:sync` | 23/23 (pielęgnacja w obu kierunkach) |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń (widoki i stany modułu) |
+
 ### Etap 4: P1, P2 (D-092; 27.09.2026)
 | Zestaw | Wynik |
 |---|---|
@@ -176,7 +185,11 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .dn-sync .dn-cloud .dn-cloud-msg .dn-cloud-cfg .dn-sync-s .has-unsent .dn-cloud-auto .dn-cloud-auto-b .dn-cloud-pull-b .cloud-banner .inv-head .zp-more[open]
 .kv .mode .m-pr .dz-outside .sp-outside .dz-past .dz-plan-h .dz-attn .wk-grid .wk-day .is-out .cf-past .cf-recall .cf-recall-chip
 .mp-eve .mp-daynav .sheet-msg .toast #toast .skip-link .zp-empty .zp-hint #zp-q #zp-stan-hint .c-shop .inv-low .dn-diag .dn-diag-list
-.dn-plain .dn-evict .dn-ics .gs-dialog .gs-input .gs-list .gs-hit .gs-t .gs-help .more-search .side-search .rc-preview`
+.dn-plain .dn-evict .dn-ics .gs-dialog .gs-input .gs-list .gs-hit .gs-t .gs-help .more-search .side-search .rc-preview
+.pg-empty .pg-hero .pg-pora .pg-count .pg-check .pg-step .is-done .is-opt .pg-wait .pg-timer .pg-timer-t .pg-wday .pg-prod-card .pg-plan-i .pg-edit .slot-care`
+(Pielęgnacja, D-094: identyfikatory `pg-rano`, `pg-p-<id>`, slot `slot.2015n` (niedziela), przyciski „Zamknij licznik”, „Dodaj krok”, „Usuń krok”,
+„Eksport planu (.json)”, „Edytuj produkt: <nazwa>”, „Edytuj krok: <tekst>”, „W zapasie”, teksty „Brak planu pielęgnacji”, „Pielęgnacja N / M”,
+„Plan pielęgnacji: N kroków, M produktów”, „Plan pielęgnacji (2027-pielegnacja.json)”)
 (Etapy 1–3 audytu: przyciski „Sprawdź”, „Dodaj do zapasów”, „Zapisz pozycję”, „Zapisz zmiany”, „Edytuj <nazwa>”, „Pobierz plik .ics”,
 „Przywróć ten stan”, linki „Tydzień”, „Następny dzień” (Meal Prep), `aria-label` „Recall 22:00 …”, teksty „Minione punkty”, „Wymaga uwagi”)
 (plan D-086/D-087: identyfikatory slotów `slot.1213`, `slot.1220`, `slot.1313`, `slot.1213z` (sobota), `slot.1815`, `slot.2015` i tytuły „Przerwa kognitywna”, „Przerwa na lunch”, „Zakupy”, „CFA blok A…I”)

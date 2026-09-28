@@ -19,11 +19,12 @@ test('fazy kalendarzowe D-017 (F0 od 27.09.2026 — D-090; F1 i F2 bez zmian)', 
   assert.equal(phaseFor('2026-11-16'), 2);
 });
 
-test('każdy dzień 21.09.2026–31.03.2027: sloty z godzinami szablonu — 34, soboty 33 (D-004, D-086, D-087)', () => {
+test('każdy dzień 21.09.2026–31.03.2027: sloty z godzinami szablonu — 34, soboty 33, niedziele 32 (D-004, D-086, D-087, D-094)', () => {
   for (const d of ALL) {
     const r = resolveDay(d);
     const sat = r.weekday === 6 && !SRC.cfa.D.mockCFA.includes(d) && d >= START;   // sobota poza planem (26.09) — zwykły szablon
-    assert.equal(r.slots.length, sat ? 33 : 34, d);
+    const sun = r.weekday === 7 && d > START;   // niedziela z basenem (D-094); 27.09 — wyjątek (sauna), przed startem — zwykły szablon
+    assert.equal(r.slots.length, sat ? 33 : sun ? 32 : 34, d);
     assert.equal(r.slots.map(s => `${s.from}-${s.to}`).join(), templateFor(d).map(s => `${s.from}-${s.to}`).join(), d);
   }
 });
@@ -53,7 +54,8 @@ test('slot sauny: czwartek i dni bez sauny = „Wolne” (D-018)', () => {
   assert.equal(sauna('2026-09-29'), 'Wolne');
   assert.equal(sauna('2026-09-30'), 'Sauna');
   assert.equal(sauna('2026-10-01'), 'Wolne');
-  assert.equal(sauna('2026-10-04'), 'Wolne');
+  assert.equal(sauna('2026-10-02'), 'Wolne');
+  assert.equal(resolveDay('2026-10-04').slots.some(s => s.id === 'slot.1945'), false, 'niedziela: relaks zamiast okna sauny (D-094)');
   assert.equal(sauna('2026-09-21'), 'Wolne', 'poza planem (D-088)');
 });
 

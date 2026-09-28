@@ -32,6 +32,10 @@ const PAYLOAD = {
   'prep.test': d => isId(d.id) && isValidDay(d.date) && typeof d.pass === 'boolean' && (d.value == null || isStr(d.value)),
   'private.pack': d => isObj(d.pack) && d.pack.format === '2027-private' && plain(d.pack),
   'archive': d => isId(d.kind) && plain(d.data),
+  // Pielęgnacja (D-094): definicja kroku albo produktu (ostatnia zmiana wygrywa; `deleted` — usunięcie) i odhaczenie kroku w dniu.
+  // Treść planu pochodzi wyłącznie z danych użytkownika (import pliku / edycja w aplikacji) — nie ma jej w repozytorium (D-035).
+  'care.def': d => isId(d.id) && ['step', 'product'].includes(d.kind) && isObj(d.data) && plain(d.data) && (d.deleted == null || typeof d.deleted === 'boolean'),
+  'care.done': d => isValidDay(d.date) && isId(d.step) && typeof d.done === 'boolean',
 };
 export const EVENT_TYPES = Object.keys(PAYLOAD);
 

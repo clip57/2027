@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086) + wariant sobotni „zakupy” (D-087)",
+ "generated_from": "PLAN_DNIA.html (godziny niezmienne — D-004) + rozkład 12:13–13:30 i 9 bloków CFA (D-086) + wariant sobotni „zakupy” (D-087) + wariant niedzielny „basen” (D-094)",
  "slots": [
   {
    "id": "slot.0700",
@@ -724,6 +724,95 @@
       }
      ],
      "decision": "D-087"
+    }
+   ]
+  },
+  "basen": {
+   "decision": "D-094",
+   "replaces": [
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015",
+    "slot.2035"
+   ],
+   "slots": [
+    {
+     "desc_src": "",
+     "items": [],
+     "key": "main",
+     "decision": "D-094",
+     "id": "slot.1815n",
+     "from": "18:15",
+     "to": "19:30",
+     "domain": "train",
+     "title_src": "Trening Siłowy / Cardio / Sauna",
+     "badges_src": [
+      "Trening"
+     ],
+     "role": "activity"
+    },
+    {
+     "desc_src": "",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (19:30)",
+       "text": "Posiłek potreningowy (19:30)",
+       "meal": "post",
+       "time": "19:30",
+       "decision": "D-094"
+      }
+     ],
+     "key": "post",
+     "decision": "D-094",
+     "id": "slot.1930n",
+     "from": "19:30",
+     "to": "19:45",
+     "domain": "diet",
+     "title_src": "Powrót do domu",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "role": "meal"
+    },
+    {
+     "desc_src": "",
+     "items": [],
+     "key": null,
+     "decision": "D-094",
+     "id": "slot.1945n",
+     "from": "19:45",
+     "to": "20:15",
+     "domain": "regen",
+     "title_src": "Relaks",
+     "badges_src": [
+      "Relaks"
+     ],
+     "role": "static"
+    },
+    {
+     "desc_src": "",
+     "items": [
+      {
+       "kind": "task",
+       "src": "Prysznic całego ciała i pielęgnacja ciała (moduł Pielęgnacja)",
+       "text": "Prysznic całego ciała i pielęgnacja ciała (moduł Pielęgnacja)",
+       "decision": "D-094"
+      }
+     ],
+     "key": null,
+     "decision": "D-094",
+     "id": "slot.2015n",
+     "from": "20:15",
+     "to": "20:45",
+     "domain": "regen",
+     "title_src": "Prysznic całego ciała",
+     "badges_src": [
+      "Higiena"
+     ],
+     "role": "static"
     }
    ]
   }

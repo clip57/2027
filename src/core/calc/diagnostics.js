@@ -6,6 +6,7 @@ import { addDays } from '../dates.js';
 import { PLAN_START } from '../resolver.js';
 import { packStatus, markersIn } from '../private.js';
 import rekomp from '../../data/rekomp.json' with { type: 'json' };
+import { careModel } from './care.js';
 
 const STALE_DAYS = 14;
 
@@ -57,6 +58,14 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   else if (!pk.current) push('private', 'info', `Pakiet prywatny z wcześniejszej wersji planu${pk.created ? ` (utworzony ${pk.created})` : ''}`,
     `Treść jest kompletna, ale pakiet nie ma oznaczenia planu od ${PLAN_START}. Zaktualizuj go: python3 tools/extract/private_pack_lib.py <stary.json> <nowy.json>, potem zaimportuj nowy plik (zastąpi poprzedni).`);
   else push('private', 'ok', `Pakiet prywatny aktualny (plan od ${pk.planStart})`);
+
+  // Pielęgnacja (D-094): plan z danych użytkownika — kroki wskazujące produkt, którego nie ma (np. usunięty)
+  const cm = careModel(state.careDefs || []);
+  if (!cm.empty) {
+    const orphan = cm.steps.filter(x => x.product && !cm.product[x.product]);
+    push('care', orphan.length ? 'warn' : 'ok', orphan.length ? `Pielęgnacja: kroki bez istniejącego produktu: ${orphan.length}` : `Plan pielęgnacji: ${cm.steps.length} kroków, ${cm.products.length} produktów`,
+      orphan.length ? `${orphan.slice(0, 4).map(x => x.text).join(', ')} — wybierz produkt w edycji kroku.` : '', orphan.length ? '#/pielegnacja?v=plan' : null);
+  }
 
   // Chmura: zmiany czekające na wysłanie ponad dobę
   if (cloud?.config) {

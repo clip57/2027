@@ -34,7 +34,7 @@ const PAIRS = [
   ['--accent', '--surface', 4.5], ['--accent-ink', '--accent', 4.5],
   ['--on-success', '--success', 4.5],                                      // odhaczona seria / blok CFA
   ['--success', '--surface', 4.5], ['--warning', '--surface', 4.5], ['--danger', '--surface', 4.5],
-  ['--cfa', '--surface', 4.5], ['--train', '--surface', 4.5], ['--regen', '--surface', 4.5], // tekst w kolorze domeny (plakietki, opisy)
+  ['--cfa', '--surface', 4.5], ['--train', '--surface', 4.5], ['--regen', '--surface', 4.5], ['--care', '--surface', 4.5], ['--care', '--bg', 4.5], // tekst w kolorze domeny (plakietki, opisy)
   ['--p-col', '--surface', 4.5], ['--c-col', '--surface', 4.5], ['--f-col', '--surface', 4.5], ['--org', '--surface', 4.5],
   ['--warn-ink', '--warn-bg', 4.5], ['--ok-ink', '--surface', 4.5],
   ['--border-strong', '--surface', 3],

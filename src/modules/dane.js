@@ -14,9 +14,10 @@ import { PLAN_START } from '../core/resolver.js';
 import { cloudStatus } from '../core/sync/cloud-local.js';
 
 const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY v31', private: 'Pakiet prywatny',
-  'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)' };
+  'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)', care: 'Plan pielęgnacji (2027-pielegnacja.json)' };
 const TYPE = { 'inv.count': 'stany magazynu', 'inv.move': 'zakupy i korekty', 'cat.upsert': 'własne pozycje', 'cfa.done': 'bloki CFA',
-  'cfa.err.put': 'wpisy error logu', 'train.set': 'serie treningowe', setting: 'ustawienia', 'private.pack': 'pakiet prywatny', archive: 'archiwum' };
+  'cfa.err.put': 'wpisy error logu', 'train.set': 'serie treningowe', setting: 'ustawienia', 'private.pack': 'pakiet prywatny', archive: 'archiwum',
+  'care.def': 'kroki i produkty pielęgnacji', 'care.done': 'odhaczenia pielęgnacji' };
 // Środowisko uruchomienia: każde (przeglądarka, aplikacja z ekranu początkowego, plik lokalny) ma OSOBNĄ bazę danych.
 export const appVersion = () => document.querySelector('meta[name="app-version"]')?.content || 'nieznana';
 export function runMode() {
@@ -46,6 +47,8 @@ export async function renderDane(root, ctx) {
     backups: await store.adapter.getBackups() } : {};
   const own = store ? store.allEvents().filter(e => e.dev === store.device) : [];
   const unsent = meta.exp ? own.filter(e => e.hlc > meta.exp.hlc).length : own.length;
+  // Treści wrażliwe w pliku synchronizacji: pakiet prywatny (D-035) i plan pielęgnacji (D-094)
+  const sensitive = [store?.state?.privatePack && 'zaimportowany pakiet prywatny', store?.state?.careDefs?.length && 'plan pielęgnacji'].filter(Boolean);
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const say = (text, cls = 'warn') => { clear(msg).append(h('div', { class: `banner ${cls}` }, text)); };
 
@@ -101,10 +104,10 @@ export async function renderDane(root, ctx) {
     h('p', { class: 'dn-sync-m' }, `Ostatnie wysłanie: ${meta.exp ? new Date(meta.exp.at).toLocaleString('pl-PL') : 'jeszcze nie'} · ostatni import: ${meta.imp ? new Date(meta.imp.at).toLocaleString('pl-PL') : 'jeszcze nie'}`),
     h('p', { class: 'muted' }, 'Po pracy na jednym urządzeniu wybierz „Wyślij do iCloud” i zapisz plik 2027-sync.json w iCloud Drive/2027. Na drugim urządzeniu wybierz „Pobierz z iCloud” i wskaż ten plik. Dane są scalane — nic nie jest nadpisywane, a ten sam plik możesz wczytać wiele razy.'),
     h('div', { class: 'row' }, sendBtn, pickBtn, input),
-    h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA oraz pakiet prywatny.'),
+    h('p', { class: 'muted', style: { marginTop: '.75rem' } }, 'Ten sam przycisk importuje też kopię ZAPASY v31, postęp i error log CFA, pakiet prywatny oraz plan pielęgnacji.'),
     // U-h: plik synchronizacji jest jawnym tekstem (także pakiet prywatny) — w przeciwieństwie do chmury, która szyfruje zdarzenia
-    h('p', { class: `dn-plain${store?.state?.privatePack ? ' banner warn' : ' muted'}` }, icon('lock', { size: 16 }),
-      h('span', {}, `Plik 2027-sync.json nie jest szyfrowany${store?.state?.privatePack ? ' i zawiera zaimportowany pakiet prywatny' : ''}. Trzymaj go tylko w swoim iCloud Drive i włącz Zaawansowaną ochronę danych iCloud (Ustawienia → Twoje imię → iCloud). Synchronizacja w chmurze szyfruje dane na urządzeniu.`))),
+    h('p', { class: `dn-plain${sensitive.length ? ' banner warn' : ' muted'}` }, icon('lock', { size: 16 }),
+      h('span', {}, `Plik 2027-sync.json nie jest szyfrowany${sensitive.length ? ` i zawiera ${sensitive.join(' oraz ')}` : ''}. Trzymaj go tylko w swoim iCloud Drive i włącz Zaawansowaną ochronę danych iCloud (Ustawienia → Twoje imię → iCloud). Synchronizacja w chmurze szyfruje dane na urządzeniu.`))),
     // Synchronizacja w chmurze (D-078, Etap 2) — niezależna od pliku; ręczna, przyciskiem
     await cloudSection(ctx));
 

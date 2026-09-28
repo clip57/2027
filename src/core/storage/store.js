@@ -20,6 +20,8 @@ export function lwwKey(e) {
     case 'private.pack': return 'private.pack';
     case 'cat.upsert': return `cat:${e.d.item.id}`;
     case 'cat.delete': return `cat:${e.d.id}`;
+    case 'care.def': return `care.def:${e.d.id}`;
+    case 'care.done': return `care.done:${e.d.date}|${e.d.step}`;
     default: return null; // inv.* i archive są addytywne
   }
 }
@@ -38,6 +40,7 @@ const OBJ = {
   trainsess: ['trainSessions', e => e.d.date, e => e.d],
   prep: ['prep', e => `${e.d.date}|${e.d.card}|${e.d.idx}`, e => e.d.done],
   preptest: ['prepTests', e => e.d.id, e => e.d],
+  'care.done': ['careDone', e => `${e.d.date}|${e.d.step}`, e => e.d.done],
 };
 const DERIVE = {
   'cfa.done': m => ({ cfaDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),
@@ -45,6 +48,8 @@ const DERIVE = {
   ...Object.fromEntries(Object.entries(OBJ).map(([g, [field, key, val]]) => [g, m => ({ [field]: Object.fromEntries(vals(m).map(e => [key(e), val(e)])) })])),
   'private.pack': m => ({ privatePack: m?.get('private.pack')?.d.pack || null }),
   cat: m => ({ catalogUser: vals(m).filter(e => e.t === 'cat.upsert').map(e => e.d.item) }),
+  // Pielęgnacja (D-094): definicje kroków i produktów bez usuniętych, w kolejności pierwszego pojawienia się
+  'care.def': m => ({ careDefs: vals(m).filter(e => !e.d.deleted).map(e => ({ ...e.d.data, id: e.d.id, kind: e.d.kind })) }),
 };
 const INV = { 'inv.count': 'counts', 'inv.move': 'moves' };
 
@@ -115,7 +120,7 @@ export class Reducer {
 
 const byHlc = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
 // Kolejność pól stanu jak dotąd (czytelność w narzędziach deweloperskich)
-const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed'];
+const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed', 'careDefs', 'careDone'];
 const order = s => Object.fromEntries(FIELDS.map(f => [f, s[f]]));
 
 export function reduceInto(events) {

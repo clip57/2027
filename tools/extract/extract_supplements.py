@@ -6,6 +6,8 @@ tekstu źródłowego ('evidence') występuje w pliku źródłowym (po usunięciu
 Dodatki spoza pliku źródłowego mają pole 'decision' (D-015, D-016, D-030).
 """
 import json, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from day_plan_d094 import apply_supplements_d094
 
 SRC = os.environ.get("SOURCES_DIR") or sys.exit("Ustaw SOURCES_DIR")
 OUT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "data", "supplements.json")
@@ -96,6 +98,7 @@ for t, sit, sid, qty, label, days, ev in D:
         d["validity"] = VALID[sid]
     doses.append(d)
 
+doses = apply_supplements_d094(doses)   # D-094: niedziela — kreatyna z posiłkiem potreningowym o 19:30
 out = {"schema": 1, "generated_from": "SUPLEMENTACJA_2027 (D-001)", "supplements": SUPPS,
        "doses": doses, "other_rows": [{"time": t, "text": s} for t, s in OTHER_ROWS],
        "decisions": {"D-014": "tauryna codziennie, także w czwartek",

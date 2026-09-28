@@ -61,6 +61,29 @@ def synthetic_private_pack():
             ]}
 
 
+def synthetic_care_plan():
+    """Plan pielęgnacji (format 2027-care, D-094) wyłącznie z tekstów zastępczych — bez nazw produktów, leków i danych osobowych.
+    Obejmuje wszystkie reguły: codziennie, dni tygodnia, okres od–do, doraźnie, ostrzeżenie, odczekanie, powiązanie ze slotem."""
+    t = lambda s: f'[DANE TESTOWE] {s}'
+    products = [{'id': f'p.t{i}', 'name': t(f'Produkt {c}'), 'area': a, 'status': st}
+                for i, (c, a, st) in enumerate([('A', 'twarz', 'uzywany'), ('B', 'wlosy', 'uzywany'), ('C', 'cialo', 'zapas'),
+                                                ('D', 'jama', 'uzywany'), ('E', 'detale', 'skonczony')], 1)]
+    step = lambda i, pora, group, text, **k: {'id': f's.t{i}', 'pora': pora, 'group': t(group), 'order': i, 'text': t(text), **k}
+    steps = [
+        step(1, 'rano', 'Twarz', 'krok poranny 1', product='p.t1', slot='slot.0700'),
+        step(2, 'rano', 'Twarz', 'krok poranny 2', warn=t('ostrzeżenie'), wait=10, slot='slot.0700'),
+        step(3, 'rano', 'Jama ustna', 'krok poranny 3', product='p.t4', slot='slot.0700'),
+        step(4, 'dzien', 'Twarz', 'krok doraźny', asNeeded=True),
+        step(5, 'dzien', 'Twarz', 'krok w ciągu dnia'),
+        step(6, 'wieczor', 'Włosy', 'krok PN i PT do 11.10', product='p.t2', days=[1, 5], until='2026-10-11', slot='slot.2035'),
+        step(7, 'wieczor', 'Włosy', 'krok PN od 12.10', product='p.t2', days=[1], **{'from': '2026-10-12'}, slot='slot.2035'),
+        step(8, 'wieczor', 'Ciało', 'krok ŚR i ND', product='p.t3', days=[3, 7]),
+        step(9, 'wieczor', 'Ciało', 'krok niedzielny', days=[7], slot='slot.2015n'),
+        step(10, 'wieczor', 'Twarz', 'krok wieczorny', product='p.t1', slot='slot.2145'),
+    ]
+    return {'format': '2027-care', 'schema': 1, 'created': '2026-01-01', 'source': 'tests/e2e/fixtures.py', 'products': products, 'steps': steps}
+
+
 def write(obj, name):
     p = pathlib.Path(tempfile.mkdtemp(prefix='p2027-syn-')) / name
     p.write_text(json.dumps(obj, ensure_ascii=False), encoding='utf8')

@@ -129,6 +129,8 @@ check(len(tpl) == 34 and tpl[0]["from"] == "07:00" and tpl[-1]["from"] == "23:00
 check([s["from"] for s in tpl if s["role"] == "cfa"] == ["08:00", "09:10", "10:10", "11:20", "12:20", "13:30", "14:30", "15:30", "16:40"],
       "szablon dnia: 9 slotów CFA A–I (D-086)")
 check(D("day_template.json")["variants"]["zakupy"]["replaces"] == ["slot.1213", "slot.1220"], "szablon dnia: soboty — zakupy 12:13–13:13 (D-087)")
+check(D("day_template.json")["variants"]["basen"]["replaces"] == ["slot.1815", "slot.1935", "slot.1945", "slot.2005", "slot.2015", "slot.2035"]
+      and D("week.json")["days"]["7"].get("variant") == "basen", "szablon dnia: niedziele — basen 18:15–19:30, prysznic 20:15–20:45 (D-094)")
 check(sorted(D("week.json")["exceptions"]) == ["2026-09-27"], "tydzień: wyjątek 27.09.2026 (D-087; 25–26.09 usunięte — D-090)")
 
 os.makedirs(os.path.join(ROOT, "docs"), exist_ok=True)

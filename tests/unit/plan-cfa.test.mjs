@@ -222,7 +222,8 @@ test('Soboty (D-087): 12:13–13:13 „Zakupy” zamiast przerwy i bloku E; lunc
   assert.deepEqual(v.replaces, ['slot.1213', 'slot.1220']);
   assert.equal(SRC.week.days['6'].variant, 'zakupy');
   for (const d of range('2026-09-19', '2027-03-27')) {
-    // przed startem planu (D-088) i w dni inne niż sobota — zwykły szablon
+    // przed startem planu (D-088) i w dni inne niż sobota i niedziela — zwykły szablon; niedziela — wariant „basen” (D-094, osobny test)
+    if (weekday(d) === 7 && d > SRC.phases.start) continue;
     if (weekday(d) !== 6 || d < SRC.phases.start) { assert.equal(templateFor(d), SRC.dayTemplate.slots, d); continue; }
     const t = templateFor(d), mock = D.mockCFA.includes(d);
     t.forEach((s, i) => assert.equal(s.to, t[(i + 1) % t.length].from, `${d} ${s.id}`));
@@ -254,4 +255,31 @@ test('Wyjątki dat (D-087, D-090, D-093): 25.09 i 26.09 poza planem, 27.09 — p
   // Kolejne tygodnie bez wyjątków
   assert.deepEqual([resolveDay('2026-10-02').dayType, resolveDay('2026-10-04').dayType, resolveDay('2026-10-04').dietVariant], ['strength', 'swim', 'T']);
   assert.deepEqual(Object.keys(SRC.week.exceptions), [START]);
+});
+
+test('Niedziela z basenem (D-094): basen 18:15–19:30, posiłek 19:30, relaks, prysznic całego ciała 20:15–20:45; 27.09 bez wariantu', () => {
+  const v = SRC.dayTemplate.variants.basen;
+  assert.deepEqual(v.replaces, ['slot.1815', 'slot.1935', 'slot.1945', 'slot.2005', 'slot.2015', 'slot.2035']);
+  assert.equal(SRC.week.days['7'].variant, 'basen');
+  for (const d of range('2026-10-04', '2027-03-28')) {
+    if (weekday(d) !== 7) continue;
+    const t = templateFor(d);
+    t.forEach((s, i) => assert.equal(s.to, t[(i + 1) % t.length].from, `${d} ${s.id}`));
+    assert.equal(t.length, 32, d);
+    const r = resolveDay(d), at = from => r.slots.find(s => s.from === from);
+    assert.deepEqual([at('18:15').to, at('18:15').title], ['19:30', 'Basen 55 min'], d);
+    assert.deepEqual([at('19:30').to, at('19:30').meal, at('19:30').items.map(i => i.text)], ['19:45', 'post', ['Posiłek potreningowy (19:30)']], d);
+    assert.deepEqual([at('19:45').to, at('19:45').title], ['20:15', 'Relaks'], d);
+    assert.deepEqual([at('20:15').to, at('20:15').title], ['20:45', 'Prysznic całego ciała'], d);
+    assert.ok(!r.slots.some(s => s.title === 'Wieczorne mycie głowy i suszenie' || s.title === 'Prysznic'), d);
+    assert.equal(at('20:45').id, 'slot.2045', `${d}: od 20:45 bez zmian`);
+  }
+  // Kreatyna z posiłkiem potreningowym: w niedzielę 19:30 (D-094), w pozostałe dni 20:15 (SUPLEMENTACJA)
+  const kre = d => resolveDay(d).slots.filter(x => x.doses.some(y => y.supp === 'kreatyna')).map(x => [x.id, x.doses.find(y => y.supp === 'kreatyna').time]);
+  assert.deepEqual(kre('2026-10-04'), [['slot.1930n', '19:30']]);
+  for (const d of ['2026-10-05', '2026-10-08', '2026-10-10']) assert.deepEqual(kre(d), [['slot.2015', '20:15']], d);
+  assert.equal(SRC.supplements.doses.filter(x => x.supp === 'kreatyna').reduce((n, x) => n + x.weekdays.length, 0), 7, 'jedna dawka dziennie');
+  // Wyjątek 27.09 (dzień sauny, D-087): zwykły szablon, posiłek po saunie 20:15
+  assert.equal(templateFor(START), SRC.dayTemplate.slots);
+  assert.equal(resolveDay(START).slots.find(s => s.id === 'slot.2015').mealName, 'Posiłek po saunie');
 });

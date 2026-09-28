@@ -8,7 +8,7 @@ import { MODULES } from '../modules/registry.js';
 import rekomp from '../data/rekomp.json' with { type: 'json' };
 
 export const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
-const KIND = { mod: 'Moduł', inv: 'Zapasy', supp: 'Suplementy', ex: 'Trening', cfa: 'CFA', err: 'Error log', safe: 'Bezpieczeństwo', rek: 'Rekompozycja' };
+const KIND = { mod: 'Moduł', inv: 'Zapasy', supp: 'Suplementy', ex: 'Trening', cfa: 'CFA', err: 'Error log', safe: 'Bezpieczeństwo', rek: 'Rekompozycja', care: 'Pielęgnacja' };
 export const kindLabel = k => KIND[k] || k;
 
 export function buildIndex(state, today) {
@@ -33,6 +33,11 @@ export function buildIndex(state, today) {
   for (const e of state?.cfaErrors || []) add('err', e.temat || '(bez tematu)', `${e.rodzaj || ''} · ${e.data || ''}`, '#/cfa?v=log', e.regula || '');
   const prods = new Set();
   for (const r of SRC.safety.rows) if (!prods.has(r.Produkt)) { prods.add(r.Produkt); add('safe', r.Produkt, r.section || '', `#/bezpieczenstwo?q=${encodeURIComponent(r.Produkt)}`); }
+  // Pielęgnacja (D-094): produkty i kroki z danych użytkownika (tylko na tym urządzeniu)
+  for (const d of state?.careDefs || []) {
+    if (d.kind === 'product' && d.name) add('care', d.name, 'Produkt pielęgnacji', '#/pielegnacja?v=produkty', d.note || '');
+    else if (d.kind === 'step' && d.text) add('care', d.text, `Krok pielęgnacji${d.group ? ` · ${d.group}` : ''}`, '#/pielegnacja?v=plan', d.note || '');
+  }
   for (const s of rekomp.sections) add('rek', `${s.num}. ${s.title}`, 'Rekompozycja', `#/rekompozycja?s=${s.id}`, JSON.stringify(s.blocks || []).slice(0, 4000));
   return out;
 }

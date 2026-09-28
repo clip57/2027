@@ -7,7 +7,7 @@ import fixtures
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BACKUP = os.environ.get('SOURCES_DIR') and pathlib.Path(os.environ['SOURCES_DIR']) / 'zapasy_kopia_2026-09-22.json'
-ROUTES = ['#/bezpieczenstwo?m=poradnik', '#/rekompozycja', '#/rekompozycja?s=s6', '#/bezpieczenstwo', '#/bezpieczenstwo?m=tabela', '#/trening?v=stat', '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/dzis?d=2026-10-03', '#/trening', '#/trening?d=2026-09-21', '#/zapasy', '#/mealprep', '#/dieta?f=1&w=NT', '#/suplementy?d=2026-09-24', '#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-24', '#/dane', '#/wiecej', '#/dieta', '#/zapasy', '#/trening', '#/cfa', '#/suplementy', '#/bezpieczenstwo']
+ROUTES = ['#/bezpieczenstwo?m=poradnik', '#/rekompozycja', '#/rekompozycja?s=s6', '#/bezpieczenstwo', '#/bezpieczenstwo?m=tabela', '#/trening?v=stat', '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/dzis?d=2026-10-03', '#/trening', '#/trening?d=2026-09-21', '#/zapasy', '#/mealprep', '#/dieta?f=1&w=NT', '#/suplementy?d=2026-09-24', '#/dzis', '#/dzis?d=2026-10-26', '#/dzis?d=2026-09-24', '#/dane', '#/wiecej', '#/dieta', '#/zapasy', '#/trening', '#/cfa', '#/suplementy', '#/bezpieczenstwo', '#/pielegnacja', '#/pielegnacja?v=plan']
 results = []
 # Kontrast tekstu elementu względem jego własnego (nieprzezroczystego) tła — WCAG; stany, których axe nie widzi.
 CONTRAST = '''el => { const px = c => { const x = document.createElement('canvas').getContext('2d'); x.fillStyle = c; x.fillRect(0, 0, 1, 1); return [...x.getImageData(0, 0, 1, 1).data]; };
@@ -132,7 +132,7 @@ async def run_variant(pw, name, url, mobile):
         ok(labels == ['Dziś', 'Dieta', 'Trening', 'CFA', 'Więcej'], f'{tag} Pasek dolny: 4 sekcje + Więcej ({labels})')
         ok(await pg.locator('.tabs a svg[aria-hidden=true]').count() == 5, f'{tag} Pasek dolny: ikony dekoracyjne z etykietą tekstową')
         await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
-        ok(await pg.locator('.more-list a').count() == 6, f'{tag} Więcej: 6 pozostałych modułów w grupach')
+        ok(await pg.locator('.more-list a').count() == 7, f'{tag} Więcej: 7 pozostałych modułów w grupach (z Pielęgnacją, D-094)')
         dcs = await pg.eval_on_selector_all('.more-list a', 'e => e.map(a => a.style.getPropertyValue("--dc"))')
         ok(all(dcs) and await pg.eval_on_selector('.more-ic', 'e => getComputedStyle(e).color') != await pg.eval_on_selector('.more-n', 'e => getComputedStyle(e).color'),
            f'{tag} Więcej: ikony w kolorze domeny modułu (zmienna --dc ustawiona)')
@@ -145,7 +145,7 @@ async def run_variant(pw, name, url, mobile):
     else:
         groups = await pg.eval_on_selector_all('.side .side-gl', 'e => e.map(x => x.textContent.trim())')
         ok(groups == ['Dzień', 'Trening', 'Dieta', 'Nauka', 'System'], f'{tag} Panel: grupy {groups}')
-        ok(await pg.locator('.side .side-a').count() == 10, f'{tag} Panel: 10 modułów')
+        ok(await pg.locator('.side .side-a').count() == 11, f'{tag} Panel: 11 modułów (z Pielęgnacją, D-094)')
         await pg.get_by_role('button', name='Zwiń panel').click(); await pg.wait_for_timeout(200)
         await pg.reload(); await pg.wait_for_selector('.side')
         ok(await pg.locator('.side.is-min').count() == 1, f'{tag} Panel: zwinięcie zapamiętane')
@@ -724,7 +724,7 @@ async def run_etap2(pw, name, url, mobile):
     ok(await past.count() == 1 and await past.get_attribute('open') is None and 'Minione punkty' in await pg.inner_text('.dz-past > summary')
        and await pg.locator('.dz-plan > .day .slot.is-now').count() == 1, f'{tag} U-a: minione punkty zwinięte, „teraz” w planie')
     n_all = await pg.locator('.slot').count()
-    ok(n_all == 34, f'{tag} U-a: wszystkie 34 punkty w DOM ({n_all})')
+    ok(n_all == 32, f'{tag} U-a: wszystkie 32 punkty niedzieli w DOM ({n_all}; wariant „basen”, D-094)')
     # U-f: strzałki kart ≥ 44 px
     sz = await pg.eval_on_selector('.dz-more', 'e => [e.getBoundingClientRect().width, e.getBoundingClientRect().height]')
     ok(sz[0] >= 44 and sz[1] >= 44, f'{tag} U-f: .dz-more {sz}')
@@ -934,6 +934,110 @@ async def run_p2(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
 
+# Pielęgnacja (D-094): moduł z planem WYŁĄCZNIE z danych użytkownika — tu syntetyczny plan „[DANE TESTOWE]” (fixtures.synthetic_care_plan)
+CLOCK_C = _dt.datetime(2026, 10, 5, 7, 5, tzinfo=_dt.timezone(_dt.timedelta(hours=2)))   # poniedziałek 05.10, slot 07:00
+async def run_care(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [Pielęgnacja, zegar 05.10 07:05]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw', accept_downloads=True)
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+    await pg.clock.install(time=CLOCK_C)
+    # Bez planu: pusty stan z instrukcją, „Dziś” bez znaczników pielęgnacji
+    await pg.goto(url + '#/pielegnacja'); await pg.wait_for_selector('.pg-empty')
+    ok('Brak planu pielęgnacji' in await pg.inner_text('.pg-empty') and await pg.locator('.pg-empty a[href="#/dane"]').count() == 1, f'{tag} bez planu: pusty stan z odnośnikiem do importu')
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    ok(await pg.locator('.slot-care').count() == 0 and 'Pielęgnacja' not in await pg.inner_text('.dz-aside'), f'{tag} bez planu: Dziś bez pielęgnacji')
+    # Import planu w Dane (podgląd, nazwa rodzaju pliku, liczba definicji)
+    plan = str(fixtures.write(fixtures.synthetic_care_plan(), 'pielegnacja_syntetyczna.json'))
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
+    await pg.set_input_files('input[type=file]', plan); await pg.wait_for_selector('dialog[open]')
+    txt = await pg.inner_text('dialog')
+    ok('Plan pielęgnacji' in txt and 'kroki i produkty pielęgnacji' in txt, f'{tag} import: plan pielęgnacji rozpoznany ({txt.count(chr(10))} wierszy podglądu)')
+    await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano 15 zmian')
+    ok(True, f'{tag} import: 15 definicji (5 produktów, 10 kroków)')
+    await pg.goto(url + '#/dzis'); await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-diag')
+    ok('Plan pielęgnacji: 10 kroków, 5 produktów' in await pg.inner_text('.dn-diag') and 'plan pielęgnacji' in await pg.inner_text('.dn-plain'),
+       f'{tag} Dane: Diagnostyka i ostrzeżenie o jawnym pliku obejmują plan pielęgnacji')
+    # Dzień: lista wg pór, postęp, odhaczenie punktowe (bez przebudowy widoku), trwałość
+    await pg.goto(url + '#/pielegnacja'); await pg.wait_for_selector('.pg-pora')
+    ok('0 z 6 kroków' in await pg.inner_text('.pg-hero') and await pg.locator('.pg-pora').count() == 3, f'{tag} Dzień: 6 kroków (doraźny poza postępem), 3 pory')
+    ok(await pg.locator('.pg-step.is-opt').count() == 1 and 'doraźnie' in await pg.inner_text('.pg-step.is-opt'), f'{tag} Dzień: krok doraźny oznaczony')
+    ok('krok PN i PT do 11.10' in await pg.inner_text('main') and 'krok PN od 12.10' not in await pg.inner_text('main'), f'{tag} Dzień: okres kroku (do 11.10)')
+    await pg.evaluate("document.querySelector('main').dataset.p2 = '1'")
+    await pg.locator('.pg-check input').first.check(); await pg.wait_for_timeout(500)
+    ok('1 z 6 kroków' in await pg.inner_text('.pg-hero') and (await pg.inner_text('#pg-rano .pg-count')).strip() == '1 / 3'
+       and await pg.evaluate("!!document.querySelector('main[data-p2]')") and await pg.evaluate("document.activeElement?.type === 'checkbox'"),
+       f'{tag} Dzień: odhaczenie punktowe (postęp, licznik pory, fokus na polu)')
+    point = await pg.evaluate("document.querySelector('main').innerText")
+    await pg.goto(url + '#/wiecej'); await pg.goto(url + '#/pielegnacja'); await pg.wait_for_selector('.pg-pora')
+    ok(await pg.evaluate("document.querySelector('main').innerText") == point and await pg.locator('.pg-step.is-done').count() == 1, f'{tag} Dzień: po przerysowaniu to samo (zapis trwały)')
+    await pg.locator('.pg-wait').first.click(); await pg.wait_for_selector('.pg-timer')
+    ok('Odczekaj' in await pg.inner_text('.pg-timer') and '10:00' in await pg.inner_text('.pg-timer-t'), f'{tag} licznik „odczekaj 10 min”')
+    await pg.clock.fast_forward(601000); await pg.wait_for_timeout(1200)
+    ok('is-ready' in await pg.get_attribute('.pg-timer', 'class') and 'Czas minął' in await pg.inner_text('.pg-timer .sr-only'), f'{tag} licznik: koniec oznaczony i ogłoszony')
+    await pg.get_by_role('button', name='Zamknij licznik').click()
+    ok(await pg.locator('.pg-timer').count() == 0, f'{tag} licznik: zamknięcie')
+    await pg.clock.set_system_time(CLOCK_C)
+    for d, want, not_want in (('2026-10-11', ['krok ŚR i ND', 'krok niedzielny'], ['krok PN i PT']), ('2026-10-12', ['krok PN od 12.10'], ['krok PN i PT', 'krok niedzielny'])):
+        await pg.goto(url + f'#/pielegnacja?d={d}'); await pg.wait_for_selector('.pg-pora')
+        m = await pg.inner_text('main')
+        ok(all(w in m for w in want) and not any(w in m for w in not_want), f'{tag} reguły dni i okresu: {d}')
+    # Tydzień, Produkty (filtr, edycja), Plan (dodanie, usunięcie, eksport)
+    await pg.goto(url + '#/pielegnacja?v=tydzien&d=2026-10-05'); await pg.wait_for_selector('.pg-wday')
+    days = await pg.eval_on_selector_all('.pg-wday', 'e => e.map(x => x.textContent)')
+    ok(len(days) == 7 and '1 / 6' in days[0] and 'krok niedzielny' in days[6], f'{tag} Tydzień: 7 dni, postęp i kroki nie codzienne')
+    await pg.goto(url + '#/pielegnacja?v=produkty'); await pg.wait_for_selector('.pg-prod-card')
+    ok(await pg.locator('.pg-prod-card').count() == 5 and 'Nieprzypisany' in await pg.inner_text('#pg-p-p\\.t5'), f'{tag} Produkty: 5 produktów, użycie w krokach')
+    await pg.get_by_role('button', name='W zapasie').click(); await pg.wait_for_timeout(300)
+    ok(await pg.locator('.pg-prod-card').count() == 1, f'{tag} Produkty: filtr statusu')
+    await pg.goto(url + '#/pielegnacja?v=produkty'); await pg.wait_for_selector('.pg-prod-card')
+    await pg.get_by_role('button', name='Edytuj produkt: [DANE TESTOWE] Produkt A').click(); await pg.wait_for_selector('dialog[open]')
+    await pg.select_option('dialog select >> nth=1', 'zapas'); await pg.fill('dialog input[type=date]', '2026-10-01')
+    await pg.get_by_role('button', name='Zapisz zmiany').click(); await pg.wait_for_timeout(500)
+    card = await pg.inner_text('#pg-p-p\\.t1')
+    ok('W zapasie' in card and 'Otwarty 1 października 2026' in card, f'{tag} Produkty: edycja statusu i daty otwarcia')
+    await pg.goto(url + '#/pielegnacja?v=plan'); await pg.wait_for_selector('.pg-plan-i')
+    n0 = await pg.locator('.pg-plan-i').count()
+    await pg.get_by_role('button', name='Dodaj krok').click(); await pg.wait_for_selector('dialog[open]')
+    await pg.get_by_role('button', name='Dodaj krok').last.click(); await pg.wait_for_timeout(200)
+    ok('Podaj czynność' in await pg.inner_text('dialog'), f'{tag} Plan: walidacja w oknie')
+    await pg.fill('dialog input >> nth=0', '[DANE TESTOWE] krok dodany'); await pg.get_by_role('button', name='Dodaj krok').last.click(); await pg.wait_for_timeout(500)
+    ok(await pg.locator('.pg-plan-i').count() == n0 + 1 and 'krok dodany' in await pg.inner_text('main'), f'{tag} Plan: dodanie kroku')
+    await pg.get_by_role('button', name='Edytuj krok: [DANE TESTOWE] krok dodany').click(); await pg.wait_for_selector('dialog[open]')
+    await pg.get_by_role('button', name='Usuń krok').click(); await pg.wait_for_timeout(500)
+    ok(await pg.locator('.pg-plan-i').count() == n0, f'{tag} Plan: usunięcie kroku')
+    async with pg.expect_download() as dl:
+        await pg.get_by_role('button', name='Eksport planu (.json)').click()
+    exp = json.loads(pathlib.Path(await (await dl.value).path()).read_text(encoding='utf8'))
+    ok(exp['format'] == '2027-care' and len(exp['steps']) == 10 and len(exp['products']) == 5 and all('kind' not in x for x in exp['steps']),
+       f'{tag} Plan: eksport w formacie importu (10 kroków, 5 produktów)')
+    # Dziś: postęp przy slotach (bez nazw produktów — D-041), karta, niedziela z prysznicem (D-094), „Wymaga uwagi”
+    await pg.goto(url + '#/dzis?d=2026-10-05'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('Pielęgnacja 1 / 3' in await pg.inner_text('#slot\\.0700') and 'Pielęgnacja 0 / 1' in await pg.inner_text('#slot\\.2035')
+       and 'Produkt' not in await pg.inner_text('.dz-plan'), f'{tag} Dziś: postęp pielęgnacji przy slotach, bez nazw produktów')
+    ok('1 / 6' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: karta „Pielęgnacja”')
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-attn')
+    ok('Pielęgnacja: zmiana w planie 12.10' in await pg.inner_text('.dz-attn'), f'{tag} Wymaga uwagi: zapowiedź zmiany w planie pielęgnacji')
+    await pg.goto(url + '#/dzis?d=2026-10-11'); await pg.wait_for_selector('.dz-plan-h')
+    ok('Prysznic całego ciała' in await pg.inner_text('#slot\\.2015n') and 'Pielęgnacja 0 / 1' in await pg.inner_text('#slot\\.2015n')
+       and await pg.locator('#slot\\.2035').count() == 0, f'{tag} niedziela: prysznic 20:15–20:45 z postępem pielęgnacji, bez mycia głowy (D-094)')
+    if not mobile:
+        await pg.keyboard.press('Control+k'); await pg.wait_for_selector('dialog.gs-dialog')
+        await pg.keyboard.type('Produkt C'); await pg.wait_for_timeout(300)
+        ok('Pielęgnacja' in await pg.inner_text('dialog.gs-dialog'), f'{tag} ⌘K: produkty pielęgnacji w wyszukiwaniu')
+        await pg.keyboard.press('Escape')
+    await pg.set_viewport_size({'width': 320, 'height': 700})
+    for r in ('#/pielegnacja', '#/pielegnacja?v=tydzien', '#/pielegnacja?v=produkty', '#/pielegnacja?v=plan'):
+        await pg.goto(url + r); await pg.wait_for_timeout(300)
+        sw = await pg.evaluate('document.documentElement.scrollWidth')
+        ok(sw <= 320, f'{tag} {r}: 320 px bez przewijania w poziomie ({sw}px)')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -950,6 +1054,8 @@ async def main():
         await run_etap3(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_p2(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_p2(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_care(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_care(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

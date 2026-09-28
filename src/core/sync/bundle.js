@@ -6,6 +6,7 @@ import { migrateZapasyV31, isZapasyV31 } from '../migrate/zapasy-v31.js';
 import { isPrivatePack, privatePackEvent } from '../private.js';
 import { sha256 } from '../hash.js';
 import { cfaProgressEvents } from '../migrate/cfa.js';
+import { isCarePlan, careDefsFromPlan } from '../calc/care.js';
 export { sha256 };
 
 export const FORMAT = '2027-sync';
@@ -36,11 +37,19 @@ export async function preview(store, obj) {
   } else if (isPrivatePack(obj)) {
     kind = 'private';
     try { events = [await privatePackEvent(obj, store)]; } catch (e) { errors.push(e.message); }
+  } else if (isCarePlan(obj)) {
+    // Plan pielęgnacji (D-094): każda definicja kroku i produktu jako `care.def`. Identyfikator zdarzenia z treści — ponowny import
+    // tego samego pliku niczego nie dodaje; zmieniona definicja = nowa wersja (wygrywa późniejsza zmiana).
+    kind = 'care';
+    for (const d of careDefsFromPlan(obj)) {
+      const h = (await sha256(JSON.stringify(d))).slice(0, 16);
+      events.push({ ...store.makeEvent('care.def', d), id: `care.def:${d.id}:${h}` });
+    }
   } else if (obj && Array.isArray(obj.wykonane)) {
     kind = 'cfa-progress';
     events = cfaProgressEvents(obj);
   } else {
-    return { ok: false, kind: 'unknown', errors: ['Nie rozpoznano pliku. Obsługiwane: kopia 2027 (2027-sync.json), kopia ZAPASY v31, postęp CFA (postep-nauki.json), error log CFA (error-log.csv), pakiet prywatny.'] };
+    return { ok: false, kind: 'unknown', errors: ['Nie rozpoznano pliku. Obsługiwane: kopia 2027 (2027-sync.json), kopia ZAPASY v31, postęp CFA (postep-nauki.json), error log CFA (error-log.csv), pakiet prywatny, plan pielęgnacji.'] };
   }
   const pv = previewEvents(store, events, kind, errors);
   // Informacje o pliku (pola istniejące w formacie od początku — bez zmiany formatu)

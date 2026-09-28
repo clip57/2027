@@ -12,6 +12,7 @@ import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.j
 import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
 import { sessions, weekStart } from '../core/calc/training.js';
+import { careModel, stepsFor, progress, slotProgress } from '../core/calc/care.js';
 
 const suppName = id => SRC.supplements.supplements[id]?.name || id;
 
@@ -31,7 +32,7 @@ export function currentSlot(slots, hhmm) {
   return { current: cur, next: slots[i + 1] || null };
 }
 
-function slotView(s, now) {
+function slotView(s, now, care) {
   // Gdy posiłek jest jednocześnie tytułem slotu (Śniadanie 09:00), kcal trafia do tytułu, a podpunkt się nie powtarza.
   const lead = s.items.find(i => i.kind === 'meal' && i.text === s.title) || null;
   const title = s.title, titleKcal = lead?.kcal ?? null;
@@ -46,6 +47,9 @@ function slotView(s, now) {
       (s.cfa || []).map(b => cfaBlock(b, s)),
       items.length > 0 && h('ul', { class: 'slot-items' }, items.map(i => h('li', { class: i.kind === 'meal' ? 'is-meal' : null },
         i.text, i.kind === 'meal' && i.kcal != null && h('span', { class: 'kcal' }, `${i.kcal} kcal`)))),
+      // Pielęgnacja (D-094): tylko postęp kroków przypiętych do slotu i odnośnik — treść kroków w module (bez dublowania, jak D-041)
+      care?.[s.id] && h('a', { class: 'slot-care', href: `#/pielegnacja?d=${care.date}`, 'aria-label': `Pielęgnacja: ${care[s.id].done} z ${care[s.id].total} kroków — otwórz moduł` },
+        icon('sparkles', { size: 14 }), h('span', {}, `Pielęgnacja ${care[s.id].done} / ${care[s.id].total}`)),
       s.doses.length > 0 && h('div', { class: 'slot-supps' },
         h('p', { class: 'supps-h' }, 'Suplementy'),
         h('ul', {}, s.doses.map(d => h('li', {}, h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp)), h('span', { class: 'sd' }, d.label),
@@ -170,6 +174,10 @@ export function renderDzis(root, ctx) {
   const kpi = (label, value, hint, extra, cls = '') => h('div', { class: `stat dz-kpi ${cls}` },
     h('span', { class: 'stat-l' }, label), h('strong', { class: 'stat-v' }, value), hint && h('span', { class: 'stat-h' }, hint), extra);
   const bar = (v, max, dom) => h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%`, background: `var(--${dom})` } }));
+  // Pielęgnacja (D-094): plan z danych użytkownika; bez planu — bez karty i bez znaczników w slotach
+  const cm = careModel(ctx.store?.state?.careDefs || []), cDone = ctx.store?.state?.careDone || {};
+  const care = cm.empty ? null : { date, ...slotProgress(cm, cDone, date) };
+  const careP = cm.empty ? null : progress(stepsFor(cm, date), cDone, date);
 
   add(root,
     h('header', { class: 'dz-head' },
@@ -188,7 +196,8 @@ export function renderDzis(root, ctx) {
       h('a', { class: 'btn ql', href: `#/dieta?f=${r.phase ?? 0}&w=${r.dietVariant}` }, icon('utensils', { size: 18 }), h('span', {}, 'Jadłospis dnia')),
       h('a', { class: 'btn ql', href: `#/suplementy?d=${date}` }, icon('pill', { size: 18 }), h('span', {}, 'Suplementacja dnia')),
       r.training?.length > 0 && h('a', { class: 'btn ql', href: `#/trening?d=${date}` }, icon('dumbbell', { size: 18 }), h('span', {}, 'Trening dnia')),
-      r.cfa.inPlan && h('a', { class: 'btn ql', href: `#/cfa?v=dzien&d=${date}` }, icon('graduation-cap', { size: 18 }), h('span', {}, 'Bloki CFA'))),
+      r.cfa.inPlan && h('a', { class: 'btn ql', href: `#/cfa?v=dzien&d=${date}` }, icon('graduation-cap', { size: 18 }), h('span', {}, 'Bloki CFA')),
+      careP && h('a', { class: 'btn ql', href: `#/pielegnacja?d=${date}` }, icon('sparkles', { size: 18 }), h('span', {}, 'Pielęgnacja'))),
     h('div', { class: 'dz-grid' },
       date === ctx.today && attentionCard(ctx),
       now && (now.current || now.next) ? h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz' },
@@ -214,6 +223,8 @@ export function renderDzis(root, ctx) {
         card('Suplementy', 'pill', `#/suplementy?d=${date}`,
           h('div', { class: 'dz-prog' }, h('strong', {}, String(allDoses.length)), h('span', { class: 'muted' }, `${plural(allDoses.length, 'dawka', 'dawki', 'dawek')} w ${new Set(allDoses.map(x => x.time)).size} porach`)),
           h('p', { class: 'dz-foot' }, date !== ctx.today ? 'Szczegóły w planie dnia poniżej.' : nextDose ? `Następna pora: ${nextDose.time} — szczegóły w planie dnia.` : 'Wszystkie dzisiejsze dawki za Tobą.')),
+        careP && card('Pielęgnacja', 'sparkles', `#/pielegnacja?d=${date}`,
+          h('div', { class: 'dz-prog' }, h('strong', {}, `${careP.done} / ${careP.total}`), h('span', { class: 'muted' }, 'kroków dziś')), bar(careP.done, careP.total, 'care')),
         card('Meal prep', 'chef-hat', '#/mealprep',
           h('div', { class: 'dz-prog' }, h('strong', {}, `${D.prepDone} / ${D.prepTotal}`), h('span', { class: 'muted' }, 'kroków dziś')), bar(D.prepDone, D.prepTotal, 'prep')),
         D.inv && card('Zapasy', 'package', '#/zapasy',
@@ -229,7 +240,7 @@ export function renderDzis(root, ctx) {
         // U-a: w dniu bieżącym minione punkty planu zwinięte (plan zaczyna się od „teraz”); rozwinięcie pamiętane do przeładowania
         slotIdx > 0 && h('details', { class: 'dz-past', open: pastOpen || null, ontoggle: e => { pastOpen = e.target.open; } },
           h('summary', {}, icon('chevron-down', { size: 16 }), `Minione punkty (${slotIdx}) · ${r.slots[0].from}–${r.slots[slotIdx - 1].to}`),
-          h('div', { class: 'day' }, r.slots.slice(0, slotIdx).map(s => slotView(s, now)))),
-        h('div', { class: 'day' }, r.slots.slice(Math.max(0, slotIdx)).map(s => slotView(s, now))))));
+          h('div', { class: 'day' }, r.slots.slice(0, slotIdx).map(s => slotView(s, now, care)))),
+        h('div', { class: 'day' }, r.slots.slice(Math.max(0, slotIdx)).map(s => slotView(s, now, care))))));
 }
 let pastOpen = false;

@@ -13,7 +13,8 @@ export const NAMES = ['sun', 'moon', 'monitor', 'utensils', 'dumbbell', 'graduat
   'square', 'copy', 'skip-forward', 'calendar-clock', 'list-todo',
   'undo-2', 'history', 'bot', 'save', 'receipt', 'sliders-horizontal', 'package-check', 'clock-3',
   'cloud', 'cloud-check', 'cloud-off', 'lock', 'log-in', 'log-out',
-  'smartphone', 'trash-2', 'download', 'folder-open', 'pencil', 'calendar-plus', 'calendar-range', 'keyboard', 'activity', 'bell', 'arrow-right'];
+  'smartphone', 'trash-2', 'download', 'folder-open', 'pencil', 'calendar-plus', 'calendar-range', 'keyboard', 'activity', 'bell', 'arrow-right',
+  'sparkles', 'sun-medium', 'droplets'];
 const out = {};
 for (const n of NAMES) {
   const svg = fs.readFileSync(path.join(DIR, `${n}.svg`), 'utf8');
