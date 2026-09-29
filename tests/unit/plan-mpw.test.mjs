@@ -36,8 +36,12 @@ test('MPW v8: 392 bloki 1–392, 119 dni (114 × 3 + 5 × 10: P1–P7 w godzinac
     assert.equal(list.map(b => b.blok).join(''), long ? 'P1P2P3P4P5P6P7ABC' : 'ABC', d);
     if (long) assert.deepEqual(list.slice(0, 7).map(b => b.godz), SLOTS_AG, d);
     const sim = D.mockCFA.includes(d);
-    assert.deepEqual(abc.map(b => b.godz), sim ? ['15:30–16:30', '16:30–17:30', '17:30–18:30'] : ['15:30–16:23', '16:30–17:23', '17:30–18:23'], d);
+    assert.deepEqual(abc.map(b => b.godz_src ?? b.godz), sim ? ['15:30–16:30', '16:30–17:30', '17:30–18:30'] : ['15:30–16:23', '16:30–17:23', '17:30–18:23'], d);
+    // D-097: w czwartki od 07.01.2027 bloki A–C 30 min później (zakupy 15:30–16:00); dane planu (godz_src) bez zmian
+    const shift = d >= '2027-01-07' && new Date(`${d}T12:00`).getDay() === 4;
+    assert.deepEqual(abc.map(b => b.godz), shift ? ['16:00–16:53', '17:00–17:53', '18:00–18:53'] : abc.map(b => b.godz_src ?? b.godz), d);
   }
+  assert.ok(B.every(b => !('godz_src' in b)), 'mpw.json bez zmian — przesunięcie tylko w widoku (week.mpwShift)');
   assert.ok(B.every(b => b.egzamin === 'MPW'));
   assert.ok(MPW_BLOCKS >= B.length, 'plan mieści się w limicie walidacji');
 });
@@ -91,7 +95,7 @@ test('Zakładka: CFA do 11.11.2026, od 12.11.2026 MPW (koniec planu CFA); w grup
   assert.deepEqual(tabs('2026-11-12'), ['dzis', 'dieta', 'trening', 'mpw']);
   assert.deepEqual(tabs('2027-04-01'), ['dzis', 'dieta', 'trening', 'mpw']);
   assert.deepEqual([nauka('2026-10-01'), nauka('2026-11-12')], [['cfa', 'mpw'], ['mpw', 'cfa']]);
-  assert.equal(modulesOn('2026-11-12').length, 12);
+  assert.equal(modulesOn('2026-11-12').length, 13, 'z modułem Kalendarz (D-097)');
   assert.ok(!isTab(byId.mpw, '2026-11-11') && isTab(byId.mpw, '2026-11-12'));
 });
 

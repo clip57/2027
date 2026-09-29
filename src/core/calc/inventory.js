@@ -1,6 +1,7 @@
 // Stan magazynu = ostatnia inwentaryzacja + zakupy/korekty − planowane zużycie dzień po dniu (D-003, D-027).
 // Inwentaryzacja z datą D oznacza stan na KONIEC dnia D; odliczanie zaczyna się od D+1.
 import { consumptionForDay } from './consumption.js';
+import { templateFor } from '../resolver.js';
 import { catalogById } from '../data.js';
 import { addDays, weekday } from '../dates.js';
 
@@ -62,11 +63,17 @@ export function statusInfo(item, stock, fc) {
 }
 export const status = (item, stock, fc) => statusInfo(item, stock, fc).code;
 
-// Najbliższy dzień zakupów (domyślnie sobota, po 18:00 kolejna) — bez dat zakodowanych na sztywno (W-12).
-export function nextShopping(todayStr, hour, shopWeekday = 6, cutoffHour = 18) {
-  let n = (shopWeekday - weekday(todayStr) + 7) % 7;
-  if (n === 0 && hour >= cutoffHour) n = 7;
-  return { date: addDays(todayStr, n), inDays: n };
+// Najbliższe zakupy wg planu dnia (slot z `shop`; D-097: czwartki po saunie 19:05–20:35, od 07.01.2027 15:30–16:00) —
+// dziś, dopóki slot zakupów się nie skończył. Tydzień bez zakupów (np. 28.09–04.10.2026) i święta są pomijane.
+// Poza planem (po 28.03.2027) — najbliższy czwartek. Bez dat zakodowanych na sztywno (W-12).
+export function nextShopping(todayStr, hour, minute = 0) {
+  const now = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  for (let i = 0; i < 35; i++) {
+    const date = addDays(todayStr, i), s = templateFor(date).find(x => x.shop);
+    if (s && !(i === 0 && now >= s.to)) return { date, inDays: i, from: s.from, to: s.to };
+  }
+  const n = ((4 - weekday(todayStr) + 7) % 7) || 7;
+  return { date: addDays(todayStr, n), inDays: n, from: null, to: null };
 }
 
 // Lista zakupów: reguły v31 (cel 7 dni świeże / 14 dni trwałe, maxLimit, zaokrąglenie do opakowań),

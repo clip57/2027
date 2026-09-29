@@ -96,8 +96,8 @@
    "src": "SUPL:07:00/chondroityna",
    "note": "na czczo",
    "validity": {
-    "from": "2026-09-27",
-    "until": "2027-03-21",
+    "from": "2026-09-30",
+    "until": "2027-03-28",
     "decision": "D-015"
    }
   },
@@ -131,8 +131,8 @@
    ],
    "src": "SUPL:09:00/boswellia",
    "validity": {
-    "from": "2026-09-27",
-    "until": "2027-03-21",
+    "from": "2026-09-30",
+    "until": "2027-03-28",
     "decision": "D-015"
    }
   },
@@ -221,8 +221,8 @@
    ],
    "src": "SUPL:13:20/glukozamina",
    "validity": {
-    "from": "2026-09-27",
-    "until": "2027-03-21",
+    "from": "2026-09-30",
+    "until": "2027-03-28",
     "decision": "D-015"
    }
   },
@@ -253,12 +253,43 @@
     1,
     2,
     3,
-    4,
     5,
     6,
     7
    ],
    "src": "SUPL:17:15/kolagen"
+  },
+  {
+   "time": "17:15",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "kolagen",
+   "qty": 5,
+   "label": "5 g",
+   "weekdays": [
+    4
+   ],
+   "src": "SUPL:17:15/kolagen",
+   "validity": {
+    "until": "2027-01-06",
+    "decision": "D-097"
+   }
+  },
+  {
+   "time": "17:45",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "kolagen",
+   "qty": 5,
+   "label": "5 g",
+   "weekdays": [
+    4
+   ],
+   "src": "SUPL:17:15/kolagen (D-097: czwartek od 07.01 — 17:45)",
+   "validity": {
+    "from": "2027-01-07",
+    "until": "2027-03-28",
+    "decision": "D-097"
+   },
+   "decision": "D-097"
   },
   {
    "time": "17:15",
@@ -270,12 +301,43 @@
     1,
     2,
     3,
-    4,
     5,
     6,
     7
    ],
    "src": "SUPL:17:15/witamina_c"
+  },
+  {
+   "time": "17:15",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "witamina_c",
+   "qty": 0.1,
+   "label": "100 mg",
+   "weekdays": [
+    4
+   ],
+   "src": "SUPL:17:15/witamina_c",
+   "validity": {
+    "until": "2027-01-06",
+    "decision": "D-097"
+   }
+  },
+  {
+   "time": "17:45",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "witamina_c",
+   "qty": 0.1,
+   "label": "100 mg",
+   "weekdays": [
+    4
+   ],
+   "src": "SUPL:17:15/witamina_c (D-097: czwartek od 07.01 — 17:45)",
+   "validity": {
+    "from": "2027-01-07",
+    "until": "2027-03-28",
+    "decision": "D-097"
+   },
+   "decision": "D-097"
   },
   {
    "time": "17:15",
@@ -287,12 +349,43 @@
     1,
     2,
     3,
-    4,
     5,
     6,
     7
    ],
    "src": "SUPL:17:15/tauryna"
+  },
+  {
+   "time": "17:15",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "tauryna",
+   "qty": 2,
+   "label": "2 g",
+   "weekdays": [
+    4
+   ],
+   "src": "SUPL:17:15/tauryna",
+   "validity": {
+    "until": "2027-01-06",
+    "decision": "D-097"
+   }
+  },
+  {
+   "time": "17:45",
+   "situation_src": "Pre-trening — 60 minut przed treningiem",
+   "supp": "tauryna",
+   "qty": 2,
+   "label": "2 g",
+   "weekdays": [
+    4
+   ],
+   "src": "SUPL:17:15/tauryna (D-097: czwartek od 07.01 — 17:45)",
+   "validity": {
+    "from": "2027-01-07",
+    "until": "2027-03-28",
+    "decision": "D-097"
+   },
+   "decision": "D-097"
   },
   {
    "time": "20:15",
@@ -349,8 +442,8 @@
    ],
    "src": "SUPL:21:00/chondroityna",
    "validity": {
-    "from": "2026-09-27",
-    "until": "2027-03-21",
+    "from": "2026-09-30",
+    "until": "2027-03-28",
     "decision": "D-015"
    }
   },
@@ -434,7 +527,7 @@
  ],
  "decisions": {
   "D-014": "tauryna codziennie, także w czwartek",
-  "D-015": "chondroityna, boswellia, glukozamina od 27.09.2026 do 21.03.2027 (D-087, D-090; I-9)",
+  "D-015": "chondroityna, boswellia, glukozamina od 30.09.2026 do 28.03.2027 (D-097; wcześniej D-087, D-090, I-9)",
   "D-016": "cynk kontynuowany; stan nieśledzony"
  }
 }

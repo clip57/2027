@@ -20,14 +20,20 @@ export function supplementOverview(date) {
   const map = new Map();
   for (const d of SRC.supplements.doses) {
     const s = map.get(d.supp) || { id: d.supp, name: SRC.supplements.supplements[d.supp]?.name || d.supp,
-      form: SRC.supplements.supplements[d.supp]?.form || '', times: [], weekdays: new Set(), daily: 0,
-      unit: catalogById[d.supp]?.unit || '', validity: null, tracked: catalogById[d.supp]?.tracked !== false };
-    s.times.push(d.time);
+      form: SRC.supplements.supplements[d.supp]?.form || '', doses: [], weekdays: new Set(), daily: 0,
+      unit: catalogById[d.supp]?.unit || '', tracked: catalogById[d.supp]?.tracked !== false };
+    s.doses.push(d);
     d.weekdays.forEach(w => s.weekdays.add(w));
     if (d.weekdays.includes(wd) && inValidity(d, date)) s.daily += d.qty;
-    if (d.validity) s.validity = d.validity;
     map.set(d.supp, s);
   }
-  return [...map.values()].map(s => ({ ...s, weekdays: [...s.weekdays].sort(),
-    everyDay: s.weekdays.size === 7, active: inValidity(s, date) }));
+  return [...map.values()].map(({ doses, ...s }) => {
+    // Okres preparatu — tylko gdy każda dawka ma okres (D-015); dawki z inną godziną w części okresu (D-097: czwartki od 07.01)
+    // nie czynią preparatu czasowym. Godziny: dawki obowiązujące w dniu `date` (bez powtórzeń), a gdy brak — wszystkie.
+    const validity = doses.every(d => d.validity) ? { ...doses[doses.length - 1].validity,
+      from: doses.map(d => d.validity.from).filter(Boolean).sort()[0], until: doses.map(d => d.validity.until).sort().at(-1) } : null;
+    const now = doses.filter(d => inValidity(d, date));
+    const times = [...new Set((now.length ? now : doses).map(d => d.time))];
+    return { ...s, times, validity, weekdays: [...s.weekdays].sort(), everyDay: s.weekdays.size === 7, active: inValidity({ validity }, date) };
+  });
 }

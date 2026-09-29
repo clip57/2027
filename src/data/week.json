@@ -32,7 +32,8 @@
    "sessionName": "Bez treningu, 2 × sauna",
    "sauna": 2,
    "diet": "NT",
-   "recall": true
+   "recall": true,
+   "variant": "czwartek"
   },
   "5": {
    "dayType": "strength",
@@ -48,8 +49,7 @@
    "sessionName": "LOWER 2",
    "sauna": 1,
    "diet": "T",
-   "recall": false,
-   "variant": "zakupy"
+   "recall": false
   },
   "7": {
    "dayType": "swim",
@@ -105,36 +105,8 @@
   "free_when_no_block": "D-036",
   "replace_decision": "D-019, D-086 (E: kontynuacja sesji 2 do 13:00)"
  },
- "variant_decision": "D-087: soboty — 12:13–13:13 zakupy (bez bloku E); D-094: niedziele — basen 18:15–19:30, posiłek 19:30, relaks, prysznic całego ciała 20:15–20:45; nie dotyczy dnia mocka",
+ "variant_decision": "D-097: czwartki — sauna 17:55–19:05 i zakupy 19:05–20:35, od 07.01 zakupy 15:30–16:00 i bloki MPW +30 min; soboty bez zakupów; D-094: niedziele — basen 18:15–19:30, posiłek 19:30, relaks, prysznic 20:15–20:45; nie dotyczy dnia mocka",
  "exceptions": {
-  "2026-09-27": {
-   "decision": "D-087",
-   "dayType": "rest_sauna2",
-   "session": null,
-   "sessionName": "Bez treningu, 2 × sauna",
-   "sauna": 2,
-   "diet": "NT",
-   "note": "Wyjątek 27.09.2026: zamiast basenu dzień sauny (bez treningu, dieta NT)",
-   "variant": null
-  },
-  "2026-09-28": {
-   "decision": "D-096",
-   "dayType": "free",
-   "session": null,
-   "sessionName": "Bez treningu",
-   "sauna": 0,
-   "diet": "NT",
-   "note": "Wyjątek 28.09.2026: bez treningu (dieta NT); tydzień przesunięty — UPPER 1 + sauna w środę 30.09"
-  },
-  "2026-09-29": {
-   "decision": "D-096",
-   "dayType": "free",
-   "session": null,
-   "sessionName": "Bez treningu",
-   "sauna": 0,
-   "diet": "NT",
-   "note": "Wyjątek 29.09.2026: bez treningu (dieta NT); LOWER 1 w czwartek 01.10"
-  },
   "2026-09-30": {
    "decision": "D-096",
    "dayType": "strength_sauna",
@@ -151,7 +123,8 @@
    "sessionName": "LOWER 1",
    "sauna": 0,
    "diet": "T",
-   "note": "Wyjątek 01.10.2026: LOWER 1 (przesunięte z wtorku)"
+   "note": "Wyjątek 01.10.2026: LOWER 1 (przesunięte z wtorku)",
+   "variant": null
   },
   "2026-10-02": {
    "decision": "D-096",
@@ -190,6 +163,54 @@
    "diet": "NT",
    "note": "Boże Narodzenie: dzień całkowicie wolny — bez bloków i treningu (dieta NT)",
    "variant": null
+  },
+  "2027-01-07": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-01-14": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-01-21": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-01-28": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-02-04": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-02-11": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-02-18": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-02-25": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-03-04": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-03-11": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-03-18": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
+  },
+  "2027-03-25": {
+   "decision": "D-097",
+   "variant": "czwartek_st"
   },
   "2027-03-27": {
    "decision": "D-096",
@@ -459,5 +480,13 @@
    "decision": "D-096"
   }
  },
- "blocks_decision": "D-096: weekendy 8:00–15:23 w slotach A–G — studia (zjazdy, bez zakupów w sobotę), przygotowanie do rozmowy, praca magisterska; święta wolne; dni z blokami P1–P7 planu MPW i egzamin MPW bez pracy magisterskiej"
+ "blocks_decision": "D-096: weekendy 8:00–15:23 w slotach A–G — studia (zjazdy, bez zakupów w sobotę), przygotowanie do rozmowy, praca magisterska; święta wolne; dni z blokami P1–P7 planu MPW i egzamin MPW bez pracy magisterskiej",
+ "mpwShift": {
+  "weekdays": [
+   4
+  ],
+  "from": "2027-01-07",
+  "minutes": 30,
+  "decision": "D-097"
+ }
 }

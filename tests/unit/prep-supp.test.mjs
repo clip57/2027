@@ -4,15 +4,15 @@ import assert from 'node:assert/strict';
 import { coverage } from '../../src/core/calc/inventory.js';
 import { consumptionForDay } from '../../src/core/calc/consumption.js';
 
-const inv = q => ({ counts: Object.fromEntries(Object.entries(q).map(([p, qty]) => [p, [{ id: `c-${p}`, qty, date: '2026-09-27', hlc: '1' }]])), moves: {}, shifts: [] });
+const inv = q => ({ counts: Object.fromEntries(Object.entries(q).map(([p, qty]) => [p, [{ id: `c-${p}`, qty, date: '2026-10-04', hlc: '1' }]])), moves: {}, shifts: [] });
 
 test('coverage: brak, gdy stan na koniec dziś < zużycie jutra', () => {
-  const need = consumptionForDay('2026-09-29').kurczak;                 // wtorek: dzień treningowy, obiad z kurczakiem
+  const need = consumptionForDay('2026-10-06').kurczak;                 // wtorek: dzień treningowy, obiad z kurczakiem
   assert.ok(need > 0);
-  const todayUse = consumptionForDay('2026-09-28').kurczak;
-  const ok = coverage(inv({ kurczak: todayUse + need }), ['kurczak'], '2026-09-28', '2026-09-29')[0];
+  const todayUse = consumptionForDay('2026-10-05').kurczak;
+  const ok = coverage(inv({ kurczak: todayUse + need }), ['kurczak'], '2026-10-05', '2026-10-06')[0];
   assert.deepEqual([ok.short, ok.need], [false, need]);
-  const short = coverage(inv({ kurczak: todayUse + need - 1 }), ['kurczak'], '2026-09-28', '2026-09-29')[0];
+  const short = coverage(inv({ kurczak: todayUse + need - 1 }), ['kurczak'], '2026-10-05', '2026-10-06')[0];
   assert.equal(short.short, true);
 });
 

@@ -3,12 +3,12 @@
 // moduł jest w „Więcej”; od 12.11 zajmuje miejsce CFA na pasku zakładek (registry.js).
 import { h, fmt, add, plural } from '../ui/dom.js';
 import { section } from '../ui/components.js';
-import { SRC, mpwByDay } from '../core/data.js';
+import { SRC, mpwByDay, mpwBloki } from '../core/data.js';
 import { longDate, shortDate, dayShort } from '../core/dates.js';
 import { renderStudy, modeStats } from './study.js';
 import { mpwSources, mpwFreeDays } from '../core/calc/mpw.js';
 
-const D = SRC.mpw.D;
+const D = { ...SRC.mpw.D, bloki: mpwBloki };   // godziny wg decyzji (D-097: czwartki od 07.01 +30 min)
 // Tryby planu v8 (D-096) i wcześniejszych wersji (D-095) — nieznany tryb bez koloru (BUFOR)
 const MODE_CLASS = { 'PRAWO – FIRST PASS': 'm-fp', 'LITERATURA – FIRST PASS': 'm-fp', 'PRAWO – 2. PRZEJŚCIE': 'm-co', 'AUDYT PRAWNY': 'm-co',
   'POWTÓRKA CAŁOŚCI': 'm-co',

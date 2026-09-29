@@ -1,11 +1,11 @@
 {
  "schema": 1,
- "decision": "D-017, D-087, D-090 (start planu i Faza 0 od 27.09.2026 — dni wcześniejsze poza planem, D-088)",
- "start": "2026-09-27",
+ "decision": "D-017, D-097 (Dzień zero 29.09.2026 — bez diety, treningu, nauki i suplementów; Faza 0 od 30.09; plan do 28.03.2027; dni wcześniejsze i późniejsze poza planem, D-088)",
+ "start": "2026-09-29",
  "phases": [
   {
    "phase": 0,
-   "from": "2026-09-27"
+   "from": "2026-09-30"
   },
   {
    "phase": 1,
@@ -15,5 +15,7 @@
    "phase": 2,
    "from": "2026-11-16"
   }
- ]
+ ],
+ "zero": "2026-09-29",
+ "end": "2027-03-28"
 }

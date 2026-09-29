@@ -8,6 +8,7 @@ Dodatki spoza pliku źródłowego mają pole 'decision' (D-015, D-016, D-030).
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from day_plan_d094 import apply_supplements_d094
+from day_plan_d097 import apply_supplements_d097
 
 SRC = os.environ.get("SOURCES_DIR") or sys.exit("Ustaw SOURCES_DIR")
 OUT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "data", "supplements.json")
@@ -99,10 +100,11 @@ for t, sit, sid, qty, label, days, ev in D:
     doses.append(d)
 
 doses = apply_supplements_d094(doses)   # D-094: niedziela — kreatyna z posiłkiem potreningowym o 19:30
+doses = apply_supplements_d097(doses)   # D-097: preparaty czasowe 30.09.2026–28.03.2027; czwartek od 07.01 — 17:45
 out = {"schema": 1, "generated_from": "SUPLEMENTACJA_2027 (D-001)", "supplements": SUPPS,
        "doses": doses, "other_rows": [{"time": t, "text": s} for t, s in OTHER_ROWS],
        "decisions": {"D-014": "tauryna codziennie, także w czwartek",
-                     "D-015": "chondroityna, boswellia, glukozamina od 27.09.2026 do 21.03.2027 (D-087, D-090; I-9)",
+                     "D-015": "chondroityna, boswellia, glukozamina od 30.09.2026 do 28.03.2027 (D-097; wcześniej D-087, D-090, I-9)",
                      "D-016": "cynk kontynuowany; stan nieśledzony"}}
 json.dump(out, open(OUT, "w", encoding="utf8"), ensure_ascii=False, indent=1)
 print("supplements.json:", len(doses), "dawek,", len(SUPPS), "preparatów — wszystkie fragmenty potwierdzone w źródle")

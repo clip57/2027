@@ -3,9 +3,10 @@
 // Tylko odczyt, bez DOM — testy w tests/unit/care.test.mjs.
 //
 // Krok:    { id, kind: 'step', pora: 'rano'|'dzien'|'wieczor', group, order, text, product?, note?, warn?, wait? (min),
-//            days? [1–7, pn = 1], from?, until? (RRRR-MM-DD, włącznie), asNeeded? (doraźnie — bez liczenia postępu), slot? (id slotu planu dnia) }
+//            days? [1–7, pn = 1], from?, until? (RRRR-MM-DD, włącznie), asNeeded? (doraźnie — bez liczenia postępu), slot? (id slotu planu dnia),
+//            cycle? { on, off } — cykl dni liczony od `from` (np. 3 dni kroku, 1 dzień przerwy; D-097) }
 // Produkt: { id, kind: 'product', name, area, status?: 'uzywany'|'zapas'|'skonczony', opened?, note?, order? }
-import { weekday, addDays, shortDate } from '../dates.js';
+import { weekday, addDays, shortDate, diffDays } from '../dates.js';
 
 export const PORY = [
   { id: 'rano', label: 'Rano', icon: 'sun' },
@@ -28,7 +29,15 @@ export function careModel(defs = []) {
   return { steps, products, product: Object.fromEntries(products.map(p => [p.id, p])), empty: !steps.length && !products.length };
 }
 
-export const activeOn = (s, date) => (!s.days?.length || s.days.includes(weekday(date))) && (!s.from || date >= s.from) && (!s.until || date <= s.until);
+// Cykl (D-097): dzień kroku, gdy (dni od `from`) mod (on + off) < on; bez `from` albo z niepoprawnym cyklem — codziennie
+const inCycle = (s, date) => {
+  const c = s.cycle, on = Number(c?.on), off = Number(c?.off);
+  if (!c || !s.from || !(on > 0) || !(off >= 0)) return true;
+  const n = diffDays(s.from, date);
+  return n >= 0 && n % (on + off) < on;
+};
+export const activeOn = (s, date) => (!s.days?.length || s.days.includes(weekday(date))) && (!s.from || date >= s.from) && (!s.until || date <= s.until)
+  && inCycle(s, date);
 export const doneKey = (date, id) => `${date}|${id}`;
 export const isDone = (done, date, id) => done?.[doneKey(date, id)] === true;
 
@@ -65,8 +74,10 @@ export function slotProgress(model, done, date) {
 }
 
 // Opis reguły kroku: „codziennie”, „PN, ŚR”, „doraźnie”, z okresem („do 11.10”, „od 12.10”)
+const cycleText = c => `cykl: ${c.on} ${c.on === 1 ? 'dzień' : 'dni'} tak, ${c.off} ${c.off === 1 ? 'dzień' : 'dni'} przerwy`;
 export function ruleText(s) {
-  const days = !s.days?.length || s.days.length === 7 ? 'codziennie' : [...s.days].sort((a, b) => a - b).map(d => DAY_SHORT[d - 1]).join(', ');
+  const days = s.cycle?.on > 0 ? cycleText(s.cycle)
+    : !s.days?.length || s.days.length === 7 ? 'codziennie' : [...s.days].sort((a, b) => a - b).map(d => DAY_SHORT[d - 1]).join(', ');
   const period = [s.from && `od ${shortDate(s.from)}`, s.until && `do ${shortDate(s.until)}`].filter(Boolean).join(' ');
   return [s.asNeeded ? 'doraźnie' : days, period].filter(Boolean).join(' · ');
 }
@@ -80,7 +91,7 @@ export function productUse(model, pid) {
 export function weekGrid(model, done, monday) {
   return [...Array(7)].map((_, i) => {
     const date = addDays(monday, i), list = stepsFor(model, date);
-    return { date, ...progress(list, done, date), special: list.filter(s => !s.asNeeded && s.days?.length && s.days.length < 7) };
+    return { date, ...progress(list, done, date), special: list.filter(s => !s.asNeeded && ((s.days?.length && s.days.length < 7) || s.cycle)) };
   });
 }
 

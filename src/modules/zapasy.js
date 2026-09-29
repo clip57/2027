@@ -57,7 +57,7 @@ export function renderZapasy(root, ctx) {
 
   const items = [...allItems(), ...(store.state.catalogUser || [])];
   const day = resolveDay(today);
-  const shop = nextShopping(today, new Date().getHours(), store.state.settings.shopWeekday ?? 6);
+  const shop = nextShopping(today, new Date().getHours(), new Date().getMinutes());
   const INV_T = ['inv.count', 'inv.move', 'inv.dayshift'];
   const undoable = () => store.allEvents().filter(e => INV_T.includes(e.t)).sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
   const days = r => (r.fc ? r.fc.days : Infinity);

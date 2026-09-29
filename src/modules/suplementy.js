@@ -8,7 +8,7 @@ import { scheduleFor, supplementOverview } from '../core/calc/supplements.js';
 import { addDays, longDate, weekday, dayShort, shortDate } from '../core/dates.js';
 import { stockAt, forecast, statusInfo, runway, nextShopping } from '../core/calc/inventory.js';
 import { catalogById } from '../core/data.js';
-import { dayPlan, inPlan, PLAN_START } from '../core/resolver.js';
+import { dayPlan, inPlan, PLAN_START, PLAN_END } from '../core/resolver.js';
 
 const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
 
@@ -30,7 +30,7 @@ export function renderSuplementy(root, ctx) {
 
   // Zapas preparatów (ten sam dziennik co moduł Zapasy): stan, prognoza, status v31 (suplementy: < 10 / < 20 dni)
   const store = ctx.store, inv = store?.state?.inv;
-  const shop = nextShopping(ctx.today, now.getHours(), store?.state?.settings?.shopWeekday ?? 6);
+  const shop = nextShopping(ctx.today, now.getHours(), now.getMinutes());
   const stockOf = s => {
     if (!inv || !s.tracked || !catalogById[s.id]) return null;
     const st = stockAt(inv, s.id, ctx.today);
@@ -57,7 +57,9 @@ export function renderSuplementy(root, ctx) {
     h('div', { class: 'controls sp-days' }, segmented('Dzień', week, date, go)));
 
   // Oś dnia: dla dzisiejszego dnia pory minione przygaszone, następna wyróżniona (godzina z SUPLEMENTACJI)
-  if (!inPlan(date)) add(root, h('p', { class: 'panel sp-outside' }, `Poza planem — suplementacja zaczyna się ${longDate(PLAN_START)}.`));
+  if (dayPlan(date).zero) add(root, h('p', { class: 'panel sp-outside' }, `Dzień zero — bez suplementów. Suplementacja od ${longDate(addDays(date, 1))}.`));
+  else if (!inPlan(date)) add(root, h('p', { class: 'panel sp-outside' }, date > PLAN_END ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.`
+    : `Poza planem — suplementacja zaczyna się ${longDate(addDays(PLAN_START, 1))}.`));
   for (const g of groups) {
     const past = isToday && g.time < hhmm, next = g.time === nextTime;
     add(root, h('article', { class: `tl-item${past ? ' is-past' : ''}${next ? ' is-next' : ''}` },

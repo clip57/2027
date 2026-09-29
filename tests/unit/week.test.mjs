@@ -16,14 +16,17 @@ test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (28 t
       const r = resolveDay(addDays(monday, i));
       assert.equal(x.date, r.date);
       assert.deepEqual([x.training, x.diet, x.kcal, x.cfa, x.recall, x.mock, x.outside], [r.sessionLabel, r.dietVariant, r.kcal, r.cfa.blocks.length, r.cfa.recall, r.cfa.isMock, r.outside], x.date);
-      // D-096: bez zakupów w soboty zjazdów, z blokami P1–P7 planu MPW i w święta
-      const busy = SRC.week.blocks?.[x.date]?.kind === 'studia' || (mpwByDay[x.date] || []).some(b => b.blok.startsWith('P')) || SRC.week.exceptions?.[x.date]?.variant === null;
-      assert.equal(x.shopping, r.weekday === 6 && !r.cfa.isMock && !r.outside && !busy, `${x.date}: zakupy w soboty (D-087, D-096)`);
+      // D-097: zakupy w czwartki (19:05 do 06.01, 15:30 od 07.01), bez zakupów w tygodniu 28.09–04.10 i poza planem; soboty bez zakupów
+      const exp = r.weekday !== 4 || r.outside || x.date === '2026-10-01' || r.cfa.isMock ? null : x.date >= '2027-01-07' ? '15:30' : '19:05';
+      assert.equal(x.shopping, exp, `${x.date}: zakupy w czwartek (D-097)`);
+      assert.equal(x.zero, x.date === '2026-09-29', x.date);
       assert.equal(x.blocks, r.blocks?.short || null, `${x.date}: weekendowe bloki (D-096)`);
     });
   }
-  const first = weekSummary('2026-09-25');
-  assert.deepEqual(first.map(x => x.outside), [true, true, true, true, true, true, false], 'D-088, D-090: 21–26.09 poza planem');
-  assert.equal(first[6].diet, 'NT');
-  assert.equal(first[6].exception, 'D-087');
+  const first = weekSummary('2026-09-29');
+  assert.deepEqual(first.map(x => x.outside), [true, true, false, false, false, false, false], 'D-088, D-097: 28.09 poza planem, 29.09 Dzień zero');
+  assert.deepEqual(first.map(x => x.zero), [false, true, false, false, false, false, false]);
+  const last = weekSummary('2027-03-28');
+  assert.deepEqual(last.map(x => x.outside), [false, false, false, false, false, false, false], '22–28.03 w planie (koniec 28.03)');
+  assert.ok(weekSummary('2027-03-29').every(x => x.outside), 'od 29.03 poza planem');
 });

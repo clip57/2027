@@ -304,17 +304,41 @@ body.kbd .toast { bottom: var(--s-3); }
 .dg-warn .ico { color: var(--warning); }
 .dg-info .ico { color: var(--text-2); }
 /* ---------- Etap 3 (audyt 25.09.2026) ---------- */
-/* I2: „Wymaga uwagi” w Dziś */
-.dz-attn { padding: var(--s-4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--e1); }
-.dz-attn.has-warn { border-color: color-mix(in srgb, var(--warning) 50%, var(--border)); }
-.dz-attn h2 { display: flex; align-items: center; gap: var(--s-2); margin: 0 0 var(--s-2); font-size: var(--fs-md); }
+/* I2: „Wymaga uwagi” w Dziś — nowy wygląd (D-097): nagłówek z licznikiem, sygnały jako kafelki-odnośniki */
+.dz-attn { padding: var(--s-4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--e1);
+  display: grid; gap: var(--s-3); }
+.dz-attn.has-warn { border-color: color-mix(in srgb, var(--warning) 40%, var(--border));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--warning) 6%, var(--surface)), var(--surface) 70%); }
+.dz-attn-head { display: flex; align-items: center; gap: var(--s-3); }
+.dz-attn-bell { width: 36px; height: 36px; border-radius: var(--r-full); display: grid; place-items: center; flex: none;
+  background: var(--accent-soft); color: var(--accent); }
+.dz-attn.has-warn .dz-attn-bell { background: color-mix(in srgb, var(--warning) 16%, var(--surface)); color: var(--text); }
+.dz-attn-ht { flex: 1 1 auto; min-width: 0; }
+.dz-attn h2 { margin: 0; font-size: var(--fs-md); letter-spacing: -.01em; }
+.dz-attn-sub { margin: 2px 0 0; font-size: var(--fs-xs); color: var(--text-2); }
+.dz-attn-count { min-width: 28px; height: 28px; padding: 0 var(--s-2); border-radius: var(--r-full); display: grid; place-items: center;
+  font-size: var(--fs-sm); font-weight: 700; font-variant-numeric: tabular-nums; background: var(--sunken); color: var(--text); }
+.dz-attn.has-warn .dz-attn-count { background: color-mix(in srgb, var(--warning) 22%, var(--surface)); }
 .dz-attn p { margin: 0; }
-.dz-attn-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-.dz-attn-list li { display: flex; align-items: center; gap: var(--s-2); }
+.dz-attn-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.dz-attn-list li { display: block; }
+.dz-at-item { display: flex; align-items: center; gap: var(--s-3); min-height: 48px; padding: var(--s-2) var(--s-3); border-radius: var(--r-md);
+  color: var(--text); text-decoration: none; background: var(--sunken); border: 1px solid transparent;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease); }
+.dz-at-item:hover { border-color: var(--border); background: color-mix(in srgb, var(--accent) 6%, var(--sunken)); }
+.dz-at-item:active { transform: scale(.99); }
+.at-warn .dz-at-item { background: color-mix(in srgb, var(--warning) 10%, var(--surface)); border-color: color-mix(in srgb, var(--warning) 30%, var(--border)); }
+.dz-at-ic { width: 28px; height: 28px; border-radius: var(--r-full); display: grid; place-items: center; flex: none; background: var(--surface); }
+.dz-at-t { flex: 1 1 auto; min-width: 0; font-size: var(--fs-sm); font-weight: 550; overflow-wrap: anywhere; }
+.dz-at-go { flex: none; color: var(--text-2); }
 .dz-attn-list .ico { flex: none; }
-.dz-attn-list a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); }
-.at-warn .ico { color: var(--warning); }
-.at-info .ico { color: var(--text-2); }
+.at-warn .dz-at-ic .ico { color: var(--warning); }
+.at-info .dz-at-ic .ico { color: var(--text-2); }
+.dz-attn-empty { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-2) var(--s-3); border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--success) 8%, var(--surface)); }
+.dz-attn-empty .dz-at-ic .ico { color: var(--success); }
+.dz-attn-empty p { display: grid; gap: 1px; font-size: var(--fs-sm); }
+.dz-attn-empty span { color: var(--text-2); font-size: var(--fs-xs); }
 .dz-attn [hidden] { display: none; }
 @media (min-width: 1100px) {
   .dz-grid:has(> .dz-attn) { grid-template-areas: "attn aside" "now aside" "kpis aside" "plan aside"; }
@@ -481,3 +505,43 @@ body.kbd .pg-timer { display: none; }
 /* Długie ciągi bez spacji w planie MPW (adresy stron w zadaniach, „a/b/c” w tematach) — łamanie zamiast przewijania w poziomie */
 .cfa-body { min-width: 0; }
 .cfa-body p, .cf-next { overflow-wrap: anywhere; }
+/* ---------- Kalendarz (D-097) — przedrostek kl-; dzień → plan dnia w „Dziś” ---------- */
+.kl-month { display: grid; gap: var(--s-2); }
+.kl-month h2 { margin: 0 0 var(--s-1); text-transform: capitalize; }
+.kl-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.kl-wd li { text-align: center; font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; color: var(--text-2); padding: 2px 0; }
+.kl-day { display: flex; flex-direction: column; gap: 4px; min-height: 56px; height: 100%; padding: 6px; border-radius: var(--r-md);
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); text-decoration: none; min-width: 0;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease); }
+.kl-day:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.kl-day.is-today { box-shadow: inset 0 0 0 2px var(--accent); }
+.kl-day.is-out { background: var(--sunken); color: var(--text-2); border-style: dashed; }
+.kl-day.is-holiday { background: color-mix(in srgb, var(--success) 9%, var(--surface)); }
+.kl-day.is-exam { border-color: color-mix(in srgb, var(--warning) 70%, var(--border)); }
+.kl-day.is-zero { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.kl-n { font-weight: 700; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; line-height: 1; }
+.kl-dots { display: flex; flex-wrap: wrap; gap: 3px; }
+.kl-dot { display: inline-block; width: 8px; height: 8px; border-radius: var(--r-full); flex: none; background: var(--text-2); }
+.k-train { --k: var(--train); } .k-cfa { --k: var(--cfa); } .k-mpw { --k: var(--regen); } .k-block { --k: var(--care); }
+.k-shop { --k: var(--prep); } .k-holiday { --k: var(--success); } .k-exam { --k: var(--warning); } .k-zero { --k: var(--accent); }
+.kl-dot[class*="k-"] { background: var(--k); }
+.kl-lines { display: none; }
+.kl-l { display: flex; align-items: center; gap: 4px; font-size: var(--fs-2xs); line-height: 1.25; min-width: 0; overflow-wrap: anywhere; }
+.kl-l::before { content: ""; width: 6px; height: 6px; border-radius: var(--r-full); background: var(--k); flex: none; }
+.kl-legend { list-style: none; margin: var(--s-3) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); font-size: var(--fs-xs); color: var(--text-2); }
+.kl-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.kl-hint { margin-top: var(--s-2); font-size: var(--fs-xs); }
+@media (min-width: 900px) {
+  .kl-grid { gap: 6px; }
+  .kl-day { min-height: 108px; padding: 8px; }
+  .kl-dots { display: none; }
+  .kl-lines { display: grid; gap: 2px; }
+}
+/* Dzień zero (D-097) */
+.dz-zero { display: grid; gap: var(--s-3); border-left: 4px solid var(--accent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface) 60%); }
+.dz-zero h2, .dz-zero p { margin: 0; }
+.dz-zero .eyebrow { color: var(--text-2); }
+.dz-zero-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.dz-zero-list li { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-sm); }
+.dz-zero-list .ico { color: var(--accent); flex: none; }

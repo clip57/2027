@@ -7,7 +7,7 @@ import { segmented, progressRing, sheet } from '../ui/components.js';
 import { icon } from '../ui/icons.js';
 import { region } from '../ui/patch.js';
 import { SRC } from '../core/data.js';
-import { inPlan, PLAN_START } from '../core/resolver.js';
+import { inPlan, PLAN_START, PLAN_END } from '../core/resolver.js';
 import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.js';
 import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, weekGrid, PORY, AREAS, STATUS, DAY_SHORT } from '../core/calc/care.js';
 
@@ -92,7 +92,7 @@ export function renderPielegnacja(root, ctx) {
       date > PLAN_START && h('a', { class: 'btn dz-nav', href: `#/pielegnacja?d=${addDays(date, -1)}` }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
       date !== today && h('a', { class: 'btn dz-nav', href: '#/pielegnacja' }, 'Dziś'),
       h('a', { class: 'btn dz-nav', href: `#/pielegnacja?d=${addDays(date, 1)}` }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 })));
-    if (!inPlan(date)) { add(root, nav, h('p', { class: 'panel pg-outside' }, `Poza planem — plan zaczyna się ${longDate(PLAN_START)}.`)); return; }
+    if (!inPlan(date)) { add(root, nav, h('p', { class: 'panel pg-outside' }, date > PLAN_END ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.` : `Poza planem — plan zaczyna się ${longDate(PLAN_START)}.`)); return; }
     const list = stepsFor(model, date);
     const poras = byPora(list);
     const hero = region(() => {
@@ -263,6 +263,9 @@ export function renderPielegnacja(root, ctx) {
       product: h('select', {}, opts([['', '— bez produktu —'], ...model.products.map(p => [p.id, p.name])], s?.product || '')),
       from: h('input', { type: 'date', value: s?.from || '' }),
       until: h('input', { type: 'date', value: s?.until || '' }),
+      // Cykl (D-097): N dni kroku, M dni przerwy — liczony od daty „od”
+      cycOn: h('input', { type: 'number', min: '0', step: '1', value: s?.cycle?.on || '', placeholder: 'dni' }),
+      cycOff: h('input', { type: 'number', min: '0', step: '1', value: s?.cycle?.off ?? '', placeholder: 'dni' }),
       asNeeded: h('input', { type: 'checkbox', checked: s?.asNeeded || null }),
       warn: h('input', { value: s?.warn || '', placeholder: 'np. Nie płucz po szczotkowaniu' }),
       wait: h('input', { type: 'number', min: '0', step: '1', value: s?.wait || '', placeholder: 'min' }),
@@ -277,6 +280,7 @@ export function renderPielegnacja(root, ctx) {
       field('Kolejność', f.order), field('Produkt', f.product),
       h('fieldset', { class: 'pg-days' }, h('legend', {}, 'Dni tygodnia'), dayBoxes),
       h('div', { class: 'row' }, field('Od (opcjonalnie)', f.from), field('Do (opcjonalnie)', f.until)),
+      h('div', { class: 'row' }, field('Cykl: dni kroku (opcjonalnie)', f.cycOn), field('Cykl: dni przerwy', f.cycOff)),
       h('label', { class: 'chk' }, f.asNeeded, ' Doraźnie (nie liczy się do postępu dnia)'),
       field('Ostrzeżenie', f.warn), field('Odczekaj po kroku (min)', f.wait), field('Notatka', f.note), field('Powiązanie z planem dnia', f.slot),
       h('div', { class: 'row' },
@@ -285,9 +289,12 @@ export function renderPielegnacja(root, ctx) {
           if (!text) { dlg.error(new Error('Podaj czynność.')); f.text.focus(); return; }
           if (!days.size) { dlg.error(new Error('Wybierz co najmniej jeden dzień tygodnia.')); return; }
           if (f.from.value && f.until.value && f.until.value < f.from.value) { dlg.error(new Error('Data „do” jest wcześniejsza niż „od”.')); return; }
+          const cOn = Number(f.cycOn.value) || 0, cOff = Number(f.cycOff.value) || 0;
+          if (cOn > 0 && !f.from.value) { dlg.error(new Error('Cykl liczony jest od daty „od” — podaj ją.')); f.from.focus(); return; }
           const data = { pora: f.pora.value, group: f.group.value.trim(), order: Number(f.order.value) || 0, text };
           if (days.size < 7) data.days = [...days].sort((a, b) => a - b);
           for (const k of ['product', 'from', 'until', 'slot']) if (f[k].value) data[k] = f[k].value;
+          if (cOn > 0) data.cycle = { on: cOn, off: cOff };
           if (f.asNeeded.checked) data.asNeeded = true;
           if (f.warn.value.trim()) data.warn = f.warn.value.trim();
           if (Number(f.wait.value) > 0) data.wait = Number(f.wait.value);

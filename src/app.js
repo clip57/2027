@@ -19,12 +19,13 @@ import { renderMealPrep } from './modules/mealprep.js';
 import { renderTrening } from './modules/trening.js';
 import { renderCFA } from './modules/cfa.js';
 import { renderMPW } from './modules/mpw.js';
+import { renderKalendarz } from './modules/kalendarz.js';
 import { renderBezpieczenstwo } from './modules/bezpieczenstwo.js';
 import { renderRekompozycja } from './modules/rekompozycja.js';
 import { renderPielegnacja } from './modules/pielegnacja.js';
 import { renderPlaceholder } from './modules/placeholder.js';
 
-const RENDER = { dzis: renderDzis, dane: renderDane, dieta: renderDieta, suplementy: renderSuplementy, zapasy: renderZapasy, mealprep: renderMealPrep, trening: renderTrening, cfa: renderCFA, mpw: renderMPW, bezpieczenstwo: renderBezpieczenstwo, rekompozycja: renderRekompozycja, pielegnacja: renderPielegnacja };
+const RENDER = { dzis: renderDzis, dane: renderDane, dieta: renderDieta, suplementy: renderSuplementy, zapasy: renderZapasy, mealprep: renderMealPrep, trening: renderTrening, cfa: renderCFA, mpw: renderMPW, kalendarz: renderKalendarz, bezpieczenstwo: renderBezpieczenstwo, rekompozycja: renderRekompozycja, pielegnacja: renderPielegnacja };
 const ctx = { store: null, storeError: null, update: { state: 'idle', check: async () => {}, apply: () => {} }, cloudAuto: null };
 // Komunikaty po akcji (B4): stały obszar nad dolnym paskiem, poza przerysowywanym <main> — widoczny także przy przewiniętej
 // stronie. Region aria-live istnieje od startu, więc czytniki ekranu odczytują każdy komunikat. Znika po 6 s.

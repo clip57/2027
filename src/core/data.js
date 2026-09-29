@@ -1,4 +1,5 @@
 // Jedyny punkt dostępu do danych źródłowych (warstwa ŹRÓDŁO, tylko do odczytu).
+import { weekday } from './dates.js';
 import diet from '../data/diet.json' with { type: 'json' };
 import supplements from '../data/supplements.json' with { type: 'json' };
 import catalog from '../data/catalog.json' with { type: 'json' };
@@ -21,7 +22,15 @@ export const plan = (variant, phase) => diet.plans.find(p => p.variant === varia
 export const catalogById = Object.freeze(Object.fromEntries(catalog.items.map(i => [i.id, i])));
 const byDay = bloki => Object.freeze(bloki.reduce((m, b) => ((m[b.data] ||= []).push(b), m), {}));
 export const cfaByDay = byDay(cfa.D.bloki);
-export const mpwByDay = byDay(mpw.D.bloki);   // plan MPW (D-095)
+// Plan MPW (D-095) z przesunięciem godzin wg decyzji (D-097: czwartki od 07.01.2027 — bloki A–C 30 min później; `week.mpwShift`).
+// Dane planu (mpw.json) bez zmian — oryginalna godzina w polu `godz_src`.
+const mm = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+const hhmm = n => `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+const shiftGodz = (g, min) => g.split('–').map(t => hhmm(mm(t) + min)).join('–');
+const MS = week.mpwShift;
+const shifted = b => MS && b.data >= MS.from && MS.weekdays.includes(weekday(b.data)) && !b.blok.startsWith('P');
+export const mpwBloki = Object.freeze(mpw.D.bloki.map(b => (shifted(b) ? Object.freeze({ ...b, godz: shiftGodz(b.godz, MS.minutes), godz_src: b.godz }) : b)));
+export const mpwByDay = byDay(mpwBloki);
 
 // Zużycie spoza tabel PDF (D-021): imbir 5 g/d do zielonej herbaty.
 export const EXTRA_DAILY = Object.freeze([{ prod: 'imbir', qty: 5, unit: 'g', basis: 'D-021: imbir 5 g (2–3 plastry)' }]);

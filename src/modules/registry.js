@@ -5,6 +5,7 @@
 export const GROUPS = ['Dzień', 'Trening', 'Dieta', 'Nauka', 'System'];
 export const MODULES = [
   { id: 'dzis', name: 'Dziś', group: 'Dzień', icon: 'sun', domain: 'regen', tab: true, stage: 3, ready: true },
+  { id: 'kalendarz', name: 'Kalendarz', group: 'Dzień', icon: 'calendar', domain: 'regen', stage: 7, ready: true },   // D-097
   { id: 'pielegnacja', name: 'Pielęgnacja', group: 'Dzień', icon: 'sparkles', domain: 'care', stage: 7, ready: true },   // D-094
   { id: 'dieta', name: 'Dieta', group: 'Dieta', icon: 'utensils', domain: 'diet', tab: true, stage: 3, ready: true },
   { id: 'trening', name: 'Trening', group: 'Trening', icon: 'dumbbell', domain: 'train', tab: true, stage: 5, ready: true },

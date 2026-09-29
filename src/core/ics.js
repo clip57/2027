@@ -1,5 +1,5 @@
 // Eksport planu do kalendarza (I1, audyt 25.09.2026): plik iCalendar (RFC 5545) z przypomnieniami (VALARM) — dawki
-// suplementów, bloki CFA i recall, bloki MPW (D-095), trening, sobotnie zakupy. Generowany lokalnie z resolvera; bez serwera i bez kont.
+// suplementów, bloki CFA i recall, bloki MPW (D-095), trening, zakupy (czwartki — D-097). Generowany lokalnie z resolvera; bez serwera i bez kont.
 // Godziny w strefie Europe/Warsaw (TZID + VTIMEZONE z regułami czasu letniego) — zmiana czasu 25.10.2026 bez przesunięć.
 // UID stały dla dnia i punktu planu: ponowny import po zmianie planu aktualizuje wydarzenia zamiast je dublować.
 import { resolveDay, cfaSourceLine } from './resolver.js';
@@ -7,7 +7,7 @@ import { scheduleFor } from './calc/supplements.js';
 import { SRC } from './data.js';
 import { addDays } from './dates.js';
 
-export const ICS_KINDS = [['supp', 'Suplementy (pory dawek)'], ['cfa', 'Bloki CFA i recall'], ['mpw', 'Bloki MPW'], ['train', 'Trening, basen i sauna'], ['shop', 'Zakupy w sobotę']];
+export const ICS_KINDS = [['supp', 'Suplementy (pory dawek)'], ['cfa', 'Bloki CFA i recall'], ['mpw', 'Bloki MPW'], ['train', 'Trening, basen i sauna'], ['shop', 'Zakupy w czwartek']];
 const KEY = Object.fromEntries(SRC.dayTemplate.slots.map(s => [s.id, s.key]));
 const TZ = ['BEGIN:VTIMEZONE', 'TZID:Europe/Warsaw',
   'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'TZNAME:CEST', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'END:DAYLIGHT',
@@ -55,7 +55,7 @@ export function planEvents(date, kinds, now = new Date()) {
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT5M', summary: 'CFA Active Recall', desc: s.desc }));
     if (kinds.includes('train') && s.role === 'activity' && KEY[s.id] === 'main' && r.dayType !== 'free' && s.title !== 'Wolne')
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT30M', summary: s.title, desc: [r.sessionLabel, s.desc].filter(Boolean).join('\n') }));
-    if (kinds.includes('shop') && s.id === 'slot.1213z')
+    if (kinds.includes('shop') && s.shop)
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT15M', summary: 'Zakupy', desc: 'Lista „Do kupienia” w module Zapasy.' }));
   }
   // MPW (D-095): bloki wg godzin z planu MPW (poza szablonem planu dnia); symulacja jako jedno wydarzenie 15:30–18:30

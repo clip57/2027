@@ -52,20 +52,19 @@ test('prognoza uwzględnia czwartki i fazy', async () => {
   assert.equal(fc.lastCovered, '2026-10-09', '07.10 i 09.10 po 120 g, 08.10 (czw) bez banana');
   assert.equal(fc.runOut, '2026-10-10');
   assert.equal(fc.days, 3);
-  const oats = forecast('platki_owsiane', 70 * 15, '2026-09-24');   // 27.09–11.10: 15 dni × 70 g (D-090)
+  const oats = forecast('platki_owsiane', 70 * 12, '2026-09-24');   // 30.09–11.10: 12 dni × 70 g (D-097: Dzień zero 29.09 bez diety)
   assert.equal(oats.runOut, '2026-10-12', 'od 12.10 porcja 85 g');
   assert.equal(oats.lastCovered, '2026-10-11');
 });
 
-test('start planu 27.09.2026 (D-088, D-090): brak zużycia przed startem; 27.09 (dieta NT) bez banana; 28–29.09 NT (D-096)', async () => {
+test('start planu 29.09.2026 — Dzień zero (D-088, D-097): brak zużycia przed startem i w Dniu zero', async () => {
   const fc = forecast('banan', 240, '2026-09-22');
-  assert.equal(fc.lastCovered, '2026-10-01', '23–26.09 poza planem, 27–29.09 NT (D-087, D-096), 30.09 i 01.10 po 120 g');
+  assert.equal(fc.lastCovered, '2026-10-01', '23–28.09 poza planem, 29.09 Dzień zero (bez diety), 30.09 i 01.10 po 120 g');
   assert.equal(fc.runOut, '2026-10-02');
   const s = await new Store(new MemoryAdapter()).open();
   await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-09-22' });
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-26'), 1000, 'inwentaryzacja z 22.09 bez odliczeń do 26.09');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-27'), 1000, '27.09 — dieta NT bez kefiru');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-29'), 1000, '28–29.09 — dieta NT (D-096)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-29'), 1000, '29.09 — Dzień zero, bez diety (D-097)');
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-30'), 800);
 });
 
@@ -101,10 +100,17 @@ test('statusy — progi v31 (suplementy i trwałe)', () => {
   assert.equal(status(catalogById.cynk, null, null), 'UNTRACKED');
 });
 
-test('najbliższe zakupy: sobota, po 18:00 w sobotę kolejna', () => {
-  assert.deepEqual(nextShopping('2026-09-22', 10), { date: '2026-09-26', inDays: 4 });
-  assert.deepEqual(nextShopping('2026-09-26', 17), { date: '2026-09-26', inDays: 0 });
-  assert.deepEqual(nextShopping('2026-09-26', 18), { date: '2026-10-03', inDays: 7 });
+test('najbliższe zakupy wg planu dnia (D-097): czwartek po saunie 19:05–20:35, od 07.01 15:30–16:00; do końca slotu — dziś', () => {
+  const thu = { from: '19:05', to: '20:35' }, jan = { from: '15:30', to: '16:00' };
+  assert.deepEqual(nextShopping('2026-09-29', 10), { date: '2026-10-08', inDays: 9, ...thu }, 'tydzień 28.09–04.10 bez zakupów');
+  assert.deepEqual(nextShopping('2026-10-06', 10), { date: '2026-10-08', inDays: 2, ...thu });
+  assert.deepEqual(nextShopping('2026-10-08', 20, 34), { date: '2026-10-08', inDays: 0, ...thu });
+  assert.deepEqual(nextShopping('2026-10-08', 20, 35), { date: '2026-10-15', inDays: 7, ...thu });
+  assert.deepEqual(nextShopping('2026-10-09', 10), { date: '2026-10-15', inDays: 6, ...thu }, 'sobota bez zakupów (plan CFA v12)');
+  assert.deepEqual(nextShopping('2027-01-05', 8), { date: '2027-01-07', inDays: 2, ...jan });
+  assert.deepEqual(nextShopping('2027-01-07', 15, 59), { date: '2027-01-07', inDays: 0, ...jan });
+  assert.deepEqual(nextShopping('2027-01-07', 16), { date: '2027-01-14', inDays: 7, ...jan });
+  assert.equal(nextShopping('2027-03-26', 9).date, '2027-04-01', 'po końcu planu — kolejny czwartek (bez godzin)');
 });
 
 test('lista zakupów: maxLimit, pełne opakowania, pomija suplementy czasowe i cynk', async () => {

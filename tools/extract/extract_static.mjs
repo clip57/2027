@@ -64,17 +64,17 @@ if (want('trening')) {
   console.log('training.json:', Object.values(days).reduce((a, l) => a + l.length, 0), 'ćwiczeń');
 }
 
-// ---------- CFA (D-086/D-087/D-090/D-093: plan „MASTER SCHEDULE FINAL” v9 od 28.09.2026, 400 bloków; zastępuje v3 z D-006) ----------
+// ---------- CFA (D-086/D-087/D-090/D-093/D-097: plan „MASTER SCHEDULE FINAL” v12 od 30.09.2026, 387 bloków; zastępuje v3 z D-006) ----------
 if (want('cfa')) {
   const file = process.env.CFA_PLAN || 'PLAN_NAUKI_CFA_LEVEL_I.html';
   const js = scripts(read(file))[0].trim();
   const D = JSON.parse(js.replace(/^const D\s*=\s*/, '').replace(/;\s*$/, ''));
-  // Starszy plik (v3: 416 bloków od 21.09; v4: 432; v5: 421 od 25.09; v7: 409 od 27.09) nie może po cichu nadpisać planu D-093
-  if (D.bloki.length !== 400 || D.stat.start !== '2026-09-28' || D.stat.end !== '2026-11-11')
-    throw new Error(`${file}: oczekiwano planu D-093 (400 bloków, 28.09–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
+  // Starszy plik (v3: 416 bloków od 21.09; v4: 432; v5: 421 od 25.09; v7: 409 od 27.09; v9: 400 od 28.09) nie może po cichu nadpisać planu D-097
+  if (D.bloki.length !== 387 || D.stat.start !== '2026-09-30' || D.stat.end !== '2026-11-11')
+    throw new Error(`${file}: oczekiwano planu D-097 (387 bloków, 30.09–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
   // Kontrola krzyżowa z MASTER_SCHEDULE_CFA.csv (jeśli jest w SOURCES_DIR): te same bloki, pole po polu
   crossCheck(process.env.CFA_CSV || 'MASTER_SCHEDULE_CFA.csv', file, D, 'cfa');
-  write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v9, 28.09.2026) — obiekt D (D-086, D-087, D-090, D-093)',
+  write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v12, 30.09.2026) — obiekt D (D-086, D-087, D-090, D-093, D-097)',
     exam: '2026-11-12', D });
   console.log('cfa.json:', D.bloki.length, 'bloków');
 }

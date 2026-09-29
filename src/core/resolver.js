@@ -6,7 +6,8 @@ import { weekday, dayName, isValidDay } from './dates.js';
 const CFA_FIRST = SRC.cfa.D.stat.start, CFA_LAST = SRC.cfa.D.stat.end;
 const MOCKS = new Set(SRC.cfa.D.mockCFA);
 // Plan MPW (D-095; v8 — D-096): 16.11.2026–20.03.2027 — bloki A–C 15:30–18:23 nie zmieniają szablonu godzin (osobna karta w „Dziś”);
-// bloki P1–P7 (powtórka całości, 8:00–15:23 w wybrane weekendy) zajmują sloty A–G o tych samych godzinach
+// bloki P1–P7 (powtórka całości, 8:00–15:23 w wybrane weekendy) zajmują sloty A–G o tych samych godzinach; w czwartki od 07.01
+// (D-097) bloki A–C są 30 min później i mają własne sloty wariantu „czwartek_st” (`mpwSlot`)
 const MPW_FIRST = SRC.mpw.D.stat.start, MPW_LAST = SRC.mpw.D.stat.end, SIMS = new Set(SRC.mpw.D.mockCFA);
 const mpwSlotBlocks = date => (mpwByDay[date] || []).filter(b => b.blok.startsWith('P'));
 // Weekendowe bloki 8:00–15:23 (D-096): studia, rozmowa, praca magisterska, święta, egzamin MPW — sloty A–G
@@ -15,10 +16,14 @@ const BLOCKS_END = '15:23';
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Start planu (D-088, D-090): 27.09.2026 (`phases.json` → `start`). Dni wcześniejsze są poza planem — bez treningu, dawek, bloków CFA i zużycia w Zapasach.
-// Zdarzenia z tych dni zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
+// Plan (D-088, D-097): od Dnia zero 29.09.2026 do 28.03.2027 (`phases.json` → `start`, `zero`, `end`). Dni wcześniejsze i późniejsze są
+// poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero: bez diety, treningu, nauki i suplementów (pielęgnacja tak).
+// Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
-export const inPlan = date => date >= PLAN_START;
+export const PLAN_END = SRC.phases.end || '9999-12-31';
+export const DAY_ZERO = SRC.phases.zero || null;
+export const inPlan = date => date >= PLAN_START && date <= PLAN_END;
+export const isZero = date => date === DAY_ZERO;
 
 export function phaseFor(date) {
   let ph = null;
@@ -27,12 +32,12 @@ export function phaseFor(date) {
 }
 
 export function dosesFor(date) {
-  if (!inPlan(date)) return [];   // suplementacja zaczyna się razem z planem (D-088)
+  if (!inPlan(date) || isZero(date)) return [];   // suplementacja od dnia 1 planu (D-088, D-097)
   const wd = weekday(date);
   return SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
 }
-// Okres przyjmowania preparatów czasowych (D-015; 27.09.2026–21.03.2027 — D-087, D-090). `from` opcjonalne.
+// Okres przyjmowania preparatów czasowych (D-015; 30.09.2026–28.03.2027 — D-097). `from` opcjonalne.
 export function inValidity(d, date) {
   return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
 }
@@ -41,17 +46,19 @@ export function inValidity(d, date) {
 export function dayPlan(date) {
   const w = SRC.week.days[String(weekday(date))];
   if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: false, variant: null,
-    outside: true, note: null, decision: 'D-088' };
+    outside: true, after: date > PLAN_END, note: null, decision: 'D-088' };
+  // Dzień zero (D-097): jak dzień poza planem (bez diety, treningu, nauki, suplementów i zużycia), ale z własnym widokiem w „Dziś”
+  if (isZero(date)) return { ...w, dayType: 'zero', session: null, sessionName: 'Dzień zero', sauna: 0, recall: false, variant: null,
+    outside: true, zero: true, note: null, decision: 'D-097' };
   const x = SRC.week.exceptions?.[date];
   return x ? { ...w, ...x } : w;
 }
 
-// Szablon godzin dnia: w soboty (poza dniem mocka) wariant „zakupy” 12:13–13:13 zamiast przerwy i bloku E (D-087).
-// Bez zakupów także w soboty zjazdów studiów i w dni z blokami P1–P7 planu MPW (blok 12:20–13:13 zajęty — D-096).
+// Szablon godzin dnia z wariantem dnia (poza dniem mocka): niedziela „basen” (D-094), czwartek „czwartek” — sauna i zakupy,
+// od 07.01 „czwartek_st” — zakupy 15:30 i bloki MPW 30 min później (D-097). Soboty bez zakupów (plan CFA v12, D-097).
 export function templateFor(date, isMock = MOCKS.has(date)) {
   const name = dayPlan(date).variant;
-  const busy = isMock || (name === 'zakupy' && (dayBlocks(date)?.kind === 'studia' || mpwSlotBlocks(date).length > 0));
-  const v = !busy && name && SRC.dayTemplate.variants?.[name];
+  const v = !isMock && name && SRC.dayTemplate.variants?.[name];
   if (!v) return SRC.dayTemplate.slots;
   const out = [];
   for (const s of SRC.dayTemplate.slots) {
@@ -81,25 +88,26 @@ export function resolveDay(date) {
   const blocks = cfaByDay[date] || [];
   const isMock = MOCKS.has(date);
   const doses = dosesFor(date);
-  const wb = dayBlocks(date), mpwP = mpwSlotBlocks(date);
+  const wb = dayBlocks(date), mpwAll = mpwByDay[date] || [], mpwP = mpwSlotBlocks(date);
   const exercises = w.session && SRC.training.days[w.session]; // basen (nd) nie ma listy ćwiczeń w TRENING
   const session = exercises ? exercises.map(e => ({ ...e, seriesToday: e.series[String(effPhase)] })) : null;
 
   const mealName = key => (key === 'post' && w.diet === 'NT' ? 'Posiłek po saunie' : MEAL_NAMES[key]); // D-018
   const sessionLabel = w.sauna === 1 ? `${w.sessionName} + sauna` : w.sessionName; // D-040
-  const free = w.dayType === 'free';   // dzień bez treningu i sauny (D-087): całe okno treningowe wolne
+  const free = w.dayType === 'free' || !!w.zero;   // dzień bez treningu i sauny (D-087): całe okno treningowe wolne
   const slots = templateFor(date, isMock).map(s => {
     // Podpunkty: suplementy z tekstu PLAN_DNIA są ukryte — pokazywane są wyłącznie dawki z SUPLEMENTACJI (D-001).
     const items = (s.items || []).filter(i => i.kind === 'task' || i.kind === 'meal').map(i => i.kind === 'meal'
       ? { kind: 'meal', meal: i.meal, time: i.time, text: `${mealName(i.meal)} (${i.time})`, kcal: p.meals.find(m => m.id === i.meal)?.total.kcal ?? null }
       : { kind: 'task', text: i.text, decision: i.decision });
-    const out = { id: s.id, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items,
+    const out = { id: s.id, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items, shop: !!s.shop,
       doses: doses.filter(d => d.time >= s.from && (s.to < s.from || d.time < s.to)) };
     if (s.role === 'cfa') {
       const letter = isMock && SRC.week.mock.replace[s.key] ? SRC.week.mock.replace[s.key] : s.key;
       const bl = blocks.filter(b => b.blok === letter);
-      const pb = !inCfa && mpwP.find(b => b.godz.startsWith(s.from));
-      if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G
+      const pb = !inCfa && (s.mpwSlot ? mpwAll : mpwP).find(b => b.godz.startsWith(s.from));
+      if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G; D-097: czwartek
+      else if (s.mpwSlot) Object.assign(out, { title: 'Wolne', desc: 'Brak bloku MPW', cfa: [] });
       else if (!inCfa && wb && (wb.kind === 'wolne' || s.to <= BLOCKS_END)) Object.assign(out, { title: wb.title, desc: wb.desc, cfa: [], block: wb.kind });
       else if (!inCfa) Object.assign(out, { title: 'Brak bloku CFA', desc: 'Poza okresem planu nauki', cfa: [] });
       else if (!bl.length) Object.assign(out, { title: 'Wolne', desc: isMock ? 'Dzień mocka — brak bloku w planie (D-036)' : 'Brak bloku w planie CFA tego dnia', cfa: [] });
@@ -113,7 +121,7 @@ export function resolveDay(date) {
       const m = p.meals.find(x => x.id === s.key);
       Object.assign(out, { meal: s.key, kcal: m ? m.total.kcal : null, mealName: mealName(s.key) });
     } else if (s.role === 'activity') {
-      out.title = SRC.week.activity[w.dayType][s.key];
+      out.title = SRC.week.activity[w.dayType]?.[s.key] ?? 'Wolne';   // Dzień zero (D-097) — bez zajęć
       if (s.key === 'main' && w.session && SRC.training.days[w.session] && w.dayType.startsWith('strength')) out.title = `Trening siłowy: ${w.sessionName}`;
       if (s.key === 'main' && w.note) out.desc = w.note;   // wyjątek dnia (D-087), np. trening kalibracyjny
     } else if (free && s.domain === 'train') {
@@ -127,7 +135,7 @@ export function resolveDay(date) {
   });
 
   return {
-    date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
+    date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, zero: !!w.zero, after: !!w.after, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
     note: w.note || null, exception: w.decision || null,
     sauna: w.sauna, dietVariant: w.diet, kcal: p.total.kcal, meals: mealsFor(w.diet, effPhase),
     doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall },

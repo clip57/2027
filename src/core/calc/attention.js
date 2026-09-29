@@ -16,7 +16,7 @@ export function attention(state, { today, hour = 12, custom = [] } = {}) {
   if (!state) return out;
 
   // Zapasy: pozycje, których zabraknie przed najbliższymi zakupami (suplementy bez nazw — nazwy dawek tylko w planie dnia, D-041)
-  const shop = nextShopping(today, hour, state.settings?.shopWeekday ?? 6);
+  const shop = nextShopping(today, hour);
   const short = [], supp = [];
   for (const it of [...allItems(), ...custom]) {
     if (it.tracked === false) continue;

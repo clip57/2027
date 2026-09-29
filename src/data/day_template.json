@@ -691,42 +691,6 @@
   }
  ],
  "variants": {
-  "zakupy": {
-   "decision": "D-087",
-   "replaces": [
-    "slot.1213",
-    "slot.1220"
-   ],
-   "slots": [
-    {
-     "id": "slot.1213z",
-     "from": "12:13",
-     "to": "13:13",
-     "domain": "prep",
-     "title_src": "Zakupy",
-     "badges_src": [
-      "Zakupy"
-     ],
-     "desc_src": "",
-     "role": "static",
-     "key": null,
-     "items": [
-      {
-       "kind": "task",
-       "src": "Zakupy według listy „Do kupienia” w module Zapasy",
-       "text": "Zakupy według listy „Do kupienia” w module Zapasy",
-       "decision": "D-087"
-      },
-      {
-       "kind": "task",
-       "src": "Druga Kawa (12:20)",
-       "text": "Druga kawa (12:20)"
-      }
-     ],
-     "decision": "D-087"
-    }
-   ]
-  },
   "basen": {
    "decision": "D-094",
    "replaces": [
@@ -813,6 +777,252 @@
       "Higiena"
      ],
      "role": "static"
+    }
+   ]
+  },
+  "czwartek": {
+   "decision": "D-097",
+   "replaces": [
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015"
+   ],
+   "slots": [
+    {
+     "id": "slot.1745c",
+     "from": "17:45",
+     "to": "17:55",
+     "domain": "train",
+     "title_src": "Transport na siłownię",
+     "badges_src": [
+      "Dojazd"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1755c",
+     "from": "17:55",
+     "to": "19:05",
+     "domain": "train",
+     "title_src": "Sauna",
+     "badges_src": [
+      "SAUNA"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "main",
+     "items": [
+      {
+       "kind": "task",
+       "src": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "text": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1905c",
+     "from": "19:05",
+     "to": "20:35",
+     "domain": "prep",
+     "title_src": "Zakupy",
+     "badges_src": [
+      "Zakupy"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "text": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "decision": "D-097"
+      },
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:15",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097",
+     "shop": true
+    }
+   ]
+  },
+  "czwartek_st": {
+   "decision": "D-097",
+   "replaces": [
+    "slot.1530",
+    "slot.1623",
+    "slot.1640",
+    "slot.1733",
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005"
+   ],
+   "slots": [
+    {
+     "id": "slot.1530j",
+     "from": "15:30",
+     "to": "16:00",
+     "domain": "prep",
+     "title_src": "Zakupy",
+     "badges_src": [
+      "Zakupy"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "text": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097",
+     "shop": true
+    },
+    {
+     "id": "slot.1600j",
+     "from": "16:00",
+     "to": "16:53",
+     "domain": "cfa",
+     "title_src": "Blok MPW A",
+     "badges_src": [
+      "MPW"
+     ],
+     "desc_src": "",
+     "role": "cfa",
+     "key": "A",
+     "items": [],
+     "decision": "D-097",
+     "mpwSlot": true
+    },
+    {
+     "id": "slot.1653j",
+     "from": "16:53",
+     "to": "17:00",
+     "domain": "diet",
+     "title_src": "Przerwa obiadowa",
+     "badges_src": [
+      "563 kcal"
+     ],
+     "desc_src": "",
+     "role": "meal",
+     "key": "dinner",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Obiad (16:53)",
+       "text": "Obiad (16:53)",
+       "meal": "dinner",
+       "time": "16:53",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1700j",
+     "from": "17:00",
+     "to": "17:53",
+     "domain": "cfa",
+     "title_src": "Blok MPW B",
+     "badges_src": [
+      "MPW"
+     ],
+     "desc_src": "",
+     "role": "cfa",
+     "key": "B",
+     "items": [],
+     "decision": "D-097",
+     "mpwSlot": true
+    },
+    {
+     "id": "slot.1753j",
+     "from": "17:53",
+     "to": "18:00",
+     "domain": "regen",
+     "title_src": "Przerwa kognitywna",
+     "badges_src": [
+      "Przerwa"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1800j",
+     "from": "18:00",
+     "to": "18:53",
+     "domain": "cfa",
+     "title_src": "Blok MPW C",
+     "badges_src": [
+      "MPW"
+     ],
+     "desc_src": "",
+     "role": "cfa",
+     "key": "C",
+     "items": [],
+     "decision": "D-097",
+     "mpwSlot": true
+    },
+    {
+     "id": "slot.1853j",
+     "from": "18:53",
+     "to": "19:05",
+     "domain": "train",
+     "title_src": "Transport na siłownię",
+     "badges_src": [
+      "Dojazd"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1905j",
+     "from": "19:05",
+     "to": "20:15",
+     "domain": "train",
+     "title_src": "Sauna",
+     "badges_src": [
+      "SAUNA"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "main",
+     "items": [
+      {
+       "kind": "task",
+       "src": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "text": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097"
     }
    ]
   }

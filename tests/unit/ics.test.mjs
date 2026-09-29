@@ -23,22 +23,25 @@ test('struktura: VCALENDAR, VTIMEZONE Europe/Warsaw z regułami DST, CRLF, linie
   assert.equal(new Set(u.match(/^UID:.*$/gm)).size, count, 'UID unikalne');
 });
 
-test('treść: dawki, 9 bloków CFA, recall, trening, zakupy w sobotę; godziny lokalne także po zmianie czasu 25.10.2026', () => {
+test('treść: dawki, 9 bloków CFA, recall, trening, zakupy w czwartek (D-097); godziny lokalne także po zmianie czasu 25.10.2026', () => {
   const mon = unfold(planEvents('2026-10-05', ALL, NOW).join('\r\n'));   // 28.09–04.10 z wyjątkami (D-096)
   assert.equal((mon.match(/SUMMARY:CFA blok/g) || []).length, 9);
   assert.match(mon, /SUMMARY:CFA Active Recall/);
   assert.match(mon, /SUMMARY:Trening siłowy: UPPER 1/);
   assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-10-05').length);
-  const sat = unfold(planEvents('2026-10-03', ['shop'], NOW).join('\r\n'));
-  assert.match(sat, /DTSTART;TZID=Europe\/Warsaw:20261003T121300/);
+  const thu = unfold(planEvents('2026-10-08', ['shop'], NOW).join('\r\n'));
+  assert.match(thu, /DTSTART;TZID=Europe\/Warsaw:20261008T190500/);
+  assert.match(unfold(planEvents('2027-01-07', ['shop'], NOW).join('\r\n')), /DTSTART;TZID=Europe\/Warsaw:20270107T153000/, 'od 07.01 — 15:30');
+  assert.deepEqual(planEvents('2026-10-10', ['shop'], NOW), [], 'sobota — bez zakupów (plan CFA v12)');
+  assert.deepEqual(planEvents('2026-10-01', ['shop'], NOW), [], 'tydzień 28.09–04.10 — bez zakupów');
   for (const d of ['2026-10-24', '2026-10-26']) {
     const e = unfold(planEvents(d, ['supp'], NOW).join('\r\n'));
     assert.match(e, new RegExp(`DTSTART;TZID=Europe/Warsaw:${d.replace(/-/g, '')}T070000`), `${d}: 07:00 czasu lokalnego`);
   }
   assert.deepEqual(planEvents('2026-09-24', ALL, NOW), [], 'poza planem (D-088) — brak wydarzeń');
   assert.equal(planEvents('2026-10-05', ['train'], NOW).join('\n'), planEvents('2026-10-05', ['train'], NOW).join('\n'), 'stały wynik (UID)');
-  // D-096: 28.09 bez treningu, UPPER 1 w środę 30.09
-  assert.equal(planEvents('2026-09-28', ['train'], NOW).length, 0);
+  // D-096: UPPER 1 w środę 30.09; D-097: Dzień zero 29.09 — bez wydarzeń
+  assert.deepEqual(planEvents('2026-09-29', ALL, NOW), []);
   assert.match(unfold(planEvents('2026-09-30', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 1/);
 });
 
