@@ -52,3 +52,11 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 - Szybki zestaw po zmianie: `npm run build && npm test && npm run a11y`; pełny: + `npm run e2e` (+ `e2e:sync`, `e2e:cloud` przy zmianach `app.js`, `core/`, `build.mjs`).
 - Zmiana planu dnia/dat = nowa funkcja decyzji w `tools/extract/day_plan_d0xx.py` stosowana do JSON i wpięta w skrypt ekstrakcji (źródeł nie ma w repozytorium).
 - Testy ogólnej logiki: tygodnie od 05.10.2026 (bez wyjątków); czwartki od 07.01.2027 mają inny układ (`czwartek_st`).
+
+## 6. Środowisko (nowa sesja / nowe konto)
+- Node 22, `npm ci` (esbuild, axe-core, lucide-static); `dist/` jest w `.gitignore` — przed E2E/a11y zawsze `npm run build`.
+- Testy przeglądarkowe (`e2e`, `e2e:sync`, `e2e:cloud`, `a11y`) wymagają Pythona 3 z pakietem **`playwright`** (sprawdzone na 1.56) i Chromium:
+  `pip install playwright` (+ `python3 -m playwright install chromium`, jeśli środowisko nie ma przeglądarki; w chmurze Claude Code Chromium jest w `/opt/pw-browsers`).
+- Bez `SOURCES_DIR` / `PRIVATE_PACK` testy używają danych syntetycznych (`tests/e2e/fixtures.py`); `npm run verify` wymaga plików użytkownika.
+- Nowe konto GitHub/Claude: potrzebny dostęp z prawem zapisu do `clip57/2027` (push na `redesign-faza4` i `main`).
+- Jeśli sesja wyznacza inną gałąź roboczą niż `redesign-faza4` — zapytaj użytkownika przed publikacją; publikuje wyłącznie push na `main`.

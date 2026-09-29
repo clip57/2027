@@ -5,7 +5,7 @@ meal prep, trening, nauka CFA, bezpieczeństwo żywności, plan rekompozycji. Je
 iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych), przeglądarka na komputerze.
 Język interfejsu i dokumentacji: **polski**.
 
-**Bieżące zadanie: redesign UI/UX — Faza 5 zakończona; następnie Faza 6–7** (urządzenia, regresja końcowa).
+**Bieżące zadanie (29.09.2026): dokończenie D-097 — aktualizacja E2E, `verify_all.py`, `UPGRADE` pakietu prywatnego i pełna regresja (`docs/PRZEKAZANIE.md` §4); potem kolejne polecenia użytkownika.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
 Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
 24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
 następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
