@@ -5,17 +5,17 @@ import fixtures
 from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 AXE = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
-ROUTES = ['#/dzis', '#/dzis?d=2026-10-30', '#/dzis?d=2026-10-03', '#/dzis?d=2026-09-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-10-05', '#/trening?v=stat',
+ROUTES = ['#/dzis', '#/kalendarz', '#/kalendarz?m=2027-01', '#/dzis?d=2026-09-29', '#/dzis?d=2026-10-08', '#/dzis?d=2027-01-07', '#/dzis?d=2026-10-30', '#/dzis?d=2026-10-03', '#/dzis?d=2026-09-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-10-05', '#/trening?v=stat',
   '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/bezpieczenstwo',
   '#/bezpieczenstwo?m=tabela', '#/bezpieczenstwo?m=poradnik', '#/rekompozycja?s=s6', '#/dane', '#/wiecej',
-  '#/dzis?v=tydzien', '#/dzis?v=tydzien&d=2026-09-25', '#/mealprep?d=2026-10-11', '#/cfa?v=dzien&d=2026-09-28',   # Etapy 1–3 audytu
+  '#/dzis?v=tydzien', '#/dzis?v=tydzien&d=2026-09-25', '#/mealprep?d=2026-10-11', '#/cfa?v=dzien&d=2026-09-30',   # Etapy 1–3 audytu
   '#/pielegnacja', '#/pielegnacja?v=tydzien', '#/pielegnacja?v=produkty', '#/pielegnacja?v=plan', '#/dzis?d=2026-10-11',   # Pielęgnacja (D-094)
   '#/mpw', '#/mpw?v=harmonogram', '#/mpw?v=kalendarz', '#/mpw?v=log', '#/mpw?v=plan', '#/dzis?d=2026-11-17', '#/dzis?d=2027-03-06',   # MPW (D-095, v8 — D-096)
   '#/dzis?d=2026-11-14', '#/dzis?d=2026-12-26', '#/dzis?v=tydzien&d=2026-11-14']   # weekendy (D-096)
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.
 OPEN_ALL = "document.querySelectorAll('details').forEach(d => d.open = true)"
 STATES = [('#/trening?d=2026-10-05', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),
-  ('#/cfa?v=dzien&d=2026-09-28', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
+  ('#/cfa?v=dzien&d=2026-09-30', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
   ('#/mealprep', "document.querySelector('.prep-list input[type=checkbox]').click()", 'odhaczony krok'),
   ('#/bezpieczenstwo?m=poradnik', OPEN_ALL, 'rozwinięte sekcje'), ('#/rekompozycja', OPEN_ALL, 'rozwinięte sekcje'),
   ('#/dieta', OPEN_ALL, 'rozwinięte posiłki'), ('#/trening?d=2026-10-05', "document.querySelector('.ex-tech').click()", 'okno techniki'),
@@ -28,7 +28,7 @@ STATES = [('#/trening?d=2026-10-05', "document.querySelector('.set:not(.set-h) .
   ('#/dzis', "document.querySelector('.dz-past > summary')?.click()", 'minione punkty'),
   ('#/cfa?v=harmonogram', "document.querySelector('.cf-past > summary')?.click()", 'minione dni'),
   ('#/zapasy', "document.querySelector('.zp-pack').click()", 'komunikat po akcji'), ('#/zapasy?s=shop', None, 'filtr „Do zakupów”'),
-  ('#/cfa?v=dzien&d=2026-09-28', "document.querySelector('.cf-recall .set-toggle').click()", 'odhaczony recall'),
+  ('#/cfa?v=dzien&d=2026-09-30', "document.querySelector('.cf-recall .set-toggle').click()", 'odhaczony recall'),
   ('#/dzis', "document.querySelector('.side-search, .gs-open')?.click() || document.dispatchEvent(new KeyboardEvent('keydown', { key: '/' })); setTimeout(() => { const i = document.querySelector('.gs-input'); i.value = 'kefir'; i.dispatchEvent(new Event('input')); }, 50)", 'wyszukiwanie'),
   ('#/zapasy', "document.querySelector('dialog')?.remove(); document.querySelectorAll('.zp-act')[2].click(); const t = document.querySelector('dialog textarea'); t.value = 'banan 1,2 kg\\nczekolada 1'; [...document.querySelectorAll('dialog button')].find(b => b.textContent.includes('Sprawdź')).click()", 'podgląd paragonu'),
   ('#/zapasy', "document.querySelector('dialog')?.remove(); document.querySelectorAll('.zp-act')[1].click(); document.querySelector('dialog .sheet-body > button.primary').click()", 'błąd w oknie „Dodaj”'),
