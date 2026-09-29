@@ -1,5 +1,8 @@
 # REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0, Fazie 5 (wszystkie moduły) i Etapach 0–3 audytu — 25.09.2026
 
+> **Stan bieżący (29.09.2026):** `main` = `redesign-faza4` = `b3b4edc` (D-097). Aktualny stan, zasady i niedokończone zadania: `docs/PRZEKAZANIE.md`.
+> Poniższe zapisy o commitach (`69d5d94`, `b65b9fa`, `4e68589`) są historyczne.
+
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).
 **Stan repozytorium i wdrożenia (sprawdzone 24.09.2026):** `origin/main` = `69d5d94` (Etap 6) i to ten commit jest ostatnią publikacją
 na GitHub Pages (workflow „Publikacja 2027”, przebieg 3). **Na `main` nie ma naprawy synchronizacji** (D-056–D-058) — naprawa i Fazy 3–4

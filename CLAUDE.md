@@ -12,7 +12,7 @@ następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `
 Faza 5, moduły 3–4 (Dieta, Zapasy jako jeden system; kierunek „premium personal OS” — D-071…D-073) — zakończone,
 raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja,
 Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona.** Następne: Faza 6
-(urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = commit `4e68589` (Faza 5 kompletna).
+(urządzenia, 7 szerokości) i Faza 7 (regresja końcowa). `main`/Pages = `redesign-faza4` = commit `b3b4edc` (D-097).
 **Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
 **Synchronizacja przez chmurę (Supabase, D-078…D-085)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
 `cloud.js`, `tools/supabase/schema.sql`), Etap 2 (interfejs: sekcja „Synchronizacja w chmurze” w Dane —
@@ -22,6 +22,7 @@ pobieranie zmian — lekkie sprawdzanie) wykonane. Adres
 projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta`); synchronizacja automatyczna (przełącznik
 per urządzenie) + „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
 plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu projektu, kluczy, haseł ani `service_role`.
+**Przekazanie projektu (stan, zasady współpracy, niedokończone zadania, pliki spoza repozytorium): `docs/PRZEKAZANIE.md` — czytaj najpierw.**
 Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
 **Plan od 25.09.2026 (D-086, D-087):** plan CFA „MASTER SCHEDULE FINAL” v5 — 421 bloków po 53 min (25.09–11.11: 41 dni × 9,
 6 sobót × 8, 25.09 × 4), źródło `PLAN_NAUKI_CFA_LEVEL_I.html` (+ kontrola `MASTER_SCHEDULE_CFA.csv`); plan dnia: 12:13–12:20 przerwa
@@ -62,7 +63,7 @@ soboty bez zakupów), rozmowa kwalifikacyjna, praca magisterska, święta 26–2
 (`PLAN_END`, `inPlan` sprawdza też koniec); plan CFA **v12** (387 bloków, 30.09–11.11, soboty 9 bloków); **zakupy w czwartki** (warianty `czwartek` do 06.01
 i `czwartek_st` od 07.01 w `day_template.json`, `day_plan_d097.py`; od 07.01 bloki MPW w czwartki +30 min — `week.mpwShift`, `mpwBloki` w `data.js`, pole `godz_src`);
 najbliższe zakupy zawsze z planu dnia: `nextShopping(data, godz, min)` (slot `shop`), nie „sobota”; preparaty czasowe 30.09–28.03; reguła `cycle` w Pielęgnacji;
-moduł **Kalendarz** (`kalendarz.js`, 13 modułów). Testy E2E mogą jeszcze zawierać oczekiwania sprzed D-097 (zakupy w sobotę, 12 modułów) — do aktualizacji.
+moduł **Kalendarz** (`kalendarz.js`, 13 modułów). Raport: `docs/RAPORT_D097.md`. **Niedokończone:** E2E, `verify_all.py` i `UPGRADE` pakietu prywatnego mają stan sprzed D-097 — lista w `docs/PRZEKAZANIE.md` §4.
 Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-097).
 
 ---
