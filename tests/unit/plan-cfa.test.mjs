@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
-import { SRC } from '../../src/core/data.js';
+import { SRC, mpwByDay } from '../../src/core/data.js';
 import { weekday, dayName, range } from '../../src/core/dates.js';
 import { CFA_BLOCKS } from '../../src/core/storage/validate.js';
 import { cfaProgressEvents } from '../../src/core/migrate/cfa.js';
@@ -228,6 +228,9 @@ test('Soboty (D-087): 12:13–13:13 „Zakupy” zamiast przerwy i bloku E; lunc
     const t = templateFor(d), mock = D.mockCFA.includes(d);
     t.forEach((s, i) => assert.equal(s.to, t[(i + 1) % t.length].from, `${d} ${s.id}`));
     if (mock) { assert.equal(t, SRC.dayTemplate.slots, `${d}: dzień mocka — układ zwykły`); continue; }
+    // D-096: bez zakupów w soboty zjazdów studiów, w dni z blokami P1–P7 planu MPW i w święta (26.12, 27.03)
+    const busy = SRC.week.blocks[d]?.kind === 'studia' || (mpwByDay[d] || []).some(b => b.blok.startsWith('P')) || SRC.week.exceptions[d]?.variant === null;
+    if (busy) { assert.equal(t, SRC.dayTemplate.slots, `${d}: sobota bez zakupów (D-096)`); continue; }
     assert.equal(t.length, 33, d);
     const z = t.find(s => s.from === '12:13');
     assert.deepEqual([z.title_src, z.to, z.domain], ['Zakupy', '13:13', 'prep'], d);
@@ -252,9 +255,10 @@ test('Wyjątki dat (D-087, D-090, D-093): 25.09 i 26.09 poza planem, 27.09 — p
   assert.equal(c.slots.find(s => s.id === 'slot.2015').mealName, 'Posiłek po saunie');
   assert.equal(consumptionForDay(START).banan, undefined, 'dieta NT: bez banana');
   assert.ok(c.doses.some(d => d.supp === 'cynk'), 'cynk w niedzielę bez zmian');
-  // Kolejne tygodnie bez wyjątków
-  assert.deepEqual([resolveDay('2026-10-02').dayType, resolveDay('2026-10-04').dayType, resolveDay('2026-10-04').dietVariant], ['strength', 'swim', 'T']);
-  assert.deepEqual(Object.keys(SRC.week.exceptions), [START]);
+  // Kolejne tygodnie: wyjątki tylko 28.09–03.10 (D-096) i święta (D-096); od 05.10 plan tygodnia
+  assert.deepEqual([resolveDay('2026-10-09').dayType, resolveDay('2026-10-04').dayType, resolveDay('2026-10-04').dietVariant], ['strength', 'swim', 'T']);
+  assert.deepEqual(Object.keys(SRC.week.exceptions), [START, '2026-09-28', '2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02', '2026-10-03',
+    '2026-12-26', '2026-12-27', '2027-03-27', '2027-03-28']);
 });
 
 test('Niedziela z basenem (D-094): basen 18:15–19:30, posiłek 19:30, relaks, prysznic całego ciała 20:15–20:45; 27.09 bez wariantu', () => {
@@ -263,6 +267,7 @@ test('Niedziela z basenem (D-094): basen 18:15–19:30, posiłek 19:30, relaks, 
   assert.equal(SRC.week.days['7'].variant, 'basen');
   for (const d of range('2026-10-04', '2027-03-28')) {
     if (weekday(d) !== 7) continue;
+    if (SRC.week.exceptions[d]) { assert.equal(templateFor(d), SRC.dayTemplate.slots, `${d}: święta bez basenu (D-096)`); continue; }
     const t = templateFor(d);
     t.forEach((s, i) => assert.equal(s.to, t[(i + 1) % t.length].from, `${d} ${s.id}`));
     assert.equal(t.length, 32, d);

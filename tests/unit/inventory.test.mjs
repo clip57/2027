@@ -57,15 +57,16 @@ test('prognoza uwzględnia czwartki i fazy', async () => {
   assert.equal(oats.lastCovered, '2026-10-11');
 });
 
-test('start planu 27.09.2026 (D-088, D-090): brak zużycia przed startem; 27.09 (dieta NT) bez banana', async () => {
+test('start planu 27.09.2026 (D-088, D-090): brak zużycia przed startem; 27.09 (dieta NT) bez banana; 28–29.09 NT (D-096)', async () => {
   const fc = forecast('banan', 240, '2026-09-22');
-  assert.equal(fc.lastCovered, '2026-09-29', '23–26.09 poza planem, 27.09 NT, 28.09 i 29.09 po 120 g');
-  assert.equal(fc.runOut, '2026-09-30');
+  assert.equal(fc.lastCovered, '2026-10-01', '23–26.09 poza planem, 27–29.09 NT (D-087, D-096), 30.09 i 01.10 po 120 g');
+  assert.equal(fc.runOut, '2026-10-02');
   const s = await new Store(new MemoryAdapter()).open();
   await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-09-22' });
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-26'), 1000, 'inwentaryzacja z 22.09 bez odliczeń do 26.09');
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-27'), 1000, '27.09 — dieta NT bez kefiru');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-28'), 800);
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-29'), 1000, '28–29.09 — dieta NT (D-096)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-30'), 800);
 });
 
 test('statusy — klasyfikacja wg terminu przydatności (v31)', () => {

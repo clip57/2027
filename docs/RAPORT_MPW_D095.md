@@ -1,5 +1,7 @@
 # Plan nauki MPW (D-095) — raport (29.09.2026)
 
+> Aktualizacja 29.09.2026 (D-096): plan MPW v8 — 392 bloki od 16.11.2026, bloki P1–P7 w wybrane weekendy; zob. `docs/RAPORT_D096.md`.
+
 Zakres wg polecenia i decyzji użytkownika (29.09.2026): plan nauki do egzaminu na Maklera Papierów Wartościowych „w takiej samej formie jak CFA”,
 obowiązujący od 17.11.2026 do 21.03.2027; do końca planu CFA moduł „na bocznym torze”, potem zajmuje miejsce CFA na liście.
 

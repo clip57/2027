@@ -17,19 +17,26 @@ import { buildIndex, search } from '../../src/core/search.js';
 import { exportBundle, preview, apply } from '../../src/core/sync/bundle.js';
 
 const D = SRC.mpw.D, B = D.bloki;
-const START = '2026-11-17', END = '2027-03-20', FREE = ['2026-12-24', '2026-12-25', '2026-12-26', '2026-12-27', '2027-02-19', '2027-02-20'];
+// Plan v8 (D-096): 392 bloki, 119 dni — 114 × 3 (A–C 15:30–18:23) + 5 × 10 (P1–P7 8:00–15:23 + A–C) w 6–7.03, 13–14.03, 20.03
+const START = '2026-11-16', END = '2027-03-20', FREE = ['2026-12-24', '2026-12-25', '2026-12-26', '2026-12-27', '2027-02-19', '2027-02-20'];
+const LONG = ['2027-03-06', '2027-03-07', '2027-03-13', '2027-03-14', '2027-03-20'];
+const SLOTS_AG = ['08:00–08:53', '09:10–10:03', '10:10–11:03', '11:20–12:13', '12:20–13:13', '13:30–14:23', '14:30–15:23'];
 
-test('MPW: 354 bloki 1–354, 118 dni × 3 (A 15:30, B 16:30, C 17:30), dni wolne 24–27.12 i 19–20.02, egzamin 21.03.2027 11:00', () => {
-  assert.equal(B.length, 354);
-  assert.deepEqual(B.map(b => b.nr), [...Array(354)].map((_, i) => i + 1));
+test('MPW v8: 392 bloki 1–392, 119 dni (114 × 3 + 5 × 10: P1–P7 w godzinach slotów A–G), dni wolne 24–27.12 i 19–20.02, egzamin 21.03.2027 11:00', () => {
+  assert.equal(B.length, 392);
+  assert.deepEqual(B.map(b => b.nr), [...Array(392)].map((_, i) => i + 1));
   assert.deepEqual([D.stat.start, D.stat.end, SRC.mpw.exam, SRC.mpw.examTime], [START, END, '2027-03-21', '11:00']);
   assert.deepEqual(Object.keys(mpwByDay), [...range(START, END)].filter(d => !FREE.includes(d)));
   assert.deepEqual(mpwFreeDays(), [['2026-12-24', '2026-12-27'], ['2027-02-19', '2027-02-20']]);
   for (const b of B) assert.equal(b.dzien, dayName(b.data), `nr ${b.nr}`);
+  const tmpl = SRC.dayTemplate.slots.filter(s => s.role === 'cfa').slice(0, 7).map(s => `${s.from}–${s.to}`);
+  assert.deepEqual(tmpl, SLOTS_AG, 'P1–P7 = godziny slotów CFA A–G');
   for (const [d, list] of Object.entries(mpwByDay)) {
-    assert.equal(list.map(b => b.blok).join(''), 'ABC', d);
+    const long = LONG.includes(d), abc = list.filter(b => !b.blok.startsWith('P'));
+    assert.equal(list.map(b => b.blok).join(''), long ? 'P1P2P3P4P5P6P7ABC' : 'ABC', d);
+    if (long) assert.deepEqual(list.slice(0, 7).map(b => b.godz), SLOTS_AG, d);
     const sim = D.mockCFA.includes(d);
-    assert.deepEqual(list.map(b => b.godz), sim ? ['15:30–16:30', '16:30–17:30', '17:30–18:30'] : ['15:30–16:23', '16:30–17:23', '17:30–18:23'], d);
+    assert.deepEqual(abc.map(b => b.godz), sim ? ['15:30–16:30', '16:30–17:30', '17:30–18:30'] : ['15:30–16:23', '16:30–17:23', '17:30–18:23'], d);
   }
   assert.ok(B.every(b => b.egzamin === 'MPW'));
   assert.ok(MPW_BLOCKS >= B.length, 'plan mieści się w limicie walidacji');
@@ -41,18 +48,20 @@ test('MPW: statystyki, fazy i symulacje zgodne z blokami', () => {
   assert.deepEqual(count('tryb'), D.stat.tryb);
   assert.equal(D.stat.dni, Object.keys(mpwByDay).length);
   for (const f of Object.values(D.faza)) assert.equal(B.filter(b => b.data >= f.od && b.data <= f.do).length, f.bl);
-  assert.equal(D.mockCFA.length, 6);
-  for (const d of D.mockCFA) { assert.ok(mpwByDay[d].every(b => b.tryb === 'SYMULACJA'), d); assert.match(D.simTest[d], /^\d\d\.\d\d\.\d{4}$/); }
-  assert.equal(B.filter(b => b.tryb === 'SYMULACJA').length, 18);
+  assert.equal(D.mockCFA.length, 5);
+  for (const d of D.mockCFA) { assert.ok(mpwByDay[d].filter(b => !b.blok.startsWith('P')).every(b => b.tryb === 'SYMULACJA'), d); assert.match(D.simTest[d], /^\d\d\.\d\d\.\d{4}$/); }
+  assert.equal(B.filter(b => b.tryb === 'SYMULACJA').length, 15);
+  assert.ok(B.filter(b => b.blok.startsWith('P')).every(b => b.tryb === 'POWTÓRKA CAŁOŚCI'), 'P1–P7 — powtórka całości');
   // Źródła pierwszego przejścia: każdy blok FP dokładnie w jednym źródle
   const src = mpwSources();
   assert.equal(src.reduce((n, s) => n + s.nrs.length, 0), D.stat.kat['Prawo MPW'] + D.stat.kat['Literatura MPW']);
-  assert.ok(B.filter(b => b.data > D.fpEnd).every(b => !b.tryb.endsWith('FIRST PASS')), 'pierwsze przejście do fpEnd');
+  // v8: literatura w pierwszym przejściu do fpEnd; prawo (265 bloków) także w fazie 2 — do 20.03
+  assert.ok(B.filter(b => b.data > D.fpEnd).every(b => b.tryb !== 'LITERATURA – FIRST PASS'), 'literatura do fpEnd');
 });
 
 test('mpw.done i mpw.err.*: walidacja, stan niezależny od CFA (ten sam numer bloku), LWW, usunięcie wpisu', async () => {
   const ev = (t, d) => ({ id: `${t}:x`, hlc: '1790000000000:0000:dtest', dev: 'dtest', t, d, v: 1 });
-  assert.equal(validateEvent(ev('mpw.done', { block: 354, done: true })), null);
+  assert.equal(validateEvent(ev('mpw.done', { block: 392, done: true })), null);
   assert.ok(validateEvent(ev('mpw.done', { block: MPW_BLOCKS + 1, done: true })));
   assert.ok(validateEvent(ev('mpw.done', { block: 0, done: true })));
   assert.equal(validateEvent(ev('mpw.err.put', { id: 'e_1', data: { egz: 'MPW', temat: 'x' } })), null);
@@ -88,12 +97,16 @@ test('Zakładka: CFA do 11.11.2026, od 12.11.2026 MPW (koniec planu CFA); w grup
 
 test('Dzień z MPW: bloki w resolverze, szablon godzin bez zmian (decyzja 29.09.2026), symulacja', () => {
   const r = resolveDay('2026-11-17'), ref = resolveDay('2026-11-10');   // oba wtorki, 10.11 — jeszcze CFA
-  assert.deepEqual([r.mpw.inPlan, r.mpw.blocks.map(b => b.nr), r.mpw.isSim], [true, [1, 2, 3], false]);
+  assert.deepEqual([r.mpw.inPlan, r.mpw.blocks.map(b => b.nr), r.mpw.isSim], [true, [4, 5, 6], false]);
   assert.deepEqual(r.slots.map(s => `${s.id} ${s.from}–${s.to}`), ref.slots.map(s => `${s.id} ${s.from}–${s.to}`));
-  assert.ok(!JSON.stringify(r.slots).includes('MPW'), 'bloki MPW nie trafiają do slotów');
-  assert.equal(resolveDay('2027-01-23').mpw.isSim, true);
+  assert.ok(!JSON.stringify(r.slots).includes('MPW'), 'bloki MPW A–C nie trafiają do slotów');
+  assert.equal(resolveDay('2027-02-27').mpw.isSim, true);
   assert.deepEqual([resolveDay('2026-12-25').mpw.inPlan, resolveDay('2026-12-25').mpw.blocks.length], [true, 0]);
-  assert.deepEqual([resolveDay('2026-11-16').mpw.inPlan, resolveDay('2027-03-21').mpw.inPlan], [false, false]);
+  assert.deepEqual([resolveDay('2026-11-15').mpw.inPlan, resolveDay('2026-11-16').mpw.inPlan, resolveDay('2027-03-21').mpw.inPlan], [false, true, false]);
+  // D-096: P1–P7 w slotach A–G, A–C w karcie
+  const p = resolveDay('2027-03-06');
+  assert.deepEqual(p.slots.filter(s => s.mpw).map(s => `${s.from} ${s.mpw.blok}`), ['08:00 P1', '09:10 P2', '10:10 P3', '11:20 P4', '12:20 P5', '13:30 P6', '14:30 P7']);
+  assert.equal(p.mpw.blocks.length, 10);
 });
 
 test('Wymaga uwagi: CFA do egzaminu CFA (12.11), potem zaległe bloki MPW', async () => {
@@ -115,16 +128,18 @@ test('.ics: bloki MPW w godzinach planu MPW; symulacja jako jedno wydarzenie 15:
   assert.match(day, /DTSTART;TZID=Europe\/Warsaw:20261117T153000/);
   assert.match(day, /DTEND;TZID=Europe\/Warsaw:20261117T182300/);
   assert.match(day, /UID:2026-11-17-mpw-A@p2027/);
-  const sim = planEvents('2027-01-23', ['mpw'], NOW).join('\n');
+  const sim = planEvents('2027-02-27', ['mpw'], NOW).join('\n');
   assert.equal((sim.match(/BEGIN:VEVENT/g) || []).length, 1);
   assert.match(sim, /SUMMARY:Symulacja egzaminu MPW/);
-  assert.match(sim, /DTEND;TZID=Europe\/Warsaw:20270123T183000/);
+  assert.match(sim, /DTEND;TZID=Europe\/Warsaw:20270227T183000/);
+  assert.equal((planEvents('2027-03-07', ['mpw'], NOW).join('\n').match(/BEGIN:VEVENT/g) || []).length, 10, 'P1–P7 i A–C');
   assert.equal(planEvents('2026-11-17', ['cfa'], NOW).length, 0, 'bez bloków CFA po 11.11');
 });
 
 test('⌘K: bloki MPW i error log MPW', () => {
   const idx = buildIndex({ mpwErrors: [{ id: 'e1', temat: '[TEST] próg wezwania', rodzaj: 'pośpiech' }] }, '2026-11-17');
-  assert.ok(search(idx, 'kodeks cywilny zdolnosc prawna').some(x => x.kind === 'mpw' && x.href === '#/mpw?v=dzien&d=2026-11-17'));
+  assert.ok(search(idx, 'kodeks cywilny zdolnosc prawna').some(x => x.kind === 'mpw' && x.href === '#/mpw?v=dzien&d=2026-11-16'));
+  assert.ok(search(idx, 'powtorka calego materialu').some(x => x.kind === 'mpw' && x.href === '#/mpw?v=dzien&d=2027-03-06'));
   assert.ok(search(idx, 'prog wezwania').some(x => x.kind === 'mpwerr' && x.href === '#/mpw?v=log'));
   assert.ok(search(idx, 'mpw').some(x => x.kind === 'mod'));
 });

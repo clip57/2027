@@ -15,6 +15,7 @@ export function weekSummary(date) {
       diet: r.dietVariant, kcal: r.kcal,
       cfa: r.cfa.blocks.length, mock: r.cfa.isMock, recall: r.cfa.recall,
       mpw: r.mpw.blocks.length, mpwSim: r.mpw.isSim,   // plan MPW (D-095)
+      blocks: r.blocks?.short || null,                  // weekendy 8:00–15:23 (D-096)
       shopping: r.slots.some(s => s.id === 'slot.1213z'),
       note: r.note, exception: r.exception && r.exception !== 'D-088' ? r.exception : null,
     };

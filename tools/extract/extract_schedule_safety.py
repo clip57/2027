@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from day_plan_d086 import apply_d086
 from day_plan_d087 import saturday_variant, apply_week_d087
 from day_plan_d094 import sunday_variant, apply_week_d094
+from day_plan_d096 import apply_week_d096
 
 SRC = os.environ.get("SOURCES_DIR") or sys.exit("Ustaw SOURCES_DIR")
 DATA = os.path.join(os.path.dirname(__file__), "..", "..", "src", "data")
@@ -140,7 +141,7 @@ week = {"schema": 1, "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING)", "days": 
     "swim": {"warmup": "Basen (przygotowanie)", "main": "Basen 55 min", "sauna": "Wolne"},
 }, "mock": {"decision": "D-019", "replace": {"A": "S1", "B": "S1", "C": "S2", "D": "S2", "E": "S2"},
             "free_when_no_block": "D-036", "replace_decision": "D-019, D-086 (E: kontynuacja sesji 2 do 13:00)"}}
-w("week.json", apply_week_d094(apply_week_d087(week)))  # soboty: zakupy; wyjątek 27.09.2026 (D-087; 25–26.09 usunięte — D-090)
+w("week.json", apply_week_d096(apply_week_d094(apply_week_d087(week))))  # soboty: zakupy; wyjątek 27.09.2026 (D-087; 25–26.09 usunięte — D-090); weekendy, święta, tydzień 28.09 (D-096)
 w("phases.json", {"schema": 1, "decision": "D-017, D-087, D-090 (start planu i Faza 0 od 27.09.2026 — dni wcześniejsze poza planem, D-088)", "start": "2026-09-27",
                   "phases": [{"phase": 0, "from": "2026-09-27"}, {"phase": 1, "from": "2026-10-12"}, {"phase": 2, "from": "2026-11-16"}]})
 w("seeds.json", {"schema": 1, "note": "Stany z decyzji użytkownika (nie z pliku kopii)", "counts": [

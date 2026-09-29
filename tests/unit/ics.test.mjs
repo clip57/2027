@@ -24,11 +24,11 @@ test('struktura: VCALENDAR, VTIMEZONE Europe/Warsaw z regułami DST, CRLF, linie
 });
 
 test('treść: dawki, 9 bloków CFA, recall, trening, zakupy w sobotę; godziny lokalne także po zmianie czasu 25.10.2026', () => {
-  const mon = unfold(planEvents('2026-09-28', ALL, NOW).join('\r\n'));
+  const mon = unfold(planEvents('2026-10-05', ALL, NOW).join('\r\n'));   // 28.09–04.10 z wyjątkami (D-096)
   assert.equal((mon.match(/SUMMARY:CFA blok/g) || []).length, 9);
   assert.match(mon, /SUMMARY:CFA Active Recall/);
   assert.match(mon, /SUMMARY:Trening siłowy: UPPER 1/);
-  assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-09-28').length);
+  assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-10-05').length);
   const sat = unfold(planEvents('2026-10-03', ['shop'], NOW).join('\r\n'));
   assert.match(sat, /DTSTART;TZID=Europe\/Warsaw:20261003T121300/);
   for (const d of ['2026-10-24', '2026-10-26']) {
@@ -36,7 +36,10 @@ test('treść: dawki, 9 bloków CFA, recall, trening, zakupy w sobotę; godziny 
     assert.match(e, new RegExp(`DTSTART;TZID=Europe/Warsaw:${d.replace(/-/g, '')}T070000`), `${d}: 07:00 czasu lokalnego`);
   }
   assert.deepEqual(planEvents('2026-09-24', ALL, NOW), [], 'poza planem (D-088) — brak wydarzeń');
-  assert.equal(planEvents('2026-09-28', ['train'], NOW).join('\n'), planEvents('2026-09-28', ['train'], NOW).join('\n'), 'stały wynik (UID)');
+  assert.equal(planEvents('2026-10-05', ['train'], NOW).join('\n'), planEvents('2026-10-05', ['train'], NOW).join('\n'), 'stały wynik (UID)');
+  // D-096: 28.09 bez treningu, UPPER 1 w środę 30.09
+  assert.equal(planEvents('2026-09-28', ['train'], NOW).length, 0);
+  assert.match(unfold(planEvents('2026-09-30', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 1/);
 });
 
 test('kodowanie tekstu i zawijanie wielobajtowych znaków', () => {

@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { consumptionForDay } from '../../src/core/calc/consumption.js';
 import { catalogById } from '../../src/core/data.js';
 
+// Tydzień 28.09–04.10.2026 ma wyjątki treningu i diety (D-096) — ogólna logika na tygodniu bez wyjątków (05.10, Faza 0)
 test('poniedziałek F0 (T) = porcje ZAPASY v31 poza decyzjami D-021 i nowymi suplementami', () => {
-  const u = consumptionForDay('2026-09-28');
+  const u = consumptionForDay('2026-10-05');
   for (const [id, it] of Object.entries(catalogById)) {
     if (it.daily_v31 == null) continue;
     const exp = { szczypiorek: 5, melisa: 2 }[id] ?? it.daily_v31;
@@ -15,7 +16,7 @@ test('poniedziałek F0 (T) = porcje ZAPASY v31 poza decyzjami D-021 i nowymi sup
 });
 
 test('czwartek (NT): bez kefiru, siemienia, ostropestu, kakao, wanilii, banana i 2 g cynamonu; tauryna zostaje', () => {
-  const t = consumptionForDay('2026-09-28'), n = consumptionForDay('2026-10-01');
+  const t = consumptionForDay('2026-10-05'), n = consumptionForDay('2026-10-08');
   for (const id of ['kefir', 'siemie_lniane', 'ostropest', 'kakao', 'wanilia', 'banan']) assert.equal(n[id], undefined, id);
   assert.equal(n.cynamon, 3); assert.equal(t.cynamon, 5);
   assert.equal(n.tauryna, 2); assert.equal(n.bialko_kfd, 30); assert.equal(n.orzech_brazylijski, 4);
@@ -33,4 +34,12 @@ test('suplementy czasowe 27.09.2026–21.03.2027 (D-087, D-090)', () => {
   assert.equal(consumptionForDay('2026-09-27').glukozamina, 1);
   assert.equal(consumptionForDay('2027-03-21').glukozamina, 1);
   assert.equal(consumptionForDay('2027-03-22').glukozamina, undefined);
+});
+
+test('D-096: tydzień 28.09–04.10 — zużycie wg diety dnia (28–29.09 i 03.10 NT, 30.09–02.10 T); od 05.10 jak w planie tygodnia', () => {
+  const nt = consumptionForDay('2026-10-08'), t = consumptionForDay('2026-10-05');
+  for (const d of ['2026-09-28', '2026-09-29', '2026-10-03']) assert.equal(consumptionForDay(d).banan, nt.banan, d);
+  for (const d of ['2026-09-30', '2026-10-01', '2026-10-02']) assert.equal(consumptionForDay(d).banan, t.banan, d);
+  assert.equal(consumptionForDay('2026-10-01').cynamon, 5, 'czwartek 01.10 — dzień T (LOWER 1)');
+  assert.equal(consumptionForDay('2026-12-26').banan, undefined, 'święta — dieta NT');
 });

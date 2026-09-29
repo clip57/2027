@@ -17,6 +17,6 @@ test('coverage: brak, gdy stan na koniec dziś < zużycie jutra', () => {
 });
 
 test('coverage: stan nieznany bez oceny; pozycje niezużywane jutro pominięte; bez duplikatów', () => {
-  const r = coverage(inv({}), ['kurczak', 'kurczak', 'banan'], '2026-09-30', '2026-10-01');   // czwartek: bez banana (NT)
+  const r = coverage(inv({}), ['kurczak', 'kurczak', 'banan'], '2026-10-07', '2026-10-08');   // czwartek: bez banana (NT); 01.10 — dzień T (D-096)
   assert.deepEqual(r.map(x => [x.prod, x.stock, x.short]), [['kurczak', null, null]]);
 });

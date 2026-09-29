@@ -79,16 +79,16 @@ if (want('cfa')) {
   console.log('cfa.json:', D.bloki.length, 'bloków');
 }
 
-// ---------- MPW (D-095: plan nauki do egzaminu na Maklera Papierów Wartościowych, 17.11.2026–20.03.2027, egzamin 21.03.2027) ----------
+// ---------- MPW (D-095, D-096: plan nauki do egzaminu na Maklera Papierów Wartościowych, v8: 16.11.2026–20.03.2027, egzamin 21.03.2027) ----------
 if (want('mpw')) {
   const file = process.env.MPW_PLAN || 'PLAN_NAUKI_MPW.html';
   const js = scripts(read(file))[0].trim();
   const D = JSON.parse(js.replace(/^const D\s*=\s*/, '').replace(/;\s*$/, ''));
-  // Plik z innym planem nie może po cichu nadpisać planu D-095
-  if (D.bloki.length !== 354 || D.stat.start !== '2026-11-17' || D.stat.end !== '2027-03-20')
-    throw new Error(`${file}: oczekiwano planu D-095 (354 bloki, 17.11.2026–20.03.2027), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
+  // Plik z innym planem nie może po cichu nadpisać planu D-096 (v3 z D-095: 354 bloki od 17.11)
+  if (D.bloki.length !== 392 || D.stat.start !== '2026-11-16' || D.stat.end !== '2027-03-20')
+    throw new Error(`${file}: oczekiwano planu D-096 (392 bloki, 16.11.2026–20.03.2027), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
   crossCheck(process.env.MPW_CSV || 'MASTER_SCHEDULE_MPW.csv', file, D, 'mpw');
-  write('mpw.json', { schema: 1, generated_from: 'PLAN_NAUKI_MPW.html (plan MPW 2027, 354 bloki, 17.11.2026–20.03.2027) — obiekt D (D-095)',
+  write('mpw.json', { schema: 1, generated_from: 'PLAN_NAUKI_MPW.html (plan MPW 2027 v8, 392 bloki, 16.11.2026–20.03.2027) — obiekt D (D-095, D-096)',
     exam: '2027-03-21', examTime: '11:00', D });
   console.log('mpw.json:', D.bloki.length, 'bloków');
 }

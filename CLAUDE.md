@@ -49,12 +49,16 @@ typy `care.def`, `care.done`; logika `src/core/calc/care.js`) — **nigdy nie do
 testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. Niedziela z basenem: wariant planu dnia „basen” i kreatyna o 19:30 (`day_plan_d094.py`).
 Raport: `docs/RAPORT_PIELEGNACJA_D094.md`. Imię i nazwisko użytkownika nie mogą pojawić się nigdzie (także w plikach prywatnych).
 **Plan MPW (D-095):** moduł `mpw` — plan nauki do egzaminu na Maklera Papierów Wartościowych (`src/data/mpw.json` z `PLAN_NAUKI_MPW.html`
-+ kontrola `MASTER_SCHEDULE_MPW.csv`, `ONLY=mpw` w `extract_static.mjs`): 354 bloki, 118 dni × 3 (15:30, 16:30, 17:30), 17.11.2026–20.03.2027,
++ kontrola `MASTER_SCHEDULE_MPW.csv`, `ONLY=mpw` w `extract_static.mjs`): obecnie v8 (D-096) — 392 bloki, A–C 15:30, 16:30, 17:30 (+ P1–P7 w 5 weekendowych dniach), 16.11.2026–20.03.2027,
 egzamin 21.03.2027 11:00. Widok wspólny z CFA (`src/modules/study.js`; konfiguracje `CFA_PLAN` w `cfa.js`, `MPW_PLAN` w `mpw.js`) — zmiany widoku nauki
 wprowadzaj tam, dla obu planów. Typy `mpw.done`, `mpw.err.put`, `mpw.err.del` (limit bloków `MPW_BLOCKS`). Zakładka: CFA do 11.11, od 12.11 MPW
 (`tabUntil`/`tabFrom`, `modulesOn(today)` w `registry.js` — nawigacja zawsze przez `modulesOn`, nie `MODULES.filter(m => m.tab)`). Godziny planu dnia
 bez zmian — bloki MPW w karcie „Nauka MPW” w „Dziś” (`resolveDay().mpw`), nie w slotach. Raport: `docs/RAPORT_MPW_D095.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-095).
+**D-096 (29.09.2026):** plan MPW **v8** — 392 bloki, 16.11.2026–20.03.2027, w 6–7.03, 13–14.03 i 20.03 bloki P1–P7 8:00–15:23 w slotach A–G;
+**weekendowe bloki 8:00–15:23** w slotach A–G z `week.json` → `blocks` (`dayBlocks(date)` w `resolver.js`, `tools/extract/day_plan_d096.py`): studia (zjazdy,
+soboty bez zakupów), rozmowa kwalifikacyjna, praca magisterska, święta 26–27.12 i 27–28.03 (całkowicie wolne, bez treningu, NT), egzamin MPW 21.03;
+**wyjątki 28.09–03.10.2026** (przesunięte treningi) — testy ogólnej logiki na tygodniach od 05.10. Raport: `docs/RAPORT_D096.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-096).
 
 ---
 

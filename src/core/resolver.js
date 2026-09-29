@@ -5,8 +5,13 @@ import { weekday, dayName, isValidDay } from './dates.js';
 
 const CFA_FIRST = SRC.cfa.D.stat.start, CFA_LAST = SRC.cfa.D.stat.end;
 const MOCKS = new Set(SRC.cfa.D.mockCFA);
-// Plan MPW (D-095): 17.11.2026–20.03.2027 — bloki 15:30–18:23 nie zmieniają szablonu godzin (decyzja użytkownika: osobna karta w „Dziś”)
+// Plan MPW (D-095; v8 — D-096): 16.11.2026–20.03.2027 — bloki A–C 15:30–18:23 nie zmieniają szablonu godzin (osobna karta w „Dziś”);
+// bloki P1–P7 (powtórka całości, 8:00–15:23 w wybrane weekendy) zajmują sloty A–G o tych samych godzinach
 const MPW_FIRST = SRC.mpw.D.stat.start, MPW_LAST = SRC.mpw.D.stat.end, SIMS = new Set(SRC.mpw.D.mockCFA);
+const mpwSlotBlocks = date => (mpwByDay[date] || []).filter(b => b.blok.startsWith('P'));
+// Weekendowe bloki 8:00–15:23 (D-096): studia, rozmowa, praca magisterska, święta, egzamin MPW — sloty A–G
+export const dayBlocks = date => SRC.week.blocks?.[date] || null;
+const BLOCKS_END = '15:23';
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
@@ -42,8 +47,11 @@ export function dayPlan(date) {
 }
 
 // Szablon godzin dnia: w soboty (poza dniem mocka) wariant „zakupy” 12:13–13:13 zamiast przerwy i bloku E (D-087).
+// Bez zakupów także w soboty zjazdów studiów i w dni z blokami P1–P7 planu MPW (blok 12:20–13:13 zajęty — D-096).
 export function templateFor(date, isMock = MOCKS.has(date)) {
-  const v = !isMock && dayPlan(date).variant && SRC.dayTemplate.variants?.[dayPlan(date).variant];
+  const name = dayPlan(date).variant;
+  const busy = isMock || (name === 'zakupy' && (dayBlocks(date)?.kind === 'studia' || mpwSlotBlocks(date).length > 0));
+  const v = !busy && name && SRC.dayTemplate.variants?.[name];
   if (!v) return SRC.dayTemplate.slots;
   const out = [];
   for (const s of SRC.dayTemplate.slots) {
@@ -73,6 +81,7 @@ export function resolveDay(date) {
   const blocks = cfaByDay[date] || [];
   const isMock = MOCKS.has(date);
   const doses = dosesFor(date);
+  const wb = dayBlocks(date), mpwP = mpwSlotBlocks(date);
   const exercises = w.session && SRC.training.days[w.session]; // basen (nd) nie ma listy ćwiczeń w TRENING
   const session = exercises ? exercises.map(e => ({ ...e, seriesToday: e.series[String(effPhase)] })) : null;
 
@@ -89,7 +98,10 @@ export function resolveDay(date) {
     if (s.role === 'cfa') {
       const letter = isMock && SRC.week.mock.replace[s.key] ? SRC.week.mock.replace[s.key] : s.key;
       const bl = blocks.filter(b => b.blok === letter);
-      if (!inCfa) Object.assign(out, { title: 'Brak bloku CFA', desc: 'Poza okresem planu nauki', cfa: [] });
+      const pb = !inCfa && mpwP.find(b => b.godz.startsWith(s.from));
+      if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G
+      else if (!inCfa && wb && (wb.kind === 'wolne' || s.to <= BLOCKS_END)) Object.assign(out, { title: wb.title, desc: wb.desc, cfa: [], block: wb.kind });
+      else if (!inCfa) Object.assign(out, { title: 'Brak bloku CFA', desc: 'Poza okresem planu nauki', cfa: [] });
       else if (!bl.length) Object.assign(out, { title: 'Wolne', desc: isMock ? 'Dzień mocka — brak bloku w planie (D-036)' : 'Brak bloku w planie CFA tego dnia', cfa: [] });
       else if (isMock && letter.startsWith('S')) {
         // Bloki sesji przypisane tylko do pierwszego slotu sesji (A lub C); drugi slot = kontynuacja.
@@ -119,7 +131,7 @@ export function resolveDay(date) {
     note: w.note || null, exception: w.decision || null,
     sauna: w.sauna, dietVariant: w.diet, kcal: p.total.kcal, meals: mealsFor(w.diet, effPhase),
     doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall },
-    mpw: { inPlan: date >= MPW_FIRST && date <= MPW_LAST, blocks: mpwByDay[date] || [], isSim: SIMS.has(date) }, slots,
+    mpw: { inPlan: date >= MPW_FIRST && date <= MPW_LAST, blocks: mpwByDay[date] || [], isSim: SIMS.has(date) }, blocks: wb, slots,
   };
 }
 

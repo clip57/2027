@@ -25,6 +25,15 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 | `npm run e2e:cloud` | 100/100 |
 | `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
 
+### MPW v8, weekendy, tydzień 28.09 (D-096; 29.09.2026)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 206 testów: 205 zaliczonych, 1 pominięty |
+| `npm run e2e` | 1382/1382 (zegar `run_features` i a11y: 05.10.2026 10:00 — tydzień 28.09 ma wyjątki) |
+| `npm run e2e:sync` | 23/23 |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń (także weekendy D-096) |
+
 ### Plan MPW (D-095; 29.09.2026)
 | Zestaw | Wynik |
 |---|---|
@@ -196,7 +205,7 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .mp-eve .mp-daynav .sheet-msg .toast #toast .skip-link .zp-empty .zp-hint #zp-q #zp-stan-hint .c-shop .inv-low .dn-diag .dn-diag-list
 .dn-plain .dn-evict .dn-ics .gs-dialog .gs-input .gs-list .gs-hit .gs-t .gs-help .more-search .side-search .rc-preview
 .pg-empty .pg-hero .pg-pora .pg-count .pg-check .pg-step .is-done .is-opt .pg-wait .pg-timer .pg-timer-t .pg-wday .pg-prod-card .pg-plan-i .pg-edit .slot-care
-.hero-mpw .dz-mpw .cf-task .topic .tech-list .cal-d .c-mock .c-exam .log-item`
+.hero-mpw .dz-mpw .cf-task .topic .tech-list .cal-d .c-mock .c-exam .log-item .wk-blocks`
 (MPW, D-095: `aria-label` „Blok MPW N do wykonania” (Dziś) i „Blok N do wykonania” (moduł), placeholder „np. KSH…”, przycisk „Eksport CSV”
 (plik `error-log-mpw.csv`), teksty „Start planu: …”, „Nauka MPW”, „Symulacja egzaminu MPW”, „Zaległe bloki MPW”, „MPW: N bloki”, „Bloki MPW”, „Plan MPW”)
 (Pielęgnacja, D-094: identyfikatory `pg-rano`, `pg-p-<id>`, slot `slot.2015n` (niedziela), przyciski „Zamknij licznik”, „Dodaj krok”, „Usuń krok”,

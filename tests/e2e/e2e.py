@@ -103,7 +103,7 @@ async def run_variant(pw, name, url, mobile):
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
     ok(len(slots) == 33 and '12:13 Zakupy' in slots and '13:13 Przerwa na lunch' in slots and not any(s.startswith('12:20') for s in slots)
        and 'Druga kawa (12:20)' in await pg.inner_text('#slot\\.1213z'), f'{tag} sobota: zakupy 12:13–13:13 z drugą kawą, bez bloku E, lunch bez zmian (D-087)')
-    await pg.goto(url + '#/dzis?d=2026-09-28'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    await pg.goto(url + '#/dzis?d=2026-10-05'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")   # 28.09–04.10 — wyjątki D-096
     main = await pg.inner_text('main')
     chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
     ok('UPPER 1 + sauna' in chips and 'Faza 0' in chips, f'{tag} nazwa treningu w nagłówku (D-040), Faza 0: {chips}')
@@ -151,7 +151,7 @@ async def run_variant(pw, name, url, mobile):
         await pg.reload(); await pg.wait_for_selector('.side')
         ok(await pg.locator('.side.is-min').count() == 1, f'{tag} Panel: zwinięcie zapamiętane')
         await pg.get_by_role('button', name='Rozwiń panel').click(); await pg.wait_for_timeout(200)
-    await pg.goto(url + '#/dzis?d=2026-09-28'); await pg.wait_for_selector('.dz-kpis')
+    await pg.goto(url + '#/dzis?d=2026-10-05'); await pg.wait_for_selector('.dz-kpis')
     kp = await pg.inner_text('.dz-kpis')
     ok('2629 kcal' in kp and '/ 10' in kp and '/ 9 bloków' in kp and '477 min + 53 min recall' in kp, f'{tag} Dziś: kafle z danych (kcal, serie, bloki CFA)')
     ok(await pg.locator('.dz-aside .dz-card').count() >= 4 and 'Plan dnia' in await pg.inner_text('main'), f'{tag} Dziś: karty podsumowań i plan dnia')
@@ -205,7 +205,7 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/suplementy?d=2026-09-24'); await pg.wait_for_selector('.sp-outside')
     ok(await pg.locator('.dose-list').count() == 0 and '0 dawek' in await pg.inner_text('.topline'), f'{tag} Suplementacja: 24.09 poza planem — bez dawek (D-088)')
     # --- Etap 5: Trening
-    await pg.goto(url + '#/trening?d=2026-09-28'); await pg.wait_for_selector('.ex')
+    await pg.goto(url + '#/trening?d=2026-09-30'); await pg.wait_for_selector('.ex')   # UPPER 1 przesunięty na 30.09 (D-096)
     SETS = '.set:not(.set-h)'
     ok(await pg.locator('.ex').count() == 9 and await pg.locator(SETS).count() == 10, f'{tag} Trening: UPPER 1 w Fazie 0 — 9 ćwiczeń, 10 serii')
     ok(await pg.locator('.hero-tr .bodymap').count() == 1 and await pg.locator('.ex-map .bodymap').count() == 9, f'{tag} Trening: mapa mięśni sesji i każdego ćwiczenia')
@@ -226,7 +226,7 @@ async def run_variant(pw, name, url, mobile):
     ok('Główne: Klatka piersiowa' in dtxt and 'free-exercise-db' in dtxt and await pg.locator('dialog .bm-p').count() > 0, f'{tag} Trening: mapa mięśni z podanym źródłem')
     await pg.locator('dialog .sheet-head button').click()
     # schemat ruchu (interaktywny)
-    await pg.goto(url + '#/trening?d=2026-09-28'); await pg.wait_for_selector('.ex')
+    await pg.goto(url + '#/trening?d=2026-09-30'); await pg.wait_for_selector('.ex')   # UPPER 1 przesunięty na 30.09 (D-096)
     await pg.locator('.ex-tech').first.click(); await pg.wait_for_selector('dialog .fig-svg')
     ok(await pg.locator('dialog .fig-svg .fg-head').count() == 1, f'{tag} Trening: animowana postać w oknie techniki')
     arm0 = await pg.locator('dialog .fig-svg polyline').last.get_attribute('points')
@@ -258,8 +258,10 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/trening?v=historia'); await pg.wait_for_selector('.hist-item')
     hs = await pg.inner_text('.hist-list')
     ok('72 min' in hs and '1 opcjonalna' in hs, f'{tag} Historia: sesja z czasem i oznaczeniem serii opcjonalnej')
-    await pg.goto(url + '#/trening?d=2026-10-01'); await pg.wait_for_selector('h1')
+    await pg.goto(url + '#/trening?d=2026-10-08'); await pg.wait_for_selector('h1')
     ok('Dzień bez treningu' in await pg.inner_text('main'), f'{tag} Trening: czwartek bez ćwiczeń')
+    await pg.goto(url + '#/trening?d=2026-09-28'); await pg.wait_for_selector('h1')
+    ok('Dzień bez treningu' in await pg.inner_text('main') and await pg.locator('.ex').count() == 0, f'{tag} Trening: 28.09 bez treningu (D-096)')
     await pg.goto(url + '#/trening?d=2026-09-21'); await pg.wait_for_selector('h1')
     tm = await pg.inner_text('main')
     ok('Poza planem — plan i treningi zaczynają się 27 września 2026' in tm and await pg.locator('.ex').count() == 0 and await pg.locator('.tm').count() == 0,
@@ -532,14 +534,14 @@ async def run_variant(pw, name, url, mobile):
 # --- Faza 5 (Trening, CFA): funkcje zależne od bieżącej godziny — zegar przeglądarki ustawiony na poniedziałek
 # 28.09.2026 10:00 (UPPER 1, Faza 0); część CFA — 29.09 10:00 (1 dzień planu CFA przed „dziś” — start CFA 28.09, D-093).
 # Oczekiwania liczone z danych, nie z kodu aplikacji.
-CLOCK = _dt.datetime(2026, 9, 28, 10, 0, tzinfo=_dt.timezone(_dt.timedelta(hours=2)))
+CLOCK = _dt.datetime(2026, 10, 5, 10, 0, tzinfo=_dt.timezone(_dt.timedelta(hours=2)))   # poniedziałek 05.10 (UPPER 1; 28.09–04.10 — wyjątki D-096)
 CFA_D = json.loads((ROOT / 'src/data/cfa.json').read_text(encoding='utf8'))['D']
 def rest_left(t):  # '1:58' / '+0:13' -> sekundy do końca przerwy (ujemne po czasie)
     m, s_ = t.lstrip('+').split(':'); v = int(m) * 60 + int(s_); return -v if t.startswith('+') else v
 
 async def run_features(pw, name, url, mobile):
     vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
-    tag = f'{name} {vp["width"]}px [zegar 28.09 10:00]'
+    tag = f'{name} {vp["width"]}px [zegar 05.10 10:00]'
     b = await pw.chromium.launch()
     ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
     pg = await ctx.new_page(); errs = []
@@ -570,12 +572,12 @@ async def run_features(pw, name, url, mobile):
         await pg.locator('.set:not(.set-h) .set-toggle[aria-pressed=false]').first.click(); await pg.wait_for_timeout(350)
     done_txt = await pg.inner_text('.tr-next')
     ok('Sesja ukończona' in done_txt and '10 serii' in done_txt and await pg.locator('.tr-rest').count() == 0, f'{tag} Trening: podsumowanie ukończonej sesji, bez przerwy po ostatniej serii')
-    await pg.goto(url + '#/trening?d=2026-09-29'); await pg.wait_for_selector('.ex')
+    await pg.goto(url + '#/trening?d=2026-10-06'); await pg.wait_for_selector('.ex')
     await pg.locator('.set:not(.set-h) .set-toggle').first.click(); await pg.wait_for_timeout(500)
     ok(await pg.locator('.tr-rest').count() == 0, f'{tag} Trening: brak licznika przerwy dla innego dnia niż dziś')
     # CFA: tempo względem planu, zaległe bloki, następny blok, nawigacja dni, filtr error logu
     await pg.clock.set_system_time(CLOCK + _dt.timedelta(days=1))
-    due = [b for b in CFA_D['bloki'] if b['data'] < '2026-09-29']
+    due = [b for b in CFA_D['bloki'] if b['data'] < '2026-10-06']
     await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.cfa-row')
     hero = await pg.inner_text('.hero-cfa')
     ok(f'Zaległe: {len(due)} bloków' in hero and f'Plan do wczoraj: 0 / {len(due)}' in hero, f'{tag} CFA: tempo i zaległe z planu ({len(due)})')
@@ -584,10 +586,10 @@ async def run_features(pw, name, url, mobile):
     ok(f'Zaległe: {len(due) - 1} bloków' in await pg.inner_text('.hero-cfa') and f'Plan do wczoraj: 1 / {len(due)}' in await pg.inner_text('.hero-cfa'),
        f'{tag} CFA: odhaczenie zaległego bloku zmniejsza zaległości')
     await pg.get_by_role('link', name='Następny dzień').click(); await pg.wait_for_timeout(400)
-    ok('d=2026-09-30' in await pg.evaluate('location.hash') and await pg.locator('.cf-backlog').count() == 0, f'{tag} CFA: nawigacja dni (panel zaległych tylko dla dnia bieżącego)')
+    ok('d=2026-10-07' in await pg.evaluate('location.hash') and await pg.locator('.cf-backlog').count() == 0, f'{tag} CFA: nawigacja dni (panel zaległych tylko dla dnia bieżącego)')
     await pg.goto(url + '#/cfa?v=harmonogram&zal=1'); await pg.wait_for_selector('.filters')
     ok(f'{len(due) - 1} bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row').count() == len(due) - 1, f'{tag} CFA: filtr „tylko zaległe” w harmonogramie')
-    await pg.clock.set_system_time(CLOCK)   # dalsze kontrole — poniedziałek 28.09 10:00
+    await pg.clock.set_system_time(CLOCK)   # dalsze kontrole — poniedziałek 05.10 10:00
     await pg.goto(url + '#/cfa?v=log'); await pg.wait_for_selector('.form-grid')
     for temat, kind in (('[TEST] FI — duration', 'pośpiech'), ('[TEST] QM — hipotezy', 'brak wiedzy')):
         await pg.fill('.form-grid input:not([type=date])', temat); await pg.select_option('.form-grid select', kind)
@@ -1066,8 +1068,8 @@ async def run_mpw(pw, name, url, mobile):
         ok(nauka == ['CFA', 'MPW'], f'{tag} 05.10: panel „Nauka” — CFA, potem MPW ({nauka})')
     await pg.goto(url + '#/mpw'); await pg.wait_for_selector('.cfa-row')
     hero = await pg.text_content('.hero-mpw')
-    ok('Start planu: wt 17 listopada 2026 (za 43 dni)' in hero and '0 / 354 bloków' in hero and '21 marca 2027, 11:00' in hero, f'{tag} przed startem: odliczanie i podgląd ({hero[:60]!r})')
-    ok('wt 17 listopada 2026' in await pg.inner_text('.cfa-dayhead') and await pg.locator('.cfa-row').count() == 3, f'{tag} przed startem: podgląd pierwszego dnia (3 bloki)')
+    ok('Start planu: pn 16 listopada 2026 (za 42 dni)' in hero and '0 / 392 bloków' in hero and '21 marca 2027, 11:00' in hero, f'{tag} przed startem: odliczanie i podgląd ({hero[:60]!r})')
+    ok('pn 16 listopada 2026' in await pg.inner_text('.cfa-dayhead') and await pg.locator('.cfa-row').count() == 3, f'{tag} przed startem: podgląd pierwszego dnia (3 bloki)')
     # Zamiana od 12.11 (koniec planu CFA 11.11)
     await pg.clock.set_system_time(at(2026, 11, 12)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
     if mobile:
@@ -1085,27 +1087,27 @@ async def run_mpw(pw, name, url, mobile):
     ok('MPW' in await pg.inner_text('.dz-kpis') and '0 / 3 bloków' in await pg.inner_text('.dz-kpis') and 'Plan MPW' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: kafel MPW i karta „Plan MPW”')
     await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     ok(await pg.locator('.dz-plan .slot').count() == 34 and 'Brak bloku CFA' in await pg.inner_text('#slot\\.1530'), f'{tag} Dziś: szablon godzin bez zmian (34 punkty)')
-    await pg.get_by_role('button', name='Blok MPW 1 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.dz-mpw')?.innerText.includes('1 / 3 bloków')")
+    await pg.get_by_role('button', name='Blok MPW 4 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.dz-mpw')?.innerText.includes('1 / 3 bloków')")
     ok(await pg.locator('.dz-mpw .cfa-row.is-done').count() == 1, f'{tag} Dziś: odhaczenie bloku MPW')
     # Moduł: postęp niezależny od CFA, punktowe odświeżanie (P2), zadania bloku
     await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.hero-cfa')
     ok('0 / 400 bloków' in await pg.inner_text('.hero-cfa'), f'{tag} CFA: postęp CFA bez bloków MPW')
     await pg.goto(url + '#/mpw'); await pg.wait_for_selector('.cfa-row')
-    ok('1 / 354 bloków' in await pg.inner_text('.hero-mpw') and await pg.locator('.cfa-row.is-done').count() == 1, f'{tag} MPW: odhaczenie z „Dziś” widoczne w module')
+    ok('1 / 392 bloków' in await pg.inner_text('.hero-mpw') and await pg.locator('.cfa-row.is-done').count() == 1, f'{tag} MPW: odhaczenie z „Dziś” widoczne w module')
     await pg.evaluate("document.querySelector('main').dataset.p2 = '1'")
-    await pg.get_by_role('button', name='Blok 2 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.hero-mpw')?.innerText.includes('2 / 354')")
+    await pg.get_by_role('button', name='Blok 5 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.hero-mpw')?.innerText.includes('2 / 392')")
     ok(await pg.evaluate("!!document.querySelector('main[data-p2]')") and '2 / 3 bloków' in await pg.inner_text('.cfa-dayhead'), f'{tag} MPW: odhaczenie punktowe (P2)')
     await pg.locator('.cf-task summary').first.click()
     ok('Przeczytaj' in await pg.inner_text('.cf-task[open]') and 'KNF 1.1.1–1.1.13' in await pg.inner_text('.cfa-row >> nth=0'), f'{tag} MPW: zadania bloku i punkty KNF')
     # Harmonogram: filtr kategorii i wyszukiwanie po punkcie KNF
     await pg.goto(url + '#/mpw?v=harmonogram&kat=Literatura+MPW'); await pg.wait_for_selector('.filters')
-    ok('66 bloków' in await pg.inner_text('.filters'), f'{tag} Harmonogram: 66 bloków literatury')
+    ok('65 bloków' in await pg.inner_text('.filters'), f'{tag} Harmonogram: 65 bloków literatury')
     await pg.goto(url + '#/mpw?v=harmonogram&q=9.1.1'); await pg.wait_for_selector('.filters')
     ok(await pg.locator('.cfa-row').count() > 0 and 'Regulamin Giełdy' in await pg.inner_text('main'), f'{tag} Harmonogram: wyszukiwanie po punkcie KNF')
     # Kalendarz: 6 symulacji, egzamin 21.03, dni wolne bez odnośnika
     await pg.goto(url + '#/mpw?v=kalendarz'); await pg.wait_for_selector('.cal')
-    ok(await pg.locator('a.cal-d.c-mock').count() == 6 and await pg.locator('a.cal-d.c-exam').count() == 1 and await pg.locator('a.cal-d[href$="2026-12-25"]').count() == 0,
-       f'{tag} Kalendarz: 6 symulacji, egzamin, dni wolne')
+    ok(await pg.locator('a.cal-d.c-mock').count() == 5 and await pg.locator('a.cal-d.c-exam').count() == 1 and await pg.locator('a.cal-d[href$="2026-12-25"]').count() == 0,
+       f'{tag} Kalendarz: 5 symulacji, egzamin, dni wolne')
     # Error log MPW: osobny od CFA, eksport CSV, bez importu v3
     await pg.goto(url + '#/mpw?v=log'); await pg.wait_for_selector('text=Nowy wpis')
     ok(await pg.get_by_role('button', name='Import CSV (v3)').count() == 0, f'{tag} Error log MPW: bez importu v3 (tylko CFA)')
@@ -1119,13 +1121,25 @@ async def run_mpw(pw, name, url, mobile):
     # Plan: źródła, symulacje, fazy, dni wolne
     await pg.goto(url + '#/mpw?v=plan'); await pg.wait_for_selector('.topic')
     m = await pg.inner_text('main')
-    ok('Źródła — pierwsze przejście' in m and await pg.locator('main .tech-list a[href^="#/mpw?v=dzien"]').count() == 6 and '24.12–27.12, 19.02–20.02' in m and 'test KNF z 15.10.2023' in m,
-       f'{tag} Plan: źródła, 6 symulacji, dni wolne')
+    ok('Źródła — pierwsze przejście' in m and await pg.locator('main .tech-list a[href^="#/mpw?v=dzien"]').count() == 5 and '24.12–27.12, 19.02–20.02' in m and 'test KNF z 17.03.2024' in m,
+       f'{tag} Plan: źródła, 5 symulacji, dni wolne')
     # Symulacja w „Dziś”, tydzień, Wymaga uwagi
-    await pg.goto(url + '#/dzis?d=2027-01-23'); await pg.wait_for_selector('.dz-mpw')
+    await pg.goto(url + '#/dzis?d=2027-02-27'); await pg.wait_for_selector('.dz-mpw')
     ok('Symulacja egzaminu MPW' in await pg.inner_text('.dz-mpw') and '15:30–18:30' in await pg.inner_text('.dz-mpw'), f'{tag} Dziś: dzień symulacji')
     await pg.goto(url + '#/dzis?v=tydzien&d=2026-11-17'); await pg.wait_for_selector('.wk-grid')
     ok('MPW: 3 bloki' in await pg.inner_text('.wk-grid'), f'{tag} Tydzień: bloki MPW')
+    # D-096: weekendy 8:00–15:23 w slotach A–G (studia bez zakupów, praca magisterska z zakupami, święta, P1–P7 MPW)
+    await pg.goto(url + '#/dzis?v=tydzien&d=2026-11-14'); await pg.wait_for_selector('.wk-grid')
+    ok(await pg.locator('.wk-blocks').count() == 2 and 'Studia 8:00–15:23' in await pg.inner_text('.wk-grid'), f'{tag} Tydzień: weekend studiów (D-096)')
+    await pg.goto(url + '#/dzis?d=2026-11-14'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('Wycena przedsiębiorstwa i modelowanie finansowe - studia' in await pg.inner_text('#slot\\.1220') and await pg.locator('#slot\\.1213z').count() == 0
+       and 'Studia 8:00–15:23' in await pg.inner_text('.dz-head'), f'{tag} Dziś: sobota zjazdu — studia w slotach A–G, bez zakupów')
+    await pg.goto(url + '#/dzis?d=2026-12-12'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('Pisanie pracy magisterskiej' in await pg.inner_text('#slot\\.0800') and await pg.locator('#slot\\.1213z').count() == 1, f'{tag} Dziś: sobota z pracą magisterską i zakupami')
+    await pg.goto(url + '#/dzis?d=2026-12-26'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('Boże Narodzenie' in await pg.inner_text('#slot\\.0800') and 'Bez treningu' in await pg.inner_text('.dz-head') and 'NT' in await pg.inner_text('.dz-head'), f'{tag} Dziś: święta całkowicie wolne (D-096)')
+    await pg.goto(url + '#/dzis?d=2027-03-06'); await pg.wait_for_selector('.dz-mpw'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('MPW blok P1' in await pg.inner_text('#slot\\.0800') and await pg.locator('.dz-mpw .cfa-row').count() == 10, f'{tag} Dziś: P1–P7 MPW w slotach A–G, 10 bloków w karcie')
     await pg.clock.set_system_time(at(2026, 11, 20, 9)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-attn')
     at_ = await pg.inner_text('.dz-attn')
     ok('Zaległe bloki MPW' in at_ and 'Zaległe bloki CFA' not in at_, f'{tag} Wymaga uwagi: zaległe MPW, bez CFA po egzaminie CFA')

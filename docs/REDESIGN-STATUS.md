@@ -31,6 +31,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | Plan CFA D-093 (27.09.2026) | Plan CFA v9 (400 bloków, 45 dni 28.09–11.11, 3 mocki, mixed practice 26–27.10); start całego planu 27.09 bez zmian | `docs/RAPORT_PLAN_CFA_D093.md` |
 | Moduł Pielęgnacja D-094 (28.09.2026) | Nowy moduł (plan tylko w danych użytkownika, typy `care.def`/`care.done`), integracje, niedziela z basenem w planie dnia | `docs/RAPORT_PIELEGNACJA_D094.md` |
 | Plan MPW D-095 (29.09.2026) | Moduł MPW (wspólny kod z CFA), typy `mpw.done`/`mpw.err.*`, zakładka od 12.11, karta w „Dziś”, integracje | `docs/RAPORT_MPW_D095.md` |
+| MPW v8, weekendy, tydzień 28.09 — D-096 (29.09.2026) | Plan MPW v8, bloki weekendowe (studia, rozmowa, praca magisterska), święta, przesunięte treningi 28.09–04.10 | `docs/RAPORT_D096.md` |
 
 ## 2. Wykonane
 
