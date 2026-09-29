@@ -1,0 +1,285 @@
+// Wspólny widok planu nauki (CFA — Etap 5, D-086…D-093; MPW — D-095): harmonogram, trwały postęp i error log.
+// Jeden kod dla obu planów — różnice (dane, typy zdarzeń, recall, widok „Plan”) opisuje konfiguracja `P` w cfa.js / mpw.js.
+// Daty lokalne (naprawa błędu UTC z v1/v2).
+import { h, clear, fmt, plural, add } from '../ui/dom.js';
+import { segmented, progressRing, section } from '../ui/components.js';
+import { cfaSourceLine } from '../core/resolver.js';
+import { addDays, diffDays, longDate, shortDate, dayShort, weekday, parse } from '../core/dates.js';
+import { previewEvents, apply } from '../core/sync/bundle.js';
+import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
+import { sha256 } from '../core/hash.js';
+import { cfaPace } from '../core/calc/cfa.js';
+import { icon } from '../ui/icons.js';
+import { region, swap } from '../ui/patch.js';
+
+const KINDS = ['brak wiedzy', 'pomyłka rachunkowa', 'niezrozumienie pytania', 'błąd interpretacyjny', 'błąd pamięciowy', 'pośpiech', 'błędna strategia'];
+const VIEWS = [{ value: 'dzien', label: 'Dzień' }, { value: 'harmonogram', label: 'Harmonogram' }, { value: 'kalendarz', label: 'Kalendarz' },
+  { value: 'log', label: 'Error log' }, { value: 'plan', label: 'Plan' }];
+const harmoPast = {};   // U-b: rozwinięcie minionych dni harmonogramu (pamięć modułu, osobno dla każdego planu)
+
+/* P — konfiguracja planu:
+   id, name, D, byDay, exam, eyebrow, types { done, errPut, errDel }, fields { done, errors }, modeClass,
+   recall (CFA: { days, key, done, stats } | null), mock { word, day(date) }, meta(b), tasks, log { placeholder, csv, importV3 },
+   plan(root, s) — widok „Plan” (s: done, pace, late, rs, link). */
+export function renderStudy(root, ctx, P) {
+  const { store, today } = ctx;
+  const D = P.D, EXAM = P.exam, R = P.recall;
+  const view = ctx.params.get('v') || 'dzien';
+  const link = o => `#/${P.id}?${new URLSearchParams({ v: view, ...Object.fromEntries(ctx.params), ...o })}`;
+  // Ten sam adres nie wywołuje hashchange (np. drugi wpis error logu z rzędu) — wtedy przerysowanie wprost
+  const go = o => { const to = link(o); if (location.hash === to) ctx.rerender(); else location.hash = to; };
+  // Stan pochodny z dziennika — zmienne (nie stałe): po punktowym odświeżeniu (P2) obsługa kliknięć w niezmienionych
+  // fragmentach widoku czyta już bieżące wartości.
+  let done, pace, late, settings, rs;
+  const derive = () => {
+    done = store?.state?.[P.fields.done] || new Set();
+    // Tempo względem harmonogramu (D-070): wyłącznie daty bloków z planu i dziennik postępu
+    pace = cfaPace(D.bloki, done, today);
+    late = pace.overdue.length;
+    // Recall 22:00 (I11, tylko CFA): odhaczenie jako ustawienie `cfa.recall:<data>` (istniejący typ `setting`)
+    settings = store?.state?.settings || {};
+    rs = R ? R.stats(settings, today) : null;
+  };
+  derive();
+  // Po zapisie: widok dnia i harmonogramu odświeżają tylko zmienione fragmenty (P2); pozostałe widoki — pełne przerysowanie
+  let update = () => ctx.rerender();
+  const after = nrs => { derive(); update(nrs); };
+  const msg = h('div', { role: 'status', 'aria-live': 'polite' });
+  const err = e => clear(msg).append(h('div', { class: 'banner err' }, e.message || String(e)));
+  const toggle = async (nr, value) => {
+    if (!store) return err(new Error('Baza danych jest niedostępna.'));
+    try { await store.record(P.types.done, { block: nr, done: value }); after([nr]); } catch (e) { err(e); }
+  };
+  const toExam = diffDays(today, EXAM), toStart = diffDays(today, D.stat.start);
+  const toggleRecall = async (date, value) => {
+    if (!store) return err(new Error('Baza danych jest niedostępna.'));
+    try { await store.record('setting', { key: R.key(date), value }); after([]); } catch (e) { err(e); }
+  };
+
+  const hero = region(() => { const doneCount = done.size, hoursDone = Math.round(doneCount * 53 / 60 * 10) / 10;
+  return h('section', { class: `hero-tr hero-cfa hero-${P.id}` },
+    h('div', { class: 'hero-tr-main' },
+      h('p', { class: 'eyebrow' }, P.eyebrow),
+      h('h1', {}, toExam > 0 ? `${toExam} ${plural(toExam, 'dzień', 'dni', 'dni')} do egzaminu` : toExam === 0 ? 'Egzamin dziś' : 'Po egzaminie'),
+      h('p', { class: 'muted' }, `${doneCount} / ${D.bloki.length} bloków · ${fmt(hoursDone, 1)} / ${fmt(D.stat.godziny, 2)} h netto`),
+      // Plan jeszcze się nie zaczął (MPW przed 17.11): podgląd i odliczanie do startu
+      toStart > 0 && h('div', { class: 'cf-pace' }, h('span', { class: 'chip cf-start' }, icon('calendar-clock', { size: 16 }),
+        `Start planu: ${dayShort(D.stat.start)} ${longDate(D.stat.start)} (za ${toStart} ${plural(toStart, 'dzień', 'dni', 'dni')})`)),
+      pace.due > 0 && h('div', { class: 'cf-pace' },
+        late ? h('a', { class: 'chip cf-late', href: `#/${P.id}?v=harmonogram&zal=1` }, icon('calendar-clock', { size: 16 }), `Zaległe: ${late} ${plural(late, 'blok', 'bloki', 'bloków')}`)
+          : h('span', { class: 'chip cf-ok' }, icon('circle-check', { size: 16 }), 'Na bieżąco z planem'),
+        h('span', { class: 'chip' }, `Plan do wczoraj: ${pace.doneDue} / ${pace.due}`),
+        pace.ahead > 0 && h('span', { class: 'chip' }, `Z wyprzedzeniem: ${pace.ahead}`),
+        rs?.due > 0 && h('span', { class: 'chip cf-recall-chip' }, `Recall: ${rs.doneDue} / ${rs.due}`))),
+    h('div', { class: 'hero-tr-side' }, progressRing(doneCount, D.bloki.length, 'Wykonane bloki'))); });
+  add(root, hero.el,
+  msg,
+  h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))));
+
+  const blockRow = (b, next = false) => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}${next ? ' is-next' : ''}` },
+    h('button', { class: 'set-toggle', 'aria-pressed': String(done.has(b.nr)), 'aria-label': `Blok ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`,
+      onclick: () => toggle(b.nr, !done.has(b.nr)) }, done.has(b.nr) ? '✓' : b.blok),
+    h('div', { class: 'cfa-body' },
+      h('p', { class: 'cfa-src' }, cfaSourceLine(b)),
+      h('p', { class: 'cfa-topic' }, b.temat),
+      h('p', { class: 'cfa-meta' }, h('span', { class: `mode ${P.modeClass[b.tryb] || ''}` }, b.tryb), h('span', { class: 'muted' }, `${b.godz} · nr ${b.nr}`),
+        P.meta?.(b)),
+      // Zadania bloku (MPW: instrukcja wykonania z planu) — zwinięte, bez przerysowania przy odhaczaniu innych bloków
+      P.tasks && b.zadania && h('details', { class: 'cf-task' }, h('summary', {}, 'Zadania bloku'), h('p', {}, b.zadania))));
+
+  // ---------------- Dzień
+  if (view === 'dzien') {
+    const first = D.stat.start, last = D.stat.end;
+    let date = ctx.params.get('d') || (today < first ? first : today > last ? last : today);
+    const blocks = P.byDay[date] || [];
+    const isMock = D.mockCFA.includes(date);
+    const recall = !!R && R.days().includes(date);
+    const markAll = value => async () => {
+      try { await store.recordMany(blocks.filter(b => done.has(b.nr) !== value).map(b => [P.types.done, { block: b.nr, done: value }])); after(); } catch (e) { err(e); }
+    };
+    // Zaległe z poprzednich dni i panel dnia — odświeżane po odhaczeniu (P2)
+    const backlog = region(() => date === today && late > 0 && h('section', { class: 'panel cf-backlog', 'aria-labelledby': 'cf-bl-h' },
+        h('h2', { id: 'cf-bl-h' }, icon('calendar-clock', { size: 20 }), `Zaległe z poprzednich dni: ${late}`),
+        h('p', { class: 'muted' }, 'Bloki zaplanowane przed dzisiaj i jeszcze nieodhaczone. Pokazano najstarsze.'),
+        h('div', { class: 'cfa-list' }, pace.overdue.slice(0, 5).map(b => blockRow(b))),
+        late > 5 && h('a', { class: 'btn', href: `#/${P.id}?v=harmonogram&zal=1` }, `Wszystkie zaległe (${late})`)));
+    const panel = region(() => {
+      const dDone = blocks.filter(b => done.has(b.nr)).length;
+      const rDone = recall && R.done(settings, date);
+      const nextBlock = date === today ? blocks.find(b => !done.has(b.nr)) : null;
+      return h('div', { class: 'panel' },
+        h('div', { class: 'cfa-dayhead' },
+          h('div', {}, h('h2', {}, `${dayShort(date)} ${longDate(date)}`),
+            h('p', { class: 'muted' }, `${dDone} / ${blocks.length} bloków${isMock ? ` · ${P.mock.day(date)}` : ''}${R ? (recall ? ' · recall 22:00' : ' · bez recall') : ''}`),
+            nextBlock && h('p', { class: 'cf-next' }, `Następny: blok ${nextBlock.blok} · ${nextBlock.godz} · ${nextBlock.temat}`)),
+          progressRing(dDone, blocks.length || 1, 'Bloki dnia')),
+        blocks.length ? h('div', { class: 'cfa-list' }, blocks.map(b => blockRow(b, b === nextBlock)))
+          : h('p', {}, date > first && date < last ? 'Dzień wolny w planie — brak bloków.' : 'Brak bloków w tym dniu (poza planem).'),
+        recall && h('div', { class: `cfa-row cf-recall${rDone ? ' is-done' : ''}` },
+          h('button', { class: 'set-toggle', 'aria-pressed': String(rDone), 'aria-label': `Recall 22:00 ${rDone ? 'wykonany' : 'do wykonania'}`,
+            onclick: () => toggleRecall(date, !R.done(settings, date)) }, rDone ? '✓' : 'R'),
+          h('div', { class: 'cfa-body' }, h('p', { class: 'cfa-topic' }, 'CFA Active Recall — sesja 53 min'),
+            h('p', { class: 'cfa-meta' }, h('span', { class: 'mode m-ar' }, 'ACTIVE RECALL'), h('span', { class: 'muted' }, '22:00–22:53')))),
+        blocks.length > 0 && h('div', { class: 'row' },
+          // Wszystkie bloki dnia jednym zapisem (B8)
+          h('button', { onclick: markAll(true) }, 'Oznacz cały dzień'),
+          h('button', { onclick: markAll(false) }, 'Wyczyść dzień')));
+    });
+    update = () => { hero.refresh(); backlog.refresh(); panel.refresh(); };
+    add(root, h('div', { class: 'row daynav' },
+      date > first && h('a', { class: 'btn dz-nav', href: link({ d: addDays(date, -1) }) }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
+      date !== today && today >= first && today <= last && h('a', { class: 'btn dz-nav', href: link({ d: today }) }, 'Dziś'),
+      date < last && h('a', { class: 'btn dz-nav', href: link({ d: addDays(date, 1) }) }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 }))),
+      // Zaległe bloki z wcześniejszych dni (tylko w widoku dnia bieżącego): najstarsze najpierw, odhaczane jak w harmonogramie
+      backlog.el, panel.el);
+  }
+
+  // ---------------- Harmonogram z filtrami
+  if (view === 'harmonogram') {
+    const q = (ctx.params.get('q') || '').toLowerCase();
+    const kat = ctx.params.get('kat') || '', tryb = ctx.params.get('tryb') || '', todo = ctx.params.get('todo') === '1', zal = ctx.params.get('zal') === '1';
+    const sel = (name, label, opts, val) => h('label', { class: 'field' }, h('span', {}, label),
+      h('select', { onchange: e => go({ [name]: e.target.value }) }, h('option', { value: '' }, 'wszystkie'), opts.map(o => h('option', { value: o, selected: o === val }, o))));
+    const list = D.bloki.filter(b => (!kat || b.kategoria === kat) && (!tryb || b.tryb === tryb) && (!todo || !done.has(b.nr)) && (!zal || (b.data < today && !done.has(b.nr)))
+      && (!q || `${b.temat} ${b.zrodlo} ${b.zakres} ${b.data} ${b.knf || ''}`.toLowerCase().includes(q)));
+    const byDay = list.reduce((m, b) => ((m[b.data] ||= []).push(b), m), {});
+    const lateLabel = region(() => h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: zal, onchange: e => go({ zal: e.target.checked ? '1' : '' }) }), ` tylko zaległe (przed dziś: ${late})`));
+    add(root, h('div', { class: 'panel filters' },
+      h('label', { class: 'field' }, h('span', {}, 'Szukaj'), h('input', { type: 'search', value: ctx.params.get('q') || '', placeholder: P.searchHint || 'temat, źródło, strony, data',
+        onchange: e => go({ q: e.target.value }) })),
+      sel('kat', 'Kategoria', Object.keys(D.stat.kat), kat),
+      sel('tryb', 'Tryb', Object.keys(D.stat.tryb), tryb),
+      h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: todo, onchange: e => go({ todo: e.target.checked ? '1' : '' }) }), ' tylko niewykonane'),
+      lateLabel.el,
+      h('p', { class: 'muted' }, `${list.length} ${plural(list.length, 'blok', 'bloki', 'bloków')} w ${Object.keys(byDay).length} ${plural(Object.keys(byDay).length, 'dniu', 'dniach', 'dniach')}`)),
+    null);
+    // P2: wiersze i nagłówki dni zapamiętane — po odhaczeniu zamieniany jest tylko wiersz bloku i licznik jego dnia
+    const rowOf = new Map(), headOf = new Map();
+    const dayPanel = ([d, bl]) => {
+      const head = region(() => h('h2', { class: 'cfa-dh' }, h('a', { href: `#/${P.id}?v=dzien&d=${d}` }, `${dayShort(d)} ${shortDate(d)}`),
+        h('span', { class: 'muted' }, ` · ${bl.filter(b => done.has(b.nr)).length}/${bl.length}`)));
+      headOf.set(d, head);
+      return h('section', { class: 'panel' }, head.el,
+        h('div', { class: 'cfa-list' }, bl.map(b => { const el = blockRow(b); rowOf.set(b.nr, el); return el; })));   // bez indeksu jako „next”
+    };
+    // U-b: harmonogram zaczyna się od dziś; minione dni zwinięte i budowane dopiero po rozwinięciu (bez filtrów „zaległe” / wyszukiwania)
+    const days = Object.entries(byDay), past = zal || q ? [] : days.filter(([d]) => d < today);
+    const pastHead = region(() => { const pb = past.flatMap(([, bl]) => bl);
+      return h('h2', {}, `Minione dni (${past.length}) · wykonane ${pb.filter(b => done.has(b.nr)).length} z ${pb.length} bloków`); });
+    if (past.length) {
+      const box = h('div', {});
+      add(root, h('details', { class: 'panel fold cf-past', open: harmoPast[P.id] || null, ontoggle: e => {
+        harmoPast[P.id] = e.target.open;
+        if (e.target.open && !box.firstChild) add(box, past.map(dayPanel));
+      } }, h('summary', {}, pastHead.el), box));
+    }
+    add(root, days.filter(x => !past.includes(x)).map(dayPanel));
+    // Filtry „tylko niewykonane” / „tylko zaległe” zmieniają skład listy — wtedy pełne przerysowanie (jak dotąd)
+    if (!todo && !zal) update = nrs => {
+      hero.refresh(); lateLabel.refresh(); if (past.length) pastHead.refresh();
+      for (const nr of nrs || []) {
+        const b = D.bloki.find(x => x.nr === nr), el = rowOf.get(nr);
+        if (el?.isConnected) rowOf.set(nr, swap(el, blockRow(b)));
+        if (b) headOf.get(b.data)?.refresh();
+      }
+    };
+  }
+
+  // ---------------- Kalendarz
+  if (view === 'kalendarz') {
+    const months = [...new Set(Object.keys(P.byDay).map(d => d.slice(0, 7)).concat(EXAM.slice(0, 7)))].sort();
+    add(root, h('div', { class: 'cal-legend' },
+      h('span', { class: 'cl c-0' }, '0%'), h('span', { class: 'cl c-1' }, '1–99%'), h('span', { class: 'cl c-2' }, '100%'),
+      h('span', { class: 'cl c-mock' }, P.mock.word.toLowerCase()), h('span', { class: 'cl c-exam' }, 'egzamin')));
+    for (const ym of months) {
+      const [y, m] = ym.split('-').map(Number);
+      const first = `${ym}-01`, days = new Date(y, m, 0).getDate();
+      const cells = [...Array(weekday(first) - 1)].map(() => h('span', { class: 'cal-e' }));
+      for (let i = 1; i <= days; i++) {
+        const d = `${ym}-${String(i).padStart(2, '0')}`, bl = P.byDay[d] || [];
+        const k = bl.filter(b => done.has(b.nr)).length;
+        const cls = d === EXAM ? 'c-exam' : !bl.length ? 'c-none' : D.mockCFA.includes(d) ? 'c-mock' : k === bl.length ? 'c-2' : k > 0 ? 'c-1' : 'c-0';
+        cells.push(bl.length || d === EXAM
+          ? h('a', { class: `cal-d ${cls}${d === today ? ' is-today' : ''}`, href: `#/${P.id}?v=dzien&d=${d}`, 'aria-label': `${longDate(d)}: ${k}/${bl.length}` },
+            h('span', {}, String(i)), bl.length ? h('small', {}, `${k}/${bl.length}`) : h('small', {}, 'egz.'))
+          : h('span', { class: 'cal-d c-none' }, h('span', {}, String(i))));
+      }
+      add(root, section(`cal-${ym}`, parse(first).toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' }),
+        h('div', { class: 'cal' }, ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'].map(x => h('span', { class: 'cal-h' }, x)), cells)));
+    }
+  }
+
+  // ---------------- Error log
+  if (view === 'log') {
+    const all = [...(store?.state?.[P.fields.errors] || [])].sort((a, b) => (a.data < b.data ? 1 : -1));
+    const lk = ctx.params.get('lk') || '', lq = (ctx.params.get('lq') || '').toLowerCase();
+    const entries = all.filter(x => (!lk || x.rodzaj === lk) && (!lq || `${x.temat} ${x.regula} ${x.data}`.toLowerCase().includes(lq)));
+    const edit = ctx.params.get('e');
+    const cur = entries.find(x => x.id === edit) || {};
+    const f = {
+      data: h('input', { type: 'date', value: cur.data || today }),
+      temat: h('input', { value: cur.temat || '', placeholder: P.log.placeholder }),
+      rodzaj: h('select', {}, KINDS.map(k => h('option', { value: k, selected: k === (cur.rodzaj || KINDS[0]) }, k))),
+      regula: h('textarea', { rows: '3', placeholder: 'prawidłowa reguła / wniosek' }, cur.regula || ''),
+    };
+    const saveEntry = async () => {
+      if (!f.temat.value.trim()) return err(new Error('Podaj temat lub źródło.'));
+      const id = cur.id || `e_${Date.now().toString(36)}`;
+      try {
+        await store.record(P.types.errPut, { id, data: { egz: P.name, data: f.data.value, temat: f.temat.value.trim(), rodzaj: f.rodzaj.value, regula: f.regula.value.trim() } });
+        ctx.flash(cur.id ? 'Zapisano zmiany wpisu.' : 'Dodano wpis do error logu.'); go({ e: '' });
+      } catch (e) { err(e); }
+    };
+    // Import CSV zgodny z v3 — tylko CFA (plik error logu z poprzedniej wersji aplikacji CFA)
+    const csvInput = P.log.importV3 && h('input', { type: 'file', accept: '.csv,text/csv', hidden: true, onchange: async () => {
+      const file = csvInput.files[0]; if (!file) return;
+      try {
+        const pv = previewEvents(store, await cfaErrorLogEvents(await file.text(), sha256), 'cfa-errors');
+        if (!pv.ok) return err(new Error(pv.errors.join(' ')));
+        if (!confirm(`Nowe wpisy: ${pv.fresh.length}, już znane: ${pv.known}. Zaimportować?`)) return;
+        const n = await apply(store, pv); ctx.flash(`Zaimportowano ${n} wpisów.`); ctx.rerender();
+      } catch (e) { err(e); }
+    } });
+    const counts = KINDS.map(k => [k, all.filter(x => x.rodzaj === k).length]).filter(([, n]) => n);
+    add(root, h('section', { class: 'panel' }, h('h2', {}, cur.id ? 'Edytuj wpis' : 'Nowy wpis'),
+      h('div', { class: 'form-grid' },
+        h('label', { class: 'field' }, h('span', {}, 'Data'), f.data),
+        h('label', { class: 'field' }, h('span', {}, 'Temat / źródło'), f.temat),
+        h('label', { class: 'field' }, h('span', {}, 'Rodzaj błędu'), f.rodzaj),
+        h('label', { class: 'field wide' }, h('span', {}, 'Prawidłowa reguła'), f.regula)),
+      h('div', { class: 'row' }, h('button', { class: 'primary', disabled: !store, onclick: saveEntry }, cur.id ? 'Zapisz zmiany' : 'Dodaj wpis'),
+        cur.id && h('button', { onclick: () => go({ e: '' }) }, 'Anuluj'))),
+    // Filtr wg rodzaju błędu i wyszukiwanie (powtórka przed egzaminem) — tylko widok, bez zmian w danych
+    all.length > 0 && h('div', { class: 'cf-search field' }, h('span', {}, 'Szukaj w error logu'),
+      h('input', { type: 'search', value: ctx.params.get('lq') || '', placeholder: 'temat, reguła, data', 'aria-label': 'Szukaj w error logu', onchange: e => go({ lq: e.target.value }) })),
+    counts.length > 0 && h('div', { class: 'cf-kinds', role: 'group', 'aria-label': 'Rodzaj błędu' },
+      h('button', { class: 'chip-b', 'aria-pressed': String(!lk), onclick: () => go({ lk: '' }) }, `Wszystkie: ${all.length}`),
+      counts.map(([k, n]) => h('button', { class: 'chip-b', 'aria-pressed': String(lk === k), onclick: () => go({ lk: lk === k ? '' : k }) }, `${k}: ${n}`))),
+    h('div', { class: 'row' },
+      h('button', { disabled: !all.length, onclick: () => {
+        const head = 'egzamin;data;temat_zrodlo;rodzaj_bledu;prawidlowa_regula';
+        const rows = all.map(e => [e.egz || P.name, e.data, e.temat, e.rodzaj, e.regula].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'));
+        const file = new File(['﻿' + head + '\n' + rows.join('\n')], P.log.csv, { type: 'text/csv' });
+        const a = h('a', { href: URL.createObjectURL(file), download: file.name }); document.body.append(a); a.click(); a.remove();
+      } }, 'Eksport CSV'),
+      csvInput && h('button', { disabled: !store, onclick: () => { csvInput.value = ''; csvInput.click(); } }, 'Import CSV (v3)'), csvInput),
+    entries.length === 0 ? h('p', { class: 'muted' }, all.length ? 'Brak wpisów spełniających filtr.' : 'Error log jest pusty.') :
+      h('div', { class: 'log-list' }, entries.map(e => h('article', { class: 'log-item' },
+        h('div', { class: 'log-head' }, h('span', { class: 'mode m-an' }, e.rodzaj), h('span', { class: 'muted' }, e.data)),
+        h('p', { class: 'log-t' }, e.temat),
+        e.regula && h('p', { class: 'log-r' }, e.regula),
+        h('div', { class: 'row' },
+          h('button', { onclick: () => go({ e: e.id }) }, 'Edytuj'),
+          h('button', { class: 'danger', onclick: async () => {
+            if (!confirm('Usunąć wpis?')) return;
+            try { await store.record(P.types.errDel, { id: e.id }); ctx.flash('Usunięto wpis.'); ctx.rerender(); } catch (x) { err(x); }
+          } }, 'Usuń'))))));
+  }
+
+  // ---------------- Plan (działy / obszary, mocki / symulacje, statystyki) — zależny od planu
+  if (view === 'plan') P.plan(root, { done, pace, late, rs });
+}
+
+// Wiersz statystyk trybów — wspólny dla obu planów
+export const modeStats = (D, done) => Object.entries(D.stat.tryb).map(([k, n]) =>
+  [h('dt', {}, k), h('dd', {}, `${n} ${plural(n, 'blok', 'bloki', 'bloków')} · wykonane ${D.bloki.filter(b => b.tryb === k && done.has(b.nr)).length}`)]);

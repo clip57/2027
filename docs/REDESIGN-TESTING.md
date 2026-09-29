@@ -25,6 +25,15 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 | `npm run e2e:cloud` | 100/100 |
 | `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
 
+### Plan MPW (D-095; 29.09.2026)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 203 testy: 202 zaliczone, 1 pominięty; nowy `plan-mpw.test.mjs` |
+| `npm run e2e` | 1368/1368 (nowy blok `run_mpw`) |
+| `npm run e2e:sync` | 23/23 |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń (widoki MPW, karta w „Dziś”) |
+
 ### Moduł Pielęgnacja i niedziela z basenem (D-094; 28.09.2026)
 | Zestaw | Wynik |
 |---|---|
@@ -186,7 +195,10 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .kv .mode .m-pr .dz-outside .sp-outside .dz-past .dz-plan-h .dz-attn .wk-grid .wk-day .is-out .cf-past .cf-recall .cf-recall-chip
 .mp-eve .mp-daynav .sheet-msg .toast #toast .skip-link .zp-empty .zp-hint #zp-q #zp-stan-hint .c-shop .inv-low .dn-diag .dn-diag-list
 .dn-plain .dn-evict .dn-ics .gs-dialog .gs-input .gs-list .gs-hit .gs-t .gs-help .more-search .side-search .rc-preview
-.pg-empty .pg-hero .pg-pora .pg-count .pg-check .pg-step .is-done .is-opt .pg-wait .pg-timer .pg-timer-t .pg-wday .pg-prod-card .pg-plan-i .pg-edit .slot-care`
+.pg-empty .pg-hero .pg-pora .pg-count .pg-check .pg-step .is-done .is-opt .pg-wait .pg-timer .pg-timer-t .pg-wday .pg-prod-card .pg-plan-i .pg-edit .slot-care
+.hero-mpw .dz-mpw .cf-task .topic .tech-list .cal-d .c-mock .c-exam .log-item`
+(MPW, D-095: `aria-label` „Blok MPW N do wykonania” (Dziś) i „Blok N do wykonania” (moduł), placeholder „np. KSH…”, przycisk „Eksport CSV”
+(plik `error-log-mpw.csv`), teksty „Start planu: …”, „Nauka MPW”, „Symulacja egzaminu MPW”, „Zaległe bloki MPW”, „MPW: N bloki”, „Bloki MPW”, „Plan MPW”)
 (Pielęgnacja, D-094: identyfikatory `pg-rano`, `pg-p-<id>`, slot `slot.2015n` (niedziela), przyciski „Zamknij licznik”, „Dodaj krok”, „Usuń krok”,
 „Eksport planu (.json)”, „Edytuj produkt: <nazwa>”, „Edytuj krok: <tekst>”, „W zapasie”, teksty „Brak planu pielęgnacji”, „Pielęgnacja N / M”,
 „Plan pielęgnacji: N kroków, M produktów”, „Plan pielęgnacji (2027-pielegnacja.json)”)

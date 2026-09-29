@@ -1,10 +1,12 @@
 // Resolver dnia: data -> kompletny opis dnia. Jedyne miejsce, w którym łączą się
 // kalendarz faz (D-017), typ dnia (D-018), dieta, suplementy (D-001), trening, CFA i szablon godzin (D-004).
-import { SRC, plan, cfaByDay } from './data.js';
+import { SRC, plan, cfaByDay, mpwByDay } from './data.js';
 import { weekday, dayName, isValidDay } from './dates.js';
 
 const CFA_FIRST = SRC.cfa.D.stat.start, CFA_LAST = SRC.cfa.D.stat.end;
 const MOCKS = new Set(SRC.cfa.D.mockCFA);
+// Plan MPW (D-095): 17.11.2026–20.03.2027 — bloki 15:30–18:23 nie zmieniają szablonu godzin (decyzja użytkownika: osobna karta w „Dziś”)
+const MPW_FIRST = SRC.mpw.D.stat.start, MPW_LAST = SRC.mpw.D.stat.end, SIMS = new Set(SRC.mpw.D.mockCFA);
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
@@ -116,7 +118,8 @@ export function resolveDay(date) {
     date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
     note: w.note || null, exception: w.decision || null,
     sauna: w.sauna, dietVariant: w.diet, kcal: p.total.kcal, meals: mealsFor(w.diet, effPhase),
-    doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall }, slots,
+    doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall },
+    mpw: { inPlan: date >= MPW_FIRST && date <= MPW_LAST, blocks: mpwByDay[date] || [], isSim: SIMS.has(date) }, slots,
   };
 }
 

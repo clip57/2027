@@ -129,10 +129,11 @@ async def run_variant(pw, name, url, mobile):
     ok(th == 'dark' or await pg.evaluate("localStorage.getItem('p2027.theme')") is not None, f'{tag} Motyw: domyślnie ciemny')
     if mobile:
         labels = await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())')
-        ok(labels == ['Dziś', 'Dieta', 'Trening', 'CFA', 'Więcej'], f'{tag} Pasek dolny: 4 sekcje + Więcej ({labels})')
+        study = 'MPW' if _dt.datetime.now(ZoneInfo('Europe/Warsaw')).date() >= _dt.date(2026, 11, 12) else 'CFA'   # D-095: zamiana 12.11
+        ok(labels == ['Dziś', 'Dieta', 'Trening', study, 'Więcej'], f'{tag} Pasek dolny: 4 sekcje + Więcej ({labels})')
         ok(await pg.locator('.tabs a svg[aria-hidden=true]').count() == 5, f'{tag} Pasek dolny: ikony dekoracyjne z etykietą tekstową')
         await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
-        ok(await pg.locator('.more-list a').count() == 7, f'{tag} Więcej: 7 pozostałych modułów w grupach (z Pielęgnacją, D-094)')
+        ok(await pg.locator('.more-list a').count() == 8, f'{tag} Więcej: 8 pozostałych modułów w grupach (z Pielęgnacją D-094 i CFA/MPW D-095)')
         dcs = await pg.eval_on_selector_all('.more-list a', 'e => e.map(a => a.style.getPropertyValue("--dc"))')
         ok(all(dcs) and await pg.eval_on_selector('.more-ic', 'e => getComputedStyle(e).color') != await pg.eval_on_selector('.more-n', 'e => getComputedStyle(e).color'),
            f'{tag} Więcej: ikony w kolorze domeny modułu (zmienna --dc ustawiona)')
@@ -145,7 +146,7 @@ async def run_variant(pw, name, url, mobile):
     else:
         groups = await pg.eval_on_selector_all('.side .side-gl', 'e => e.map(x => x.textContent.trim())')
         ok(groups == ['Dzień', 'Trening', 'Dieta', 'Nauka', 'System'], f'{tag} Panel: grupy {groups}')
-        ok(await pg.locator('.side .side-a').count() == 11, f'{tag} Panel: 11 modułów (z Pielęgnacją, D-094)')
+        ok(await pg.locator('.side .side-a').count() == 12, f'{tag} Panel: 12 modułów (z Pielęgnacją D-094 i MPW D-095)')
         await pg.get_by_role('button', name='Zwiń panel').click(); await pg.wait_for_timeout(200)
         await pg.reload(); await pg.wait_for_selector('.side')
         ok(await pg.locator('.side.is-min').count() == 1, f'{tag} Panel: zwinięcie zapamiętane')
@@ -1038,6 +1039,106 @@ async def run_care(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
 
+# Plan MPW (D-095): moduł w „Więcej” do 11.11, zakładka od 12.11 (w miejsce CFA), karta w „Dziś” bez zmian godzin planu dnia,
+# postęp `mpw.done` niezależny od CFA, punktowe odświeżanie, harmonogram, kalendarz, error log MPW, plan, Wymaga uwagi, tydzień, .ics
+def at(y, m, d, hh=10, mm=0):   # czas lokalny Europe/Warsaw (od 25.10.2026 CET, +01:00)
+    off = 2 if (m, d) < (10, 25) and y == 2026 else 1
+    return _dt.datetime(y, m, d, hh, mm, tzinfo=_dt.timezone(_dt.timedelta(hours=off)))
+async def run_mpw(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [MPW]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw', accept_downloads=True)
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+    await pg.clock.install(time=at(2026, 10, 5))
+    # Przed końcem CFA: MPW „na bocznym torze” — w „Więcej” / w panelu za CFA; podgląd planu z odliczaniem do startu
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    if mobile:
+        labels = await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())')
+        ok(labels == ['Dziś', 'Dieta', 'Trening', 'CFA', 'Więcej'], f'{tag} 05.10: na pasku CFA ({labels})')
+        await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
+        ok(await pg.locator('.more-list a[href="#/mpw"]').count() == 1 and await pg.locator('.more-list a[href="#/cfa"]').count() == 0, f'{tag} 05.10: MPW w „Więcej”')
+    else:
+        nauka = await pg.eval_on_selector_all('.side-group:nth-child(4) .side-a', 'e => e.map(x => x.textContent.trim())')
+        ok(nauka == ['CFA', 'MPW'], f'{tag} 05.10: panel „Nauka” — CFA, potem MPW ({nauka})')
+    await pg.goto(url + '#/mpw'); await pg.wait_for_selector('.cfa-row')
+    hero = await pg.text_content('.hero-mpw')
+    ok('Start planu: wt 17 listopada 2026 (za 43 dni)' in hero and '0 / 354 bloków' in hero and '21 marca 2027, 11:00' in hero, f'{tag} przed startem: odliczanie i podgląd ({hero[:60]!r})')
+    ok('wt 17 listopada 2026' in await pg.inner_text('.cfa-dayhead') and await pg.locator('.cfa-row').count() == 3, f'{tag} przed startem: podgląd pierwszego dnia (3 bloki)')
+    # Zamiana od 12.11 (koniec planu CFA 11.11)
+    await pg.clock.set_system_time(at(2026, 11, 12)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    if mobile:
+        labels = await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())')
+        ok(labels == ['Dziś', 'Dieta', 'Trening', 'MPW', 'Więcej'], f'{tag} 12.11: MPW na pasku w miejscu CFA ({labels})')
+        await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
+        ok(await pg.locator('.more-list a[href="#/cfa"]').count() == 1 and await pg.locator('.more-list a').count() == 8, f'{tag} 12.11: CFA w „Więcej” (8 modułów)')
+    else:
+        nauka = await pg.eval_on_selector_all('.side-group:nth-child(4) .side-a', 'e => e.map(x => x.textContent.trim())')
+        ok(nauka == ['MPW', 'CFA'], f'{tag} 12.11: panel „Nauka” — MPW, potem CFA ({nauka})')
+    # Dzień z MPW (17.11, 16:00): karta „Nauka MPW”, godziny planu dnia bez zmian, kafel i karta planu
+    await pg.clock.set_system_time(at(2026, 11, 17, 16)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-mpw')
+    card = await pg.inner_text('.dz-mpw')
+    ok(await pg.locator('.dz-mpw .cfa-row').count() == 3 and '15:30–18:23 · 0 / 3 bloków' in card and 'Kodeks cywilny' in card, f'{tag} Dziś: karta „Nauka MPW” (3 bloki, 15:30–18:23)')
+    ok('MPW' in await pg.inner_text('.dz-kpis') and '0 / 3 bloków' in await pg.inner_text('.dz-kpis') and 'Plan MPW' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: kafel MPW i karta „Plan MPW”')
+    await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok(await pg.locator('.dz-plan .slot').count() == 34 and 'Brak bloku CFA' in await pg.inner_text('#slot\\.1530'), f'{tag} Dziś: szablon godzin bez zmian (34 punkty)')
+    await pg.get_by_role('button', name='Blok MPW 1 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.dz-mpw')?.innerText.includes('1 / 3 bloków')")
+    ok(await pg.locator('.dz-mpw .cfa-row.is-done').count() == 1, f'{tag} Dziś: odhaczenie bloku MPW')
+    # Moduł: postęp niezależny od CFA, punktowe odświeżanie (P2), zadania bloku
+    await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.hero-cfa')
+    ok('0 / 400 bloków' in await pg.inner_text('.hero-cfa'), f'{tag} CFA: postęp CFA bez bloków MPW')
+    await pg.goto(url + '#/mpw'); await pg.wait_for_selector('.cfa-row')
+    ok('1 / 354 bloków' in await pg.inner_text('.hero-mpw') and await pg.locator('.cfa-row.is-done').count() == 1, f'{tag} MPW: odhaczenie z „Dziś” widoczne w module')
+    await pg.evaluate("document.querySelector('main').dataset.p2 = '1'")
+    await pg.get_by_role('button', name='Blok 2 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.hero-mpw')?.innerText.includes('2 / 354')")
+    ok(await pg.evaluate("!!document.querySelector('main[data-p2]')") and '2 / 3 bloków' in await pg.inner_text('.cfa-dayhead'), f'{tag} MPW: odhaczenie punktowe (P2)')
+    await pg.locator('.cf-task summary').first.click()
+    ok('Przeczytaj' in await pg.inner_text('.cf-task[open]') and 'KNF 1.1.1–1.1.13' in await pg.inner_text('.cfa-row >> nth=0'), f'{tag} MPW: zadania bloku i punkty KNF')
+    # Harmonogram: filtr kategorii i wyszukiwanie po punkcie KNF
+    await pg.goto(url + '#/mpw?v=harmonogram&kat=Literatura+MPW'); await pg.wait_for_selector('.filters')
+    ok('66 bloków' in await pg.inner_text('.filters'), f'{tag} Harmonogram: 66 bloków literatury')
+    await pg.goto(url + '#/mpw?v=harmonogram&q=9.1.1'); await pg.wait_for_selector('.filters')
+    ok(await pg.locator('.cfa-row').count() > 0 and 'Regulamin Giełdy' in await pg.inner_text('main'), f'{tag} Harmonogram: wyszukiwanie po punkcie KNF')
+    # Kalendarz: 6 symulacji, egzamin 21.03, dni wolne bez odnośnika
+    await pg.goto(url + '#/mpw?v=kalendarz'); await pg.wait_for_selector('.cal')
+    ok(await pg.locator('a.cal-d.c-mock').count() == 6 and await pg.locator('a.cal-d.c-exam').count() == 1 and await pg.locator('a.cal-d[href$="2026-12-25"]').count() == 0,
+       f'{tag} Kalendarz: 6 symulacji, egzamin, dni wolne')
+    # Error log MPW: osobny od CFA, eksport CSV, bez importu v3
+    await pg.goto(url + '#/mpw?v=log'); await pg.wait_for_selector('text=Nowy wpis')
+    ok(await pg.get_by_role('button', name='Import CSV (v3)').count() == 0, f'{tag} Error log MPW: bez importu v3 (tylko CFA)')
+    await pg.fill('input[placeholder^="np. KSH"]', '[TEST] KSH — próg'); await pg.get_by_role('button', name='Dodaj wpis').click(); await pg.wait_for_selector('.log-item')
+    async with pg.expect_download() as dl:
+        await pg.get_by_role('button', name='Eksport CSV').click()
+    d = await dl.value; csv = pathlib.Path(await d.path()).read_text(encoding='utf-8-sig')
+    ok(d.suggested_filename == 'error-log-mpw.csv' and '"MPW";' in csv and '[TEST] KSH' in csv, f'{tag} Error log MPW: wpis i eksport CSV')
+    await pg.goto(url + '#/cfa?v=log'); await pg.wait_for_selector('text=Nowy wpis')
+    ok('Error log jest pusty' in await pg.inner_text('main'), f'{tag} Error log CFA bez wpisów MPW')
+    # Plan: źródła, symulacje, fazy, dni wolne
+    await pg.goto(url + '#/mpw?v=plan'); await pg.wait_for_selector('.topic')
+    m = await pg.inner_text('main')
+    ok('Źródła — pierwsze przejście' in m and await pg.locator('main .tech-list a[href^="#/mpw?v=dzien"]').count() == 6 and '24.12–27.12, 19.02–20.02' in m and 'test KNF z 15.10.2023' in m,
+       f'{tag} Plan: źródła, 6 symulacji, dni wolne')
+    # Symulacja w „Dziś”, tydzień, Wymaga uwagi
+    await pg.goto(url + '#/dzis?d=2027-01-23'); await pg.wait_for_selector('.dz-mpw')
+    ok('Symulacja egzaminu MPW' in await pg.inner_text('.dz-mpw') and '15:30–18:30' in await pg.inner_text('.dz-mpw'), f'{tag} Dziś: dzień symulacji')
+    await pg.goto(url + '#/dzis?v=tydzien&d=2026-11-17'); await pg.wait_for_selector('.wk-grid')
+    ok('MPW: 3 bloki' in await pg.inner_text('.wk-grid'), f'{tag} Tydzień: bloki MPW')
+    await pg.clock.set_system_time(at(2026, 11, 20, 9)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-attn')
+    at_ = await pg.inner_text('.dz-attn')
+    ok('Zaległe bloki MPW' in at_ and 'Zaległe bloki CFA' not in at_, f'{tag} Wymaga uwagi: zaległe MPW, bez CFA po egzaminie CFA')
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-ics')
+    ok('Bloki MPW' in await pg.inner_text('.dn-ics'), f'{tag} Dane: przypomnienia .ics z blokami MPW')
+    await pg.set_viewport_size({'width': 320, 'height': 700})
+    for r in ('#/mpw', '#/mpw?v=harmonogram', '#/mpw?v=kalendarz', '#/mpw?v=log', '#/mpw?v=plan', '#/dzis?d=2026-11-17'):
+        await pg.goto(url + r); await pg.wait_for_timeout(300)
+        sw = await pg.evaluate('document.documentElement.scrollWidth')
+        ok(sw <= 320, f'{tag} {r}: 320 px bez przewijania w poziomie ({sw}px)')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -1056,6 +1157,8 @@ async def main():
         await run_p2(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_care(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_care(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_mpw(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_mpw(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

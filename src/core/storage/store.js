@@ -12,6 +12,8 @@ export function lwwKey(e) {
   switch (e.t) {
     case 'cfa.done': return `cfa.done:${e.d.block}`;
     case 'cfa.err.put': case 'cfa.err.del': return `cfa.err:${e.d.id}`;
+    case 'mpw.done': return `mpw.done:${e.d.block}`;
+    case 'mpw.err.put': case 'mpw.err.del': return `mpw.err:${e.d.id}`;
     case 'train.set': return `train:${e.d.date}|${e.d.ex}|${e.d.set}`;
     case 'setting': return `setting:${e.d.key}`;
     case 'train.session': return `trainsess:${e.d.date}`;
@@ -45,6 +47,9 @@ const OBJ = {
 const DERIVE = {
   'cfa.done': m => ({ cfaDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),
   'cfa.err': m => ({ cfaErrors: vals(m).filter(e => e.t === 'cfa.err.put').map(e => ({ id: e.d.id, ...e.d.data })) }),
+  // Plan MPW (D-095): postęp i error log jak w CFA, osobne typy (numery bloków obu planów się pokrywają)
+  'mpw.done': m => ({ mpwDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),
+  'mpw.err': m => ({ mpwErrors: vals(m).filter(e => e.t === 'mpw.err.put').map(e => ({ id: e.d.id, ...e.d.data })) }),
   ...Object.fromEntries(Object.entries(OBJ).map(([g, [field, key, val]]) => [g, m => ({ [field]: Object.fromEntries(vals(m).map(e => [key(e), val(e)])) })])),
   'private.pack': m => ({ privatePack: m?.get('private.pack')?.d.pack || null }),
   cat: m => ({ catalogUser: vals(m).filter(e => e.t === 'cat.upsert').map(e => e.d.item) }),
@@ -120,7 +125,7 @@ export class Reducer {
 
 const byHlc = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
 // Kolejność pól stanu jak dotąd (czytelność w narzędziach deweloperskich)
-const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed', 'careDefs', 'careDone'];
+const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed', 'careDefs', 'careDone', 'mpwDone', 'mpwErrors'];
 const order = s => Object.fromEntries(FIELDS.map(f => [f, s[f]]));
 
 export function reduceInto(events) {

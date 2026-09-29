@@ -46,12 +46,16 @@ function legacyReduce(events) {
 // Pielęgnacja (D-094): wzorzec nowych pól stanu liczony niezależnie (LWW w kolejności HLC, kolejność pierwszego pojawienia się)
 const byHlc0 = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
 function legacy(events) {
-  const out = legacyReduce(events), defs = new Map(), done = {};
+  const out = legacyReduce(events), defs = new Map(), done = {}, mDone = new Map(), mErr = new Map();
   for (const e of [...events].sort(byHlc0)) {
     if (e.t === 'care.def') defs.set(e.d.id, e);
     if (e.t === 'care.done') done[`${e.d.date}|${e.d.step}`] = e.d.done;
+    if (e.t === 'mpw.done') mDone.set(e.d.block, e.d.done);                      // plan MPW (D-095)
+    if (e.t === 'mpw.err.put' || e.t === 'mpw.err.del') mErr.set(e.d.id, e);
   }
-  return { ...out, careDefs: [...defs.values()].filter(e => !e.d.deleted).map(e => ({ ...e.d.data, id: e.d.id, kind: e.d.kind })), careDone: done };
+  return { ...out, careDefs: [...defs.values()].filter(e => !e.d.deleted).map(e => ({ ...e.d.data, id: e.d.id, kind: e.d.kind })), careDone: done,
+    mpwDone: new Set([...mDone].filter(([, v]) => v).map(([k]) => k)),
+    mpwErrors: [...mErr.values()].filter(e => e.t === 'mpw.err.put').map(e => ({ id: e.d.id, ...e.d.data })) };
 }
 
 // Deterministyczny generator liczb losowych (powtarzalne przypadki)
@@ -78,6 +82,9 @@ function randomEvent(r, i, ms) {
     () => ['archive', { kind: 'test', data: { i } }],
     () => ['care.def', { id: pick(['s1', 's2', 'p1']), kind: pick(['step', 'product']), data: { text: 'krok', n: i }, deleted: r() < 0.15 ? true : undefined }],
     () => ['care.done', { date: day, step: pick(['s1', 's2']), done: r() < 0.7 }],
+    () => ['mpw.done', { block: 1 + Math.floor(r() * 12), done: r() < 0.7 }],
+    () => ['mpw.err.put', { id: pick(['e1', 'e2', 'e4']), data: { q: 'pytanie MPW', n: Math.floor(r() * 9) } }],
+    () => ['mpw.err.del', { id: pick(['e1', 'e2', 'e4']) }],
     () => ['future.type', { cokolwiek: [1, { a: 2 }] }],
   ];
   const [t, d] = pick(kinds)();

@@ -36,6 +36,10 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   const future = SRC.cfa.D.bloki.filter(b => b.data > today && state.cfaDone.has(b.nr));
   push('cfa-future', future.length ? 'warn' : 'ok', future.length ? `Bloki CFA odhaczone z przyszłą datą: ${future.length}` : 'Brak bloków CFA odhaczonych „na zapas”',
     future.length ? future.slice(0, 5).map(b => `nr ${b.nr} (${b.data})`).join(', ') : '', future.length ? `#/cfa?v=dzien&d=${future[0].data}` : null);
+  // MPW (D-095): to samo dla planu MPW
+  const mFuture = SRC.mpw.D.bloki.filter(b => b.data > today && state.mpwDone?.has(b.nr));
+  push('mpw-future', mFuture.length ? 'warn' : 'ok', mFuture.length ? `Bloki MPW odhaczone z przyszłą datą: ${mFuture.length}` : 'Brak bloków MPW odhaczonych „na zapas”',
+    mFuture.length ? mFuture.slice(0, 5).map(b => `nr ${b.nr} (${b.data})`).join(', ') : '', mFuture.length ? `#/mpw?v=dzien&d=${mFuture[0].data}` : null);
 
   // Dziennik: kwarantanna i zdarzenia z nowszej wersji
   push('quarantine', quarantined ? 'warn' : 'ok', quarantined ? `W kwarantannie: ${quarantined} uszkodzonych wpisów` : 'Kwarantanna pusta',

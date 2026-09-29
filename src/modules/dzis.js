@@ -13,6 +13,7 @@ import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
 import { sessions, weekStart } from '../core/calc/training.js';
 import { careModel, stepsFor, progress, slotProgress } from '../core/calc/care.js';
+import { byId, isTab } from './registry.js';
 
 const suppName = id => SRC.supplements.supplements[id]?.name || id;
 
@@ -63,6 +64,8 @@ function dayData(r, date, store, today) {
   const done = (r.training || []).reduce((a, e) => a + [...Array(e.seriesToday)].filter((_, i) => st?.train?.[`${date}|${e.id}|${i + 1}`]?.done).length, 0);
   const cfaToday = r.cfa.blocks.filter(b => st?.cfaDone?.has(b.nr)).length;
   const cfaAll = st?.cfaDone?.size || 0;
+  const mpwToday = r.mpw.blocks.filter(b => st?.mpwDone?.has(b.nr)).length;
+  const mpwAll = st?.mpwDone?.size || 0;
   const prepTotal = SRC.mealprep.cards.reduce((n, c) => n + c.blocks.filter(b => b.items).reduce((k, b) => k + b.items.length, 0), 0);
   const prepDone = st ? Object.entries(st.prep || {}).filter(([k, v]) => k.startsWith(`${date}|`) && v).length : 0;
   let inv = null;
@@ -72,12 +75,35 @@ function dayData(r, date, store, today) {
     inv = { critical: rows.filter(x => x.info.code === 'CRITICAL'), known: rows.filter(x => x.st != null).length,
       shop: nextShopping(today, new Date().getHours(), st.settings.shopWeekday ?? 6), toBuy: shoppingList(st.inv, today, items).length };
   }
-  return { planned, done, cfaToday, cfaAll, prepTotal, prepDone, inv };
+  return { planned, done, cfaToday, cfaAll, mpwToday, mpwAll, prepTotal, prepDone, inv };
 }
 
 const card = (title, ic, href, ...body) => h('section', { class: 'dz-card' },
   h('div', { class: 'dz-card-h' }, h('span', { class: 'dz-ic' }, icon(ic, { size: 18 })), h('h2', {}, title),
     href && h('a', { class: 'dz-more', href, 'aria-label': `${title} — otwórz moduł` }, icon('chevron-right', { size: 18 }))), ...body);
+
+// Nauka MPW (D-095): bloki dnia z planu MPW w osobnej karcie — godziny planu dnia bez zmian (decyzja użytkownika 29.09.2026).
+// Odhaczanie jak w module MPW (`mpw.done`); szczegóły i zadania bloków w module.
+function mpwCard(r, ctx) {
+  const st = ctx.store?.state, bl = r.mpw.blocks, done = st?.mpwDone || new Set();
+  const k = bl.filter(b => done.has(b.nr)).length;
+  const toggle = async (b, value) => {
+    try { await ctx.store.record('mpw.done', { block: b.nr, done: value }); ctx.rerender(); } catch (e) { ctx.flash(e.message || String(e)); }
+  };
+  return h('section', { class: 'panel dz-mpw', 'aria-labelledby': 'dz-mpw-h' },
+    h('div', { class: 'dz-mpw-h' },
+      h('h2', { id: 'dz-mpw-h' }, icon('landmark', { size: 20 }), r.mpw.isSim ? 'Symulacja egzaminu MPW' : 'Nauka MPW'),
+      h('span', { class: 'muted' }, `${bl[0].godz.slice(0, 5)}–${bl[bl.length - 1].godz.slice(-5)} · ${k} / ${bl.length} bloków`),
+      h('a', { class: 'dz-more', href: `#/mpw?v=dzien&d=${r.date}`, 'aria-label': 'Nauka MPW — otwórz moduł' }, icon('chevron-right', { size: 18 }))),
+    h('div', { class: 'cfa-list' }, bl.map(b => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}` },
+      h('button', { class: 'set-toggle', 'aria-pressed': String(done.has(b.nr)), disabled: !ctx.store || null,
+        'aria-label': `Blok MPW ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`, onclick: () => toggle(b, !done.has(b.nr)) }, done.has(b.nr) ? '✓' : b.blok),
+      h('div', { class: 'cfa-body' },
+        h('p', { class: 'cfa-src' }, cfaSourceLine(b)),
+        h('p', { class: 'cfa-topic' }, b.temat),
+        h('p', { class: 'cfa-meta' }, h('span', { class: 'chip' }, b.tryb), h('span', { class: 'muted' }, b.godz)))))),
+    h('p', { class: 'dz-foot' }, 'Bloki według planu MPW — poza szablonem godzin planu dnia.'));
+}
 
 // Siatka aktywności: ostatnie 6 tygodni × 7 dni; kropka = dzień z zapisanym treningiem (seria lub czas)
 function activityGrid(store, today) {
@@ -141,6 +167,7 @@ function renderWeek(root, ctx, date) {
           h('span', { class: 'wk-l wk-train' }, icon('dumbbell', { size: 14 }), x.training),
           h('span', { class: 'wk-l' }, icon('utensils', { size: 14 }), `${x.diet} · ${x.kcal} kcal`),
           x.cfa > 0 && h('span', { class: 'wk-l' }, icon('graduation-cap', { size: 14 }), x.mock ? `Mock CFA · ${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}` : `${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}${x.recall ? ' + recall' : ''}`),
+          x.mpw > 0 && h('span', { class: 'wk-l' }, icon('landmark', { size: 14 }), x.mpwSim ? 'Symulacja MPW 15:30' : `MPW: ${x.mpw} ${plural(x.mpw, 'blok', 'bloki', 'bloków')}`),
           x.shopping && h('span', { class: 'wk-l' }, icon('shopping-cart', { size: 14 }), 'Zakupy 12:13'),
           x.phase != null && x.date === mon && h('span', { class: 'wk-l muted' }, `Faza ${x.phase}`),
           x.note && h('span', { class: 'wk-note' }, x.note)])))));
@@ -167,6 +194,8 @@ export function renderDzis(root, ctx) {
   const t = plan(r.dietVariant, r.phase ?? 0).total;
   const D = dayData(r, date, ctx.store, ctx.today);
   const cfaMin = r.cfa.blocks.length * 53;
+  // Od 12.11.2026 (koniec planu CFA) nauka w podsumowaniu = MPW (D-095)
+  const mpwNow = isTab(byId.mpw, date), MD = SRC.mpw.D;
   const nav = (n, label, ic) => h('a', { class: 'btn dz-nav', href: `#/dzis?d=${addDays(date, n)}`, 'aria-label': label }, n < 0 && icon(ic, { size: 18 }), h('span', {}, label), n > 0 && icon(ic, { size: 18 }));
   const slotIdx = now?.current ? r.slots.indexOf(now.current) : -1;
   const allDoses = r.slots.flatMap(s => s.doses);
@@ -188,7 +217,8 @@ export function renderDzis(root, ctx) {
           h('span', { class: 'chip' }, r.phase == null ? 'start planu · przed Fazą 0' : `Faza ${r.phase}`),
           h('span', { class: 'chip' }, r.sessionLabel),
           h('span', { class: 'chip' }, `${r.kcal} kcal (${r.dietVariant})`),
-          r.cfa.isMock && h('span', { class: 'chip' }, 'Mock CFA'))),
+          r.cfa.isMock && h('span', { class: 'chip' }, 'Mock CFA'),
+          r.mpw.isSim && h('span', { class: 'chip' }, 'Symulacja MPW'))),
       h('div', { class: 'row daynav' }, date > PLAN_START && nav(-1, 'Poprzedni dzień', 'chevron-left'),
         date !== ctx.today && h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'), nav(1, 'Następny dzień', 'chevron-right'))),
     h('div', { class: 'row quicklinks' },
@@ -197,6 +227,7 @@ export function renderDzis(root, ctx) {
       h('a', { class: 'btn ql', href: `#/suplementy?d=${date}` }, icon('pill', { size: 18 }), h('span', {}, 'Suplementacja dnia')),
       r.training?.length > 0 && h('a', { class: 'btn ql', href: `#/trening?d=${date}` }, icon('dumbbell', { size: 18 }), h('span', {}, 'Trening dnia')),
       r.cfa.inPlan && h('a', { class: 'btn ql', href: `#/cfa?v=dzien&d=${date}` }, icon('graduation-cap', { size: 18 }), h('span', {}, 'Bloki CFA')),
+      r.mpw.inPlan && h('a', { class: 'btn ql', href: `#/mpw?v=dzien&d=${date}` }, icon('landmark', { size: 18 }), h('span', {}, 'Bloki MPW')),
       careP && h('a', { class: 'btn ql', href: `#/pielegnacja?d=${date}` }, icon('sparkles', { size: 18 }), h('span', {}, 'Pielęgnacja'))),
     h('div', { class: 'dz-grid' },
       date === ctx.today && attentionCard(ctx),
@@ -213,6 +244,9 @@ export function renderDzis(root, ctx) {
         kpi('Trening', D.planned ? `${D.done} / ${D.planned}` : (r.training?.length ? r.sessionLabel : 'Bez treningu'),
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
           D.planned ? bar(D.done, D.planned, 'train') : null),
+        mpwNow ? kpi('MPW', r.mpw.blocks.length ? `${D.mpwToday} / ${r.mpw.blocks.length} bloków` : r.mpw.inPlan ? 'dzień wolny' : date < MD.stat.start ? `od ${shortDate(MD.stat.start)}` : 'po planie',
+          r.mpw.blocks.length ? (r.mpw.isSim ? 'symulacja 180 min · 15:30–18:30' : `${r.mpw.blocks.length * 53} min · od 15:30`) : null,
+          r.mpw.blocks.length ? bar(D.mpwToday, r.mpw.blocks.length, 'cfa') : null) :
         kpi('CFA', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length} bloków` : 'poza planem',
           r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null, r.cfa.inPlan ? bar(D.cfaToday, r.cfa.blocks.length, 'cfa') : null),
         kpi('Zapasy', D.inv ? (D.inv.known ? `${D.inv.critical.length} ${plural(D.inv.critical.length, 'pilna', 'pilne', 'pilnych')}` : 'brak stanów') : '—',
@@ -231,10 +265,14 @@ export function renderDzis(root, ctx) {
           D.inv.critical.length ? h('ul', { class: 'dz-list' }, D.inv.critical.slice(0, 4).map(x => h('li', {}, h('span', { class: 'dz-flag' }, icon('triangle-alert', { size: 14 })), h('span', {}, x.it.name), h('span', { class: 'muted' }, x.info.badge))))
             : h('p', { class: 'muted' }, D.inv.known ? 'Brak pilnych braków.' : 'Wczytaj kopię zapasów w module Dane albo ustaw stany w Zapasach.'),
           h('p', { class: 'dz-foot' }, `Najbliższe zakupy: ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)}`)),
-        card('Plan CFA', 'graduation-cap', '#/cfa?v=plan',
+        mpwNow ? card('Plan MPW', 'landmark', '#/mpw?v=plan',
+          h('div', { class: 'dz-prog' }, h('strong', {}, `${Math.round((D.mpwAll / MD.bloki.length) * 100)}%`), h('span', { class: 'muted' }, `${D.mpwAll} z ${MD.bloki.length} bloków`)),
+          bar(D.mpwAll, MD.bloki.length, 'cfa'))
+        : card('Plan CFA', 'graduation-cap', '#/cfa?v=plan',
           h('div', { class: 'dz-prog' }, h('strong', {}, `${Math.round((D.cfaAll / SRC.cfa.D.bloki.length) * 100)}%`), h('span', { class: 'muted' }, `${D.cfaAll} z ${SRC.cfa.D.bloki.length} bloków`)),
           bar(D.cfaAll, SRC.cfa.D.bloki.length, 'cfa')),
         card('Aktywność treningowa', 'dumbbell', '#/trening?v=stat', activityGrid(ctx.store, ctx.today))),
+      r.mpw.blocks.length > 0 && mpwCard(r, ctx),
       h('section', { class: 'dz-plan', 'aria-labelledby': 'dz-plan-h' },
         h('h2', { id: 'dz-plan-h', class: 'dz-plan-h' }, 'Plan dnia'),
         // U-a: w dniu bieżącym minione punkty planu zwinięte (plan zaczyna się od „teraz”); rozwinięcie pamiętane do przeładowania

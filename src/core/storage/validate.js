@@ -6,6 +6,8 @@ export const SCHEMA = 1;
 // Najwyższy dopuszczalny numer bloku CFA: 432 (plan D-086; v3: 416, v5 z D-087: 421, v7 z D-090: 409 bloków). Limitu nie zmniejszamy —
 // zdarzenia zapisane przy dłuższym planie nie mogą trafić do kwarantanny. Test: plan z cfa.json mieści się w limicie.
 export const CFA_BLOCKS = 432;
+// Plan MPW (D-095): 354 bloki; limit z zapasem na aktualizacje planu (tak jak CFA — nie zmniejszamy). Test: plan z mpw.json mieści się w limicie.
+export const MPW_BLOCKS = 400;
 const isStr = v => typeof v === 'string' && v.length > 0 && v.length < 5000;
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
 const isId = v => isStr(v) && /^[A-Za-z0-9_.:\-|]{1,200}$/.test(v);
@@ -23,6 +25,10 @@ const PAYLOAD = {
   'cfa.done': d => Number.isInteger(d.block) && d.block >= 1 && d.block <= CFA_BLOCKS && typeof d.done === 'boolean',
   'cfa.err.put': d => isId(d.id) && isObj(d.data) && plain(d.data),
   'cfa.err.del': d => isId(d.id),
+  // Plan MPW (D-095): postęp bloków i error log — ta sama postać co cfa.*, osobne typy
+  'mpw.done': d => Number.isInteger(d.block) && d.block >= 1 && d.block <= MPW_BLOCKS && typeof d.done === 'boolean',
+  'mpw.err.put': d => isId(d.id) && isObj(d.data) && plain(d.data),
+  'mpw.err.del': d => isId(d.id),
   'train.set': d => isValidDay(d.date) && isId(d.ex) && Number.isInteger(d.set) && d.set >= 1 && d.set <= 10 && typeof d.done === 'boolean' &&
     ['kg', 'reps', 'rir'].every(k => d[k] == null || isNum(d[k])) && (d.opt == null || typeof d.opt === 'boolean'),
   'setting': d => isId(d.key) && plain(d.value),

@@ -30,6 +30,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | Etap 4: P1, P2 (27.09.2026) | D-092: przyrostowe przeliczanie stanu po zapisie (wynik identyczny z `reduce()`), punktowe odświeżanie w CFA, Treningu i Zapasach; D2, I9, I12 niewdrożone | `docs/RAPORT_P1_P2.md` |
 | Plan CFA D-093 (27.09.2026) | Plan CFA v9 (400 bloków, 45 dni 28.09–11.11, 3 mocki, mixed practice 26–27.10); start całego planu 27.09 bez zmian | `docs/RAPORT_PLAN_CFA_D093.md` |
 | Moduł Pielęgnacja D-094 (28.09.2026) | Nowy moduł (plan tylko w danych użytkownika, typy `care.def`/`care.done`), integracje, niedziela z basenem w planie dnia | `docs/RAPORT_PIELEGNACJA_D094.md` |
+| Plan MPW D-095 (29.09.2026) | Moduł MPW (wspólny kod z CFA), typy `mpw.done`/`mpw.err.*`, zakładka od 12.11, karta w „Dziś”, integracje | `docs/RAPORT_MPW_D095.md` |
 
 ## 2. Wykonane
 

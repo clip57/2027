@@ -1,5 +1,5 @@
 // Eksport planu do kalendarza (I1, audyt 25.09.2026): plik iCalendar (RFC 5545) z przypomnieniami (VALARM) — dawki
-// suplementów, bloki CFA i recall, trening, sobotnie zakupy. Generowany lokalnie z resolvera; bez serwera i bez kont.
+// suplementów, bloki CFA i recall, bloki MPW (D-095), trening, sobotnie zakupy. Generowany lokalnie z resolvera; bez serwera i bez kont.
 // Godziny w strefie Europe/Warsaw (TZID + VTIMEZONE z regułami czasu letniego) — zmiana czasu 25.10.2026 bez przesunięć.
 // UID stały dla dnia i punktu planu: ponowny import po zmianie planu aktualizuje wydarzenia zamiast je dublować.
 import { resolveDay, cfaSourceLine } from './resolver.js';
@@ -7,7 +7,7 @@ import { scheduleFor } from './calc/supplements.js';
 import { SRC } from './data.js';
 import { addDays } from './dates.js';
 
-export const ICS_KINDS = [['supp', 'Suplementy (pory dawek)'], ['cfa', 'Bloki CFA i recall'], ['train', 'Trening, basen i sauna'], ['shop', 'Zakupy w sobotę']];
+export const ICS_KINDS = [['supp', 'Suplementy (pory dawek)'], ['cfa', 'Bloki CFA i recall'], ['mpw', 'Bloki MPW'], ['train', 'Trening, basen i sauna'], ['shop', 'Zakupy w sobotę']];
 const KEY = Object.fromEntries(SRC.dayTemplate.slots.map(s => [s.id, s.key]));
 const TZ = ['BEGIN:VTIMEZONE', 'TZID:Europe/Warsaw',
   'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'TZNAME:CEST', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'END:DAYLIGHT',
@@ -57,6 +57,14 @@ export function planEvents(date, kinds, now = new Date()) {
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT30M', summary: s.title, desc: [r.sessionLabel, s.desc].filter(Boolean).join('\n') }));
     if (kinds.includes('shop') && s.id === 'slot.1213z')
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT15M', summary: 'Zakupy', desc: 'Lista „Do kupienia” w module Zapasy.' }));
+  }
+  // MPW (D-095): bloki wg godzin z planu MPW (poza szablonem planu dnia); symulacja jako jedno wydarzenie 15:30–18:30
+  if (kinds.includes('mpw') && r.mpw.blocks.length) {
+    const bl = r.mpw.blocks;
+    if (r.mpw.isSim) ev.push(event({ uid: `${date}-mpw-sim`, date, from: bl[0].godz.slice(0, 5), to: bl[bl.length - 1].godz.slice(-5), now, alarm: '-PT15M',
+      summary: 'Symulacja egzaminu MPW', desc: bl[0].temat }));
+    else for (const b of bl) ev.push(event({ uid: `${date}-mpw-${b.blok}`, date, from: b.godz.slice(0, 5), to: b.godz.slice(-5), now, alarm: '-PT2M',
+      summary: `MPW blok ${b.blok}: ${b.temat}`, desc: `${b.temat}\n${cfaSourceLine(b)}` }));
   }
   return ev.flat();   // lista linii (bez zawijania)
 }

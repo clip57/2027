@@ -99,7 +99,7 @@ dialog::backdrop { background: var(--scrim); }
   background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
   border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); transition: transform var(--dur-2) var(--ease); }
 .tabs a { position: relative; min-width: 0; min-height: var(--tab-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  font-size: var(--fs-2xs); font-weight: 600; letter-spacing: .01em; color: var(--muted); text-decoration: none; }
+  font-size: var(--fs-2xs); font-weight: 600; letter-spacing: .01em; color: var(--text-2); text-decoration: none; }   /* --text-2: kontrast AA także nad prześwitującym przyciskiem (D-095) */
 .tabs a[aria-current="page"] { color: var(--accent); }
 .tabs a[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 32%; right: 32%; height: 3px; border-radius: 0 0 var(--r-full) var(--r-full); background: var(--accent); }
 /* klawiatura ekranowa otwarta — pasek chowa się (obejście przesuwania elementów fixed na iOS) */
@@ -319,6 +319,10 @@ body.kbd .toast { bottom: var(--s-3); }
 @media (min-width: 1100px) {
   .dz-grid:has(> .dz-attn) { grid-template-areas: "attn aside" "now aside" "kpis aside" "plan aside"; }
   .dz-attn { grid-area: attn; }
+  /* Nauka MPW (D-095): karta między podsumowaniem a planem dnia */
+  .dz-grid:has(> .dz-mpw) { grid-template-areas: "now aside" "kpis aside" "mpw aside" "plan aside"; }
+  .dz-grid:has(> .dz-attn):has(> .dz-mpw) { grid-template-areas: "attn aside" "now aside" "kpis aside" "mpw aside" "plan aside"; }
+  .dz-mpw { grid-area: mpw; }
 }
 /* I3: widok tygodnia */
 .wk-grid { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: grid; gap: var(--s-2); grid-template-columns: minmax(0, 1fr); }
@@ -453,3 +457,27 @@ body.kbd .pg-timer { display: none; }
 @media (min-width: 760px) { .pg-prods { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 900px) { .pg-timer { left: auto; right: var(--s-6); bottom: var(--s-6); width: 460px; } .main:has(.pg-timer) { padding-bottom: 140px; } }
 @media (min-width: 1100px) { .pg-week { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+
+/* ---------- Plan MPW (D-095) — przedrostek mw-; wspólne klasy widoku nauki z CFA (study.js), kolor --cfa ---------- */
+.dz-mpw { margin: 0; display: grid; gap: var(--s-3); }
+.dz-mpw-h { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.dz-mpw-h h2 { display: flex; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--fs-md); flex: 1 1 auto; }
+.dz-mpw-h h2 .ico { color: var(--cfa); }
+.dz-mpw-h .dz-more { margin: 0 -10px 0 0; }
+.cf-task { margin-top: var(--s-1); font-size: var(--fs-sm); }
+.cf-task summary { cursor: pointer; min-height: 32px; display: inline-flex; align-items: center; color: var(--text-2); font-weight: 600; }
+.cf-task p { margin: var(--s-1) 0 0; color: var(--text); }
+.cf-start { color: var(--text); }
+.mw-prio { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .03em; padding: .1rem var(--s-2); border-radius: var(--r-full);
+  border: 1px solid var(--border); color: var(--text-2); }
+.mw-prio.mw-p-high { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); color: var(--text); }
+.mw-areas li { margin-bottom: var(--s-1); }
+/* Widok „Plan” CFA i MPW: pasek postępu działu / źródła jako blok (wewnątrz wiersza inline nachodził na sąsiednie wiersze) */
+.topic .prog-bar { display: block; margin-top: var(--s-1); }
+.topic-h > span { min-width: 0; overflow-wrap: anywhere; }
+/* Nagłówek dnia CFA/MPW: długi „Następny: …” (tematy MPW) nie ściska pierścienia do zera (przewijanie w poziomie przy 320 px) */
+.cfa-dayhead > div { min-width: 0; }
+.cfa-dayhead .ring { flex: none; }
+/* Długie ciągi bez spacji w planie MPW (adresy stron w zadaniach, „a/b/c” w tematach) — łamanie zamiast przewijania w poziomie */
+.cfa-body { min-width: 0; }
+.cfa-body p, .cf-next { overflow-wrap: anywhere; }

@@ -1,5 +1,5 @@
 // Widok tygodnia (I3, audyt 25.09.2026): 7 dni od poniedziałku, wyłącznie z resolvera dnia (trening, sauna, dieta, CFA,
-// recall, zakupy w sobotę, wyjątki dat D-087, dni poza planem D-088). Bez nowych danych.
+// recall, MPW, zakupy w sobotę, wyjątki dat D-087, dni poza planem D-088). Bez nowych danych.
 import { resolveDay } from '../resolver.js';
 import { addDays, weekday } from '../dates.js';
 
@@ -14,6 +14,7 @@ export function weekSummary(date) {
       training: r.sessionLabel, dayType: r.dayType, sauna: r.sauna,
       diet: r.dietVariant, kcal: r.kcal,
       cfa: r.cfa.blocks.length, mock: r.cfa.isMock, recall: r.cfa.recall,
+      mpw: r.mpw.blocks.length, mpwSim: r.mpw.isSim,   // plan MPW (D-095)
       shopping: r.slots.some(s => s.id === 'slot.1213z'),
       note: r.note, exception: r.exception && r.exception !== 'D-088' ? r.exception : null,
     };

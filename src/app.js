@@ -6,7 +6,7 @@ import { today } from './core/dates.js';
 import { createAutoSync } from './core/sync/cloud-auto.js';
 import { autoRound, autoCheck, describeError, cloudStatus } from './core/sync/cloud-local.js';
 import { setCustomItems } from './core/calc/inventory.js';
-import { MODULES, GROUPS, byId } from './modules/registry.js';
+import { GROUPS, byId, modulesOn } from './modules/registry.js';
 import { icon } from './ui/icons.js';
 import { THEMES, themePref, applyTheme, setTheme, sideCollapsed, setSideCollapsed } from './ui/prefs.js';
 import { setupShortcuts, searchButton } from './ui/search.js';
@@ -18,12 +18,13 @@ import { renderZapasy } from './modules/zapasy.js';
 import { renderMealPrep } from './modules/mealprep.js';
 import { renderTrening } from './modules/trening.js';
 import { renderCFA } from './modules/cfa.js';
+import { renderMPW } from './modules/mpw.js';
 import { renderBezpieczenstwo } from './modules/bezpieczenstwo.js';
 import { renderRekompozycja } from './modules/rekompozycja.js';
 import { renderPielegnacja } from './modules/pielegnacja.js';
 import { renderPlaceholder } from './modules/placeholder.js';
 
-const RENDER = { dzis: renderDzis, dane: renderDane, dieta: renderDieta, suplementy: renderSuplementy, zapasy: renderZapasy, mealprep: renderMealPrep, trening: renderTrening, cfa: renderCFA, bezpieczenstwo: renderBezpieczenstwo, rekompozycja: renderRekompozycja, pielegnacja: renderPielegnacja };
+const RENDER = { dzis: renderDzis, dane: renderDane, dieta: renderDieta, suplementy: renderSuplementy, zapasy: renderZapasy, mealprep: renderMealPrep, trening: renderTrening, cfa: renderCFA, mpw: renderMPW, bezpieczenstwo: renderBezpieczenstwo, rekompozycja: renderRekompozycja, pielegnacja: renderPielegnacja };
 const ctx = { store: null, storeError: null, update: { state: 'idle', check: async () => {}, apply: () => {} }, cloudAuto: null };
 // Komunikaty po akcji (B4): stały obszar nad dolnym paskiem, poza przerysowywanym <main> — widoczny także przy przewiniętej
 // stronie. Region aria-live istnieje od startu, więc czytniki ekranu odczytują każdy komunikat. Znika po 6 s.
@@ -114,8 +115,10 @@ function themeSwitch(compact = false) {
 }
 
 function nav(current) {
+  // Zakładki i kolejność w grupach zależne od dnia (D-095: od 12.11.2026 MPW zamiast CFA)
+  const MODULES = modulesOn(today());
   const tabs = MODULES.filter(m => m.tab);
-  const moreActive = !byId[current]?.tab;
+  const moreActive = !tabs.some(m => m.id === current);
   const collapsed = sideCollapsed();
   return [
     h('a', { class: 'skip-link', href: '#main' }, 'Przejdź do treści'),   // U-i: pominięcie panelu nawigacji
@@ -162,7 +165,7 @@ async function render(keepFocus = false) {
       h('button', { 'aria-label': 'Zamknij komunikat synchronizacji', onclick: () => { cloudUi.dismissed = true; render(true); } }, 'Zamknij'))));
   if (id === 'wiecej') {
     add(main, h('h1', {}, 'Więcej'), searchButton(() => ctx.store?.state, 'more-search'),
-      GROUPS.map(g => { const list = MODULES.filter(m => m.group === g && !m.tab); return list.length ? h('section', { class: 'more-sec' },
+      GROUPS.map(g => { const list = modulesOn(today()).filter(m => m.group === g && !m.tab); return list.length ? h('section', { class: 'more-sec' },
         h('p', { class: 'side-gl' }, g),
         h('div', { class: 'more-list' }, list.map(m => h('a', { href: `#/${m.id}`, style: { '--dc': `var(--${m.domain})` } },
           h('span', { class: 'more-ic' }, icon(m.icon, { size: 20 })), h('span', { class: 'more-n' }, m.name), icon('chevron-right', { size: 18 }))))) : null; }),

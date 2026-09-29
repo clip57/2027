@@ -17,7 +17,7 @@ const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY 
   'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)', care: 'Plan pielęgnacji (2027-pielegnacja.json)' };
 const TYPE = { 'inv.count': 'stany magazynu', 'inv.move': 'zakupy i korekty', 'cat.upsert': 'własne pozycje', 'cfa.done': 'bloki CFA',
   'cfa.err.put': 'wpisy error logu', 'train.set': 'serie treningowe', setting: 'ustawienia', 'private.pack': 'pakiet prywatny', archive: 'archiwum',
-  'care.def': 'kroki i produkty pielęgnacji', 'care.done': 'odhaczenia pielęgnacji' };
+  'care.def': 'kroki i produkty pielęgnacji', 'care.done': 'odhaczenia pielęgnacji', 'mpw.done': 'bloki MPW', 'mpw.err.put': 'wpisy error logu MPW' };
 // Środowisko uruchomienia: każde (przeglądarka, aplikacja z ekranu początkowego, plik lokalny) ma OSOBNĄ bazę danych.
 export const appVersion = () => document.querySelector('meta[name="app-version"]')?.content || 'nieznana';
 export function runMode() {

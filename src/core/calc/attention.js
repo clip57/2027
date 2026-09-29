@@ -1,5 +1,5 @@
 // „Wymaga uwagi” (I2, audyt 25.09.2026): jedno miejsce na sygnały rozproszone po modułach — wyłącznie z danych,
-// które te moduły już liczą (plan CFA, dziennik, prognoza zapasów, okres preparatów). Tylko odczyt.
+// które te moduły już liczą (plan CFA i MPW, dziennik, prognoza zapasów, okres preparatów). Tylko odczyt.
 // Wynik: [{ id, level: 'warn' | 'info', text, href }] w kolejności ważności.
 import { SRC } from '../data.js';
 import { cfaPace } from './cfa.js';
@@ -30,11 +30,18 @@ export function attention(state, { today, hour = 12, custom = [] } = {}) {
   if (short.length) push('shop', 'warn', `Zabraknie przed zakupami (${dayShort(shop.date)} ${shortDate(shop.date)}): ${short.slice(0, 4).join(', ')}${short.length > 4 ? ` i ${short.length - 4} innych` : ''}`, '#/zapasy?s=shop');
   if (supp.length) push('supp', 'warn', `Suplementy do uzupełnienia: ${supp.length}`, '#/suplementy');
 
-  // CFA: zaległe bloki i nieodhaczone sesje recall (do wczoraj)
-  const pace = cfaPace(SRC.cfa.D.bloki, state.cfaDone || new Set(), today);
-  if (pace.overdue.length) push('cfa', 'warn', `Zaległe bloki CFA: ${pace.overdue.length}`, '#/cfa?v=harmonogram&zal=1');
-  const rs = recallStats(state.settings, today);
-  if (rs.due - rs.doneDue > 0) push('recall', 'info', `Nieodhaczone sesje recall: ${rs.due - rs.doneDue}`, '#/cfa?v=plan');
+  // CFA: zaległe bloki i nieodhaczone sesje recall (do wczoraj) — do dnia egzaminu CFA; później bez znaczenia (D-095)
+  if (today < SRC.cfa.exam) {
+    const pace = cfaPace(SRC.cfa.D.bloki, state.cfaDone || new Set(), today);
+    if (pace.overdue.length) push('cfa', 'warn', `Zaległe bloki CFA: ${pace.overdue.length}`, '#/cfa?v=harmonogram&zal=1');
+    const rs = recallStats(state.settings, today);
+    if (rs.due - rs.doneDue > 0) push('recall', 'info', `Nieodhaczone sesje recall: ${rs.due - rs.doneDue}`, '#/cfa?v=plan');
+  }
+  // MPW (D-095): zaległe bloki planu MPW — do dnia egzaminu MPW
+  if (today < SRC.mpw.exam) {
+    const pace = cfaPace(SRC.mpw.D.bloki, state.mpwDone || new Set(), today);
+    if (pace.overdue.length) push('mpw', 'warn', `Zaległe bloki MPW: ${pace.overdue.length}`, '#/mpw?v=harmonogram&zal=1');
+  }
 
   // Koniec preparatów czasowych (D-015, D-087) w ciągu 14 dni
   const ends = [...new Set(SRC.supplements.doses.filter(d => d.validity?.until).map(d => d.validity.until))];

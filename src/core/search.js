@@ -1,4 +1,4 @@
-// Globalne wyszukiwanie (I4, audyt 25.09.2026): moduły, pozycje Zapasów, suplementy, ćwiczenia, bloki CFA (temat, źródło,
+// Globalne wyszukiwanie (I4, audyt 25.09.2026): moduły, pozycje Zapasów, suplementy, ćwiczenia, bloki CFA i MPW (temat, źródło,
 // strony), wpisy error logu, Bezpieczeństwo (produkty) i sekcje Rekompozycji. Indeks budowany leniwie z danych statycznych
 // i stanu; tylko odczyt. Wyszukiwanie bez polskich znaków diakrytycznych („zolty” = „żółty”), wszystkie słowa naraz.
 import { SRC, catalogById } from './data.js';
@@ -8,7 +8,7 @@ import { MODULES } from '../modules/registry.js';
 import rekomp from '../data/rekomp.json' with { type: 'json' };
 
 export const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
-const KIND = { mod: 'Moduł', inv: 'Zapasy', supp: 'Suplementy', ex: 'Trening', cfa: 'CFA', err: 'Error log', safe: 'Bezpieczeństwo', rek: 'Rekompozycja', care: 'Pielęgnacja' };
+const KIND = { mod: 'Moduł', inv: 'Zapasy', supp: 'Suplementy', ex: 'Trening', cfa: 'CFA', mpw: 'MPW', err: 'Error log', mpwerr: 'Error log MPW', safe: 'Bezpieczeństwo', rek: 'Rekompozycja', care: 'Pielęgnacja' };
 export const kindLabel = k => KIND[k] || k;
 
 export function buildIndex(state, today) {
@@ -31,6 +31,9 @@ export function buildIndex(state, today) {
   }
   for (const b of SRC.cfa.D.bloki) add('cfa', b.temat, `${dayShort(b.data)} ${shortDate(b.data)} · blok ${b.blok} · ${b.zrodlo}, ${b.do_przeczytania}`, `#/cfa?v=dzien&d=${b.data}`, `${b.zakres || ''} ${b.kategoria || ''}`);
   for (const e of state?.cfaErrors || []) add('err', e.temat || '(bez tematu)', `${e.rodzaj || ''} · ${e.data || ''}`, '#/cfa?v=log', e.regula || '');
+  // Plan MPW (D-095): bloki (temat, źródło, artykuły, punkty KNF) i error log MPW
+  for (const b of SRC.mpw.D.bloki) add('mpw', b.temat, `${dayShort(b.data)} ${shortDate(b.data)} · blok ${b.blok} · ${b.zrodlo}, ${b.do_przeczytania}`, `#/mpw?v=dzien&d=${b.data}`, `${b.kategoria || ''} ${b.knf || ''}`);
+  for (const e of state?.mpwErrors || []) add('mpwerr', e.temat || '(bez tematu)', `${e.rodzaj || ''} · ${e.data || ''}`, '#/mpw?v=log', e.regula || '');
   const prods = new Set();
   for (const r of SRC.safety.rows) if (!prods.has(r.Produkt)) { prods.add(r.Produkt); add('safe', r.Produkt, r.section || '', `#/bezpieczenstwo?q=${encodeURIComponent(r.Produkt)}`); }
   // Pielęgnacja (D-094): produkty i kroki z danych użytkownika (tylko na tym urządzeniu)

@@ -9,7 +9,8 @@ ROUTES = ['#/dzis', '#/dzis?d=2026-10-30', '#/dzis?d=2026-10-03', '#/dzis?d=2026
   '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/bezpieczenstwo',
   '#/bezpieczenstwo?m=tabela', '#/bezpieczenstwo?m=poradnik', '#/rekompozycja?s=s6', '#/dane', '#/wiecej',
   '#/dzis?v=tydzien', '#/dzis?v=tydzien&d=2026-09-25', '#/mealprep?d=2026-10-11', '#/cfa?v=dzien&d=2026-09-28',   # Etapy 1–3 audytu
-  '#/pielegnacja', '#/pielegnacja?v=tydzien', '#/pielegnacja?v=produkty', '#/pielegnacja?v=plan', '#/dzis?d=2026-10-11']   # Pielęgnacja (D-094)
+  '#/pielegnacja', '#/pielegnacja?v=tydzien', '#/pielegnacja?v=produkty', '#/pielegnacja?v=plan', '#/dzis?d=2026-10-11',   # Pielęgnacja (D-094)
+  '#/mpw', '#/mpw?v=harmonogram', '#/mpw?v=kalendarz', '#/mpw?v=log', '#/mpw?v=plan', '#/dzis?d=2026-11-17', '#/dzis?d=2027-01-23']   # MPW (D-095)
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.
 OPEN_ALL = "document.querySelectorAll('details').forEach(d => d.open = true)"
 STATES = [('#/trening?d=2026-09-28', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),
@@ -33,7 +34,9 @@ STATES = [('#/trening?d=2026-09-28', "document.querySelector('.set:not(.set-h) .
   ('#/pielegnacja', "document.querySelector('dialog')?.remove(); document.querySelector('.pg-check input').click()", 'odhaczony krok pielęgnacji'),
   ('#/pielegnacja', "document.querySelector('.pg-wait').click()", 'licznik „odczekaj”'),
   ('#/pielegnacja?v=plan', "document.querySelector('.pg-edit').click()", 'okno edycji kroku'),
-  ('#/pielegnacja?v=produkty', "document.querySelector('dialog')?.remove(); document.querySelector('.pg-prod-card button').click()", 'okno edycji produktu')]
+  ('#/pielegnacja?v=produkty', "document.querySelector('dialog')?.remove(); document.querySelector('.pg-prod-card button').click()", 'okno edycji produktu'),
+  ('#/mpw?v=dzien&d=2026-11-17', "document.querySelector('.cfa-row .set-toggle').click(); document.querySelector('.cf-task summary').click()", 'odhaczony blok MPW i zadania'),
+  ('#/dzis?d=2026-11-17', "document.querySelector('.dz-mpw .set-toggle').click()", 'odhaczony blok MPW w „Dziś”')]
 # Stany zapasów: SYNTETYCZNA kopia (D-065) importowana przed audytem — statusy, paski zapasu, „Do kupienia”, ostrzeżenia w Diecie
 SYN = fixtures.write(fixtures.synthetic_zapasy(dt.date(2026, 9, 27))[0], 'zapasy_syntetyczne.json')
 CARE = fixtures.write(fixtures.synthetic_care_plan(), 'pielegnacja_syntetyczna.json')   # D-094: plan pielęgnacji z tekstami zastępczymi

@@ -116,6 +116,19 @@ if os.path.exists(cfa_src):
 else:
     check(False, "CFA: brak PLAN_NAUKI_CFA_LEVEL_I.html w SOURCES_DIR (D-086)")
 
+# ---------- MPW (D-095) ----------
+mpw = D("mpw.json")
+MB = mpw["D"]["bloki"]
+check(len(MB) == 354 and [b["nr"] for b in MB] == list(range(1, 355)), "MPW: 354 bloki 1–354 (D-095)")
+check(len({b["data"] for b in MB}) == 118 and min(b["data"] for b in MB) == "2026-11-17" and max(b["data"] for b in MB) == "2027-03-20", "MPW: 118 dni 17.11.2026–20.03.2027 (D-095)")
+check(mpw["exam"] == "2027-03-21", "MPW: egzamin 21.03.2027 (D-095)")
+mpw_src = os.path.join(SRC, os.environ.get("MPW_PLAN", "PLAN_NAUKI_MPW.html"))
+if os.path.exists(mpw_src):
+    js = re.findall(r"<script[^>]*>([\s\S]*?)</script>", open(mpw_src, encoding="utf8").read())[0].strip()
+    check(json.loads(re.sub(r"^const D\s*=\s*", "", js).rstrip().rstrip(";")) == mpw["D"], "MPW: mpw.json = obiekt D z PLAN_NAUKI_MPW.html (D-095)")
+else:
+    check(False, "MPW: brak PLAN_NAUKI_MPW.html w SOURCES_DIR (D-095)")
+
 # ---------- bezpieczeństwo ----------
 saf = D("safety.json")["rows"]
 check(len([r for r in saf if not r.get("user_decision")]) == 70, "bezpieczeństwo: 70 wierszy ze źródła")

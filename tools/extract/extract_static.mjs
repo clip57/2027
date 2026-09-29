@@ -1,6 +1,6 @@
-// Ekstrakcja: TRENING (EX, EX_ROM), CFA (D, plan D-086), ZAPASY (katalog) -> src/data/*.json
+// Ekstrakcja: TRENING (EX, EX_ROM), CFA (D, plan D-086), MPW (D, plan D-095), ZAPASY (katalog) -> src/data/*.json
 // Uruchomienie: SOURCES_DIR=... node tools/extract/extract_static.mjs
-// Tylko wybrane części: ONLY=cfa (albo trening, katalog; kilka po przecinku).
+// Tylko wybrane części: ONLY=cfa (albo trening, mpw, katalog; kilka po przecinku).
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -14,6 +14,27 @@ const read = f => fs.readFileSync(path.join(SRC, f), 'utf8');
 const write = (f, o) => fs.writeFileSync(OUT(f), JSON.stringify(o, null, 1));
 const scripts = html => [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const want = part => !process.env.ONLY || process.env.ONLY.split(',').includes(part);
+
+// Kontrola krzyżowa planu nauki (obiekt D z HTML) z MASTER_SCHEDULE_*.csv: te same bloki, pole po polu (plik CSV opcjonalny)
+function crossCheck(csvFile, file, D, tag) {
+  if (!fs.existsSync(path.join(SRC, csvFile))) return;
+  const rows = [], text = read(csvFile).replace(/^\uFEFF/, '');
+  let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  const [head, ...body] = rows.filter(r => r.some(x => x !== ''));
+  const diff = body.length !== D.bloki.length ? [`liczba wierszy ${body.length}`]
+    : body.flatMap((r, i) => head.filter((k, j) => String(D.bloki[i][k]) !== r[j]).map(k => `nr ${i + 1}: ${k}`));
+  if (diff.length) throw new Error(`${csvFile} ≠ ${file}: ${diff.slice(0, 5).join('; ')}`);
+  console.log(`${tag}: ${csvFile} zgodny z ${file} (${body.length} wierszy)`);
+}
 
 // ---------- TRENING ----------
 if (want('trening')) {
@@ -52,28 +73,24 @@ if (want('cfa')) {
   if (D.bloki.length !== 400 || D.stat.start !== '2026-09-28' || D.stat.end !== '2026-11-11')
     throw new Error(`${file}: oczekiwano planu D-093 (400 bloków, 28.09–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
   // Kontrola krzyżowa z MASTER_SCHEDULE_CFA.csv (jeśli jest w SOURCES_DIR): te same bloki, pole po polu
-  const csvFile = process.env.CFA_CSV || 'MASTER_SCHEDULE_CFA.csv';
-  if (fs.existsSync(path.join(SRC, csvFile))) {
-    const rows = [], text = read(csvFile).replace(/^\uFEFF/, '');
-    let row = [], cell = '', q = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      if (q) { if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; }
-      else if (c === '"') q = true;
-      else if (c === ',') { row.push(cell); cell = ''; }
-      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
-      else cell += c;
-    }
-    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
-    const [head, ...body] = rows.filter(r => r.some(x => x !== ''));
-    const diff = body.length !== D.bloki.length ? [`liczba wierszy ${body.length}`]
-      : body.flatMap((r, i) => head.filter((k, j) => String(D.bloki[i][k]) !== r[j]).map(k => `nr ${i + 1}: ${k}`));
-    if (diff.length) throw new Error(`${csvFile} ≠ ${file}: ${diff.slice(0, 5).join('; ')}`);
-    console.log(`cfa: ${csvFile} zgodny z ${file} (${body.length} wierszy)`);
-  }
+  crossCheck(process.env.CFA_CSV || 'MASTER_SCHEDULE_CFA.csv', file, D, 'cfa');
   write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (MASTER SCHEDULE FINAL v9, 28.09.2026) — obiekt D (D-086, D-087, D-090, D-093)',
     exam: '2026-11-12', D });
   console.log('cfa.json:', D.bloki.length, 'bloków');
+}
+
+// ---------- MPW (D-095: plan nauki do egzaminu na Maklera Papierów Wartościowych, 17.11.2026–20.03.2027, egzamin 21.03.2027) ----------
+if (want('mpw')) {
+  const file = process.env.MPW_PLAN || 'PLAN_NAUKI_MPW.html';
+  const js = scripts(read(file))[0].trim();
+  const D = JSON.parse(js.replace(/^const D\s*=\s*/, '').replace(/;\s*$/, ''));
+  // Plik z innym planem nie może po cichu nadpisać planu D-095
+  if (D.bloki.length !== 354 || D.stat.start !== '2026-11-17' || D.stat.end !== '2027-03-20')
+    throw new Error(`${file}: oczekiwano planu D-095 (354 bloki, 17.11.2026–20.03.2027), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
+  crossCheck(process.env.MPW_CSV || 'MASTER_SCHEDULE_MPW.csv', file, D, 'mpw');
+  write('mpw.json', { schema: 1, generated_from: 'PLAN_NAUKI_MPW.html (plan MPW 2027, 354 bloki, 17.11.2026–20.03.2027) — obiekt D (D-095)',
+    exam: '2027-03-21', examTime: '11:00', D });
+  console.log('mpw.json:', D.bloki.length, 'bloków');
 }
 
 // ---------- ZAPASY: katalog ----------
