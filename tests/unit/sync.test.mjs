@@ -11,8 +11,8 @@ const roundTrip = o => JSON.parse(JSON.stringify(o));
 
 test('iPhone ↔ Mac: wymiana plików scala dane obu urządzeń', async () => {
   const phone = await open(), mac = await open();
-  await phone.record('cfa.done', { block: 1, done: true });
-  await mac.record('cfa.done', { block: 2, done: true });
+  await phone.record('cfa.done', { block: 1, done: true, plan: 13 });
+  await mac.record('cfa.done', { block: 2, done: true, plan: 13 });
   await apply(mac, await preview(mac, roundTrip(await exportBundle(phone))));
   await apply(phone, await preview(phone, roundTrip(await exportBundle(mac))));
   assert.deepEqual([...phone.state.cfaDone].sort(), [1, 2]);
@@ -47,7 +47,7 @@ test('konflikt: ta sama pozycja zmieniona na obu urządzeniach — wygrywa póź
 
 test('plik zmieniony ręcznie lub uszkodzony jest odrzucany (suma kontrolna)', async () => {
   const a = await open(), b = await open();
-  await a.record('cfa.done', { block: 1, done: true });
+  await a.record('cfa.done', { block: 1, done: true, plan: 13 });
   const f = roundTrip(await exportBundle(a));
   f.events[0].d.block = 2;
   const pv = await preview(b, f);
@@ -64,8 +64,8 @@ test('nierozpoznany plik — jasny komunikat', async () => {
 
 test('import tworzy kopię zapasową stanu sprzed importu', async () => {
   const a = await open(), b = await open();
-  await b.record('cfa.done', { block: 9, done: true });
-  await a.record('cfa.done', { block: 1, done: true });
+  await b.record('cfa.done', { block: 9, done: true, plan: 13 });
+  await a.record('cfa.done', { block: 1, done: true, plan: 13 });
   await apply(b, await preview(b, roundTrip(await exportBundle(a))));
   const backups = await b.adapter.getBackups();
   assert.equal(backups.length, 1);

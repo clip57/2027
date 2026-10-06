@@ -6,6 +6,7 @@ import { SRC, cfaByDay } from '../core/data.js';
 import { longDate, shortDate, dayShort } from '../core/dates.js';
 import { recallDays, recallKey, recallDone, recallStats } from '../core/calc/recall.js';
 import { renderStudy, modeStats } from './study.js';
+import { CFA_PLAN_VERSION } from '../core/storage/validate.js';
 
 const D = SRC.cfa.D;
 const MODE_CLASS = { 'FIRST PASS': 'm-fp', CONSOLIDATION: 'm-co', MOCK: 'm-mo', 'ANALIZA BŁĘDÓW': 'm-an', PRACTICE: 'm-pr', 'ACTIVE RECALL': 'm-ar' };
@@ -35,6 +36,7 @@ function plan(root, { done, pace, late, rs }) {
 export const CFA_PLAN = {
   id: 'cfa', name: 'CFA', D, byDay: cfaByDay, exam: SRC.cfa.exam, eyebrow: `CFA Level I · egzamin ${longDate(SRC.cfa.exam)}`,
   types: { done: 'cfa.done', errPut: 'cfa.err.put', errDel: 'cfa.err.del' }, fields: { done: 'cfaDone', errors: 'cfaErrors' },
+  doneExtra: { plan: CFA_PLAN_VERSION },   // D-098: odhaczenia znakowane wersją planu
   modeClass: MODE_CLASS,
   // Recall 22:00 (I11): odhaczenie jako ustawienie `cfa.recall:<data>` (istniejący typ `setting`)
   recall: { days: recallDays, key: recallKey, done: recallDone, stats: recallStats },

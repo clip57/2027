@@ -84,7 +84,7 @@ test('klucze i sesja przetrwają ponowne uruchomienie; hasło nie jest nigdzie z
   const srv = server();
   const A = await device(srv);
   await ready(srv, A, { first: true });
-  await A.store.record('cfa.done', { block: 3, done: true });
+  await A.store.record('cfa.done', { block: 3, done: true, plan: 13 });
   // „ponowne uruchomienie”: nowy Store na tej samej bazie
   const again = await new Store(A.adapter).open();
   const st = await cloudStatus(again);

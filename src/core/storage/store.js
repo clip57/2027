@@ -2,7 +2,7 @@
 // Zasady: (1) każdy zapis potwierdzany odczytem; (2) błąd zapisu = wyjątek + trwały stan „błąd zapisu”,
 // nigdy ciche przełączenie na pamięć; (3) zdarzenia niepoprawne trafiają do kwarantanny;
 // (4) przed operacjami zbiorczymi automatyczna kopia (maks. 5).
-import { validateEvent, classifyEvent, isKnownType, SCHEMA } from './validate.js';
+import { validateEvent, classifyEvent, isKnownType, SCHEMA, CFA_PLAN_VERSION } from './validate.js';
 import { hlc, observe, randomId } from '../ids.js';
 
 export class StorageError extends Error { constructor(msg, cause) { super(msg); this.name = 'StorageError'; this.cause = cause; } }
@@ -45,7 +45,8 @@ const OBJ = {
   'care.done': ['careDone', e => `${e.d.date}|${e.d.step}`, e => e.d.done],
 };
 const DERIVE = {
-  'cfa.done': m => ({ cfaDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),
+  // D-098: liczą się tylko odhaczenia planu v13+ (`plan`); zapisy z v12 (bez pola) mają inne bloki pod tymi samymi numerami
+  'cfa.done': m => ({ cfaDone: new Set(vals(m).filter(e => e.d.done && (e.d.plan ?? 0) >= CFA_PLAN_VERSION).map(e => e.d.block)) }),
   'cfa.err': m => ({ cfaErrors: vals(m).filter(e => e.t === 'cfa.err.put').map(e => ({ id: e.d.id, ...e.d.data })) }),
   // Plan MPW (D-095): postęp i error log jak w CFA, osobne typy (numery bloków obu planów się pokrywają)
   'mpw.done': m => ({ mpwDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),

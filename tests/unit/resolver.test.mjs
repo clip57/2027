@@ -143,13 +143,13 @@ test('posiłki i suplementy w dniu mocka bez zmian godzin (D-019)', () => {
   assert.deepEqual(a.doses.map(d => d.time + d.supp), b.doses.map(d => d.time + d.supp));
 });
 
-test('recall: brak w pt i sob, przed 30.09 i po 11.11; 31 sesji w planie (D-086, D-097)', () => {
+test('recall: brak w pt i sob, przed startem planu CFA (05.10) i po 11.11; 28 sesji w planie (D-086, D-098)', () => {
   let n = 0;
   for (const d of ALL) {
     const r = resolveDay(d); if (r.cfa.recall) n++;
     if (r.weekday === 5 || r.weekday === 6 || d < SRC.cfa.D.stat.start || d > '2026-11-11') assert.equal(r.cfa.recall, false, d);
   }
-  assert.equal(n, 31);
+  assert.equal(n, 28);
   assert.equal(n, SRC.cfa.D.stat.recall);
 });
 
@@ -183,8 +183,8 @@ test('D-040: nazwa treningu w nagłówku dnia', () => {
 });
 
 test('D-039: linia źródła bloku CFA', () => {
-  const a = resolveDay('2026-09-30').slots.find(s => s.id === 'slot.0800').cfa[0];   // pierwszy blok planu CFA v12: 30.09, 08:00 (D-097)
-  assert.equal(cfaSourceLine(a), 'Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)');
+  const a = resolveDay('2026-10-05').slots.find(s => s.id === 'slot.0800').cfa[0];   // pierwszy blok planu CFA v13: 05.10, 08:00 (D-098)
+  assert.equal(cfaSourceLine(a), 'Curriculum 2026 Vol 1 (QM), s. 3–14 (12 s.)');
 });
 
 test('podpunkty posiłków: nazwa i kcal z właściwej fazy i wariantu', () => {
@@ -226,7 +226,8 @@ test('D-096/D-097: tydzień 28.09–04.10.2026 — 28.09 poza planem, 29.09 Dzie
   assert.deepEqual(['2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02', '2026-10-03'].map(main),
     ['Wolne', 'Trening siłowy: UPPER 1', 'Trening siłowy: LOWER 1', 'Rower 55 min + ABS', '2 rundy sauny wg protokołu']);
   assert.ok(!['2026-10-01', '2026-10-03'].some(d => resolveDay(d).slots.some(s => s.shop)), 'tydzień bez zakupów (D-097)');
-  assert.equal(resolveDay('2026-09-30').cfa.recall, true, 'recall CFA od 30.09');
+  assert.equal(resolveDay('2026-09-30').cfa.recall, false, 'recall CFA dopiero od startu planu v13 — 05.10 (D-098)');
+  assert.equal(resolveDay('2026-10-05').cfa.recall, true, 'recall CFA od 05.10');
   // od 05.10 plan tygodnia bez zmian
   assert.deepEqual([...range('2026-10-05', '2026-10-11')].map(d => resolveDay(d).sessionName), ['UPPER 1', 'LOWER 1', 'Rower + ABS', 'Bez treningu, 2 × sauna', 'UPPER 2', 'LOWER 2', 'Basen']);
 });

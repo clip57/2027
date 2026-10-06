@@ -73,7 +73,7 @@ test('mpw.done i mpw.err.*: walidacja, stan niezależny od CFA (ten sam numer bl
   const s = await new Store(new MemoryAdapter()).open();
   assert.deepEqual([s.state.mpwDone.size, s.state.mpwErrors], [0, []]);
   await s.record('mpw.done', { block: 1, done: true });
-  await s.record('cfa.done', { block: 2, done: true });
+  await s.record('cfa.done', { block: 2, done: true, plan: 13 });
   assert.deepEqual([[...s.state.mpwDone], [...s.state.cfaDone]], [[1], [2]]);
   await s.record('mpw.done', { block: 1, done: false });
   await s.record('mpw.err.put', { id: 'e_1', data: { egz: 'MPW', temat: 'KSH', rodzaj: 'pośpiech' } });

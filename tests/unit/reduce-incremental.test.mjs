@@ -28,7 +28,7 @@ function legacyReduce(events) {
   const pick = prefix => [...st.lww.entries()].filter(([k]) => k.startsWith(prefix)).map(([, e]) => e);
   return {
     inv: st.inv,
-    cfaDone: new Set(pick('cfa.done:').filter(e => e.d.done).map(e => e.d.block)),
+    cfaDone: new Set(pick('cfa.done:').filter(e => e.d.done && (e.d.plan ?? 0) >= 13).map(e => e.d.block)),
     cfaErrors: pick('cfa.err:').filter(e => e.t === 'cfa.err.put').map(e => ({ id: e.d.id, ...e.d.data })),
     train: Object.fromEntries(pick('train:').map(e => [`${e.d.date}|${e.d.ex}|${e.d.set}`, e.d])),
     settings: Object.fromEntries(pick('setting:').map(e => [e.d.key, e.d.value])),
@@ -68,7 +68,7 @@ function randomEvent(r, i, ms) {
     () => ['inv.count', { prod: pick(['jaja', 'mleko', 'ryz']), qty: Math.floor(r() * 30), date: day }],
     () => ['inv.move', { prod: pick(['jaja', 'mleko', 'ryz']), qty: 1 + Math.floor(r() * 5), date: day, kind: pick(['purchase', 'adjust']), note: r() < 0.3 ? 'x' : undefined }],
     () => ['inv.dayshift', { date: day, dir: pick([1, -1]) }],
-    () => ['cfa.done', { block: 1 + Math.floor(r() * 12), done: r() < 0.7 }],
+    () => ['cfa.done', { block: 1 + Math.floor(r() * 12), done: r() < 0.7, ...(r() < 0.85 ? { plan: 13 } : {}) }],   // część zapisów „z v12” — bez znacznika planu (D-098)
     () => ['cfa.err.put', { id: pick(['e1', 'e2', 'e3']), data: { q: 'pytanie', n: Math.floor(r() * 9) } }],
     () => ['cfa.err.del', { id: pick(['e1', 'e2', 'e3']) }],
     () => ['train.set', { date: day, ex: pick(['przysiad', 'wiosla']), set: 1 + Math.floor(r() * 4), done: r() < 0.8, kg: Math.floor(r() * 80), reps: 8, rir: null }],
@@ -144,8 +144,8 @@ test('Store: record/recordMany przyrostowo, appendMany (import) i zdarzenia star
   await s.record('inv.count', { prod: 'jaja', qty: 10, date: '2026-10-05' }); check('inv.count');
   await s.record('train.set', { date: '2026-10-05', ex: 'przysiad', set: 1, done: true, kg: 60, reps: 8, rir: 2 }); check('train.set');
   await s.record('train.set', { date: '2026-10-05', ex: 'przysiad', set: 1, done: false, kg: 60, reps: 8, rir: 2 }); check('nadpisanie LWW');
-  await s.recordMany([['cfa.done', { block: 1, done: true }], ['cfa.done', { block: 2, done: true }], ['prep.step', { date: '2026-10-05', card: 'a', idx: 0, done: true }]]); check('recordMany');
-  await s.record('cfa.done', { block: 1, done: false }); check('odhaczenie cofnięte');
+  await s.recordMany([['cfa.done', { block: 1, done: true, plan: 13 }], ['cfa.done', { block: 2, done: true, plan: 13 }], ['prep.step', { date: '2026-10-05', card: 'a', idx: 0, done: true }]]); check('recordMany');
+  await s.record('cfa.done', { block: 1, done: false, plan: 13 }); check('odhaczenie cofnięte');
   assert.equal(full, 0, 'zapisy lokalne bez pełnego przeliczenia');
   // import: zdarzenia z innego urządzenia, w tym starsze od lokalnych i typ z nowszej wersji
   const foreign = randomLog(11, 80).map(e => ({ ...e, id: `obce-${e.id}` }));

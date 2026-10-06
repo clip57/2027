@@ -6,6 +6,9 @@ export const SCHEMA = 1;
 // Najwyższy dopuszczalny numer bloku CFA: 432 (plan D-086; v3: 416, v5 z D-087: 421, v7 z D-090: 409 bloków). Limitu nie zmniejszamy —
 // zdarzenia zapisane przy dłuższym planie nie mogą trafić do kwarantanny. Test: plan z cfa.json mieści się w limicie.
 export const CFA_BLOCKS = 432;
+// Wersja planu CFA, do której należą odhaczenia (D-098: plan v13 liczony od zera, numery bloków nie są zgodne z v12).
+// Nowe zdarzenia `cfa.done` niosą `plan`; zdarzenia bez pola (v12 i starsze) zostają w bazie i eksporcie, ale nie liczą się w stanie.
+export const CFA_PLAN_VERSION = 13;
 // Plan MPW (D-095): 354 bloki; limit z zapasem na aktualizacje planu (tak jak CFA — nie zmniejszamy). Test: plan z mpw.json mieści się w limicie.
 export const MPW_BLOCKS = 400;
 const isStr = v => typeof v === 'string' && v.length > 0 && v.length < 5000;
@@ -22,7 +25,7 @@ const PAYLOAD = {
   'inv.move': d => isId(d.prod) && isNum(d.qty) && d.qty !== 0 && isValidDay(d.date) && ['purchase', 'adjust'].includes(d.kind),
   'cat.upsert': d => isObj(d.item) && isId(d.item.id) && d.item.id.startsWith('custom_') && isStr(d.item.name) && isStr(d.item.unit) && plain(d.item),
   'cat.delete': d => isId(d.id) && d.id.startsWith('custom_'),
-  'cfa.done': d => Number.isInteger(d.block) && d.block >= 1 && d.block <= CFA_BLOCKS && typeof d.done === 'boolean',
+  'cfa.done': d => Number.isInteger(d.block) && d.block >= 1 && d.block <= CFA_BLOCKS && typeof d.done === 'boolean' && (d.plan == null || Number.isInteger(d.plan)),
   'cfa.err.put': d => isId(d.id) && isObj(d.data) && plain(d.data),
   'cfa.err.del': d => isId(d.id),
   // Plan MPW (D-095): postęp bloków i error log — ta sama postać co cfa.*, osobne typy
