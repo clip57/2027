@@ -155,7 +155,7 @@ async function device(srv, first) {
 test('runda „push” bez zmian nie wysyła żadnego zapytania; dopisanie z chmury nie zapętla', async () => {
   const srv = fakeSupabase({ anonKey: KEY }); srv.addUser(EMAIL, PWD);
   const A = await device(srv, true), B = await device(srv);
-  await A.store.record('cfa.done', { block: 1, done: true });
+  await A.store.record('cfa.done', { block: 1, done: true, plan: 13 });
   assert.equal((await A.round('push')).pushed, 1);
   const n = srv.log.length;
   assert.equal((await A.round('push')).idle, true);
@@ -170,7 +170,7 @@ test('runda „push” bez zmian nie wysyła żadnego zapytania; dopisanie z chm
 test('lekkie pobieranie: runda bez zmian pobiera tylko indeks; własne wiersze nie wracają', async () => {
   const srv = fakeSupabase({ anonKey: KEY }); srv.addUser(EMAIL, PWD);
   const A = await device(srv, true), B = await device(srv);
-  for (let i = 1; i <= 300; i++) await A.store.record('cfa.done', { block: i, done: true });
+  for (let i = 1; i <= 300; i++) await A.store.record('cfa.done', { block: i, done: true, plan: 13 });
   await A.round('full');
   await B.round('full');
   const full = srv.stats.bytesOut;
@@ -187,7 +187,7 @@ test('lekkie pobieranie: runda bez zmian pobiera tylko indeks; własne wiersze n
 test('zapis stanu tylko przy zmianie (lista potwierdzeń nie jest przepisywana w pustej rundzie)', async () => {
   const srv = fakeSupabase({ anonKey: KEY }); srv.addUser(EMAIL, PWD);
   const A = await device(srv, true);
-  await A.store.record('cfa.done', { block: 1, done: true });
+  await A.store.record('cfa.done', { block: 1, done: true, plan: 13 });
   await A.round('full'); await A.round('full');           // druga runda przesuwa kursor za własny wiersz — realna zmiana
   const writes = [];
   const orig = A.store.adapter.setMeta.bind(A.store.adapter);
@@ -201,7 +201,7 @@ test('przełącznik: wyłączona automatyczna — runda automatyczna nic nie rob
   const A = await device(srv, true);
   await setAutoEnabled(A.store, false);
   assert.equal((await cloudStatus(A.store)).auto, false);
-  await A.store.record('cfa.done', { block: 1, done: true });
+  await A.store.record('cfa.done', { block: 1, done: true, plan: 13 });
   const n = srv.log.length;
   assert.equal((await A.round('push')).off, true);
   assert.equal(srv.log.length, n);
@@ -348,7 +348,7 @@ test('wspólna blokada: sprawdzenie nie startuje w trakcie rundy; po pełnej run
 test('sprawdzenie na serwerze: bez zmian — jedno małe zapytanie; zmiana z innego urządzenia — pobrana; własne wiersze nie są „zmianą”', async () => {
   const srv = fakeSupabase({ anonKey: KEY }); srv.addUser(EMAIL, PWD);
   const A = await device(srv, true), B = await device(srv);
-  await A.store.record('cfa.done', { block: 1, done: true });
+  await A.store.record('cfa.done', { block: 1, done: true, plan: 13 });
   await A.round('push');
   await B.round('full');
   srv.stats.bytesOut = 0; let n = srv.log.length;
@@ -356,7 +356,7 @@ test('sprawdzenie na serwerze: bez zmian — jedno małe zapytanie; zmiana z inn
   assert.equal(r.changed, false);
   assert.equal(srv.log.length - n, 1, 'jedno zapytanie');
   assert.ok(srv.stats.bytesOut <= 4, `${srv.stats.bytesOut} B`);
-  await A.store.record('cfa.done', { block: 2, done: true });
+  await A.store.record('cfa.done', { block: 2, done: true, plan: 13 });
   await A.round('push');
   n = srv.log.length;
   assert.equal((await autoCheck(A.store, A.deps)).changed, false, 'A: własny wysłany wiersz nie jest zmianą');

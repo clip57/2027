@@ -60,11 +60,13 @@ bez zmian — bloki MPW w karcie „Nauka MPW” w „Dziś” (`resolveDay().mp
 soboty bez zakupów), rozmowa kwalifikacyjna, praca magisterska, święta 26–27.12 i 27–28.03 (całkowicie wolne, bez treningu, NT), egzamin MPW 21.03;
 **wyjątki 28.09–03.10.2026** (przesunięte treningi) — testy ogólnej logiki na tygodniach od 05.10. Raport: `docs/RAPORT_D096.md`.
 **D-097 (29.09.2026):** **Dzień zero 29.09.2026** (`phases.zero`, `isZero`; bez diety, treningu, nauki, suplementów — pielęgnacja tak), plan do **28.03.2027**
-(`PLAN_END`, `inPlan` sprawdza też koniec); plan CFA **v12** (387 bloków, 30.09–11.11, soboty 9 bloków); **zakupy w czwartki** (warianty `czwartek` do 06.01
+(`PLAN_END`, `inPlan` sprawdza też koniec); plan CFA **v12** (387 bloków, 30.09–11.11, soboty 9 bloków; od D-098 zastąpiony przez v13); **zakupy w czwartki** (warianty `czwartek` do 06.01
 i `czwartek_st` od 07.01 w `day_template.json`, `day_plan_d097.py`; od 07.01 bloki MPW w czwartki +30 min — `week.mpwShift`, `mpwBloki` w `data.js`, pole `godz_src`);
 najbliższe zakupy zawsze z planu dnia: `nextShopping(data, godz, min)` (slot `shop`), nie „sobota”; preparaty czasowe 30.09–28.03; reguła `cycle` w Pielęgnacji;
 moduł **Kalendarz** (`kalendarz.js`, 13 modułów). Raport: `docs/RAPORT_D097.md`. **Niedokończone:** E2E, `verify_all.py` i `UPGRADE` pakietu prywatnego mają stan sprzed D-097 — lista w `docs/PRZEKAZANIE.md` §4.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-097).
+**D-098 (06.10.2026):** plan CFA **v13** (342 bloki, 38 dni × 9, **05.10–11.11**) zastępuje v12, liczony od zera: `cfa.done` niesie `plan` (`CFA_PLAN_VERSION` = 13), stan liczy tylko `plan ≥ 13`,
+zapisy z v12 zostają w bazie, ale nie liczą się; dni 30.09–04.10 bez bloków i recallu CFA; guard ekstrakcji i testy na 342 bloki. Raport: `docs/RAPORT_D098.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-098).
 
 ---
 

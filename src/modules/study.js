@@ -48,7 +48,7 @@ export function renderStudy(root, ctx, P) {
   const err = e => clear(msg).append(h('div', { class: 'banner err' }, e.message || String(e)));
   const toggle = async (nr, value) => {
     if (!store) return err(new Error('Baza danych jest niedostępna.'));
-    try { await store.record(P.types.done, { block: nr, done: value }); after([nr]); } catch (e) { err(e); }
+    try { await store.record(P.types.done, { block: nr, done: value, ...P.doneExtra }); after([nr]); } catch (e) { err(e); }
   };
   const toExam = diffDays(today, EXAM), toStart = diffDays(today, D.stat.start);
   const toggleRecall = async (date, value) => {
@@ -95,7 +95,7 @@ export function renderStudy(root, ctx, P) {
     const isMock = D.mockCFA.includes(date);
     const recall = !!R && R.days().includes(date);
     const markAll = value => async () => {
-      try { await store.recordMany(blocks.filter(b => done.has(b.nr) !== value).map(b => [P.types.done, { block: b.nr, done: value }])); after(); } catch (e) { err(e); }
+      try { await store.recordMany(blocks.filter(b => done.has(b.nr) !== value).map(b => [P.types.done, { block: b.nr, done: value, ...P.doneExtra }])); after(); } catch (e) { err(e); }
     };
     // Zaległe z poprzednich dni i panel dnia — odświeżane po odhaczeniu (P2)
     const backlog = region(() => date === today && late > 0 && h('section', { class: 'panel cf-backlog', 'aria-labelledby': 'cf-bl-h' },

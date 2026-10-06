@@ -9,7 +9,7 @@ const open = async (a = new MemoryAdapter()) => new Store(a).open();
 test('zapis + weryfikacja + odczyt po ponownym otwarciu (trwałość)', async () => {
   const a = new MemoryAdapter();
   const s = await open(a);
-  await s.record('cfa.done', { block: 5, done: true });
+  await s.record('cfa.done', { block: 5, done: true, plan: 13 });
   const s2 = await open(a);
   assert.ok(s2.state.cfaDone.has(5));
   assert.equal(s2.device, s.device, 'identyfikator urządzenia jest trwały');
@@ -19,12 +19,12 @@ test('błąd zapisu: wyjątek, stan „błąd”, brak zmiany danych, kolejne za
   const a = new MemoryAdapter();
   const s = await open(a);
   a.fail.write = true;
-  await assert.rejects(() => s.record('cfa.done', { block: 1, done: true }), StorageError);
+  await assert.rejects(() => s.record('cfa.done', { block: 1, done: true, plan: 13 }), StorageError);
   assert.equal(s.health.ok, false);
   assert.match(s.health.error, /NIE zostały zapisane/);
   assert.equal(s.state.cfaDone.has(1), false);
   a.fail.write = false;
-  await assert.rejects(() => s.record('cfa.done', { block: 2, done: true }), StorageError, 'po błędzie zapis zablokowany do odświeżenia');
+  await assert.rejects(() => s.record('cfa.done', { block: 2, done: true, plan: 13 }), StorageError, 'po błędzie zapis zablokowany do odświeżenia');
 });
 
 test('błąd weryfikacji odczytem jest wykrywany', async () => {
@@ -42,7 +42,7 @@ test('baza niedostępna: open() zgłasza błąd, zapis niemożliwy', async () =>
 test('uszkodzone zdarzenia trafiają do kwarantanny, reszta działa', async () => {
   const a = new MemoryAdapter();
   const s = await open(a);
-  await s.record('cfa.done', { block: 7, done: true });
+  await s.record('cfa.done', { block: 7, done: true, plan: 13 });
   await a.putRaw([{ id: 'bad1', t: 'cfa.done', d: { block: 9999, done: true }, hlc: 'x', dev: 'd' }, { junk: true }]);
   const s2 = await open(a);
   assert.equal(s2.health.quarantined, 2);
@@ -61,8 +61,8 @@ test('walidacja odrzuca niepoprawne dane przed zapisem', async () => {
 
 test('LWW: późniejsza zmiana wygrywa, poprzednia zostaje w historii', async () => {
   const s = await open();
-  await s.record('cfa.done', { block: 3, done: true });
-  await s.record('cfa.done', { block: 3, done: false });
+  await s.record('cfa.done', { block: 3, done: true, plan: 13 });
+  await s.record('cfa.done', { block: 3, done: false, plan: 13 });
   assert.equal(s.state.cfaDone.has(3), false);
   assert.equal(s.state.superseded.length, 1);
 });
