@@ -102,7 +102,8 @@ test('Zakładka: CFA do 11.11.2026, od 12.11.2026 MPW (koniec planu CFA); w grup
 test('Dzień z MPW: bloki w resolverze, szablon godzin bez zmian (decyzja 29.09.2026), symulacja', () => {
   const r = resolveDay('2026-11-17'), ref = resolveDay('2026-11-10');   // oba wtorki, 10.11 — jeszcze CFA
   assert.deepEqual([r.mpw.inPlan, r.mpw.blocks.map(b => b.nr), r.mpw.isSim], [true, [4, 5, 6], false]);
-  assert.deepEqual(r.slots.map(s => `${s.id} ${s.from}–${s.to}`), ref.slots.map(s => `${s.id} ${s.from}–${s.to}`));
+  assert.deepEqual(r.slots.map(s => `${s.id} ${s.from}–${s.to}`), SRC.dayTemplate.slots.map(s => `${s.id} ${s.from}–${s.to}`));   // zwykły wtorek: szablon bez zmian (wtorek 10.11 z blokiem J ma inny wieczór — D-099)
+  assert.ok(ref.slots.some(s => s.extra), '10.11 — jeszcze CFA z blokiem J');
   assert.ok(!JSON.stringify(r.slots).includes('MPW'), 'bloki MPW A–C nie trafiają do slotów');
   assert.equal(resolveDay('2027-02-27').mpw.isSim, true);
   assert.deepEqual([resolveDay('2026-12-25').mpw.inPlan, resolveDay('2026-12-25').mpw.blocks.length], [true, 0]);

@@ -23,12 +23,15 @@ test('struktura: VCALENDAR, VTIMEZONE Europe/Warsaw z regułami DST, CRLF, linie
   assert.equal(new Set(u.match(/^UID:.*$/gm)).size, count, 'UID unikalne');
 });
 
-test('treść: dawki, 9 bloków CFA, recall, trening, zakupy w czwartek (D-097); godziny lokalne także po zmianie czasu 25.10.2026', () => {
-  const mon = unfold(planEvents('2026-10-05', ALL, NOW).join('\r\n'));   // 28.09–04.10 z wyjątkami (D-096)
-  assert.equal((mon.match(/SUMMARY:CFA blok/g) || []).length, 9);
+test('treść: dawki, 10 bloków CFA (A–J), recall, trening, zakupy w czwartek (D-097, D-099); godziny lokalne także po zmianie czasu 25.10.2026', () => {
+  const mon = unfold(planEvents('2026-10-12', ALL, NOW).join('\r\n'));   // poniedziałek w planie CFA v14 (blok J 21:00–21:53)
+  assert.equal((mon.match(/SUMMARY:CFA blok/g) || []).length, 10);
+  assert.match(mon, /SUMMARY:CFA blok J: /);
+  assert.match(unfold(planEvents('2026-10-09', ALL, NOW).join('\r\n')), /SUMMARY:CFA blok I: /, 'piątek: A–I');
+  assert.equal((unfold(planEvents('2026-10-09', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 9);
   assert.match(mon, /SUMMARY:CFA Active Recall/);
   assert.match(mon, /SUMMARY:Trening siłowy: UPPER 1/);
-  assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-10-05').length);
+  assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-10-12').length);
   const thu = unfold(planEvents('2026-10-08', ['shop'], NOW).join('\r\n'));
   assert.match(thu, /DTSTART;TZID=Europe\/Warsaw:20261008T190500/);
   assert.match(unfold(planEvents('2027-01-07', ['shop'], NOW).join('\r\n')), /DTSTART;TZID=Europe\/Warsaw:20270107T153000/, 'od 07.01 — 15:30');

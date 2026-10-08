@@ -13,9 +13,9 @@ test('Wymaga uwagi: zaległe CFA zgodne z modułem CFA, braki przed zakupami, su
   const s = await new Store(new MemoryAdapter()).open();
   await s.recordMany([['inv.count', { prod: 'banan', qty: 120, date: '2026-10-05' }], ['inv.count', { prod: 'kreatyna', qty: 5, date: '2026-10-05' }],
     ['inv.count', { prod: 'kefir', qty: 99999, date: '2026-10-05' }]]);
-  const a = attention(s.state, { today: '2026-10-06', hour: 10 });
+  const a = attention(s.state, { today: '2026-10-09', hour: 10 });   // plan CFA v14 od 08.10: 08.10 jest już zaległy (D-099)
   const cfa = a.find(x => x.id === 'cfa');
-  assert.equal(cfa.text, `Zaległe bloki CFA: ${cfaPace(SRC.cfa.D.bloki, new Set(), '2026-10-06').overdue.length}`);
+  assert.equal(cfa.text, `Zaległe bloki CFA: ${cfaPace(SRC.cfa.D.bloki, new Set(), '2026-10-09').overdue.length}`);
   assert.match(a.find(x => x.id === 'shop').text, /Banan/);
   assert.doesNotMatch(a.find(x => x.id === 'shop').text, /Kefir/);
   const supp = a.find(x => x.id === 'supp');

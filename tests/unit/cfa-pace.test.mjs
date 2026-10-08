@@ -26,14 +26,14 @@ test('cfaPace: przed startem planu i po jego końcu', () => {
   assert.deepEqual([end.due, end.overdue.length, end.ahead], [6, 0, 0]);
 });
 
-test('cfaPace na prawdziwym harmonogramie: start CFA 05.10 — 9 bloków dziennie, także w sobotę (v13, D-098)', () => {
+test('cfaPace na prawdziwym harmonogramie: start CFA 08.10 — 10 bloków (A–J), w piątki i soboty 9 (v14, D-099)', () => {
   const D = SRC.cfa.D;
-  assert.deepEqual([cfaPace(D.bloki, new Set(), '2026-09-30').due, cfaPace(D.bloki, new Set(), '2026-09-30').today], [0, 0], '30.09–04.10: dni projektu bez bloków CFA');
-  assert.deepEqual([cfaPace(D.bloki, new Set(), '2026-10-05').due, cfaPace(D.bloki, new Set(), '2026-10-05').today], [0, 9]);
-  const p = cfaPace(D.bloki, new Set(), '2026-10-06');
-  assert.equal(p.due, 9);
-  assert.equal(p.today, 9);
-  assert.equal(cfaPace(D.bloki, new Set(), '2026-10-12').due, 7 * 9, '05.10–11.10: 7 dni × 9 (sobota 10.10 także 9)');
+  assert.deepEqual([cfaPace(D.bloki, new Set(), '2026-09-30').due, cfaPace(D.bloki, new Set(), '2026-09-30').today], [0, 0], '30.09–07.10: dni projektu bez bloków CFA');
+  assert.deepEqual([cfaPace(D.bloki, new Set(), '2026-10-08').due, cfaPace(D.bloki, new Set(), '2026-10-08').today], [0, 10]);
+  const p = cfaPace(D.bloki, new Set(), '2026-10-09');
+  assert.equal(p.due, 10);
+  assert.equal(p.today, 9, 'piątek 09.10: 9 bloków (bez J)');
+  assert.equal(cfaPace(D.bloki, new Set(), '2026-10-12').due, 10 + 9 + 9 + 10, '08.10–11.10: czw 10, pt 9, sob 9, nd 10');
 });
 
 test('restSeconds: zapisy przerw z planu treningowego', () => {
