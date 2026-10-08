@@ -6,7 +6,8 @@ export const SCHEMA = 1;
 // Najwyższy dopuszczalny numer bloku CFA: 432 (plan D-086; v3: 416, v5 z D-087: 421, v7 z D-090: 409 bloków). Limitu nie zmniejszamy —
 // zdarzenia zapisane przy dłuższym planie nie mogą trafić do kwarantanny. Test: plan z cfa.json mieści się w limicie.
 export const CFA_BLOCKS = 432;
-// Wersja planu CFA, do której należą odhaczenia (D-098: plan v13 liczony od zera, numery bloków nie są zgodne z v12).
+// Wersja numeracji bloków CFA, do której należą odhaczenia (D-098: plan v13 liczony od zera, numery bloków nie są zgodne z v12).
+// D-099: plan v14 zachowuje numerację v13 dla bloków 1–192 (te same bloki), więc wersja znacznika zostaje 13 i odhaczenia v13 się liczą.
 // Nowe zdarzenia `cfa.done` niosą `plan`; zdarzenia bez pola (v12 i starsze) zostają w bazie i eksporcie, ale nie liczą się w stanie.
 export const CFA_PLAN_VERSION = 13;
 // Plan MPW (D-095): 354 bloki; limit z zapasem na aktualizacje planu (tak jak CFA — nie zmniejszamy). Test: plan z mpw.json mieści się w limicie.

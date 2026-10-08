@@ -101,11 +101,13 @@ test('statusy — progi v31 (suplementy i trwałe)', () => {
 });
 
 test('najbliższe zakupy wg planu dnia (D-097): czwartek po saunie 19:05–20:35, od 07.01 15:30–16:00; do końca slotu — dziś', () => {
-  const thu = { from: '19:05', to: '20:35' }, jan = { from: '15:30', to: '16:00' };
+  // W dni z blokiem J (08.10–05.11, D-099) slot zakupów kończy się 20:25 (powrót skrócony o 10 min); od 12.11 bez J — do 20:35
+  const thu = { from: '19:05', to: '20:25' }, thuNoJ = { from: '19:05', to: '20:35' }, jan = { from: '15:30', to: '16:00' };
   assert.deepEqual(nextShopping('2026-09-29', 10), { date: '2026-10-08', inDays: 9, ...thu }, 'tydzień 28.09–04.10 bez zakupów');
   assert.deepEqual(nextShopping('2026-10-06', 10), { date: '2026-10-08', inDays: 2, ...thu });
-  assert.deepEqual(nextShopping('2026-10-08', 20, 34), { date: '2026-10-08', inDays: 0, ...thu });
-  assert.deepEqual(nextShopping('2026-10-08', 20, 35), { date: '2026-10-15', inDays: 7, ...thu });
+  assert.deepEqual(nextShopping('2026-10-08', 20, 24), { date: '2026-10-08', inDays: 0, ...thu });
+  assert.deepEqual(nextShopping('2026-10-08', 20, 25), { date: '2026-10-15', inDays: 7, ...thu });
+  assert.deepEqual(nextShopping('2026-11-11', 10), { date: '2026-11-12', inDays: 1, ...thuNoJ }, 'po planie CFA zakupy do 20:35');
   assert.deepEqual(nextShopping('2026-10-09', 10), { date: '2026-10-15', inDays: 6, ...thu }, 'sobota bez zakupów (plan CFA v12)');
   assert.deepEqual(nextShopping('2027-01-05', 8), { date: '2027-01-07', inDays: 2, ...jan });
   assert.deepEqual(nextShopping('2027-01-07', 15, 59), { date: '2027-01-07', inDays: 0, ...jan });

@@ -101,9 +101,9 @@ async def run_variant(pw, name, url, mobile):
     SLOTS = "e => e.map(x => x.querySelector('time').textContent + ' ' + x.querySelector('.slot-title').firstChild.textContent)"   # bez znacznika „teraz”
     chips = await pg.eval_on_selector_all('.topline .chip', 'e => e.map(x => x.textContent)')
     ok('UPPER 1 + sauna' in chips and 'Faza 0' in chips, f'{tag} 30.09: UPPER 1 + sauna, Faza 0 (D-096, D-097): {chips}')
-    ok('Curriculum 2026 Vol 1' not in main and 'Brak bloku CFA' in main, f'{tag} 30.09: bez bloków CFA — plan v13 od 05.10 (D-098)')
+    ok('Curriculum 2026 Vol 1' not in main and 'Brak bloku CFA' in main, f'{tag} 30.09: bez bloków CFA — plan v14 od 08.10 (D-099)')
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
-    ok([s for s in slots if 'CFA blok' in s] == [], f'{tag} 30.09: brak slotów CFA przed startem planu (D-098)')
+    ok([s for s in slots if 'CFA blok' in s] == [], f'{tag} 30.09: brak slotów CFA przed startem planu (D-099)')
     OPEN = "document.querySelectorAll('details.dz-past').forEach(d => d.open = true)"
     await pg.goto(url + '#/dzis?d=2026-10-10'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate(OPEN)
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
@@ -111,7 +111,7 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/dzis?d=2026-10-08'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate(OPEN)
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
     ok('17:45 Transport na siłownię' in slots and '17:55 2 rundy sauny wg protokołu' in slots and '19:05 Zakupy' in slots and 'Posiłek po saunie' in await pg.inner_text('#slot\\.1905c'),
-       f'{tag} czwartek: sauna 17:55–19:05, zakupy 19:05–20:35, posiłek po saunie 20:15 (D-097)')
+       f'{tag} czwartek: sauna 17:55–19:05, zakupy 19:05–20:25 (dzień z blokiem J, D-099), posiłek po saunie 20:15 (D-097)')
     await pg.goto(url + '#/dzis?d=2027-01-07'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate(OPEN)
     slots = await pg.eval_on_selector_all('.slot', SLOTS)
     ok('15:30 Zakupy' in slots and '19:05 2 rundy sauny wg protokołu' in slots and '16:00 MPW blok A' in slots, f'{tag} czwartek od 07.01: zakupy 15:30, MPW od 16:00, sauna 19:05 (D-097)')
@@ -309,13 +309,13 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/bezpieczenstwo?m=tabela'); await pg.wait_for_selector('.safety-table')
     ok(await pg.locator('.safety-table tbody tr').count() == 71 and await pg.locator('.safety-table th').count() == 12, f'{tag} Bezpieczeństwo: pełna tabela 12 kolumn')
     # --- Etap 5: CFA
-    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-05'); await pg.wait_for_selector('.cfa-row')
-    ok(await pg.locator('.cfa-row:not(.cf-recall)').count() == 9, f'{tag} CFA: 05.10 — 9 bloków (v13)')
-    ok(await pg.locator('a:has-text("Poprzedni dzień")').count() == 0, f'{tag} CFA: 05.10 to pierwszy dzień planu CFA')
+    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-08'); await pg.wait_for_selector('.cfa-row')
+    ok(await pg.locator('.cfa-row:not(.cf-recall)').count() == 10, f'{tag} CFA: 08.10 — 10 bloków A–J (v14)')
+    ok(await pg.locator('a:has-text("Poprzedni dzień")').count() == 0, f'{tag} CFA: 08.10 to pierwszy dzień planu CFA')
     ok('Curriculum 2026 Vol 1 (QM), s. 3–14 (12 s.)' in await pg.inner_text('main'), f'{tag} CFA: źródło i strony bloku')
     await pg.locator('.cfa-row .set-toggle').first.click(); await pg.wait_for_timeout(400)
     await pg.reload(); await pg.wait_for_selector('.cfa-row')
-    ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 342' in await pg.inner_text('.hero-cfa'),
+    ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 340' in await pg.inner_text('.hero-cfa'),
        f'{tag} CFA: postęp zapisany trwale')
     c = await pg.locator('.cfa-row .set-toggle').first.evaluate(CONTRAST)
     ok(c >= 4.5, f'{tag} CFA: kontrast odhaczonego bloku ≥ 4,5:1 ({c:.2f})')
@@ -326,7 +326,7 @@ async def run_variant(pw, name, url, mobile):
     ok('18 bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row .mode.m-mo').count() == 18
        and 'PRACTICE' in await pg.inner_text('.filters select >> nth=1'), f'{tag} CFA: filtr trybu (MOCK = 18 bloków; tryb PRACTICE w filtrze, D-093)')
     await pg.goto(url + '#/cfa?v=harmonogram&tryb=PRACTICE'); await pg.wait_for_selector('.filters')
-    ok('9 bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row .mode.m-pr').count() == 9, f'{tag} CFA: mixed practice (9 bloków, v12)')
+    ok('5 bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row .mode.m-pr').count() == 5, f'{tag} CFA: mixed practice (5 bloków, v14)')
     await pg.goto(url + '#/cfa?v=kalendarz'); await pg.wait_for_selector('.cal')
     ok(await pg.locator('.cal-d.c-mock').count() == 3 and await pg.locator('.cal-d.c-exam').count() == 1, f'{tag} CFA: kalendarz z 3 mockami i egzaminem (D-093)')
     await pg.goto(url + '#/cfa?v=log'); await pg.wait_for_selector('.form-grid')
@@ -350,7 +350,7 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/cfa?v=plan'); await pg.wait_for_selector('.topic')
     ok(await pg.locator('.topic').count() == 10, f'{tag} CFA: 10 działów w planie')
     kv = await pg.inner_text('.kv')
-    ok('342 (38 dni: 38×9)' in kv and '302,1 h' in kv and '(28 sesji)' in kv, f'{tag} CFA: statystyki planu v13 (342 bloki, recall 28)')
+    ok('340 (35 dni: 25×10 + 10×9)' in kv and '300,33 h' in kv and '(31 sesji)' in kv, f'{tag} CFA: statystyki planu v14 (340 bloków, recall 25 + 6 = 31)')
     await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
     ok('od 30.09' in await pg.inner_text('main') and 'od 27.09' not in await pg.inner_text('main'), f'{tag} Dieta: Faza 0 od 30.09 (D-097)')
     await pg.goto(url + '#/rekompozycja'); await pg.wait_for_selector('.rk-sec')
@@ -816,11 +816,11 @@ async def run_etap3(pw, name, url, mobile):
     await pg.goto(url + '#/dzis?v=tydzien&d=2026-09-29'); await pg.wait_for_selector('.wk-grid')
     ok(await pg.locator('.wk-day.is-out').count() == 2 and 'Dzień zero' in await pg.inner_text('.wk-grid'), f'{tag} I3: 28.09 poza planem, 29.09 Dzień zero bez planu (D-097)')
     # I11: recall 22:00 odhaczany (ustawienie), widoczny w statystykach
-    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-05'); await pg.wait_for_selector('.cf-recall')
+    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-08'); await pg.wait_for_selector('.cf-recall')
     await pg.locator('.cf-recall .set-toggle').click(); await pg.wait_for_timeout(500)
     ok(await pg.locator('.cf-recall .set-toggle').get_attribute('aria-pressed') == 'true' and 'Recall: 1 /' in await pg.inner_text('.hero-cfa'), f'{tag} I11: recall odhaczony')
     await pg.goto(url + '#/cfa?v=plan'); await pg.wait_for_selector('.kv')
-    ok('wykonane 1 z 28 sesji' in await pg.inner_text('main'), f'{tag} I11: statystyka recall w planie')
+    ok('wykonane 1 z 25 sesji' in await pg.inner_text('main'), f'{tag} I11: statystyka recall w planie')
     await pg.goto(url + '#/cfa?v=dzien&d=2026-10-09'); await pg.wait_for_selector('.cfa-dayhead')
     ok(await pg.locator('.cf-recall').count() == 0, f'{tag} I11: piątek bez recall')
     # I4 / I5: wyszukiwanie (Ctrl+K, „/”), skróty
@@ -933,7 +933,7 @@ async def run_p2(pw, name, url, mobile):
     await check('#/cfa?v=dzien&d=2026-10-11', click('.cf-backlog .set-toggle'), 'CFA zaległy blok (dziś)', '.cf-backlog')
     await check('#/cfa?v=dzien&d=2026-10-11', click('.cfa-dayhead ~ .cfa-list .set-toggle[aria-pressed="false"]'), 'CFA blok dnia', '.cfa-dayhead')
     await check('#/cfa?v=dzien&d=2026-10-11', click('.cfa-dayhead ~ .cfa-list .set-toggle[aria-pressed="true"]'), 'CFA cofnięcie odhaczenia', '.cfa-dayhead')
-    await check('#/cfa?v=dzien&d=2026-10-05', click('.cf-recall .set-toggle'), 'CFA recall 22:00', '.cf-recall')
+    await check('#/cfa?v=dzien&d=2026-10-08', click('.cf-recall .set-toggle'), 'CFA recall 22:00', '.cf-recall')
     await check('#/cfa?v=dzien&d=2026-10-06', lambda: pg.get_by_role('button', name='Oznacz cały dzień').click(), 'CFA cały dzień', '.cfa-dayhead', focus=None)
     await check('#/cfa?v=harmonogram', click('main > section.panel .set-toggle[aria-pressed="false"]'), 'CFA harmonogram (dzień przyszły)', '.cfa-dh')
     async def past():
@@ -1109,7 +1109,7 @@ async def run_mpw(pw, name, url, mobile):
     ok(await pg.locator('.dz-mpw .cfa-row.is-done').count() == 1, f'{tag} Dziś: odhaczenie bloku MPW')
     # Moduł: postęp niezależny od CFA, punktowe odświeżanie (P2), zadania bloku
     await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.hero-cfa')
-    ok('0 / 342 bloków' in await pg.inner_text('.hero-cfa'), f'{tag} CFA: postęp CFA bez bloków MPW')
+    ok('0 / 340 bloków' in await pg.inner_text('.hero-cfa'), f'{tag} CFA: postęp CFA bez bloków MPW')
     await pg.goto(url + '#/mpw'); await pg.wait_for_selector('.cfa-row')
     ok('1 / 392 bloków' in await pg.inner_text('.hero-mpw') and await pg.locator('.cfa-row.is-done').count() == 1, f'{tag} MPW: odhaczenie z „Dziś” widoczne w module')
     await pg.evaluate("document.querySelector('main').dataset.p2 = '1'")

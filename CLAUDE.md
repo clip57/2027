@@ -66,7 +66,9 @@ najbliższe zakupy zawsze z planu dnia: `nextShopping(data, godz, min)` (slot `s
 moduł **Kalendarz** (`kalendarz.js`, 13 modułów). Raport: `docs/RAPORT_D097.md`. **Niedokończone:** E2E, `verify_all.py` i `UPGRADE` pakietu prywatnego mają stan sprzed D-097 — lista w `docs/PRZEKAZANIE.md` §4.
 **D-098 (06.10.2026):** plan CFA **v13** (342 bloki, 38 dni × 9, **05.10–11.11**) zastępuje v12, liczony od zera: `cfa.done` niesie `plan` (`CFA_PLAN_VERSION` = 13), stan liczy tylko `plan ≥ 13`,
 zapisy z v12 zostają w bazie, ale nie liczą się; dni 30.09–04.10 bez bloków i recallu CFA; guard ekstrakcji i testy na 342 bloki. Raport: `docs/RAPORT_D098.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-098).
+**D-099 (08.10.2026):** plan CFA **v14** (340 bloków, 35 dni, **08.10–11.11**, 25×10 + 10×9, **blok J 21:00–21:53** poza pt i sob) zastępuje v13; bloki 1–192 jak w v13 (odhaczenia zachowane, `CFA_PLAN_VERSION` = 13);
+w dni z J resolver dokłada slot `slot.cfa.J` (`extra`) i układa wieczór: powrót 20:15–20:25, kolacja z chondroityną 20:50–21:00, przygotowanie posiłków 21:53–22:00 (`jEvening`, `hasJ`); recall 25 + 6 sesji końcowych z 12.11 (`recallSessions`, jeszcze bez widoku). Raport: `docs/RAPORT_D099.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-099).
 
 ---
 

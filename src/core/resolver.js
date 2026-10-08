@@ -31,11 +31,16 @@ export function phaseFor(date) {
   return ph; // null = przed Fazą 0 (start planu i Faza 0 od 27.09.2026 — D-088, D-090)
 }
 
+// Dzień z blokiem J (plan CFA v14, D-099: 21:00–21:53 w dni poza pt i sob) — wieczór układany inaczej (kolacja przed blokiem).
+export const hasJ = date => (cfaByDay[date] || []).some(b => b.blok === 'J');
+const SUPPER_J = '20:50';   // kolacja 20:50–21:00 w dni z blokiem J (D-099); chondroityna idzie z kolacją
+
 export function dosesFor(date) {
   if (!inPlan(date) || isZero(date)) return [];   // suplementacja od dnia 1 planu (D-088, D-097)
   const wd = weekday(date);
-  return SRC.supplements.doses.filter(d =>
+  const doses = SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
+  return hasJ(date) ? doses.map(d => (d.time === '21:00' ? { ...d, time: SUPPER_J } : d)) : doses;   // D-099
 }
 // Okres przyjmowania preparatów czasowych (D-015; 30.09.2026–28.03.2027 — D-097). `from` opcjonalne.
 export function inValidity(d, date) {
@@ -57,6 +62,11 @@ export function dayPlan(date) {
 // Szablon godzin dnia z wariantem dnia (poza dniem mocka): niedziela „basen” (D-094), czwartek „czwartek” — sauna i zakupy,
 // od 07.01 „czwartek_st” — zakupy 15:30 i bloki MPW 30 min później (D-097). Soboty bez zakupów (plan CFA v12, D-097).
 export function templateFor(date, isMock = MOCKS.has(date)) {
+  const base = baseTemplate(date, isMock);
+  return hasJ(date) ? jEvening(base) : base;
+}
+
+function baseTemplate(date, isMock) {
   const name = dayPlan(date).variant;
   const v = !isMock && name && SRC.dayTemplate.variants?.[name];
   if (!v) return SRC.dayTemplate.slots;
@@ -66,6 +76,26 @@ export function templateFor(date, isMock = MOCKS.has(date)) {
     if (!v.replaces.includes(s.id)) out.push(s);
   }
   return out;
+}
+
+// Wieczór w dni z blokiem J 21:00–21:53 (D-099, polecenie użytkownika 08.10.2026): slot z posiłkiem potreningowym („Powrót do domu” — w czwartek „Zakupy”,
+// w niedzielę „Powrót do domu” po basenie) skrócony o 10 min (20:15–20:25), kolejne sloty o 10 min wcześniej, kolacja (z chondroityną) 20:50–21:00,
+// „Przygotowywanie posiłków, melisy i wieczorna pielęgnacja” 21:53–22:00. Inne dni bez zmian.
+const toMin = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
+const fromMin = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+const earlier = (t, n = 10) => fromMin(toMin(t) - n);
+function jEvening(list) {
+  const post = list.findIndex(s => s.items.some(i => i.kind === 'meal' && i.meal === 'post'));
+  const sup = list.findIndex(s => s.id === 'slot.2100'), tail = list.findIndex(s => s.id === 'slot.2145');
+  if (post < 0 || sup <= post || tail <= sup) return list;
+  return list.map((s, i) => {
+    if (i === post) return { ...s, to: earlier(s.to), decision: 'D-099' };
+    if (i > post && i < sup) return { ...s, from: earlier(s.from), to: earlier(s.to), decision: 'D-099' };
+    if (i === sup) return { ...s, from: SUPPER_J, to: '21:00', title_src: 'Kolacja', decision: 'D-099',
+      items: s.items.map(it => (it.kind === 'meal' && it.meal === 'supper' ? { ...it, time: SUPPER_J } : it)) };
+    if (i === tail) return { ...s, from: '21:53', decision: 'D-099' };
+    return s;
+  });
 }
 
 export function mealsFor(variant, phase) {
@@ -95,7 +125,8 @@ export function resolveDay(date) {
   const mealName = key => (key === 'post' && w.diet === 'NT' ? 'Posiłek po saunie' : MEAL_NAMES[key]); // D-018
   const sessionLabel = w.sauna === 1 ? `${w.sessionName} + sauna` : w.sessionName; // D-040
   const free = w.dayType === 'free' || !!w.zero;   // dzień bez treningu i sauny (D-087): całe okno treningowe wolne
-  const slots = templateFor(date, isMock).map(s => {
+  const tpl = templateFor(date, isMock);
+  const slots = tpl.map(s => {
     // Podpunkty: suplementy z tekstu PLAN_DNIA są ukryte — pokazywane są wyłącznie dawki z SUPLEMENTACJI (D-001).
     const items = (s.items || []).filter(i => i.kind === 'task' || i.kind === 'meal').map(i => i.kind === 'meal'
       ? { kind: 'meal', meal: i.meal, time: i.time, text: `${mealName(i.meal)} (${i.time})`, kcal: p.meals.find(m => m.id === i.meal)?.total.kcal ?? null }
@@ -133,6 +164,20 @@ export function resolveDay(date) {
     }
     return out;
   });
+
+  // D-099: blok o literze bez slotu w szablonie (plan v14: J 21:00–21:53 poza pt/sob) — własny slot „CFA blok J” między kolacją (20:50–21:00) a przygotowaniem posiłków (21:53–22:00);
+  // wieczór w dni z J układa `jEvening`. Eksport ICS i licznik bloków dostają slot automatycznie.
+  if (inCfa) {
+    const letters = new Set(tpl.filter(t => t.role === 'cfa').map(t => (isMock && SRC.week.mock.replace[t.key]) || t.key));
+    const extra = {};
+    for (const b of blocks) if (!letters.has(b.blok)) (extra[b.blok] ||= []).push(b);
+    const domain = slots.find(x => x.role === 'cfa')?.domain;
+    for (const [letter, list] of Object.entries(extra)) {
+      const [from, to] = list[0].godz.split('–');
+      const at = slots.findIndex(x => x.to > x.from && x.from >= from);   // przed pierwszym slotem zaczynającym się nie wcześniej niż blok
+      slots.splice(at < 0 ? slots.length : at, 0, { id: `slot.cfa.${letter}`, from, to, domain, role: 'cfa', title: `CFA blok ${letter}`, desc: '', items: [], shop: false, doses: [], cfa: list, extra: true });
+    }
+  }
 
   return {
     date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, zero: !!w.zero, after: !!w.after, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
