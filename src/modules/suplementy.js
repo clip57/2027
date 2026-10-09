@@ -8,7 +8,7 @@ import { scheduleFor, supplementOverview } from '../core/calc/supplements.js';
 import { addDays, longDate, weekday, dayShort, shortDate } from '../core/dates.js';
 import { stockAt, forecast, statusInfo, runway, nextShopping } from '../core/calc/inventory.js';
 import { catalogById } from '../core/data.js';
-import { dayPlan, inPlan, PLAN_START, PLAN_END } from '../core/resolver.js';
+import { dayPlan, inPlan, PLAN_START, PLAN_END, DAY_ZERO } from '../core/resolver.js';
 
 const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
 
@@ -59,7 +59,7 @@ export function renderSuplementy(root, ctx) {
   // Oś dnia: dla dzisiejszego dnia pory minione przygaszone, następna wyróżniona (godzina z SUPLEMENTACJI)
   if (dayPlan(date).zero) add(root, h('p', { class: 'panel sp-outside' }, `Dzień zero — bez suplementów. Suplementacja od ${longDate(addDays(date, 1))}.`));
   else if (!inPlan(date)) add(root, h('p', { class: 'panel sp-outside' }, date > PLAN_END ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.`
-    : `Poza planem — suplementacja zaczyna się ${longDate(addDays(PLAN_START, 1))}.`));
+    : `Poza planem — suplementacja zaczyna się ${longDate(DAY_ZERO ? addDays(PLAN_START, 1) : PLAN_START)}.`));
   for (const g of groups) {
     const past = isToday && g.time < hhmm, next = g.time === nextTime;
     add(root, h('article', { class: `tl-item${past ? ' is-past' : ''}${next ? ' is-next' : ''}` },

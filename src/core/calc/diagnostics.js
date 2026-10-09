@@ -3,7 +3,7 @@
 import { stockAt, allItems } from './inventory.js';
 import { SRC } from '../data.js';
 import { addDays } from '../dates.js';
-import { PLAN_START } from '../resolver.js';
+import { PLAN_START, TRAIN_START } from '../resolver.js';
 import { packStatus, markersIn } from '../private.js';
 import rekomp from '../../data/rekomp.json' with { type: 'json' };
 import { careModel } from './care.js';
@@ -48,10 +48,10 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   push('future', up ? 'warn' : 'ok', up ? `Zdarzenia z nowszej wersji aplikacji: ${up}` : 'Wszystkie zdarzenia rozpoznane',
     up ? `Zachowane, ale pomijane w obliczeniach (${Object.keys(state.unprocessed.types).join(', ')}). Zaktualizuj aplikację.` : '');
 
-  // Start planu (D-088, D-090): serie i czasy treningu sprzed 27.09.2026 zostają w dzienniku, poza statystykami
-  const pre = Object.values(state.train || {}).filter(s => s.date < PLAN_START).length
-    + Object.keys(state.trainSessions || {}).filter(d => d < PLAN_START).length;
-  if (pre) push('pre-start', 'info', `Wpisy treningowe sprzed startu planu: ${pre}`, `Zachowane w dzienniku i w synchronizacji; statystyki i historia liczone od ${PLAN_START} (D-088).`);
+  // Start treningów (D-088, D-100): serie i czasy treningu sprzed 10.10.2026 zostają w dzienniku, poza statystykami
+  const pre = Object.values(state.train || {}).filter(s => s.date < TRAIN_START).length
+    + Object.keys(state.trainSessions || {}).filter(d => d < TRAIN_START).length;
+  if (pre) push('pre-start', 'info', `Wpisy treningowe sprzed startu planu: ${pre}`, `Zachowane w dzienniku i w synchronizacji; statystyki i historia liczone od ${TRAIN_START} (D-088, D-100).`);
 
   // Pakiet prywatny (D-091): czy pasuje do danych aplikacji (znaczniki) i do bieżącej wersji planu
   const pk = packStatus(state.privatePack, { start: PLAN_START, markers: { 'rek-priv': markersIn(rekomp), 'mp-why': markersIn(SRC.mealprep) } });

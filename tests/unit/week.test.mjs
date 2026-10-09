@@ -16,16 +16,18 @@ test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (28 t
       const r = resolveDay(addDays(monday, i));
       assert.equal(x.date, r.date);
       assert.deepEqual([x.training, x.diet, x.kcal, x.cfa, x.recall, x.mock, x.outside], [r.sessionLabel, r.dietVariant, r.kcal, r.cfa.blocks.length, r.cfa.recall, r.cfa.isMock, r.outside], x.date);
-      // D-097: zakupy w czwartki (19:05 do 06.01, 15:30 od 07.01), bez zakupów w tygodniu 28.09–04.10 i poza planem; soboty bez zakupów
-      const exp = r.weekday !== 4 || r.outside || x.date === '2026-10-01' || r.cfa.isMock ? null : x.date >= '2027-01-07' ? '15:30' : '19:05';
+      // D-097: zakupy w czwartki (19:05 do 06.01, 15:30 od 07.01), także w pierwszy czwartek planu 08.10 (D-100); bez zakupów poza planem; soboty bez zakupów
+      const exp = r.weekday !== 4 || r.outside || r.cfa.isMock ? null : x.date >= '2027-01-07' ? '15:30' : '19:05';
       assert.equal(x.shopping, exp, `${x.date}: zakupy w czwartek (D-097)`);
-      assert.equal(x.zero, x.date === '2026-09-29', x.date);
+      assert.equal(x.zero, false, `${x.date}: Dzień zero usunięty z kalendarza (D-100)`);
+      assert.equal(!!x.noDiet, !!r.noDiet, x.date);
       assert.equal(x.blocks, r.blocks?.short || null, `${x.date}: weekendowe bloki (D-096)`);
     });
   }
-  const first = weekSummary('2026-09-29');
-  assert.deepEqual(first.map(x => x.outside), [true, true, false, false, false, false, false], 'D-088, D-097: 28.09 poza planem, 29.09 Dzień zero');
-  assert.deepEqual(first.map(x => x.zero), [false, true, false, false, false, false, false]);
+  const first = weekSummary('2026-10-08');
+  assert.deepEqual(first.map(x => x.outside), [true, true, true, false, false, false, false], 'D-088, D-100: 05–07.10 poza planem, kalendarz od 08.10');
+  assert.deepEqual(first.map(x => !!x.noDiet), [false, false, false, true, true, false, false], '08–09.10 — bez diety');
+  assert.deepEqual(first.map(x => x.training), ['Poza planem', 'Poza planem', 'Poza planem', 'Bez treningu', 'Bez treningu', 'UPPER 1 + sauna', 'Basen']);
   const last = weekSummary('2027-03-28');
   assert.deepEqual(last.map(x => x.outside), [false, false, false, false, false, false, false], '22–28.03 w planie (koniec 28.03)');
   assert.ok(weekSummary('2027-03-29').every(x => x.outside), 'od 29.03 poza planem');

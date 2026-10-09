@@ -5,7 +5,7 @@ meal prep, trening, nauka CFA, bezpieczeństwo żywności, plan rekompozycji. Je
 iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych), przeglądarka na komputerze.
 Język interfejsu i dokumentacji: **polski**.
 
-**Bieżące zadanie (29.09.2026): dokończenie D-097 — aktualizacja E2E, `verify_all.py`, `UPGRADE` pakietu prywatnego i pełna regresja (`docs/PRZEKAZANIE.md` §4); potem kolejne polecenia użytkownika.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
+**Bieżące zadanie (08.10.2026): E2E/a11y do przeglądu po D-099/D-100 (zegar testu przed startem kalendarza — `docs/RAPORT_D100.md`); wcześniej: dokończenie D-097 — aktualizacja E2E, `verify_all.py`, `UPGRADE` pakietu prywatnego i pełna regresja (`docs/PRZEKAZANIE.md` §4); potem kolejne polecenia użytkownika.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
 Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
 24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
 następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
@@ -68,7 +68,10 @@ moduł **Kalendarz** (`kalendarz.js`, 13 modułów). Raport: `docs/RAPORT_D097.m
 zapisy z v12 zostają w bazie, ale nie liczą się; dni 30.09–04.10 bez bloków i recallu CFA; guard ekstrakcji i testy na 342 bloki. Raport: `docs/RAPORT_D098.md`.
 **D-099 (08.10.2026):** plan CFA **v14** (340 bloków, 35 dni, **08.10–11.11**, 25×10 + 10×9, **blok J 21:00–21:53** poza pt i sob) zastępuje v13; bloki 1–192 jak w v13 (odhaczenia zachowane, `CFA_PLAN_VERSION` = 13);
 w dni z J resolver dokłada slot `slot.cfa.J` (`extra`) i układa wieczór: powrót 20:15–20:25, kolacja z chondroityną 20:50–21:00, przygotowanie posiłków 21:53–22:00 (`jEvening`, `hasJ`); recall 25 + 6 sesji końcowych z 12.11 (`recallSessions`, jeszcze bez widoku). Raport: `docs/RAPORT_D099.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-099).
+**D-100 (08.10.2026):** **kalendarz od 08.10.2026** (dni do 07.10 i Dzień zero 29.09 usunięte — poza planem; `phases.zero` brak), **08–09.10 — dni bez diety i treningu** (flaga `noDiet`), **dieta, trening i realny początek planu od 10.10** (`phases.dietStart/trainStart/realStart`,
+`DIET_START`, `TRAIN_START`, `PLAN_REAL_START` w resolverze); UPPER 1 + sauna w sobotę 10.10, 2 × sauna w poniedziałek 12.10 (NT); **Faza 1 od 19.10, Faza 2 od 23.11**;
+07–11.11 bez treningu z dietą NT; preparaty czasowe od 08.10 (172 dni); plan CFA bez zmian. Pielęgnacja: tylko daty w pliku użytkownika (poza repozytorium). Dane: `tools/extract/day_plan_d100.py`. Raport: `docs/RAPORT_D100.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-100).
 
 ---
 

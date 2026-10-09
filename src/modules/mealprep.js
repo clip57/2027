@@ -3,7 +3,7 @@
 import { h, clear, fmt, add } from '../ui/dom.js';
 import { progressRing } from '../ui/components.js';
 import { SRC, plan, catalogById } from '../core/data.js';
-import { resolveDay, PLAN_START } from '../core/resolver.js';
+import { resolveDay, PLAN_START, DIET_START } from '../core/resolver.js';
 import { longDate, addDays, dayShort, shortDate } from '../core/dates.js';
 import { coverage } from '../core/calc/inventory.js';
 import { icon } from '../ui/icons.js';
@@ -46,7 +46,7 @@ function timer(minutes, label) {
 }
 
 // Fazy w kolejności dnia: „Wieczór poprzedniego dnia” (karty 21:45–21:55) wykonuje się wieczorem tego dnia na jutro,
-// więc jest po „Wieczorze”, a jej ilości pochodzą z planu jutra (B1: na granicy faz, np. 11.10 → 12.10, płatki 85 g).
+// więc jest po „Wieczorze”, a jej ilości pochodzą z planu jutra (B1: na granicy faz, np. 18.10 → 19.10, płatki 85 g).
 // Identyfikatory sekcji (`mp-ph-<nr>`) = numer fazy w MEAL_PREP.
 const EVE = 0;
 const ORDER = [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && SRC.mealprep.phases[i].cards.some(Boolean))
@@ -72,7 +72,9 @@ export function renderMealPrep(root, ctx) {
   const eveIds = new Set(SRC.mealprep.phases[EVE].cards);
   const textOf = (c, t) => (eveIds.has(c.id) ? TN(t) : T(t));
   const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${date}|${c.id}|${bi * 100 + i}`, text: it, card: c })));
-  const allSteps = ORDER.flatMap(i => SRC.mealprep.phases[i].cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
+  // D-100: w dniu bez diety (08–09.10) tylko wieczorne przygotowanie na jutro — a gdy i jutro bez diety (08.10), brak kart
+  const order = r.noDiet ? (rt.noDiet ? [] : [EVE]) : ORDER;
+  const allSteps = order.flatMap(i => SRC.mealprep.phases[i].cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
   // Składniki na jutro (D-074): stan na koniec dnia vs zużycie jutra wg planu — dla produktów używanych w kartach
   const inv = store?.state?.inv;
   const cover = inv ? coverage(inv, SRC.mealprep.cards.filter(c => c.id).flatMap(cardProds), date, tomorrow) : [];
@@ -119,7 +121,7 @@ export function renderMealPrep(root, ctx) {
           h('a', { class: 'btn dz-nav', href: `#/mealprep?d=${tomorrow}` }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 })))),
       h('div', { class: 'hero-tr-side' }, ringBox),
       h('div', { class: 'hero-tr-map' }, nextBox)),
-    h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, ORDER.map(i => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, SRC.mealprep.phases[i].title))),
+    h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, order.map(i => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, SRC.mealprep.phases[i].title))),
     inv && h('section', { class: `mp-stock${short.length ? ' has-short' : ''}`, 'aria-labelledby': 'mp-stock-h' },
       h('div', { class: 'mp-stock-h' }, h('h2', { id: 'mp-stock-h' }, icon('package-check', { size: 18 }), 'Składniki na jutro'),
         h('span', { class: 'muted' }, `${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${dietLabel(rt.dietVariant)}`)),
@@ -131,7 +133,8 @@ export function renderMealPrep(root, ctx) {
           h('p', { class: 'muted' }, `Wystarczy: ${known.length - short.length} z ${known.length} składników.`),
           h('a', { class: 'btn', href: '#/zapasy?s=CRITICAL' }, icon('shopping-cart', { size: 18 }), 'Uzupełnij w Zapasach')]));
 
-  ORDER.forEach(pi => {
+  r.noDiet && add(root, h('p', { class: 'panel muted' }, rt.noDiet ? `Dziś i jutro bez diety — dieta od ${longDate(DIET_START)}; bez przygotowania posiłków.` : 'Dziś bez diety — przygotowanie posiłków tylko na jutro (wieczorem).'));
+  order.forEach(pi => {
     const ph = SRC.mealprep.phases[pi];
     add(root, h('h2', { class: 'prep-phase', id: `mp-ph-${pi}` }, ph.title),
       pi === EVE && h('p', { class: 'muted mp-eve' }, `Wieczorem ${date === today ? 'dziś' : `${dayShort(date)} ${shortDate(date)}`} — ilości na jutro: ${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${dietLabel(rt.dietVariant)}.`));

@@ -30,16 +30,16 @@ REPLACE = [
     ("przekąska zamieniona na odżywkę + orzech brazylijski; kolagen i witaminę C bierzesz o dowolnej porze, tauryna odpada (brak treningu)",
      "przekąska to orzech brazylijski, białko WPC o 20:15 po saunie; kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni", "A2.8", 1),
     ("Przejście między fazami zależy od odpowiedzi organizmu, nie od kalendarza .",
-     "Fazy zmieniają się według kalendarza: Faza 1 od 12.10.2026, Faza 2 od 16.11.2026 (D-017). Kryteria poniżej są listą kontrolną:", "A4.1", 1),
+     "Fazy zmieniają się według kalendarza: Faza 1 od 19.10.2026, Faza 2 od 23.11.2026 (D-017, D-100). Kryteria poniżej są listą kontrolną:", "A4.1", 1),
     ("Jeśli po trzech tygodniach kolano nie jest stabilnie zielone — zostajesz w Fazie 0 kolejny tydzień. Jeśli w szczycie sesji egzaminacyjnej regeneracja siada — cofasz się o fazę. Cofnięcie nie jest porażką, jest częścią systemu.",
      "jeśli kolano nie jest stabilnie zielone albo regeneracja siada w szczycie sesji egzaminacyjnej, zmiana dat faz wymaga Twojej decyzji.", "A4.1", 1),
     ("0,5–1 mg o 22:00", "1 mg o 22:00", "A2.4b", 1),
     ("melatonina 0,5–1 mg", "melatonina 1 mg", "A2.4c", 1),
     ("Glukozamina · chondroityna · Boswellia", "Glukozamina · chondroityna · Boswellia — do wyczerpania zapasu (ostatni dzień 21.03.2027), potem niekontynuowane", "A2.1", 1),
     # D-086 (P-2), D-090: start planu 27.09.2026 — Faza 0 trwa 15 dni; fazy opisane datami zamiast tygodni
-    ("Faza 0 (tygodnie 1–3)", "Faza 0 (27.09–11.10)", "D-086", 2),
-    ("Faza 1 (tygodnie 4–8)", "Faza 1 (12.10–15.11)", "D-086", 2),
-    ("Faza 2 (tygodnie 9+)", "Faza 2 (od 16.11)", "D-086", 2),
+    ("Faza 0 (tygodnie 1–3)", "Faza 0 (10.10–18.10)", "D-100", 2),
+    ("Faza 1 (tygodnie 4–8)", "Faza 1 (19.10–22.11)", "D-100", 2),
+    ("Faza 2 (tygodnie 9+)", "Faza 2 (od 23.11)", "D-100", 2),
     ("Sukces = ukończenie 3 tygodni bez objawów", "Sukces = ukończenie Fazy 0 bez objawów", "D-086", 1),
     ("Ukończone 3 tygodnie · ≥80% sesji", "Ukończona Faza 0 · ≥80% sesji", "D-086", 1),
     ("Tygodnie", "Okres", "D-086", 1),
@@ -52,9 +52,9 @@ TABLE_CELLS = [
     ("Hydrolizat kolagenu", 2, "Codziennie. W dni treningowe 17:15 — dokładnie 60 min przed sesją. W dzień wolny dowolnie", "17:15 codziennie"),
     ("Melatonina", 1, "0,5–1 mg", "1 mg"),
     ("Cynk pikolinian", 2, "2 × w tygodniu czwartek i niedziela, ze śniadaniem", "07:00, na czczo, czwartek i niedziela"),
-    ("Faza 0 wejściowa", 1, "1–3", "27.09–11.10"),   # D-086 (P-2), D-090
-    ("Faza 1 adaptacji", 1, "4–8", "12.10–15.11"),
-    ("Faza 2 docelowa", 1, "9+", "od 16.11"),
+    ("Faza 0 wejściowa", 1, "1–3", "10.10–18.10"),   # D-086 (P-2), D-090, D-100
+    ("Faza 1 adaptacji", 1, "4–8", "19.10–22.11"),
+    ("Faza 2 docelowa", 1, "9+", "od 23.11"),
     ("L-tauryna", 2, "17:15, przedtreningowo", "17:15, codziennie (także w czwartek)"),
 ]
 # Zmiany w sekcjach prywatnych (s1, s21) — stosowane przez generator pakietu prywatnego

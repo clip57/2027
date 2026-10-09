@@ -7,7 +7,7 @@ import { recallDone } from '../core/calc/recall.js';
 import { attention } from '../core/calc/attention.js';
 import { weekSummary, mondayOf } from '../core/calc/week.js';
 import { cloudStatus } from '../core/sync/cloud-local.js';
-import { resolveDay, cfaSourceLine, PLAN_START, PLAN_END } from '../core/resolver.js';
+import { resolveDay, cfaSourceLine, PLAN_START, PLAN_END, PLAN_REAL_START, DIET_START, TRAIN_START } from '../core/resolver.js';
 import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.js';
 import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
@@ -175,7 +175,7 @@ function renderWeek(root, ctx, date) {
         h('span', { class: 'wk-d' }, h('strong', {}, dayShort(x.date)), ` ${shortDate(x.date)}`, x.date === ctx.today && h('span', { class: 'now-tag' }, 'dziś')),
         x.zero ? h('span', { class: 'wk-l' }, icon('sparkles', { size: 14 }), 'Dzień zero — planowanie') : x.outside ? h('span', { class: 'muted' }, 'poza planem') : [
           h('span', { class: 'wk-l wk-train' }, icon('dumbbell', { size: 14 }), x.training),
-          h('span', { class: 'wk-l' }, icon('utensils', { size: 14 }), `${x.diet} · ${x.kcal} kcal`),
+          h('span', { class: 'wk-l' }, icon('utensils', { size: 14 }), x.noDiet ? 'bez diety' : `${x.diet} · ${x.kcal} kcal`),
           x.cfa > 0 && h('span', { class: 'wk-l' }, icon('graduation-cap', { size: 14 }), x.mock ? `Mock CFA · ${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}` : `${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}${x.recall ? ' + recall' : ''}`),
           x.blocks && h('span', { class: 'wk-l wk-blocks' }, icon('book-open', { size: 14 }), x.blocks),
           x.mpw > 0 && h('span', { class: 'wk-l' }, icon('landmark', { size: 14 }), x.mpwSim ? 'Symulacja MPW 15:30' : `MPW: ${x.mpw} ${plural(x.mpw, 'blok', 'bloki', 'bloków')}`),
@@ -220,7 +220,7 @@ export function renderDzis(root, ctx) {
       h('div', { class: 'row daynav' }, h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'))),
     h('section', { class: 'panel dz-outside' }, h('h2', {}, 'Poza planem'),
       h('p', {}, r.after ? `Plan zakończył się ${longDate(PLAN_END)}. Dni późniejsze nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach.`
-        : `Plan zaczyna się ${longDate(PLAN_START)}. Dni wcześniejsze nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach.`),
+        : `Realny początek planu: ${longDate(PLAN_REAL_START)} (kalendarz od ${longDate(PLAN_START)}, dieta od ${longDate(DIET_START)}, trening od ${longDate(TRAIN_START)}). Dni wcześniejsze nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach.`),
       h('a', { class: 'btn primary', href: `#/dzis?d=${target}` }, `Przejdź do ${shortDate(target)}`)));
     return;
   }
@@ -251,16 +251,17 @@ export function renderDzis(root, ctx) {
           h('span', { class: 'date' }, `${r.dayName}, ${longDate(date)}`),
           h('span', { class: 'chip' }, r.phase == null ? 'start planu · przed Fazą 0' : `Faza ${r.phase}`),
           h('span', { class: 'chip' }, r.sessionLabel),
-          h('span', { class: 'chip' }, `${r.kcal} kcal (${r.dietVariant})`),
+          h('span', { class: 'chip' }, r.noDiet ? 'bez diety' : `${r.kcal} kcal (${r.dietVariant})`),
           r.cfa.isMock && h('span', { class: 'chip' }, 'Mock CFA'),
           r.mpw.isSim && h('span', { class: 'chip' }, 'Symulacja MPW'),
           r.blocks && h('span', { class: 'chip' }, r.blocks.short))),
       h('div', { class: 'row daynav' }, date > PLAN_START && nav(-1, 'Poprzedni dzień', 'chevron-left'),
         date !== ctx.today && h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'), nav(1, 'Następny dzień', 'chevron-right'))),
+    r.preStart && h('p', { class: 'panel dz-prestart', role: 'note' }, `Przed startem planu — realny początek planu: ${longDate(PLAN_REAL_START)} (dieta od ${longDate(DIET_START)}, trening od ${longDate(TRAIN_START)}).`),
     h('div', { class: 'row quicklinks' },
       h('a', { class: 'btn ql', href: `#/dzis?v=tydzien&d=${date}` }, icon('calendar-range', { size: 18 }), h('span', {}, 'Tydzień')),
       h('a', { class: 'btn ql', href: `#/kalendarz?m=${date.slice(0, 7)}` }, icon('calendar', { size: 18 }), h('span', {}, 'Kalendarz')),
-      h('a', { class: 'btn ql', href: `#/dieta?f=${r.phase ?? 0}&w=${r.dietVariant}` }, icon('utensils', { size: 18 }), h('span', {}, 'Jadłospis dnia')),
+      !r.noDiet && h('a', { class: 'btn ql', href: `#/dieta?f=${r.phase ?? 0}&w=${r.dietVariant}` }, icon('utensils', { size: 18 }), h('span', {}, 'Jadłospis dnia')),
       h('a', { class: 'btn ql', href: `#/suplementy?d=${date}` }, icon('pill', { size: 18 }), h('span', {}, 'Suplementacja dnia')),
       r.training?.length > 0 && h('a', { class: 'btn ql', href: `#/trening?d=${date}` }, icon('dumbbell', { size: 18 }), h('span', {}, 'Trening dnia')),
       r.cfa.inPlan && h('a', { class: 'btn ql', href: `#/cfa?v=dzien&d=${date}` }, icon('graduation-cap', { size: 18 }), h('span', {}, 'Bloki CFA')),
@@ -276,7 +277,8 @@ export function renderDzis(root, ctx) {
           now.current && h('a', { class: 'btn', href: `#${now.current.id}` }, 'Pokaż w planie')),
         slotIdx >= 0 && h('div', { class: 'dz-now-side' }, progressRing(slotIdx + 1, r.slots.length, 'Postęp dnia'), h('span', { class: 'muted' }, `punkt ${slotIdx + 1} z ${r.slots.length}`))) : null,
       h('div', { class: 'stats dz-kpis' },
-        kpi('Dieta', `${r.kcal} kcal`, `${r.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · B ${fmt(t.p)} / W ${fmt(t.c)} / T ${fmt(t.f)} g`,
+        r.noDiet ? kpi('Dieta', 'Bez diety', `dieta od ${longDate(DIET_START)}`)
+          : kpi('Dieta', `${r.kcal} kcal`, `${r.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · B ${fmt(t.p)} / W ${fmt(t.c)} / T ${fmt(t.f)} g`,
           h('span', { class: 'dz-macro' }, bar(t.p * 4, t.p * 4 + t.c * 4 + t.f * 9, 'p-col'), bar(t.c * 4, t.p * 4 + t.c * 4 + t.f * 9, 'c-col'), bar(t.f * 9, t.p * 4 + t.c * 4 + t.f * 9, 'f-col'))),
         kpi('Trening', D.planned ? `${D.done} / ${D.planned}` : (r.training?.length ? r.sessionLabel : 'Bez treningu'),
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
