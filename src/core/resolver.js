@@ -16,38 +16,43 @@ const BLOCKS_END = '15:23';
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-097): od Dnia zero 29.09.2026 do 28.03.2027 (`phases.json` → `start`, `zero`, `end`). Dni wcześniejsze i późniejsze są
-// poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero: bez diety, treningu, nauki i suplementów (pielęgnacja tak).
+// Plan (D-088, D-100): kalendarz od 08.10.2026 do 28.03.2027 (`phases.json` → `start`, `end`; dieta, trening i realny początek planu od 10.10). Dni
+// wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
 export const PLAN_END = SRC.phases.end || '9999-12-31';
-export const DAY_ZERO = SRC.phases.zero || null;
+export const DAY_ZERO = SRC.phases.zero || null;   // D-100: Dzień zero usunięty z kalendarza (zero: null) — obsługa zostaje w kodzie
+// D-100: kalendarz od 08.10.2026 (08–09.10 — dni planu bez diety i treningu); dieta, trening i realny początek planu od 10.10
+export const PLAN_REAL_START = SRC.phases.realStart || PLAN_START;
+export const DIET_START = SRC.phases.dietStart || PLAN_START;
+export const TRAIN_START = SRC.phases.trainStart || PLAN_START;
 export const inPlan = date => date >= PLAN_START && date <= PLAN_END;
 export const isZero = date => date === DAY_ZERO;
 
 export function phaseFor(date) {
   let ph = null;
   for (const p of SRC.phases.phases) if (date >= p.from) ph = p.phase;
-  return ph; // null = przed Fazą 0 (start planu i Faza 0 od 27.09.2026 — D-088, D-090)
+  return ph; // null = przed Fazą 0 (kalendarz i Faza 0 od 08.10.2026, Faza 1 od 19.10, Faza 2 od 23.11 — D-088, D-100)
 }
 
 // Dzień z blokiem J (plan CFA v14, D-099: 21:00–21:53 w dni poza pt i sob) — wieczór układany inaczej (kolacja przed blokiem).
 export const hasJ = date => (cfaByDay[date] || []).some(b => b.blok === 'J');
 const SUPPER_J = '20:50';   // kolacja 20:50–21:00 w dni z blokiem J (D-099); chondroityna idzie z kolacją
+export const doseTime = (time, date) => (time === '21:00' && hasJ(date) ? SUPPER_J : time);   // godzina dawki w danym dniu
 
 export function dosesFor(date) {
   if (!inPlan(date) || isZero(date)) return [];   // suplementacja od dnia 1 planu (D-088, D-097)
   const wd = weekday(date);
   const doses = SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
-  return hasJ(date) ? doses.map(d => (d.time === '21:00' ? { ...d, time: SUPPER_J } : d)) : doses;   // D-099
+  return hasJ(date) ? doses.map(d => ({ ...d, time: doseTime(d.time, date) })) : doses;   // D-099
 }
-// Okres przyjmowania preparatów czasowych (D-015; 30.09.2026–28.03.2027 — D-097). `from` opcjonalne.
+// Okres przyjmowania preparatów czasowych (D-015; 08.10.2026–28.03.2027 — D-100). `from` opcjonalne.
 export function inValidity(d, date) {
   return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
 }
 
-// Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087: 25–27.09.2026) — trening, sauna, dieta, recall.
+// Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087, D-096, D-100: start treningów 10.10, 07–11.11) — trening, sauna, dieta, recall.
 export function dayPlan(date) {
   const w = SRC.week.days[String(weekday(date))];
   if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: false, variant: null,
@@ -56,7 +61,8 @@ export function dayPlan(date) {
   if (isZero(date)) return { ...w, dayType: 'zero', session: null, sessionName: 'Dzień zero', sauna: 0, recall: false, variant: null,
     outside: true, zero: true, note: null, decision: 'D-097' };
   const x = SRC.week.exceptions?.[date];
-  return x ? { ...w, ...x } : w;
+  const d = x ? { ...w, ...x } : w;
+  return date < DIET_START ? { ...d, noDiet: true } : d;   // D-100: dni planu przed startem diety (08.10)
 }
 
 // Szablon godzin dnia z wariantem dnia (poza dniem mocka): niedziela „basen” (D-094), czwartek „czwartek” — sauna i zakupy,
@@ -114,6 +120,7 @@ export function resolveDay(date) {
   const phase = phaseFor(date);
   const effPhase = phase ?? 0;
   const p = plan(w.diet, effPhase);
+  const noDiet = !!w.noDiet;   // D-100: 08.10 — bez diety (plan dnia bez posiłków i kcal, bez zużycia żywności)
   const inCfa = date >= CFA_FIRST && date <= CFA_LAST;
   const blocks = cfaByDay[date] || [];
   const isMock = MOCKS.has(date);
@@ -128,7 +135,7 @@ export function resolveDay(date) {
   const tpl = templateFor(date, isMock);
   const slots = tpl.map(s => {
     // Podpunkty: suplementy z tekstu PLAN_DNIA są ukryte — pokazywane są wyłącznie dawki z SUPLEMENTACJI (D-001).
-    const items = (s.items || []).filter(i => i.kind === 'task' || i.kind === 'meal').map(i => i.kind === 'meal'
+    const items = (s.items || []).filter(i => i.kind === 'task' || (i.kind === 'meal' && !noDiet)).map(i => i.kind === 'meal'
       ? { kind: 'meal', meal: i.meal, time: i.time, text: `${mealName(i.meal)} (${i.time})`, kcal: p.meals.find(m => m.id === i.meal)?.total.kcal ?? null }
       : { kind: 'task', text: i.text, decision: i.decision });
     const out = { id: s.id, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items, shop: !!s.shop,
@@ -150,7 +157,7 @@ export function resolveDay(date) {
       else Object.assign(out, { title: `CFA blok ${s.key}`, cfa: bl });
     } else if (s.role === 'meal') {
       const m = p.meals.find(x => x.id === s.key);
-      Object.assign(out, { meal: s.key, kcal: m ? m.total.kcal : null, mealName: mealName(s.key) });
+      Object.assign(out, { meal: s.key, kcal: m && !noDiet ? m.total.kcal : null, mealName: mealName(s.key) });
     } else if (s.role === 'activity') {
       out.title = SRC.week.activity[w.dayType]?.[s.key] ?? 'Wolne';   // Dzień zero (D-097) — bez zajęć
       if (s.key === 'main' && w.session && SRC.training.days[w.session] && w.dayType.startsWith('strength')) out.title = `Trening siłowy: ${w.sessionName}`;
@@ -182,7 +189,7 @@ export function resolveDay(date) {
   return {
     date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, zero: !!w.zero, after: !!w.after, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
     note: w.note || null, exception: w.decision || null,
-    sauna: w.sauna, dietVariant: w.diet, kcal: p.total.kcal, meals: mealsFor(w.diet, effPhase),
+    sauna: w.sauna, dietVariant: w.diet, noDiet, preStart: date < PLAN_REAL_START, kcal: noDiet ? null : p.total.kcal, meals: noDiet ? [] : mealsFor(w.diet, effPhase),
     doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall },
     mpw: { inPlan: date >= MPW_FIRST && date <= MPW_LAST, blocks: mpwByDay[date] || [], isSim: SIMS.has(date) }, blocks: wb, slots,
   };

@@ -37,35 +37,37 @@ test('migracja kopii ZAPASY z 22.09: stany 1:1, odliczanie od następnego dnia p
 });
 
 test('zakup po inwentaryzacji zwiększa stan; nowsza inwentaryzacja zastępuje starszą', async () => {
+  // wtorek 13.10 – piątek 16.10.2026: Faza 0, bez wyjątków (T, T, NT, T)
   const s = await new Store(new MemoryAdapter()).open();
-  await s.record('inv.count', { prod: 'banan', qty: 240, date: '2026-10-06' });
-  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-07'), 120);
-  await s.record('inv.move', { prod: 'banan', qty: 600, date: '2026-10-07', kind: 'purchase' });
-  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-07'), 720);
-  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-08'), 720, 'czwartek bez banana');
-  await s.record('inv.count', { prod: 'banan', qty: 100, date: '2026-10-08' });
-  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-09'), -20);
+  await s.record('inv.count', { prod: 'banan', qty: 240, date: '2026-10-13' });
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-14'), 120);
+  await s.record('inv.move', { prod: 'banan', qty: 600, date: '2026-10-14', kind: 'purchase' });
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-14'), 720);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-15'), 720, 'czwartek bez banana');
+  await s.record('inv.count', { prod: 'banan', qty: 100, date: '2026-10-15' });
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-16'), -20);
 });
 
 test('prognoza uwzględnia czwartki i fazy', async () => {
-  const fc = forecast('banan', 240, '2026-10-06');
-  assert.equal(fc.lastCovered, '2026-10-09', '07.10 i 09.10 po 120 g, 08.10 (czw) bez banana');
-  assert.equal(fc.runOut, '2026-10-10');
+  const fc = forecast('banan', 240, '2026-10-13');
+  assert.equal(fc.lastCovered, '2026-10-16', '14.10 i 16.10 po 120 g, 15.10 (czw) bez banana');
+  assert.equal(fc.runOut, '2026-10-17');
   assert.equal(fc.days, 3);
-  const oats = forecast('platki_owsiane', 70 * 12, '2026-09-24');   // 30.09–11.10: 12 dni × 70 g (D-097: Dzień zero 29.09 bez diety)
-  assert.equal(oats.runOut, '2026-10-12', 'od 12.10 porcja 85 g');
-  assert.equal(oats.lastCovered, '2026-10-11');
+  const oats = forecast('platki_owsiane', 70 * 10, '2026-10-01');   // 09.10–18.10: 10 dni × 70 g (D-100: 08.10 bez diety, dieta od 09.10)
+  assert.equal(oats.runOut, '2026-10-19', 'od 19.10 (Faza 1) porcja 85 g');
+  assert.equal(oats.lastCovered, '2026-10-18');
 });
 
-test('start planu 29.09.2026 — Dzień zero (D-088, D-097): brak zużycia przed startem i w Dniu zero', async () => {
-  const fc = forecast('banan', 240, '2026-09-22');
-  assert.equal(fc.lastCovered, '2026-10-01', '23–28.09 poza planem, 29.09 Dzień zero (bez diety), 30.09 i 01.10 po 120 g');
-  assert.equal(fc.runOut, '2026-10-02');
+test('start kalendarza 08.10.2026 i start diety 10.10 (D-100): brak zużycia przed startem i w dniach bez diety 08–09.10', async () => {
+  const fc = forecast('banan', 240, '2026-10-05');
+  assert.equal(fc.lastCovered, '2026-10-12', '06–07.10 poza planem, 08–09.10 bez diety, 10.10 i 11.10 po 120 g, 12.10 NT (bez banana)');
+  assert.equal(fc.runOut, '2026-10-13');
   const s = await new Store(new MemoryAdapter()).open();
-  await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-09-22' });
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-26'), 1000, 'inwentaryzacja z 22.09 bez odliczeń do 26.09');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-29'), 1000, '29.09 — Dzień zero, bez diety (D-097)');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-09-30'), 800);
+  await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-10-05' });
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-07'), 1000, 'inwentaryzacja z 05.10 bez odliczeń do 07.10 (poza planem)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-08'), 1000, '08.10 — bez diety (D-100)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-09'), 1000, '09.10 — też bez diety (D-100)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-10'), 800, '10.10 — UPPER 1, dzień T');
 });
 
 test('statusy — klasyfikacja wg terminu przydatności (v31)', () => {
@@ -117,10 +119,10 @@ test('najbliższe zakupy wg planu dnia (D-097): czwartek po saunie 19:05–20:35
 
 test('lista zakupów: maxLimit, pełne opakowania, pomija suplementy czasowe i cynk', async () => {
   const s = await new Store(new MemoryAdapter()).open();
-  // tydzień bez wyjątków dat (D-087: 27.09.2026 z dietą NT zmieniłby zużycie kefiru)
-  await s.record('inv.count', { prod: 'kefir', qty: 0, date: '2026-10-06' });
-  await s.record('inv.count', { prod: 'glukozamina', qty: 0, date: '2026-10-06' });
-  const list = shoppingList(s.state.inv, '2026-10-06', allItems());
+  // tydzień bez wyjątków dat i bez zmiany fazy (wtorek 13.10 – wtorek 20.10; D-100)
+  await s.record('inv.count', { prod: 'kefir', qty: 0, date: '2026-10-13' });
+  await s.record('inv.count', { prod: 'glukozamina', qty: 0, date: '2026-10-13' });
+  const list = shoppingList(s.state.inv, '2026-10-13', allItems());
   const kefir = list.find(x => x.id === 'kefir');
   assert.equal(kefir.raw, 1200, '7 dni: 6 dni po 200 ml (czwartek bez kefiru)');
   assert.equal(kefir.packs, 3);

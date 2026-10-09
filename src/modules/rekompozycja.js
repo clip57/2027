@@ -1,6 +1,8 @@
 // Moduł Rekompozycja (Etap 6): dokument PLAN_REKOMPOZYCJI po zaakceptowanych zmianach (D-049, D-050).
 // Sekcje 1 i 21 oraz zdania z danymi osobowymi i medycznymi pochodzą z pakietu prywatnego (D-035).
 import { h, add, plural } from '../ui/dom.js';
+import { PLAN_REAL_START } from '../core/resolver.js';
+import { longDate } from '../core/dates.js';
 import { icon } from '../ui/icons.js';
 import rekomp from '../data/rekomp.json' with { type: 'json' };
 
@@ -57,7 +59,7 @@ export function renderRekompozycja(root, ctx) {
   const setAll = v => document.querySelectorAll('.rk-sec').forEach(d => { d.open = v; });
   add(root,
     h('section', { class: 'hero-tr rk-hero' }, h('div', { class: 'hero-tr-main' },
-      h('p', { class: 'eyebrow' }, 'Plan indywidualny · punkt startowy 29.09.2026 (Dzień zero)'),
+      h('p', { class: 'eyebrow' }, `Plan indywidualny · realny początek planu ${longDate(PLAN_REAL_START)}`),
       h('h1', {}, 'Plan rekompozycji'),
       h('p', { class: 'muted' }, 'Dieta, trening, regeneracja i monitoring — z uwzględnieniem Twoich decyzji. Sekcje i zdania z danymi medycznymi pochodzą z pakietu prywatnego.'),
       !pack && h('p', { class: 'priv-miss block' }, '🔒 Pakiet prywatny nie jest zaimportowany — część treści jest ukryta.'))),

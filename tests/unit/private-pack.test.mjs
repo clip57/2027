@@ -63,8 +63,9 @@ test('private_pack_lib.py: aktualizacja istniejącego pakietu — daty planu, me
     const p = JSON.parse(fs.readFileSync(out, 'utf8'));
     assert.equal(p.plan.start, PLAN_START);
     assert.equal(p.plan.cfa.bloki, SRC.cfa.D.stat.bloki);
-    assert.equal(p.sections[0].blocks[0].text, T('Faza 0 (27.09–11.10) — tabela'));
-    assert.deepEqual(p.sections[0].blocks[1].rows, [['Tygodnie', 'Okres'], ['Faza 0', '27.09–11.10']], 'bez ogólnej reguły „Tygodnie”');
+    // 26.09–11.10 → 27.09–11.10 (D-090) → 10.10–18.10 (D-100: Faza 0 od 10.10, Faza 1 od 19.10)
+    assert.equal(p.sections[0].blocks[0].text, T('Faza 0 (10.10–18.10) — tabela'));
+    assert.deepEqual(p.sections[0].blocks[1].rows, [['Tygodnie', 'Okres'], ['Faza 0', '10.10–18.10']], 'bez ogólnej reguły „Tygodnie”');
     assert.match(r.stdout, /Do przejrzenia/);
     assert.match(r.stdout, /tygodniu 8/);
     assert.deepEqual(packStatus(p, { start: PLAN_START, markers: MARKERS }).current, true);

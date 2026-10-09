@@ -1,6 +1,6 @@
 // Plan suplementacji: pogrupowany po godzinach, z obsługą dni tygodnia i okresu ważności (D-001, D-015, D-016).
 import { SRC, catalogById } from '../data.js';
-import { dosesFor, inValidity } from '../resolver.js';
+import { dosesFor, inValidity, doseTime } from '../resolver.js';
 import { weekday } from '../dates.js';
 
 export function scheduleFor(date) {
@@ -33,7 +33,7 @@ export function supplementOverview(date) {
     const validity = doses.every(d => d.validity) ? { ...doses[doses.length - 1].validity,
       from: doses.map(d => d.validity.from).filter(Boolean).sort()[0], until: doses.map(d => d.validity.until).sort().at(-1) } : null;
     const now = doses.filter(d => inValidity(d, date));
-    const times = [...new Set((now.length ? now : doses).map(d => d.time))];
+    const times = [...new Set((now.length ? now : doses).map(d => doseTime(d.time, date)))];   // D-099: 20:50 w dni z blokiem J
     return { ...s, times, validity, weekdays: [...s.weekdays].sort(), everyDay: s.weekdays.size === 7, active: inValidity({ validity }, date) };
   });
 }

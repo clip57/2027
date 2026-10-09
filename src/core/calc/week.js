@@ -12,7 +12,7 @@ export function weekSummary(date) {
     return {
       date: d, weekday: r.weekday, dayName: r.dayName, outside: r.outside, zero: r.zero, phase: r.phase,
       training: r.sessionLabel, dayType: r.dayType, sauna: r.sauna,
-      diet: r.dietVariant, kcal: r.kcal,
+      diet: r.dietVariant, kcal: r.kcal, noDiet: r.noDiet,   // D-100: 08.10 bez diety
       cfa: r.cfa.blocks.length, mock: r.cfa.isMock, recall: r.cfa.recall,
       mpw: r.mpw.blocks.length, mpwSim: r.mpw.isSim,   // plan MPW (D-095)
       blocks: r.blocks?.short || null,                  // weekendy 8:00–15:23 (D-096)

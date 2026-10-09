@@ -11,7 +11,7 @@ export const weekStart = d => addDays(d, 1 - weekday(d));
 
 // Serie „liczone”: odhaczone albo z wpisanym ciężarem/powtórzeniami (wpisane wartości = wykonana seria).
 // Tylko od startu planu (D-088): serie z wcześniejszych dni zostają w dzienniku, ale nie wchodzą do statystyk i historii.
-export const TRAIN_FROM = SRC.phases.start;
+export const TRAIN_FROM = SRC.phases.trainStart || SRC.phases.start;   // D-100: serie sprzed startu treningów (10.10.2026) poza statystykami
 export function sets(train) {
   return Object.values(train).filter(s => s.date >= TRAIN_FROM && (s.done || s.kg != null || s.reps != null)).map(s => {
     const ex = EX_BY_ID[s.ex];

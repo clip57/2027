@@ -523,7 +523,7 @@ body.kbd .pg-timer { display: none; }
 .kl-dots { display: flex; flex-wrap: wrap; gap: 3px; }
 .kl-dot { display: inline-block; width: 8px; height: 8px; border-radius: var(--r-full); flex: none; background: var(--text-2); }
 .k-train { --k: var(--train); } .k-cfa { --k: var(--cfa); } .k-mpw { --k: var(--regen); } .k-block { --k: var(--care); }
-.k-shop { --k: var(--prep); } .k-holiday { --k: var(--success); } .k-exam { --k: var(--warning); } .k-zero { --k: var(--accent); }
+.k-shop { --k: var(--prep); } .k-holiday { --k: var(--success); } .k-exam { --k: var(--warning); } .k-zero { --k: var(--accent); } .k-pre { --k: var(--text-2); } .k-nodiet { --k: var(--warning); }
 .kl-dot[class*="k-"] { background: var(--k); }
 .kl-lines { display: none; }
 .kl-l { display: flex; align-items: center; gap: 4px; font-size: var(--fs-2xs); line-height: 1.25; min-width: 0; overflow-wrap: anywhere; }

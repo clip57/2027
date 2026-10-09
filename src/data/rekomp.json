@@ -107,7 +107,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 0 (27.09–11.10)"
+     "text": "Faza 0 (10.10–18.10)"
     },
     {
      "type": "table",
@@ -161,7 +161,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 1 (12.10–15.11)"
+     "text": "Faza 1 (19.10–22.11)"
     },
     {
      "type": "table",
@@ -215,7 +215,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 2 (od 16.11)"
+     "text": "Faza 2 (od 23.11)"
     },
     {
      "type": "table",
@@ -335,7 +335,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 0 (27.09–11.10) wdrożyć"
+     "text": "Faza 0 (10.10–18.10) wdrożyć"
     },
     {
      "type": "h4",
@@ -860,7 +860,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 1 (12.10–15.11)"
+     "text": "Faza 1 (19.10–22.11)"
     },
     {
      "type": "p",
@@ -1389,7 +1389,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 2 (od 16.11)"
+     "text": "Faza 2 (od 23.11)"
     },
     {
      "type": "p",
@@ -2375,21 +2375,21 @@
      "rows": [
       [
        "Faza 0 wejściowa",
-       "27.09–11.10",
+       "10.10–18.10",
        "~34 góra 20 · dół 10 · core 4",
        "Góra: przypomnienie wzorców, znalezienie obciążeń. Dół: nauka ruchu i ustalenie tolerancji kolana. Sukces = ukończenie Fazy 0 bez objawów, nie ciężar na sztandze",
        "Ukończona Faza 0 · ≥80% sesji zrealizowanych · kolano zielone przez cały czas · brak DOMS utrzymującego się >72 h"
       ],
       [
        "Faza 1 adaptacji",
-       "12.10–15.11",
+       "19.10–22.11",
        "~64 góra 34 · dół 22 · core 8",
        "Góra: progresja obciążeniem, wykorzystanie muscle memory. Dół: poszerzanie zakresu ruchu, potem obciążenia. Wprowadzenie pełnego zestawu ćwiczeń",
        "Ukończone 5 tygodni · kolano zielone · progresja siły na ≥3 bojach · sen i energia stabilne"
       ],
       [
        "Faza 2 docelowa",
-       "od 16.11",
+       "od 23.11",
        "~93 góra 50 · dół 34 · core 9",
        "Konsolidacja. To jest sufit, nie obowiązek — utrzymuj tylko taką objętość, jaką realnie regenerujesz",
        "—"
@@ -2407,7 +2407,7 @@
      "type": "box",
      "kind": "cal",
      "label": "Do kalibracji empirycznej",
-     "text": "Fazy zmieniają się według kalendarza: Faza 1 od 12.10.2026, Faza 2 od 16.11.2026 (D-017). Kryteria poniżej są listą kontrolną: jeśli kolano nie jest stabilnie zielone albo regeneracja siada w szczycie sesji egzaminacyjnej, zmiana dat faz wymaga Twojej decyzji."
+     "text": "Fazy zmieniają się według kalendarza: Faza 1 od 19.10.2026, Faza 2 od 23.11.2026 (D-017, D-100). Kryteria poniżej są listą kontrolną: jeśli kolano nie jest stabilnie zielone albo regeneracja siada w szczycie sesji egzaminacyjnej, zmiana dat faz wymaga Twojej decyzji."
     }
    ]
   },
