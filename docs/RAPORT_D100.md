@@ -1,4 +1,4 @@
-# Kalendarz od 08.10, start diety i treningu 10.10, fazy przesunięte (D-100) — raport (08.10.2026)
+# Kalendarz od 08.10, start diety, treningu i planu 12.10, fazy przesunięte (D-100) — raport (09.10.2026)
 
 Rejestr: `docs/DECYZJE_2027.md` → D-100. Dane: `tools/extract/day_plan_d100.py` (idempotentny: `phases.json`, `week.json`, `supplements.json`).
 
@@ -6,19 +6,19 @@ Rejestr: `docs/DECYZJE_2027.md` → D-100. Dane: `tools/extract/day_plan_d100.py
 | Obszar | Decyzja |
 |---|---|
 | Kalendarz | dni do 07.10 włącznie (w tym Dzień zero 29.09) usunięte „jakby ich nie było”; kalendarz od 08.10.2026 |
-| Dieta | start **10.10** (pierwotnie 09.10 — zmiana użytkownika); 08–09.10 oznaczone jako bez diety |
-| Trening | start 10.10; UPPER 1 + sauna w sobotę 10.10, poniedziałek 12.10 — 2 × sauna; 08–09.10 bez treningu |
-| Realny początek planu | **10.10.2026** |
+| Dieta | start **12.10** (kolejno 09.10, 10.10, ostatecznie 12.10); 08–11.10 oznaczone jako bez diety |
+| Trening | start 12.10: normalny poniedziałek (UPPER 1 + sauna, dieta T); 08–11.10 bez treningu, sauny i basenu |
+| Realny początek planu | **12.10.2026** |
 | Fazy diety i treningu | Faza 1 od **19.10** (było 12.10), Faza 2 od **23.11** (było 16.11) |
 | 07–11.11 | bez treningu, dieta NT (jak w czwartek) |
 | CFA, MPW, szablon dnia | bez zmian |
 | Pielęgnacja | tylko daty kroków w pliku użytkownika (patrz pkt 4) |
 
 ## 2. Zmiany w kodzie i danych
-- `phases.json`: `start` 08.10, `realStart`/`dietStart`/`trainStart` 10.10, brak `zero`, fazy 08.10 / 19.10 / 23.11. `week.json`: usunięte wyjątki 30.09–03.10, dodane 08.10, 09.10, 10.10, 12.10, 07–11.11. `supplements.json`: okres preparatów czasowych od 08.10 (172 dni; zapas 180 kaps. starcza z nadwyżką).
-- `resolver.js`: `PLAN_REAL_START`, `DIET_START`, `TRAIN_START`; flaga `noDiet` (dni przed startem diety): bez posiłków i kcal w planie dnia, bez zużycia żywności (`consumption.js`), `preStart`. `TRAIN_FROM` = start treningów (10.10).
-- Widoki: Dziś (KPI „Bez diety”, komunikat „Przed startem planu”, panel poza planem z realnym początkiem), Tydzień, Kalendarz (nagłówek od 10.10, znaczniki „Przed startem planu”, „Bez diety”), Dieta (podpowiedzi faz z danych), Trening (komunikaty), Rekompozycja (realny początek planu), Mealprep (w dniach bez diety tylko wieczorne przygotowanie przed 10.10; 08.10 bez kart), Suplementy (komunikat), Diagnostyka (statystyki treningu od 10.10).
-- Teksty faz: `rekomp.json`, `rekomp_common.py` i reguły `UPGRADE` pakietu prywatnego: Faza 0 (10.10–18.10), Faza 1 (19.10–22.11), Faza 2 (od 23.11).
+- `phases.json`: `start` 08.10, `realStart`/`dietStart`/`trainStart` 12.10, brak `zero`, fazy 08.10 / 19.10 / 23.11. `week.json`: usunięte wyjątki 30.09–03.10, dodane 08–11.10 (bez treningu i diety; 08.10 zachowuje wariant czwartkowy z zakupami, 11.10 bez basenu) i 07–11.11; 12.10 bez wyjątku (normalny poniedziałek). `supplements.json`: okres preparatów czasowych od 08.10 (172 dni; zapas 180 kaps. starcza z nadwyżką).
+- `resolver.js`: `PLAN_REAL_START`, `DIET_START`, `TRAIN_START`; flaga `noDiet` (dni przed startem diety): bez posiłków i kcal w planie dnia, bez zużycia żywności (`consumption.js`), `preStart`. `TRAIN_FROM` = start treningów (12.10).
+- Widoki: Dziś (KPI „Bez diety”, komunikat „Przed startem planu”, panel poza planem z realnym początkiem), Tydzień, Kalendarz (nagłówek od 12.10, znaczniki „Przed startem planu”, „Bez diety”), Dieta (podpowiedzi faz z danych), Trening (komunikaty), Rekompozycja (realny początek planu), Mealprep (w dniach bez diety tylko wieczorne przygotowanie przed 12.10; wcześniej bez kart), Suplementy (komunikat), Diagnostyka (statystyki treningu od 12.10).
+- Teksty faz: `rekomp.json`, `rekomp_common.py` i reguły `UPGRADE` pakietu prywatnego: Faza 0 (12.10–18.10), Faza 1 (19.10–22.11), Faza 2 (od 23.11); reguły obejmują też pakiety zaktualizowane wcześniejszą wersją (Faza 0 od 10.10).
 
 ## 3. Testy
 - `npm test`: wszystkie jednostkowe przechodzą (209, 1 pominięty); testy dat i faz przepisane na nowy kalendarz, nowe: dzień bez diety, pierwszy tydzień, 07–11.11, okres suplementów.

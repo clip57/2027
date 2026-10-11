@@ -114,7 +114,7 @@
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
-   "note": "Bez diety i bez treningu: dieta i trening od 10.10 (D-100)"
+   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
   },
   "2026-10-09": {
    "decision": "D-100",
@@ -124,25 +124,27 @@
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Bez diety i bez treningu: dieta i trening od 10.10 (D-100)"
+   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
   },
   "2026-10-10": {
    "decision": "D-100",
-   "dayType": "strength_sauna",
-   "session": "pon",
-   "sessionName": "UPPER 1",
-   "sauna": 1,
-   "diet": "T",
-   "note": "Wyjątek 10.10.2026: UPPER 1 + sauna (przesunięte z poniedziałku; start treningów)"
-  },
-  "2026-10-12": {
-   "decision": "D-100",
-   "dayType": "rest_sauna2",
+   "dayType": "free",
    "session": null,
-   "sessionName": "Bez treningu, 2 × sauna",
-   "sauna": 2,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
    "diet": "NT",
-   "note": "Wyjątek 12.10.2026: 2 × sauna bez treningu (dieta NT; UPPER 1 przeniesiony na 10.10)"
+   "variant": null,
+   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
+  },
+  "2026-10-11": {
+   "decision": "D-100",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
   },
   "2026-11-07": {
    "decision": "D-100",

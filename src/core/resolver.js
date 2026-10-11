@@ -16,13 +16,13 @@ const BLOCKS_END = '15:23';
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-100): kalendarz od 08.10.2026 do 28.03.2027 (`phases.json` → `start`, `end`; dieta, trening i realny początek planu od 10.10). Dni
+// Plan (D-088, D-100): kalendarz od 08.10.2026 do 28.03.2027 (`phases.json` → `start`, `end`; dieta, trening i realny początek planu od 12.10). Dni
 // wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
 export const PLAN_END = SRC.phases.end || '9999-12-31';
 export const DAY_ZERO = SRC.phases.zero || null;   // D-100: Dzień zero usunięty z kalendarza (zero: null) — obsługa zostaje w kodzie
-// D-100: kalendarz od 08.10.2026 (08–09.10 — dni planu bez diety i treningu); dieta, trening i realny początek planu od 10.10
+// D-100: kalendarz od 08.10.2026 (08–11.10 — dni planu bez diety i treningu); dieta, trening i realny początek planu od 12.10
 export const PLAN_REAL_START = SRC.phases.realStart || PLAN_START;
 export const DIET_START = SRC.phases.dietStart || PLAN_START;
 export const TRAIN_START = SRC.phases.trainStart || PLAN_START;
@@ -52,7 +52,7 @@ export function inValidity(d, date) {
   return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
 }
 
-// Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087, D-096, D-100: start treningów 10.10, 07–11.11) — trening, sauna, dieta, recall.
+// Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087, D-096, D-100: start treningów 12.10, 07–11.11) — trening, sauna, dieta, recall.
 export function dayPlan(date) {
   const w = SRC.week.days[String(weekday(date))];
   if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: false, variant: null,
