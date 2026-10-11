@@ -72,7 +72,7 @@ export function renderMealPrep(root, ctx) {
   const eveIds = new Set(SRC.mealprep.phases[EVE].cards);
   const textOf = (c, t) => (eveIds.has(c.id) ? TN(t) : T(t));
   const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${date}|${c.id}|${bi * 100 + i}`, text: it, card: c })));
-  // D-100: w dniu bez diety (08–09.10) tylko wieczorne przygotowanie na jutro — a gdy i jutro bez diety (08.10), brak kart
+  // D-100: w dniu bez diety (08–11.10) tylko wieczorne przygotowanie na jutro (11.10 → 12.10) — a gdy i jutro bez diety (08–10.10), brak kart
   const order = r.noDiet ? (rt.noDiet ? [] : [EVE]) : ORDER;
   const allSteps = order.flatMap(i => SRC.mealprep.phases[i].cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
   // Składniki na jutro (D-074): stan na koniec dnia vs zużycie jutra wg planu — dla produktów używanych w kartach

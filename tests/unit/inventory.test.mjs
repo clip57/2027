@@ -53,21 +53,21 @@ test('prognoza uwzględnia czwartki i fazy', async () => {
   assert.equal(fc.lastCovered, '2026-10-16', '14.10 i 16.10 po 120 g, 15.10 (czw) bez banana');
   assert.equal(fc.runOut, '2026-10-17');
   assert.equal(fc.days, 3);
-  const oats = forecast('platki_owsiane', 70 * 10, '2026-10-01');   // 09.10–18.10: 10 dni × 70 g (D-100: 08.10 bez diety, dieta od 09.10)
+  const oats = forecast('platki_owsiane', 70 * 7, '2026-10-01');   // 12.10–18.10: 7 dni × 70 g (D-100: 08–11.10 bez diety, dieta od 12.10)
   assert.equal(oats.runOut, '2026-10-19', 'od 19.10 (Faza 1) porcja 85 g');
   assert.equal(oats.lastCovered, '2026-10-18');
 });
 
-test('start kalendarza 08.10.2026 i start diety 10.10 (D-100): brak zużycia przed startem i w dniach bez diety 08–09.10', async () => {
+test('start kalendarza 08.10.2026 i start diety 12.10 (D-100): brak zużycia przed startem i w dniach bez diety 08–11.10', async () => {
   const fc = forecast('banan', 240, '2026-10-05');
-  assert.equal(fc.lastCovered, '2026-10-12', '06–07.10 poza planem, 08–09.10 bez diety, 10.10 i 11.10 po 120 g, 12.10 NT (bez banana)');
-  assert.equal(fc.runOut, '2026-10-13');
+  assert.equal(fc.lastCovered, '2026-10-13', '06–07.10 poza planem, 08–11.10 bez diety, 12.10 i 13.10 po 120 g (dzień T)');
+  assert.equal(fc.runOut, '2026-10-14');
   const s = await new Store(new MemoryAdapter()).open();
   await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-10-05' });
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-07'), 1000, 'inwentaryzacja z 05.10 bez odliczeń do 07.10 (poza planem)');
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-08'), 1000, '08.10 — bez diety (D-100)');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-09'), 1000, '09.10 — też bez diety (D-100)');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-10'), 800, '10.10 — UPPER 1, dzień T');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-11'), 1000, '08–11.10 — bez diety (D-100)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-12'), 800, '12.10 — UPPER 1, dzień T');
 });
 
 test('statusy — klasyfikacja wg terminu przydatności (v31)', () => {

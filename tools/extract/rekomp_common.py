@@ -37,7 +37,7 @@ REPLACE = [
     ("melatonina 0,5–1 mg", "melatonina 1 mg", "A2.4c", 1),
     ("Glukozamina · chondroityna · Boswellia", "Glukozamina · chondroityna · Boswellia — do wyczerpania zapasu (ostatni dzień 21.03.2027), potem niekontynuowane", "A2.1", 1),
     # D-086 (P-2), D-090: start planu 27.09.2026 — Faza 0 trwa 15 dni; fazy opisane datami zamiast tygodni
-    ("Faza 0 (tygodnie 1–3)", "Faza 0 (10.10–18.10)", "D-100", 2),
+    ("Faza 0 (tygodnie 1–3)", "Faza 0 (12.10–18.10)", "D-100", 2),
     ("Faza 1 (tygodnie 4–8)", "Faza 1 (19.10–22.11)", "D-100", 2),
     ("Faza 2 (tygodnie 9+)", "Faza 2 (od 23.11)", "D-100", 2),
     ("Sukces = ukończenie 3 tygodni bez objawów", "Sukces = ukończenie Fazy 0 bez objawów", "D-086", 1),
@@ -52,7 +52,7 @@ TABLE_CELLS = [
     ("Hydrolizat kolagenu", 2, "Codziennie. W dni treningowe 17:15 — dokładnie 60 min przed sesją. W dzień wolny dowolnie", "17:15 codziennie"),
     ("Melatonina", 1, "0,5–1 mg", "1 mg"),
     ("Cynk pikolinian", 2, "2 × w tygodniu czwartek i niedziela, ze śniadaniem", "07:00, na czczo, czwartek i niedziela"),
-    ("Faza 0 wejściowa", 1, "1–3", "10.10–18.10"),   # D-086 (P-2), D-090, D-100
+    ("Faza 0 wejściowa", 1, "1–3", "12.10–18.10"),   # D-086 (P-2), D-090, D-100
     ("Faza 1 adaptacji", 1, "4–8", "19.10–22.11"),
     ("Faza 2 docelowa", 1, "9+", "od 23.11"),
     ("L-tauryna", 2, "17:15, przedtreningowo", "17:15, codziennie (także w czwartek)"),

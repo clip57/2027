@@ -26,8 +26,9 @@ test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (28 t
   }
   const first = weekSummary('2026-10-08');
   assert.deepEqual(first.map(x => x.outside), [true, true, true, false, false, false, false], 'D-088, D-100: 05–07.10 poza planem, kalendarz od 08.10');
-  assert.deepEqual(first.map(x => !!x.noDiet), [false, false, false, true, true, false, false], '08–09.10 — bez diety');
-  assert.deepEqual(first.map(x => x.training), ['Poza planem', 'Poza planem', 'Poza planem', 'Bez treningu', 'Bez treningu', 'UPPER 1 + sauna', 'Basen']);
+  assert.deepEqual(first.map(x => !!x.noDiet), [false, false, false, true, true, true, true], '08–11.10 — bez diety');
+  assert.deepEqual(first.map(x => x.training), ['Poza planem', 'Poza planem', 'Poza planem', 'Bez treningu', 'Bez treningu', 'Bez treningu', 'Bez treningu']);
+  assert.deepEqual(weekSummary('2026-10-12').map(x => [x.training, !!x.noDiet]), [['UPPER 1 + sauna', false], ['LOWER 1', false], ['Rower + ABS + sauna', false], ['Bez treningu, 2 × sauna', false], ['UPPER 2', false], ['LOWER 2 + sauna', false], ['Basen', false]]);
   const last = weekSummary('2027-03-28');
   assert.deepEqual(last.map(x => x.outside), [false, false, false, false, false, false, false], '22–28.03 w planie (koniec 28.03)');
   assert.ok(weekSummary('2027-03-29').every(x => x.outside), 'od 29.03 poza planem');

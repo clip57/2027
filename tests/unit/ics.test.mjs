@@ -43,11 +43,10 @@ test('treść: dawki, 10 bloków CFA (A–J), recall, trening, zakupy w czwartek
   }
   assert.deepEqual(planEvents('2026-09-24', ALL, NOW), [], 'poza planem (D-088) — brak wydarzeń');
   assert.equal(planEvents('2026-10-19', ['train'], NOW).join('\n'), planEvents('2026-10-19', ['train'], NOW).join('\n'), 'stały wynik (UID)');
-  // D-100: dni do 07.10 — bez wydarzeń; trening zaczyna się 10.10 (UPPER 1 w sobotę), 08–09.10 bez treningu, 12.10 — 2 × sauna
+  // D-100: dni do 07.10 — bez wydarzeń; trening zaczyna się 12.10 (UPPER 1 jak w nominalnym poniedziałku), 08–11.10 bez treningu
   for (const d of ['2026-09-29', '2026-09-30', '2026-10-07']) assert.deepEqual(planEvents(d, ALL, NOW), [], d);
-  assert.match(unfold(planEvents('2026-10-10', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 1/);
-  for (const d of ['2026-10-08', '2026-10-09']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu`);
-  assert.ok(!/SUMMARY:Trening siłowy/.test(unfold(planEvents('2026-10-12', ['train'], NOW).join('\r\n'))), '12.10 — 2 × sauna zamiast UPPER 1');
+  assert.match(unfold(planEvents('2026-10-12', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 1/);
+  for (const d of ['2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu`);
 });
 
 test('kodowanie tekstu i zawijanie wielobajtowych znaków', () => {

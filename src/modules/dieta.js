@@ -9,7 +9,7 @@ import { resolveDay, phaseFor, DIET_START } from '../core/resolver.js';
 import { catalogById, SRC } from '../core/data.js';
 import { longDate, shortDate, dayShort } from '../core/dates.js';
 
-// Początek faz z `phases.json` (D-100: Faza 0 od startu diety 10.10, Faza 1 od 19.10, Faza 2 od 23.11)
+// Początek faz z `phases.json` (D-100: Faza 0 od startu diety 12.10, Faza 1 od 19.10, Faza 2 od 23.11)
 const fromOf = p => SRC.phases.phases.find(x => x.phase === p).from;
 const PHASES = [0, 1, 2].map(value => ({ value, label: `Faza ${value}`, hint: `od ${shortDate(value === 0 ? DIET_START : fromOf(value))}` }));
 // Etykieta z PDF bywa samą liczbą (gramy) — dodajemy jednostkę, nie zmieniając wartości.

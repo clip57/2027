@@ -48,7 +48,7 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   push('future', up ? 'warn' : 'ok', up ? `Zdarzenia z nowszej wersji aplikacji: ${up}` : 'Wszystkie zdarzenia rozpoznane',
     up ? `Zachowane, ale pomijane w obliczeniach (${Object.keys(state.unprocessed.types).join(', ')}). Zaktualizuj aplikację.` : '');
 
-  // Start treningów (D-088, D-100): serie i czasy treningu sprzed 10.10.2026 zostają w dzienniku, poza statystykami
+  // Start treningów (D-088, D-100): serie i czasy treningu sprzed 12.10.2026 zostają w dzienniku, poza statystykami
   const pre = Object.values(state.train || {}).filter(s => s.date < TRAIN_START).length
     + Object.keys(state.trainSessions || {}).filter(d => d < TRAIN_START).length;
   if (pre) push('pre-start', 'info', `Wpisy treningowe sprzed startu planu: ${pre}`, `Zachowane w dzienniku i w synchronizacji; statystyki i historia liczone od ${TRAIN_START} (D-088, D-100).`);
