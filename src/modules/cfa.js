@@ -27,7 +27,8 @@ function plan(root, { done, pace, late, rs }) {
     ` — ${(cfaByDay[d] || []).filter(b => done.has(b.nr)).length}/${(cfaByDay[d] || []).length} bloków`)))),
   section('h-stat', 'Statystyki planu', h('dl', { class: 'kv' },
     h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad || `${D.stat.dni} × ${D.stat.bloki / D.stat.dni}`})`),
-    h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h + recall ${fmt(D.stat.recallH, 2)} h (${D.stat.recall} sesji)`),
+    h('dt', {}, 'Godziny netto'), h('dd', {}, D.stat.recallH != null ? `${fmt(D.stat.godziny, 2)} h + recall ${fmt(D.stat.recallH, 2)} h (${D.stat.recall} sesji)`
+      : `${fmt(D.stat.godziny)} h łącznie z recall (${D.stat.recall} sesji: ${D.stat.recallEvening} wieczornych + ${D.stat.recallFinal} końcowych) — D-101`),
     h('dt', {}, 'Tempo (do wczoraj)'), h('dd', {}, `${pace.doneDue} z ${pace.due} zaplanowanych · zaległe ${late} · z wyprzedzeniem ${pace.ahead}`),
     h('dt', {}, 'Recall 22:00'), h('dd', {}, `wykonane ${rs.done} z ${rs.total} sesji · do wczoraj ${rs.doneDue} z ${rs.due}`),
     modeStats(D, done))));

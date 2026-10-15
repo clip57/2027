@@ -10,11 +10,11 @@ test('normalizacja: bez polskich znaków', () => assert.equal(norm('Żółć Ł�
 
 test('wyniki: produkty, ćwiczenia z najbliższym dniem sesji, bloki CFA, error log, bezpieczeństwo, rekompozycja', () => {
   const bench = search(IDX, 'wyciskanie sztangi').find(x => x.kind === 'ex');
-  assert.ok(bench && /^#\/trening\?d=2026-10-12$/.test(bench.href), 'poniedziałek 12.10 — UPPER 1 (start treningów, D-100)');
-  assert.ok(resolveDay('2026-10-12').training.some(e => e.name === bench.title));
-  // D-100: przed startem kalendarza najbliższy UPPER 1 to poniedziałek 12.10 (start treningów)
+  assert.ok(bench && /^#\/trening\?d=2026-10-19$/.test(bench.href), 'poniedziałek 19.10 — pierwszy UPPER 1 (12–15.10 bez treningu, D-101)');
+  assert.ok(resolveDay('2026-10-19').training.some(e => e.name === bench.title));
+  // D-101: przed startem kalendarza najbliższy UPPER 1 to poniedziałek 19.10 (regularny trening od 16.10)
   const b2 = search(buildIndex({}, '2026-09-28'), 'wyciskanie sztangi').find(x => x.kind === 'ex');
-  assert.equal(b2.href, '#/trening?d=2026-10-12');
+  assert.equal(b2.href, '#/trening?d=2026-10-19');
   assert.ok(search(IDX, 'platki').some(x => x.kind === 'inv' && x.title.startsWith('Płatki')));
   assert.ok(search(IDX, 'hypothesis testing').some(x => x.kind === 'cfa' && x.href.startsWith('#/cfa?v=dzien&d=')));
   assert.ok(search(IDX, 'duration').some(x => x.kind === 'err'));

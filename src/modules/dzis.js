@@ -220,7 +220,7 @@ export function renderDzis(root, ctx) {
       h('div', { class: 'row daynav' }, h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'))),
     h('section', { class: 'panel dz-outside' }, h('h2', {}, 'Poza planem'),
       h('p', {}, r.after ? `Plan zakończył się ${longDate(PLAN_END)}. Dni późniejsze nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach.`
-        : `Realny początek planu: ${longDate(PLAN_REAL_START)} (kalendarz od ${longDate(PLAN_START)}, dieta od ${longDate(DIET_START)}, trening od ${longDate(TRAIN_START)}). Dni wcześniejsze nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach.`),
+        : `Realny początek planu: ${longDate(PLAN_REAL_START)} (regularny trening i dieta od ${longDate(TRAIN_START)}). Dni wcześniejsze są historią — zapisane dane zostają, ale nie mają planu dnia, treningu, suplementacji ani zużycia w Zapasach; plan CFA liczy się od ${longDate(SRC.cfa.D.stat.start)}.`),
       h('a', { class: 'btn primary', href: `#/dzis?d=${target}` }, `Przejdź do ${shortDate(target)}`)));
     return;
   }

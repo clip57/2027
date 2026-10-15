@@ -1025,6 +1025,119 @@
      "decision": "D-097"
     }
    ]
+  },
+  "czwartek_k": {
+   "decision": "D-101",
+   "replaces": [
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015",
+    "slot.2035"
+   ],
+   "slots": [
+    {
+     "id": "slot.1745c",
+     "from": "17:45",
+     "to": "17:55",
+     "domain": "train",
+     "title_src": "Transport na siłownię",
+     "badges_src": [
+      "Dojazd"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1755c",
+     "from": "17:55",
+     "to": "19:05",
+     "domain": "train",
+     "title_src": "Sauna",
+     "badges_src": [
+      "SAUNA"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "main",
+     "items": [
+      {
+       "kind": "task",
+       "src": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "text": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1905c",
+     "from": "19:05",
+     "to": "19:30",
+     "domain": "prep",
+     "title_src": "Zakupy",
+     "badges_src": [
+      "Zakupy"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "text": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-101",
+     "shop": true
+    },
+    {
+     "id": "slot.2035",
+     "from": "19:30",
+     "to": "19:40",
+     "domain": "regen",
+     "title_src": "Wieczorne mycie głowy i suszenie",
+     "badges_src": [
+      "Higiena"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-101"
+    },
+    {
+     "id": "slot.1940c",
+     "from": "19:40",
+     "to": "20:45",
+     "domain": "diet",
+     "title_src": "Posiłek po saunie",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "desc_src": "",
+     "role": "meal",
+     "key": "post",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:15"
+      }
+     ],
+     "decision": "D-101"
+    }
+   ]
   }
  },
  "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."

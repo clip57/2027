@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100",
+ "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101",
  "days": {
   "1": {
    "dayType": "strength_sauna",
@@ -107,94 +107,115 @@
  },
  "variant_decision": "D-097: czwartki — sauna 17:55–19:05 i zakupy 19:05–20:35, od 07.01 zakupy 15:30–16:00 i bloki MPW +30 min; soboty bez zakupów; D-094: niedziele — basen 18:15–19:30, posiłek 19:30, relaks, prysznic 20:15–20:45; nie dotyczy dnia mocka",
  "exceptions": {
-  "2026-10-08": {
-   "decision": "D-100",
+  "2026-10-15": {
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
-   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
+   "variant": "czwartek_k",
+   "note": "Bez treningu, dieta NT: regularny przebieg od 16.10 (D-101); zakupy 19:05–19:30, mycie głowy 19:30–19:40"
   },
-  "2026-10-09": {
-   "decision": "D-100",
+  "2026-10-22": {
+   "decision": "D-101",
+   "variant": "czwartek_k",
+   "note": "Zakupy 19:05–19:30, mycie głowy 19:30–19:40 (D-101)"
+  },
+  "2026-10-29": {
+   "decision": "D-101",
+   "variant": "czwartek_k",
+   "note": "Zakupy 19:05–19:30, mycie głowy 19:30–19:40 (D-101)"
+  },
+  "2026-11-03": {
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
+   "note": "Wyjątek 03.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
-  "2026-10-10": {
-   "decision": "D-100",
+  "2026-11-04": {
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
+   "note": "Wyjątek 04.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
-  "2026-10-11": {
-   "decision": "D-100",
+  "2026-11-05": {
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Bez diety i bez treningu: dieta i trening od 12.10 (D-100)"
+   "note": "Wyjątek 05.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
+  },
+  "2026-11-06": {
+   "decision": "D-101",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Wyjątek 06.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
   "2026-11-07": {
-   "decision": "D-100",
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Wyjątek 07.11.2026: bez treningu, dieta NT jak w czwartek (D-100)"
+   "note": "Wyjątek 07.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
   "2026-11-08": {
-   "decision": "D-100",
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Wyjątek 08.11.2026: bez treningu, dieta NT jak w czwartek (D-100)"
+   "note": "Wyjątek 08.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
   "2026-11-09": {
-   "decision": "D-100",
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Wyjątek 09.11.2026: bez treningu, dieta NT jak w czwartek (D-100)"
+   "note": "Wyjątek 09.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
   "2026-11-10": {
-   "decision": "D-100",
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Wyjątek 10.11.2026: bez treningu, dieta NT jak w czwartek (D-100)"
+   "note": "Wyjątek 10.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
   "2026-11-11": {
-   "decision": "D-100",
+   "decision": "D-101",
    "dayType": "free",
    "session": null,
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Wyjątek 11.11.2026: bez treningu, dieta NT jak w czwartek (D-100)"
+   "note": "Wyjątek 11.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
   },
   "2026-12-26": {
    "decision": "D-096",

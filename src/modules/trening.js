@@ -216,7 +216,7 @@ function renderSession(root, ctx) {
     add(root, h('div', { class: 'panel' },
       h('p', {}, r.dayType === 'rest_sauna2' ? 'Dzień bez treningu. Dwie rundy sauny według protokołu (arkusz „Sauna”). Kolagen, witamina C i tauryna przed sauną — godziny w Suplementacji.'
         : r.dayType === 'swim' ? 'Basen 55 min.' : r.zero ? `Dzień zero — bez treningu. Treningi od ${longDate(addDays(date, 1))}.`
-          : r.after ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.` : r.outside ? `Poza planem — plan zaczyna się ${longDate(PLAN_START)}, treningi od ${longDate(TRAIN_START)}.`
+          : r.after ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.` : r.outside ? (PLAN_START === TRAIN_START ? `Poza planem — plan i treningi zaczynają się ${longDate(PLAN_START)}.` : `Poza planem — plan zaczyna się ${longDate(PLAN_START)}, treningi od ${longDate(TRAIN_START)}.`)
           : r.dayType === 'free' ? (date < TRAIN_START ? `Dzień bez treningu. Treningi od ${longDate(TRAIN_START)}.` : 'Dzień bez treningu.') : 'Brak zaplanowanych ćwiczeń.')));
     return;
   }
