@@ -71,7 +71,11 @@ w dni z J resolver dokłada slot `slot.cfa.J` (`extra`) i układa wieczór: powr
 **D-100 (08–09.10.2026, start 12.10):** **kalendarz od 08.10.2026** (dni do 07.10 i Dzień zero 29.09 usunięte — poza planem; `phases.zero` brak), **08–11.10 — dni bez diety i treningu** (flaga `noDiet`), **dieta, trening i realny początek planu od 12.10** (`phases.dietStart/trainStart/realStart`,
 `DIET_START`, `TRAIN_START`, `PLAN_REAL_START` w resolverze); 12.10 — normalny poniedziałek (UPPER 1 + sauna, dieta T); **Faza 1 od 19.10, Faza 2 od 23.11**;
 07–11.11 bez treningu z dietą NT; preparaty czasowe od 08.10 (172 dni); plan CFA bez zmian. Pielęgnacja: tylko daty w pliku użytkownika (poza repozytorium). Dane: `tools/extract/day_plan_d100.py`. Raport: `docs/RAPORT_D100.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-100).
+**D-101/D-102 (13–15.10.2026):** plan CFA **V3** (326 bloków, 13.10–11.11; J 21:00–21:53 poza 15.10/23.10/25.10, K/L/M po południu 03–11.11, M także 22.10 i 29.10; bez Schwesera; recall z `nightRecall`), `CFA_PLAN_VERSION` = 14;
+**początek planu i pierwszy dzień liczenia wszystkiego poza CFA: 15.10.2026** (dni wcześniejsze — historia, poza planem; plan CFA ma własny zakres od 13.10), regularny trening i dieta od 16.10 (15.10 dzień nietreningowy NT), Faza 0 do 22.10, Faza 1 od 23.10, Faza 2 od 23.11;
+brak treningu 03–11.11 (dieta NT; 05.11 bez zakupów), 12–15.11 nominalnie; czwartki 15/22/29.10 — wariant `czwartek_k` (zakupy 19:05–19:30, mycie głowy 19:30–19:40); w dni z blokiem M posiłek 20:15 w trakcie bloku, mycie głowy tuż przed M (`mycieBeforeM`).
+Dane: `tools/extract/day_plan_d101.py`. Raport: `docs/RAPORT_D101.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-102).
 
 ---
 

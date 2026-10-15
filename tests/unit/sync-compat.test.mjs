@@ -127,8 +127,9 @@ test('D-088: zdarzenia z dni przed startem planu (21–24.09) zostają w dzienni
   assert.equal(phone.state.trainSessions['2026-09-22'].minutes, 55);
   assert.equal(stockAt(phone.state.inv, 'banan', '2026-09-24'), 360, 'zakup 23.09 liczony, bez zużycia przed startem');
   assert.equal(stockAt(phone.state.inv, 'banan', '2026-10-07'), 360, 'bez zużycia do 07.10 (dni poza planem, D-100)');
-  assert.equal(stockAt(phone.state.inv, 'banan', '2026-10-11'), 360, '08–11.10 — bez diety (D-100)');
-  assert.equal(stockAt(phone.state.inv, 'banan', '2026-10-12'), 360 - consumptionForDay('2026-10-12').banan, '12.10 — start diety, UPPER 1 (T)');
+  assert.equal(stockAt(phone.state.inv, 'banan', '2026-10-11'), 360, 'do 11.10 poza planem (D-101)');
+  assert.equal(stockAt(phone.state.inv, 'banan', '2026-10-15'), 360, '12–15.10 — dzień NT, bez banana (D-101)');
+  assert.equal(stockAt(phone.state.inv, 'banan', '2026-10-16'), 360 - consumptionForDay('2026-10-16').banan, '16.10 — UPPER 2 (T): regularny przebieg');
   await apply(phone, await preview(phone, file));
   assert.equal(phone.events.size, 4, 'ponowny import idempotentny');
 });

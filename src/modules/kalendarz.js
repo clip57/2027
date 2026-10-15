@@ -1,4 +1,4 @@
-// Moduł „Kalendarz” (D-097, D-100): miesiące planu (kalendarz od 08.10.2026, realny początek planu 12.10 – 28.03.2027) z podsumowaniem każdego dnia z resolvera
+// Moduł „Kalendarz” (D-097, D-101): miesiące planu (kalendarz i realny początek planu od 12.10.2026 – 28.03.2027) z podsumowaniem każdego dnia z resolvera
 // (trening, nauka CFA / MPW, weekendowe bloki, zakupy, święta, egzaminy). Kliknięcie dnia otwiera plan dnia w „Dziś”.
 // Tylko odczyt — bez nowych danych; na telefonie znaczniki kropkami, na komputerze krótkie opisy.
 import { h, add, plural } from '../ui/dom.js';

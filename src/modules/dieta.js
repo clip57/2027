@@ -5,13 +5,13 @@ import { segmented } from '../ui/components.js';
 import { icon } from '../ui/icons.js';
 import { dietSummary, phaseDiff, mealTimes, nextMeal } from '../core/calc/diet.js';
 import { stockAt, forecast, statusInfo } from '../core/calc/inventory.js';
-import { resolveDay, phaseFor, DIET_START } from '../core/resolver.js';
+import { resolveDay, phaseFor, TRAIN_START } from '../core/resolver.js';
 import { catalogById, SRC } from '../core/data.js';
 import { longDate, shortDate, dayShort } from '../core/dates.js';
 
-// Początek faz z `phases.json` (D-100: Faza 0 od startu diety 12.10, Faza 1 od 19.10, Faza 2 od 23.11)
+// Początek faz z `phases.json` (D-101: Faza 0 — regularny przebieg od 16.10, Faza 1 od 23.10, Faza 2 od 23.11)
 const fromOf = p => SRC.phases.phases.find(x => x.phase === p).from;
-const PHASES = [0, 1, 2].map(value => ({ value, label: `Faza ${value}`, hint: `od ${shortDate(value === 0 ? DIET_START : fromOf(value))}` }));
+const PHASES = [0, 1, 2].map(value => ({ value, label: `Faza ${value}`, hint: `od ${shortDate(value === 0 ? TRAIN_START : fromOf(value))}` }));
 // Etykieta z PDF bywa samą liczbą (gramy) — dodajemy jednostkę, nie zmieniając wartości.
 const qty = label => (/^[\d,]+$/.test(label.trim()) ? `${label.trim()} g` : label);
 const VARIANTS = [{ value: 'T', label: 'Dzień treningowy', hint: 'pn–śr, pt–nd' }, { value: 'NT', label: 'Dzień nietreningowy', hint: 'czwartek' }];
