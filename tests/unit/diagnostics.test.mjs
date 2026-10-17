@@ -22,7 +22,7 @@ test('diagnostyka: ujemny stan, stara inwentaryzacja, blok CFA z przyszłą dat�
   await s.recordMany([
     ['inv.count', { prod: 'banan', qty: 10, date: '2026-10-19' }],          // zużycie z planu > stan -> ujemny
     ['inv.count', { prod: 'kefir', qty: 5000, date: '2026-09-10' }],        // ponad 14 dni bez inwentaryzacji
-    ['cfa.done', { block: futureBlock.nr, done: true, plan: 14 }],
+    ['cfa.done', { block: futureBlock.nr, done: true, plan: 15 }],
     ['train.set', { date: '2026-09-21', ex: 'x_test', set: 1, done: true }],
   ]);
   const d = diagnose(s.state, { today: '2026-10-21', quarantined: 2, cloud: { config: {}, pending: 3, lastSync: null } });

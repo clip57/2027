@@ -1,4 +1,4 @@
-// Ekstrakcja: TRENING (EX, EX_ROM), CFA (D, plan D-086), MPW (D, plan D-095), ZAPASY (katalog) -> src/data/*.json
+// Ekstrakcja: TRENING (EX, EX_ROM), CFA (D, plan D-103), MPW (D, plan D-095), ZAPASY (katalog) -> src/data/*.json
 // Uruchomienie: SOURCES_DIR=... node tools/extract/extract_static.mjs
 // Tylko wybrane części: ONLY=cfa (albo trening, mpw, katalog; kilka po przecinku).
 import fs from 'node:fs';
@@ -30,10 +30,12 @@ function crossCheck(csvFile, file, D, tag) {
   }
   if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
   const [head, ...body] = rows.filter(r => r.some(x => x !== ''));
+  // D-103 (plan V44): CSV ma też kolumny pochodne (minuty_*, plik_pdf, typ_praktyki, nowe_pozycje_banku…) bez pola o tej samej nazwie w D — porównywane są kolumny, które D ma
+  const str = v => (v == null ? '' : String(v)), cols = head.map((k, j) => [k, j]).filter(([k]) => D.bloki.some(b => k in b));
   const diff = body.length !== D.bloki.length ? [`liczba wierszy ${body.length}`]
-    : body.flatMap((r, i) => head.filter((k, j) => String(D.bloki[i][k]) !== r[j]).map(k => `nr ${i + 1}: ${k}`));
+    : body.flatMap((r, i) => cols.filter(([k, j]) => str(D.bloki[i][k]) !== r[j]).map(([k]) => `nr ${i + 1}: ${k}`));
   if (diff.length) throw new Error(`${csvFile} ≠ ${file}: ${diff.slice(0, 5).join('; ')}`);
-  console.log(`${tag}: ${csvFile} zgodny z ${file} (${body.length} wierszy)`);
+  console.log(`${tag}: ${csvFile} zgodny z ${file} (${body.length} wierszy, ${cols.length} porównanych kolumn)`);
 }
 
 // ---------- TRENING ----------
@@ -64,17 +66,17 @@ if (want('trening')) {
   console.log('training.json:', Object.values(days).reduce((a, l) => a + l.length, 0), 'ćwiczeń');
 }
 
-// ---------- CFA (D-086/D-087/D-090/D-093/D-097/D-098/D-099/D-101: plan CFA V3 od 13.10.2026, 326 bloków (blok J 21:00–21:53 poza 15.10, 23.10 i 25.10; bloki K, L, M po południu 22.10, 29.10 i 03–11.11); zastępuje v3 z D-006) ----------
+// ---------- CFA (D-086/D-087/D-090/D-093/D-097/D-098/D-099/D-101/D-103: plan CFA V44 od 16.10.2026, 313 bloków — SchweserNotes 2026 + Practice CFA + Curriculum; litery A–I codziennie, J i M poza 16, 23 i 25.10, K/L 23.10 i 03–11.11, L także 22 i 29.10; zastępuje V3 z D-101) ----------
 if (want('cfa')) {
-  const file = process.env.CFA_PLAN || 'PLAN_NAUKI_CFA_LEVEL_I.html';
+  const file = process.env.CFA_PLAN || 'PLAN_CFA_FINAL_V44.html';
   const js = scripts(read(file))[0].trim();
   const D = JSON.parse(js.replace(/^const D\s*=\s*/, '').replace(/;\s*$/, ''));
-  // Starszy plik (v3: 416 bloków od 21.09; v4: 432; v5: 421 od 25.09; v7: 409 od 27.09; v9: 400 od 28.09; v12: 387 od 30.09; v13: 342 od 05.10; v14: 340 od 08.10) nie może po cichu nadpisać planu D-101
-  if (D.bloki.length !== 326 || D.stat.start !== '2026-10-13' || D.stat.end !== '2026-11-11')
-    throw new Error(`${file}: oczekiwano planu D-101 (326 bloków, 13.10–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}`);
-  // Kontrola krzyżowa z MASTER_SCHEDULE_CFA.csv (jeśli jest w SOURCES_DIR): te same bloki, pole po polu
-  crossCheck(process.env.CFA_CSV || 'MASTER_SCHEDULE_CFA.csv', file, D, 'cfa');
-  write('cfa.json', { schema: 1, generated_from: 'PLAN_NAUKI_CFA_LEVEL_I.html (plan CFA V3, 13.10.2026) — obiekt D (D-086, D-087, D-090, D-093, D-097, D-098, D-099, D-101)',
+  // Starszy plik (v3: 416 bloków od 21.09; v4: 432; v5: 421 od 25.09; v7: 409 od 27.09; v9: 400 od 28.09; v12: 387 od 30.09; v13: 342 od 05.10; v14: 340 od 08.10; V3: 326 od 13.10) nie może po cichu nadpisać planu D-103
+  if (D.bloki.length !== 313 || D.stat.start !== '2026-10-16' || D.stat.end !== '2026-11-11' || D.version !== 'CFA_20261016_SCHWESER2026_V44_FINAL')
+    throw new Error(`${file}: oczekiwano planu D-103 (V44: 313 bloków, 16.10–11.11), jest ${D.bloki.length} bloków ${D.stat.start}–${D.stat.end}, wersja ${D.version}`);
+  // Kontrola krzyżowa z MASTER_CFA_FINAL_V44.csv (jeśli jest w SOURCES_DIR): te same bloki, pole po polu
+  crossCheck(process.env.CFA_CSV || 'MASTER_CFA_FINAL_V44.csv', file, D, 'cfa');
+  write('cfa.json', { schema: 1, generated_from: 'PLAN_CFA_FINAL_V44.html (plan CFA V44, 16.10.2026) — obiekt D (D-086, D-087, D-090, D-093, D-097, D-098, D-099, D-101, D-103)',
     exam: '2026-11-12', D });
   console.log('cfa.json:', D.bloki.length, 'bloków');
 }

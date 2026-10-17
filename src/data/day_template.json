@@ -1138,7 +1138,201 @@
      "decision": "D-101"
     }
    ]
+  },
+  "czwartek_zl": {
+   "decision": "D-103",
+   "replaces": [
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015",
+    "slot.2035"
+   ],
+   "slots": [
+    {
+     "id": "slot.1745z",
+     "from": "17:45",
+     "to": "18:40",
+     "domain": "prep",
+     "title_src": "Zakupy",
+     "badges_src": [
+      "Zakupy"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "text": "Zakupy według listy „Do kupienia” w module Zapasy",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-103",
+     "shop": true
+    },
+    {
+     "id": "slot.2035",
+     "from": "19:33",
+     "to": "19:40",
+     "domain": "regen",
+     "title_src": "Wieczorne mycie głowy i suszenie",
+     "badges_src": [
+      "Higiena"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-103"
+    },
+    {
+     "id": "slot.2015z",
+     "from": "20:15",
+     "to": "20:45",
+     "domain": "diet",
+     "title_src": "Powrót do domu",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "desc_src": "",
+     "role": "meal",
+     "key": "post",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:15"
+      }
+     ],
+     "decision": "D-103"
+    }
+   ]
+  },
+  "czwartek_bz": {
+   "decision": "D-103",
+   "replaces": [
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015"
+   ],
+   "slots": [
+    {
+     "id": "slot.1745c",
+     "from": "17:45",
+     "to": "17:55",
+     "domain": "train",
+     "title_src": "Transport na siłownię",
+     "badges_src": [
+      "Dojazd"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1755c",
+     "from": "17:55",
+     "to": "19:05",
+     "domain": "train",
+     "title_src": "Sauna",
+     "badges_src": [
+      "SAUNA"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "main",
+     "items": [
+      {
+       "kind": "task",
+       "src": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "text": "Przygotowanie, rundy sauny i prysznic w czasie sauny",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-097"
+    },
+    {
+     "id": "slot.1905b",
+     "from": "19:05",
+     "to": "20:35",
+     "domain": "prep",
+     "title_src": "Powrót do domu",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:15",
+       "decision": "D-097"
+      }
+     ],
+     "decision": "D-103"
+    }
+   ]
   }
  },
- "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver)."
+ "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver).",
+ "mTraining": {
+  "decision": "D-103",
+  "trainTo": "19:15",
+  "home": {
+   "id": "slot.1915m",
+   "from": "19:15",
+   "to": "19:25",
+   "domain": "diet",
+   "title_src": "Powrót do domu",
+   "badges_src": [
+    "230 kcal"
+   ],
+   "desc_src": "",
+   "role": "meal",
+   "key": "post",
+   "items": [
+    {
+     "kind": "meal",
+     "src": "Posiłek potreningowy (19:15)",
+     "text": "Posiłek potreningowy (19:15)",
+     "meal": "post",
+     "time": "19:15",
+     "decision": "D-103"
+    }
+   ],
+   "decision": "D-103"
+  },
+  "wash": {
+   "id": "slot.1925m",
+   "from": "19:25",
+   "to": "19:40",
+   "domain": "regen",
+   "title_src": "Prysznic i mycie głowy",
+   "badges_src": [
+    "Higiena"
+   ],
+   "desc_src": "",
+   "role": "static",
+   "key": null,
+   "items": [],
+   "decision": "D-103"
+  }
+ }
 }
