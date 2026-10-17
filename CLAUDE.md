@@ -5,7 +5,7 @@ meal prep, trening, nauka CFA, bezpieczeństwo żywności, plan rekompozycji. Je
 iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych), przeglądarka na komputerze.
 Język interfejsu i dokumentacji: **polski**.
 
-**Bieżące zadanie (08.10.2026): E2E/a11y do przeglądu po D-099/D-100 (zegar testu przed startem kalendarza — `docs/RAPORT_D100.md`); wcześniej: dokończenie D-097 — aktualizacja E2E, `verify_all.py`, `UPGRADE` pakietu prywatnego i pełna regresja (`docs/PRZEKAZANIE.md` §4); potem kolejne polecenia użytkownika.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
+**Bieżące zadanie (16.10.2026): plan CFA V44 wdrożony (D-103); E2E (`tests/e2e/e2e.py`) i `verify_all.py` wymagają migracji na kalendarz V44 (`docs/RAPORT_D103.md` §6); do potwierdzenia: sauna w dni z blokiem M, trening 23.10, posiłek 20:15 w czwartki z blokiem M.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
 Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
 24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
 następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
@@ -75,7 +75,11 @@ w dni z J resolver dokłada slot `slot.cfa.J` (`extra`) i układa wieczór: powr
 **początek planu i pierwszy dzień liczenia wszystkiego poza CFA: 15.10.2026** (dni wcześniejsze — historia, poza planem; plan CFA ma własny zakres od 13.10), regularny trening i dieta od 16.10 (15.10 dzień nietreningowy NT), Faza 0 do 22.10, Faza 1 od 23.10, Faza 2 od 23.11;
 brak treningu 03–11.11 (dieta NT; 05.11 bez zakupów), 12–15.11 nominalnie; czwartki 15/22/29.10 — wariant `czwartek_k` (zakupy 19:05–19:30, mycie głowy 19:30–19:40); w dni z blokiem M posiłek 20:15 w trakcie bloku, mycie głowy tuż przed M (`mycieBeforeM`).
 Dane: `tools/extract/day_plan_d101.py`. Raport: `docs/RAPORT_D101.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-102).
+
+**D-103 (16.10.2026):** plan CFA **V44** (313 bloków, 16.10–11.11, SchweserNotes 2026 + Practice CFA; J/M poza 16/23/25.10, K/L 23.10 i 03–11.11, L także 22/29.10; recall z `nightRecall`), `CFA_PLAN_VERSION` = 15; treningi od 17.10, Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12;
+dni treningowe z blokiem M (`mTrainDay`, 13 dni): trening 18:15–19:15, powrót z posiłkiem 19:15, prysznic i mycie głowy 19:25–19:40, bez sauny (`trainingBeforeM`, szablon `mTraining`); czwartki 22/29.10 — `czwartek_zl` (bez sauny, zakupy 17:45–18:40); 23.10 bez treningu; 24.12 bez zakupów (`czwartek_bz`), 25.12 wolny; okno „Wolne” pod K/L/M przycinane (`trimTrainWindow`).
+Dane: `tools/extract/day_plan_d103.py`. Kontrola: `node tools/verify/plan_check.mjs`, `python3 tests/e2e/cfa_smoke.py`. Raport: `docs/RAPORT_D103.md`.
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-103).
 
 ---
 

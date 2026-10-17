@@ -91,7 +91,7 @@ async def run_variant(pw, name, url, mobile):
     ok(any('Obiad (16:23)' in t for t in await pg.eval_on_selector_all('.slot-items li', 'e => e.map(x => x.textContent)')), f'{tag} obiad opisany jako 16:23 (D-037)')
     # D-102: 15.10.2026 — początek planu i pierwszy dzień liczenia wszystkiego poza CFA; dni wcześniejsze (14.10) — historia, poza planem
     await pg.goto(url + '#/dzis?d=2026-10-15'); await pg.wait_for_selector('.dz-plan-h')
-    ok(await pg.locator('.daynav [aria-label=\\"Poprzedni dzień\\"]').count() == 0, f'{tag} 15.10: pierwszy dzień planu — bez przejścia do dnia poprzedniego')
+    ok(await pg.locator('.daynav [aria-label="Poprzedni dzień"]').count() == 0, f'{tag} 15.10: pierwszy dzień planu — bez przejścia do dnia poprzedniego')
     await pg.goto(url + '#/dzis?d=2026-10-14'); await pg.wait_for_selector('.dz-outside')
     ok('Realny początek planu: 15 października 2026' in await pg.inner_text('.dz-outside') and 'Bez diety' not in await pg.inner_text('main'), f'{tag} 14.10: poza planem — historia (D-102)')
     # 19.10 — poniedziałek Fazy 0 (do 22.10): UPPER 1 + sauna; 12–15.10 dni nietreningowe, regularny przebieg od 16.10 (D-101)

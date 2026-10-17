@@ -23,15 +23,21 @@ test('struktura: VCALENDAR, VTIMEZONE Europe/Warsaw z regułami DST, CRLF, linie
   assert.equal(new Set(u.match(/^UID:.*$/gm)).size, count, 'UID unikalne');
 });
 
-test('treść: dawki, 10 bloków CFA (A–J), recall, trening, zakupy w czwartek (D-097, D-099, D-101); godziny lokalne także po zmianie czasu 25.10.2026', () => {
-  const mon = unfold(planEvents('2026-10-19', ALL, NOW).join('\r\n'));   // poniedziałek F1 w planie CFA v14 (blok J 21:00–21:53)
-  assert.equal((mon.match(/SUMMARY:CFA blok/g) || []).length, 10);
+test('treść: dawki, 11 bloków CFA (A–I, M, J), recall, trening 18:15–19:15, zakupy w czwartek (D-097, D-099, D-101, D-103); godziny lokalne także po zmianie czasu 25.10.2026', () => {
+  const mon = unfold(planEvents('2026-10-19', ALL, NOW).join('\r\n'));   // poniedziałek F0 w planie CFA V44 (bloki M 19:40–20:33 i J 21:00–21:53)
+  assert.equal((mon.match(/SUMMARY:CFA blok/g) || []).length, 11);
+  assert.match(mon, /SUMMARY:CFA blok M: /);
   assert.match(mon, /SUMMARY:CFA blok J: /);
-  assert.match(unfold(planEvents('2026-10-23', ALL, NOW).join('\r\n')), /SUMMARY:CFA blok I: /, 'piątek 23.10 (bez J): A–I');
-  assert.equal((unfold(planEvents('2026-10-23', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 9);
+  assert.match(unfold(planEvents('2026-10-23', ALL, NOW).join('\r\n')), /SUMMARY:CFA blok I: /, 'piątek 23.10 (bez J i M): A–I, K, L');
+  assert.equal((unfold(planEvents('2026-10-23', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 11);
+  assert.equal((unfold(planEvents('2026-10-16', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 9, '16.10 — A–I');
   assert.match(mon, /SUMMARY:CFA Active Recall/);
   assert.match(mon, /SUMMARY:Trening siłowy: UPPER 1/);
   assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-10-19').length);
+  const zl = unfold(planEvents('2026-10-22', ['shop'], NOW).join('\r\n'));   // D-103: czwartek bez sauny — zakupy 17:45–18:40
+  assert.match(zl, /DTSTART;TZID=Europe\/Warsaw:20261022T174500/);
+  assert.match(zl, /DTEND;TZID=Europe\/Warsaw:20261022T184000/);
+  assert.deepEqual(planEvents('2026-12-24', ['shop'], NOW), [], '24.12 — bez zakupów (D-103)');
   const thu = unfold(planEvents('2026-10-15', ['shop'], NOW).join('\r\n'));
   assert.match(thu, /DTSTART;TZID=Europe\/Warsaw:20261015T190500/);
   assert.match(thu, /DTEND;TZID=Europe\/Warsaw:20261015T193000/, 'D-101: zakupy 19:05–19:30');
@@ -49,8 +55,12 @@ test('treść: dawki, 10 bloków CFA (A–J), recall, trening, zakupy w czwartek
   // D-101: dni do 11.10 — bez wydarzeń; trening zaczyna się 12.10 (UPPER 1 jak w nominalnym poniedziałku); 03–11.11 bez treningu; 12–14.11 nowy trening
   for (const d of ['2026-09-29', '2026-09-30', '2026-10-07', '2026-10-11']) assert.deepEqual(planEvents(d, ALL, NOW), [], d);
   assert.match(unfold(planEvents('2026-10-19', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 1/);
-  assert.match(unfold(planEvents('2026-10-16', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 2/, '16.10 — początek regularnego treningu');
-  for (const d of ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu (D-101)`);
+  const t17 = unfold(planEvents('2026-10-17', ['train'], NOW).join('\r\n'));
+  assert.match(t17, /SUMMARY:Trening siłowy: LOWER 2/, '17.10 — pierwszy trening (D-103)');
+  assert.match(t17, /DTEND;TZID=Europe\/Warsaw:20261017T191500/, 'trening do 19:15 w dni z blokiem M');
+  assert.ok(!/SUMMARY:Sauna/.test(t17), 'bez sauny w dni z blokiem M');
+  assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents('2026-10-16', ['train'], NOW).join('\r\n'))), '16.10 — bez treningu (D-103)');
+  for (const d of ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-23']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu (D-101)`);
   for (const d of ['2026-11-03', '2026-11-05', '2026-11-07', '2026-11-11']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu`);
   assert.match(unfold(planEvents('2026-11-13', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 2/, '13.11 — nominalny piątek');
   assert.match(unfold(planEvents('2026-11-14', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: LOWER 2/, '14.11 — nominalna sobota');

@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101",
+ "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101, D-103",
  "days": {
   "1": {
    "dayType": "strength_sauna",
@@ -117,15 +117,45 @@
    "variant": "czwartek_k",
    "note": "Bez treningu, dieta NT: regularny przebieg od 16.10 (D-101); zakupy 19:05–19:30, mycie głowy 19:30–19:40"
   },
+  "2026-10-16": {
+   "decision": "D-103",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Bez treningu, dieta NT: regularne treningi od 17.10 (D-103)"
+  },
   "2026-10-22": {
-   "decision": "D-101",
-   "variant": "czwartek_k",
-   "note": "Zakupy 19:05–19:30, mycie głowy 19:30–19:40 (D-101)"
+   "decision": "D-103",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": "czwartek_zl",
+   "note": "Bez sauny: zakupy 17:45–18:40, bloki L 18:40–19:33 i M 19:40–20:33, mycie głowy 19:33–19:40 (D-103)"
+  },
+  "2026-10-23": {
+   "decision": "D-103",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Bez treningu: bloki K 17:40–18:33 i L 18:40–19:33 zajmują okno treningowe (D-103 — do potwierdzenia), dieta NT"
   },
   "2026-10-29": {
-   "decision": "D-101",
-   "variant": "czwartek_k",
-   "note": "Zakupy 19:05–19:30, mycie głowy 19:30–19:40 (D-101)"
+   "decision": "D-103",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": "czwartek_zl",
+   "note": "Bez sauny: zakupy 17:45–18:40, bloki L 18:40–19:33 i M 19:40–20:33, mycie głowy 19:33–19:40 (D-103)"
   },
   "2026-11-03": {
    "decision": "D-101",
@@ -216,6 +246,21 @@
    "diet": "NT",
    "variant": null,
    "note": "Wyjątek 11.11.2026: bez treningu, dieta NT jak w czwartek (D-101)"
+  },
+  "2026-12-24": {
+   "decision": "D-103",
+   "variant": "czwartek_bz",
+   "note": "Bez zakupów (D-103): sauna, powrót do domu z posiłkiem 20:15"
+  },
+  "2026-12-25": {
+   "decision": "D-103",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Boże Narodzenie: dzień całkowicie wolny — bez bloków, treningu i zakupów (dieta NT)"
   },
   "2026-12-26": {
    "decision": "D-096",
@@ -390,6 +435,13 @@
    "short": "Praca magisterska 8:00–15:23",
    "desc": "",
    "decision": "D-096"
+  },
+  "2026-12-25": {
+   "kind": "wolne",
+   "title": "Wolne",
+   "short": "Boże Narodzenie — wolne",
+   "desc": "Boże Narodzenie — dzień całkowicie wolny",
+   "decision": "D-103"
   },
   "2026-12-26": {
    "kind": "wolne",

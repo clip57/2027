@@ -38,15 +38,25 @@ export function phaseFor(date) {
 
 // Dzień z blokiem J (plan CFA v14, D-099: 21:00–21:53 w dni poza pt i sob) — wieczór układany inaczej (kolacja przed blokiem).
 export const hasJ = date => (cfaByDay[date] || []).some(b => b.blok === 'J');
+const hasLetter = (date, ...l) => (cfaByDay[date] || []).some(b => l.includes(b.blok));
 const SUPPER_J = '20:50';   // kolacja 20:50–21:00 w dni z blokiem J (D-099); chondroityna idzie z kolacją
-export const doseTime = (time, date) => (time === '21:00' && hasJ(date) ? SUPPER_J : time);   // godzina dawki w danym dniu
+const POST_M = '19:15';     // posiłek potreningowy 19:15 (zamiast 20:15 / 19:30 w niedzielę) w dni treningowe z blokiem M (D-103)
+// D-103: dzień TRENINGOWY z blokiem M 19:40–20:33 — trening 18:15–19:15, powrót do domu z posiłkiem 19:15–19:25, prysznic i mycie głowy 19:25–19:40, bez sauny.
+// Czwartki (osobny wariant) i dni z blokami K/L (bez treningu — okno treningowe zajęte) nie należą do tej grupy.
+export const mTrainDay = date => {
+  if (!hasLetter(date, 'M') || hasLetter(date, 'K', 'L')) return false;
+  const d = dayPlan(date);
+  return !d.outside && d.dayType !== 'free' && !String(d.variant || '').startsWith('czwartek');
+};
+export const doseTime = (time, date) => (time === '21:00' && hasJ(date) ? SUPPER_J
+  : (time === '20:15' || time === '19:30') && mTrainDay(date) ? POST_M : time);   // godzina dawki w danym dniu (D-099, D-103: kreatyna z posiłkiem potreningowym)
 
 export function dosesFor(date) {
   if (!inPlan(date) || isZero(date)) return [];   // suplementacja od dnia 1 planu (D-088, D-097)
   const wd = weekday(date);
   const doses = SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
-  return hasJ(date) ? doses.map(d => ({ ...d, time: doseTime(d.time, date) })) : doses;   // D-099
+  return hasJ(date) || mTrainDay(date) ? doses.map(d => ({ ...d, time: doseTime(d.time, date) })) : doses;   // D-099, D-103
 }
 // Okres przyjmowania preparatów czasowych (D-015; 12.10.2026–28.03.2027 — D-101). `from` opcjonalne.
 export function inValidity(d, date) {
@@ -72,8 +82,10 @@ export function dayPlan(date) {
 // Szablon godzin dnia z wariantem dnia (poza dniem mocka): niedziela „basen” (D-094), czwartek „czwartek” — sauna i zakupy,
 // od 07.01 „czwartek_st” — zakupy 15:30 i bloki MPW 30 min później (D-097). Soboty bez zakupów (plan CFA v12, D-097).
 export function templateFor(date, isMock = MOCKS.has(date)) {
-  const base = mycieBeforeM(baseTemplate(date, isMock), date);
-  return hasJ(date) ? jEvening(base) : base;
+  const base = baseTemplate(date, isMock);
+  if (mTrainDay(date)) return trainingBeforeM(hasJ(date) ? jEvening(base) : base, date);   // D-103: najpierw wieczór z J, potem układ z blokiem M
+  const t = mycieBeforeM(base, date);
+  return trimTrainWindow(hasJ(date) ? jEvening(t) : t, date);
 }
 
 function baseTemplate(date, isMock) {
@@ -86,6 +98,36 @@ function baseTemplate(date, isMock) {
     if (!v.replaces.includes(s.id)) out.push(s);
   }
   return out;
+}
+
+// Dni treningowe z blokiem M 19:40–20:33 (D-103, polecenie użytkownika 16.10.2026): trening skrócony do 18:15–19:15, potem „Powrót do domu” 19:15–19:25 z posiłkiem
+// potreningowym o 19:15 (zamiast 20:15) i „Prysznic i mycie głowy” 19:25–19:40. Sauna, chłodzenie i dawne mycie głowy odpadają (nie mieszczą się przed blokiem M);
+// przygotowywanie kolacji zaczyna się tuż po bloku M. Kroki z usuniętych slotów (prysznic, woda z sodem, przebranie) przechodzą do nowych slotów — poza opisem
+// wychładzania po saunie. Układ w `day_template.json` → `mTraining`.
+function trainingBeforeM(list, date) {
+  const m = (cfaByDay[date] || []).find(b => b.blok === 'M'), t = SRC.dayTemplate.mTraining;
+  const a = list.findIndex(s => s.id.startsWith('slot.1815')), z = list.findIndex(s => s.id === 'slot.2045');   // trening … przygotowywanie kolacji
+  if (!m || !t || a < 0 || z <= a) return list;
+  const dropped = list.slice(a + 1, z), tasks = ids => dropped.filter(s => ids.includes(s.id)).flatMap(s => s.items.filter(i => i.kind === 'task'));
+  const home = { ...t.home, items: [...t.home.items, ...tasks(['slot.2005']).filter(i => !/wychłodzen/i.test(i.text))] };   // woda z sodem, przebranie
+  const wash = { ...t.wash, items: tasks(['slot.1935', 'slot.2015n']) };                                                      // prysznic (+ pielęgnacja po basenie)
+  return [...list.slice(0, a), { ...list[a], to: t.trainTo, decision: 'D-103' }, home, wash,
+    { ...list[z], from: m.godz.slice(6), decision: 'D-103' }, ...list.slice(z + 1)];
+}
+
+// Dni bez treningu z blokami po południu (D-103: 23.10, od D-101 także 03–11.11): okno treningowe („Wolne”) nie może pokrywać się z blokami K, L, M — sloty „train”
+// są pomniejszane o czas bloków (bez tego karta „Teraz” pokazywała „Wolne” zamiast bloku). Sloty z treścią (czwartek) i dni treningowe bez zmian.
+function trimTrainWindow(list, date) {
+  if (dayPlan(date).dayType !== 'free') return list;
+  const keys = new Set([...list.filter(s => s.role === 'cfa').map(s => s.key), ...Object.values(SRC.week.mock.replace)]);
+  const cuts = (cfaByDay[date] || []).filter(b => !keys.has(b.blok)).map(b => b.godz.split('–')).sort();
+  if (!cuts.length) return list;
+  return list.flatMap(s => {
+    if (s.domain !== 'train') return [s];
+    let parts = [[s.from, s.to]];
+    for (const [cf, ct] of cuts) parts = parts.flatMap(([f, t]) => (t <= cf || f >= ct) ? [[f, t]] : [f < cf ? [f, cf] : null, t > ct ? [ct, t] : null].filter(Boolean));
+    return parts.filter(([f, t]) => toMin(t) - toMin(f) >= 1).map(([f, t], i) => ({ ...s, id: i ? `${s.id}.${i}` : s.id, from: f, to: t }));
+  });
 }
 
 // Dni z blokiem M 19:40–20:33 (D-101: 22.10, 29.10 i 03–11.11): posiłek po saunie / potreningowy o 20:15 zostaje w trakcie bloku (decyzja użytkownika), a mycie głowy
@@ -156,7 +198,9 @@ export function resolveDay(date) {
   const session = exercises ? exercises.map(e => ({ ...e, seriesToday: e.series[String(effPhase)] })) : null;
 
   const mealName = key => (key === 'post' && w.diet === 'NT' ? 'Posiłek po saunie' : MEAL_NAMES[key]); // D-018
-  const sessionLabel = w.sauna === 1 ? `${w.sessionName} + sauna` : w.sessionName; // D-040
+  const mTrain = mTrainDay(date), sauna = mTrain ? 0 : w.sauna;   // D-103: w dni treningowe z blokiem M nie ma sauny (po treningu od razu dom, prysznic i blok M)
+  const note = w.note || (mTrain && w.sauna ? 'Bez sauny: blok M o 19:40, trening do 19:15 (D-103)' : null);
+  const sessionLabel = sauna === 1 ? `${w.sessionName} + sauna` : w.sessionName; // D-040
   const free = w.dayType === 'free' || !!w.zero;   // dzień bez treningu i sauny (D-087): całe okno treningowe wolne
   const tpl = templateFor(date, isMock);
   const slots = tpl.map(s => {
@@ -187,7 +231,7 @@ export function resolveDay(date) {
     } else if (s.role === 'activity') {
       out.title = SRC.week.activity[w.dayType]?.[s.key] ?? 'Wolne';   // Dzień zero (D-097) — bez zajęć
       if (s.key === 'main' && w.session && SRC.training.days[w.session] && w.dayType.startsWith('strength')) out.title = `Trening siłowy: ${w.sessionName}`;
-      if (s.key === 'main' && w.note) out.desc = w.note;   // wyjątek dnia (D-087), np. trening kalibracyjny
+      if (s.key === 'main' && note) out.desc = note;   // wyjątek dnia (D-087), np. trening kalibracyjny
     } else if (free && s.domain === 'train') {
       Object.assign(out, { title: 'Wolne', items: [] });
     } else if (s.role === 'recall') {
@@ -214,8 +258,8 @@ export function resolveDay(date) {
 
   return {
     date, weekday: wd, dayName: dayName(date), phase, outside: !!w.outside, zero: !!w.zero, after: !!w.after, dayType: w.dayType, session: w.session, sessionName: w.sessionName, sessionLabel,
-    note: w.note || null, exception: w.decision || null,
-    sauna: w.sauna, dietVariant: w.diet, noDiet, preStart: date < PLAN_REAL_START, kcal: noDiet ? null : p.total.kcal, meals: noDiet ? [] : mealsFor(w.diet, effPhase),
+    note, exception: w.decision || null,
+    sauna, dietVariant: w.diet, noDiet, preStart: date < PLAN_REAL_START, kcal: noDiet ? null : p.total.kcal, meals: noDiet ? [] : mealsFor(w.diet, effPhase),
     doses, training: session, cfa: { inPlan: inCfa, blocks, isMock, recall: inCfa && w.recall },
     mpw: { inPlan: date >= MPW_FIRST && date <= MPW_LAST, blocks: mpwByDay[date] || [], isSim: SIMS.has(date) }, blocks: wb, slots,
   };

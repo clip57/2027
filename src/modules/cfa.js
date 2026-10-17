@@ -9,11 +9,14 @@ import { renderStudy, modeStats } from './study.js';
 import { CFA_PLAN_VERSION } from '../core/storage/validate.js';
 
 const D = SRC.cfa.D;
-const MODE_CLASS = { 'FIRST PASS': 'm-fp', CONSOLIDATION: 'm-co', MOCK: 'm-mo', 'ANALIZA BŁĘDÓW': 'm-an', PRACTICE: 'm-pr', 'ACTIVE RECALL': 'm-ar' };
+// D-103: plan V44 ma tryby CZYTANIE (jak FIRST PASS) i DOPRECYZOWANIE (jak CONSOLIDATION)
+const MODE_CLASS = { 'FIRST PASS': 'm-fp', CZYTANIE: 'm-fp', CONSOLIDATION: 'm-co', DOPRECYZOWANIE: 'm-co', MOCK: 'm-mo', 'ANALIZA BŁĘDÓW': 'm-an', PRACTICE: 'm-pr', 'ACTIVE RECALL': 'm-ar' };
 
 // Widok „Plan”: działy (pierwsze przejście), mocki, statystyki
+// D-103: w planie V44 pierwsze przejście to bloki CZYTANIE (SchweserNotes i Curriculum) przypisane do działu polem `topic`; starsze plany: Curriculum z kodem działu w źródle
 function plan(root, { done, pace, late, rs }) {
-  const topicDone = t => D.bloki.filter(b => b.kategoria === 'CFA Curriculum' && b.zrodlo.includes(`(${t.kod})`)).map(b => b.nr);
+  const topicDone = t => D.bloki.filter(b => (b.topic !== undefined ? b.tryb === 'CZYTANIE' && b.topic === t.kod
+    : b.kategoria === 'CFA Curriculum' && b.zrodlo.includes(`(${t.kod})`))).map(b => b.nr);
   add(root, section('h-topics', 'Działy — pierwsze przejście',
     h('div', { class: 'topic-list' }, D.cfa.map(t => {
       const nrs = topicDone(t), k = nrs.filter(n => done.has(n)).length;

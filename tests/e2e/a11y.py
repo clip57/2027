@@ -5,20 +5,21 @@ import fixtures
 from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 AXE = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
-ROUTES = ['#/dzis', '#/kalendarz', '#/kalendarz?m=2027-01', '#/dzis?d=2026-09-29', '#/dzis?d=2026-10-08', '#/dzis?d=2027-01-07', '#/dzis?d=2026-10-30', '#/dzis?d=2026-10-03', '#/dzis?d=2026-09-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-10-05', '#/trening?v=stat',
+ROUTES = ['#/dzis', '#/kalendarz', '#/kalendarz?m=2027-01', '#/dzis?d=2026-09-29', '#/dzis?d=2026-10-08', '#/dzis?d=2027-01-07', '#/dzis?d=2026-11-04', '#/dzis?d=2026-10-03', '#/dzis?d=2026-09-26', '#/dieta', '#/suplementy', '#/zapasy', '#/mealprep', '#/trening?d=2026-10-19', '#/trening?v=stat',
   '#/trening?v=historia', '#/cfa', '#/cfa?v=harmonogram', '#/cfa?v=kalendarz', '#/cfa?v=log', '#/cfa?v=plan', '#/bezpieczenstwo',
   '#/bezpieczenstwo?m=tabela', '#/bezpieczenstwo?m=poradnik', '#/rekompozycja?s=s6', '#/dane', '#/wiecej',
-  '#/dzis?v=tydzien', '#/dzis?v=tydzien&d=2026-09-25', '#/mealprep?d=2026-10-11', '#/cfa?v=dzien&d=2026-10-13',   # Etapy 1–3 audytu
+  '#/dzis?v=tydzien', '#/dzis?v=tydzien&d=2026-09-25', '#/mealprep?d=2026-10-11', '#/cfa?v=dzien&d=2026-10-16',   # Etapy 1–3 audytu
   '#/pielegnacja', '#/pielegnacja?v=tydzien', '#/pielegnacja?v=produkty', '#/pielegnacja?v=plan', '#/dzis?d=2026-10-11',   # Pielęgnacja (D-094)
   '#/mpw', '#/mpw?v=harmonogram', '#/mpw?v=kalendarz', '#/mpw?v=log', '#/mpw?v=plan', '#/dzis?d=2026-11-17', '#/dzis?d=2027-03-06',   # MPW (D-095, v8 — D-096)
-  '#/dzis?d=2026-11-14', '#/dzis?d=2026-12-26', '#/dzis?v=tydzien&d=2026-11-14']   # weekendy (D-096)
+  '#/dzis?d=2026-11-14', '#/dzis?d=2026-12-26', '#/dzis?v=tydzien&d=2026-11-14',   # weekendy (D-096)
+  '#/dzis?d=2026-10-17', '#/dzis?d=2026-10-18', '#/dzis?d=2026-10-22', '#/dzis?d=2026-10-23', '#/dzis?d=2026-11-03', '#/dzis?d=2026-12-24', '#/dzis?d=2026-12-25']   # D-103: dni z blokiem M, czwartek bez sauny, K/L/M, święta
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.
 OPEN_ALL = "document.querySelectorAll('details').forEach(d => d.open = true)"
-STATES = [('#/trening?d=2026-10-05', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),
-  ('#/cfa?v=dzien&d=2026-10-13', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
+STATES = [('#/trening?d=2026-10-19', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),
+  ('#/cfa?v=dzien&d=2026-10-16', "document.querySelector('.cfa-row .set-toggle').click()", 'odhaczony blok'),
   ('#/mealprep', "document.querySelector('.prep-list input[type=checkbox]').click()", 'odhaczony krok'),
   ('#/bezpieczenstwo?m=poradnik', OPEN_ALL, 'rozwinięte sekcje'), ('#/rekompozycja', OPEN_ALL, 'rozwinięte sekcje'),
-  ('#/dieta', OPEN_ALL, 'rozwinięte posiłki'), ('#/trening?d=2026-10-05', "document.querySelector('.ex-tech').click()", 'okno techniki'),
+  ('#/dieta', OPEN_ALL, 'rozwinięte posiłki'), ('#/trening?d=2026-10-19', "document.querySelector('.ex-tech').click()", 'okno techniki'),
   ('#/trening', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'licznik przerwy'),
   ('#/cfa?v=log', "document.querySelector('.cf-kinds .chip-b')?.click()", 'filtr error logu'),
   ('#/zapasy', "document.querySelectorAll('.daycard, .zp-more, .zp-bulk').forEach(d => d.open = true)", 'rozwinięte korekty i szczegóły'),
@@ -28,7 +29,7 @@ STATES = [('#/trening?d=2026-10-05', "document.querySelector('.set:not(.set-h) .
   ('#/dzis', "document.querySelector('.dz-past > summary')?.click()", 'minione punkty'),
   ('#/cfa?v=harmonogram', "document.querySelector('.cf-past > summary')?.click()", 'minione dni'),
   ('#/zapasy', "document.querySelector('.zp-pack').click()", 'komunikat po akcji'), ('#/zapasy?s=shop', None, 'filtr „Do zakupów”'),
-  ('#/cfa?v=dzien&d=2026-10-13', "document.querySelector('.cf-recall .set-toggle').click()", 'odhaczony recall'),
+  ('#/cfa?v=dzien&d=2026-10-16', "document.querySelector('.cf-recall .set-toggle').click()", 'odhaczony recall'),
   ('#/dzis', "document.querySelector('.side-search, .gs-open')?.click() || document.dispatchEvent(new KeyboardEvent('keydown', { key: '/' })); setTimeout(() => { const i = document.querySelector('.gs-input'); i.value = 'kefir'; i.dispatchEvent(new Event('input')); }, 50)", 'wyszukiwanie'),
   ('#/zapasy', "document.querySelector('dialog')?.remove(); document.querySelectorAll('.zp-act')[2].click(); const t = document.querySelector('dialog textarea'); t.value = 'banan 1,2 kg\\nczekolada 1'; [...document.querySelectorAll('dialog button')].find(b => b.textContent.includes('Sprawdź')).click()", 'podgląd paragonu'),
   ('#/zapasy', "document.querySelector('dialog')?.remove(); document.querySelectorAll('.zp-act')[1].click(); document.querySelector('dialog .sheet-body > button.primary').click()", 'błąd w oknie „Dodaj”'),
@@ -42,7 +43,7 @@ STATES = [('#/trening?d=2026-10-05', "document.querySelector('.set:not(.set-h) .
 SYN = fixtures.write(fixtures.synthetic_zapasy(dt.date(2026, 9, 27))[0], 'zapasy_syntetyczne.json')
 CARE = fixtures.write(fixtures.synthetic_care_plan(), 'pielegnacja_syntetyczna.json')   # D-094: plan pielęgnacji z tekstami zastępczymi
 # Stały zegar (poniedziałek 05.10.2026 10:00): „dziś” ma trening (licznik przerwy) i zaległe bloki CFA — widoki zależne od daty są audytowane zawsze
-CLOCK = dt.datetime(2026, 10, 5, 10, 0, tzinfo=dt.timezone(dt.timedelta(hours=2)))   # 28.09–04.10 — wyjątki D-096
+CLOCK = dt.datetime(2026, 10, 19, 10, 0, tzinfo=dt.timezone(dt.timedelta(hours=2)))   # poniedziałek 19.10 — dzień treningowy z blokiem M w planie V44 (D-103)
 async def main():
   found = collections.defaultdict(set); overflow = []
   async with async_playwright() as pw:
