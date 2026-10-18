@@ -17,7 +17,7 @@ const BLOCKS_END = '15:23';
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-102): kalendarz, dieta, trening i realny początek planu od 15.10.2026 do 28.03.2027 (`phases.json` → `start`, `end`; plan CFA ma własny zakres od 13.10). Dni
+// Plan (D-088, D-102, D-103b): kalendarz, dieta, trening i realny początek planu od 16.10.2026 do 28.03.2027 (`phases.json` → `start`, `end`; plan CFA V44 zaczyna się tego samego dnia). Dni
 // wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
@@ -48,15 +48,18 @@ export const mTrainDay = date => {
   const d = dayPlan(date);
   return !d.outside && d.dayType !== 'free' && !String(d.variant || '').startsWith('czwartek');
 };
+// Godzina dawki w danym dniu (D-099, D-103: kreatyna z posiłkiem potreningowym 19:15; D-103b: w niedzielę bez treningu — bez basenu — kreatyna 19:30 idzie z posiłkiem 20:15,
+// bo w dni z blokami L/M slot na 19:30 nie niesie dawek i dawka znikała z widoku dnia)
 export const doseTime = (time, date) => (time === '21:00' && hasJ(date) ? SUPPER_J
-  : (time === '20:15' || time === '19:30') && mTrainDay(date) ? POST_M : time);   // godzina dawki w danym dniu (D-099, D-103: kreatyna z posiłkiem potreningowym)
+  : (time === '20:15' || time === '19:30') && mTrainDay(date) ? POST_M
+    : time === '19:30' && dayPlan(date).dayType === 'free' ? '20:15' : time);
 
 export function dosesFor(date) {
   if (!inPlan(date) || isZero(date)) return [];   // suplementacja od dnia 1 planu (D-088, D-097)
   const wd = weekday(date);
   const doses = SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
-  return hasJ(date) || mTrainDay(date) ? doses.map(d => ({ ...d, time: doseTime(d.time, date) })) : doses;   // D-099, D-103
+  return doses.map(d => ({ ...d, time: doseTime(d.time, date) }));   // D-099, D-103, D-103b
 }
 // Okres przyjmowania preparatów czasowych (D-015; 12.10.2026–28.03.2027 — D-101). `from` opcjonalne.
 export function inValidity(d, date) {
@@ -66,7 +69,7 @@ export function inValidity(d, date) {
 // Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087, D-096, D-100: start treningów 12.10, 07–11.11) — trening, sauna, dieta, recall.
 export function dayPlan(date) {
   const w = SRC.week.days[String(weekday(date))];
-  // D-102: plan CFA ma własny zakres (od 13.10) — recall CFA także w dniach sprzed startu planu (15.10), które są historią
+  // D-102, D-103b: plan CFA ma własny zakres (`nightRecall`) — recall CFA także w ewentualnych dniach sprzed startu planu, które są historią
   if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: NIGHT_RECALL.has(date), variant: null,
     outside: true, after: date > PLAN_END, note: null, decision: 'D-088' };
   // Dzień zero (D-097): jak dzień poza planem (bez diety, treningu, nauki, suplementów i zużycia), ale z własnym widokiem w „Dziś”
@@ -74,7 +77,7 @@ export function dayPlan(date) {
     outside: true, zero: true, note: null, decision: 'D-097' };
   const x = SRC.week.exceptions?.[date];
   let d = x ? { ...w, ...x } : w;
-  // D-101: sesje recall 22:00 wg harmonogramu CFA (`nightRecall`: codziennie poza 15.10, 23.10 i 25.10) zamiast reguły „bez pt i sob”
+  // D-101: sesje recall 22:00 wg harmonogramu CFA (`nightRecall`: codziennie poza 23.10 i 25.10) zamiast reguły „bez pt i sob”
   if (NIGHT_RECALL.size && date >= CFA_FIRST && date <= CFA_LAST) d = { ...d, recall: NIGHT_RECALL.has(date) };
   return date < DIET_START ? { ...d, noDiet: true } : d;   // D-100: dni planu przed startem diety (przy starcie diety = start planu — nigdy)
 }
@@ -118,7 +121,7 @@ function trainingBeforeM(list, date) {
 // Dni bez treningu z blokami po południu (D-103: 23.10, od D-101 także 03–11.11): okno treningowe („Wolne”) nie może pokrywać się z blokami K, L, M — sloty „train”
 // są pomniejszane o czas bloków (bez tego karta „Teraz” pokazywała „Wolne” zamiast bloku). Sloty z treścią (czwartek) i dni treningowe bez zmian.
 function trimTrainWindow(list, date) {
-  if (dayPlan(date).dayType !== 'free') return list;
+  if (dayPlan(date).dayType !== 'free' || dayPlan(date).outside) return list;   // dni poza planem (D-103c) zostają przy szablonie podstawowym
   const keys = new Set([...list.filter(s => s.role === 'cfa').map(s => s.key), ...Object.values(SRC.week.mock.replace)]);
   const cuts = (cfaByDay[date] || []).filter(b => !keys.has(b.blok)).map(b => b.godz.split('–')).sort();
   if (!cuts.length) return list;
@@ -130,13 +133,13 @@ function trimTrainWindow(list, date) {
   });
 }
 
-// Dni z blokiem M 19:40–20:33 (D-101: 22.10, 29.10 i 03–11.11): posiłek po saunie / potreningowy o 20:15 zostaje w trakcie bloku (decyzja użytkownika), a mycie głowy
+// Dni z blokiem M 19:40–20:33 bez treningu (D-101: 22.10, 29.10 i 03–11.11; D-103b: także 17.10, 01.11 i 02.11): posiłek po saunie / potreningowy o 20:15 zostaje w trakcie bloku (decyzja użytkownika), a mycie głowy
 // (`slot.2035`) jest skrócone i leży tuż przed blokiem M — między blokami L i M (19:33–19:40) albo, gdy nie ma bloku L, 19:30–19:40. Zwolnione 10 min dostaje slot
-// z posiłkiem (powrót do domu), sąsiednie sloty „Wolne” (okno treningowe w dni bez treningu) są odpowiednio przycięte. Czwartki 15/22/29.10 mają to już w wariancie `czwartek_k`.
+// z posiłkiem (powrót do domu), sąsiednie sloty „Wolne” (okno treningowe w dni bez treningu) są odpowiednio przycięte. Czwartki 22/29.10 mają to już w wariancie `czwartek_zl` (wariant `czwartek_k` dla 15.10 jest od D-103b nieużywany).
 function mycieBeforeM(list, date) {
   const blocks = cfaByDay[date] || [], m = blocks.find(b => b.blok === 'M'), l = blocks.find(b => b.blok === 'L');
   const i = list.findIndex(s => s.id === 'slot.2035');
-  if (!m || i < 1 || list[i].from < '20:00') return list;   // brak bloku M, brak slotu mycia (niedziela z basenem) albo mycie już przed blokiem (czwartek_k)
+  if (!m || i < 1 || list[i].from < '20:00' || dayPlan(date).outside) return list;   // brak bloku M, brak slotu mycia (niedziela z basenem), mycie już przed blokiem (czwartek_k) albo dzień poza planem (D-103c: 16–17.10 mają tylko bloki CFA)
   const to = m.godz.slice(0, 5), from = l ? l.godz.slice(6) : earlier(to);
   const out = [];
   for (const s of list) {

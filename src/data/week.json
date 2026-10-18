@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101, D-103",
+ "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101, D-103, D-103b, D-103c",
  "days": {
   "1": {
    "dayType": "strength_sauna",
@@ -107,26 +107,6 @@
  },
  "variant_decision": "D-097: czwartki — sauna 17:55–19:05 i zakupy 19:05–20:35, od 07.01 zakupy 15:30–16:00 i bloki MPW +30 min; soboty bez zakupów; D-094: niedziele — basen 18:15–19:30, posiłek 19:30, relaks, prysznic 20:15–20:45; nie dotyczy dnia mocka",
  "exceptions": {
-  "2026-10-15": {
-   "decision": "D-101",
-   "dayType": "free",
-   "session": null,
-   "sessionName": "Bez treningu",
-   "sauna": 0,
-   "diet": "NT",
-   "variant": "czwartek_k",
-   "note": "Bez treningu, dieta NT: regularny przebieg od 16.10 (D-101); zakupy 19:05–19:30, mycie głowy 19:30–19:40"
-  },
-  "2026-10-16": {
-   "decision": "D-103",
-   "dayType": "free",
-   "session": null,
-   "sessionName": "Bez treningu",
-   "sauna": 0,
-   "diet": "NT",
-   "variant": null,
-   "note": "Bez treningu, dieta NT: regularne treningi od 17.10 (D-103)"
-  },
   "2026-10-22": {
    "decision": "D-103",
    "dayType": "free",
@@ -156,6 +136,26 @@
    "diet": "NT",
    "variant": "czwartek_zl",
    "note": "Bez sauny: zakupy 17:45–18:40, bloki L 18:40–19:33 i M 19:40–20:33, mycie głowy 19:33–19:40 (D-103)"
+  },
+  "2026-11-01": {
+   "decision": "D-103b",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Bez treningu i basenu (wyjątek D-103b), dieta NT"
+  },
+  "2026-11-02": {
+   "decision": "D-103b",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Bez treningu (wyjątek D-103b), dieta NT"
   },
   "2026-11-03": {
    "decision": "D-101",

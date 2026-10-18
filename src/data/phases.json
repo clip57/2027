@@ -1,11 +1,11 @@
 {
  "schema": 1,
- "decision": "D-017, D-097, D-100, D-101, D-103 (kalendarz, dieta i realny początek planu od 15.10.2026; dni wcześniejsze poza planem; treningi od 17.10; Faza 0 do 11.11 — treningi 17.10–02.11, 03–11.11 bez treningu z dietą nietreningową Fazy 0; Faza 1 od 12.11 do 10.12, Faza 2 od 11.12; plan do 28.03.2027; dni wcześniejsze i późniejsze poza planem, D-088)",
- "start": "2026-10-15",
+ "decision": "D-017, D-097, D-100, D-101, D-103, D-103b, D-103c (kalendarz, dieta, suplementy, zakupy i treningi — początek całego planu od 18.10.2026; dni wcześniejsze poza planem, 15–17.10 usunięte; wyjątkowo bez treningu 01.11 i 02.11; Faza 0 do 11.11 — treningi 18.10–31.10, 03–11.11 bez treningu z dietą nietreningową Fazy 0; Faza 1 od 12.11 do 10.12, Faza 2 od 11.12; plan do 28.03.2027; dni wcześniejsze i późniejsze poza planem, D-088)",
+ "start": "2026-10-18",
  "phases": [
   {
    "phase": 0,
-   "from": "2026-10-15"
+   "from": "2026-10-18"
   },
   {
    "phase": 1,
@@ -17,7 +17,7 @@
   }
  ],
  "end": "2027-03-28",
- "realStart": "2026-10-15",
- "dietStart": "2026-10-15",
- "trainStart": "2026-10-17"
+ "realStart": "2026-10-18",
+ "dietStart": "2026-10-18",
+ "trainStart": "2026-10-18"
 }

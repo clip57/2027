@@ -54,22 +54,23 @@ test('prognoza uwzględnia czwartki i fazy', async () => {
   assert.equal(fc.lastCovered, '2026-10-24', '21.10 i 24.10 po 120 g, 22.10 (czw) i 23.10 (bez treningu) bez banana');
   assert.equal(fc.runOut, '2026-10-25');
   assert.equal(fc.days, 4);
-  const oats = forecast('platki_owsiane', 70 * 28, '2026-10-01');   // 15.10–11.11: 28 dni × 70 g (D-102: dieta od 15.10; Faza 0 do 11.11, D-103)
+  const oats = forecast('platki_owsiane', 70 * 25, '2026-10-01');   // 18.10–11.11: 25 dni × 70 g (D-103c: dieta od 18.10; Faza 0 do 11.11, D-103)
   assert.equal(oats.runOut, '2026-11-12', 'od 12.11 (Faza 1) porcja 85 g');
   assert.equal(oats.lastCovered, '2026-11-11');
 });
 
-test('start planu i diety 15.10.2026 (D-102): brak zużycia przed startem; 15.10 dzień nietreningowy (bez banana i kefiru)', async () => {
+test('start planu i diety 18.10.2026 (D-102, D-103c): brak zużycia przed startem (także 15–17.10); 18.10 niedziela z basenem (dzień T)', async () => {
   const fc = forecast('banan', 240, '2026-10-05');
-  assert.equal(fc.lastCovered, '2026-10-18', '06–14.10 poza planem, 15–16.10 dni NT (bez banana), 17.10 i 18.10 po 120 g (dzień T, D-103)');
-  assert.equal(fc.runOut, '2026-10-19');
+  assert.equal(fc.lastCovered, '2026-10-19', '06–15.10 poza planem, 16–17.10 dni NT (bez banana, D-103b), 18.10 i 19.10 po 120 g (dzień T)');
+  assert.equal(fc.runOut, '2026-10-20');
   const s = await new Store(new MemoryAdapter()).open();
   await s.record('inv.count', { prod: 'kefir', qty: 1000, date: '2026-10-05' });
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-07'), 1000, 'inwentaryzacja z 05.10 bez odliczeń do 07.10 (poza planem)');
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-14'), 1000, 'do 14.10 poza planem — historia (D-102)');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-15'), 1000, '15.10 — dzień NT, bez kefiru (D-102)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-15'), 1000, '15.10 — poza planem (D-103b)');
   assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-16'), 1000, '16.10 — dzień nietreningowy, bez kefiru (D-103)');
-  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-17'), 800, '17.10 — LOWER 2, dzień T');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-17'), 1000, '17.10 — wyjątkowo bez treningu, dzień NT (D-103b)');
+  assert.equal(stockAt(s.state.inv, 'kefir', '2026-10-18'), 800, '18.10 — niedziela z basenem, dzień T');
 });
 
 test('statusy — klasyfikacja wg terminu przydatności (v31)', () => {
@@ -105,12 +106,12 @@ test('statusy — progi v31 (suplementy i trwałe)', () => {
 });
 
 test('najbliższe zakupy wg planu dnia (D-097): czwartek po saunie 19:05–20:35, od 07.01 15:30–16:00; do końca slotu — dziś', () => {
-  // D-101: 15.10, 22.10 i 29.10 zakupy 19:05–19:30; 05.11 bez zakupów; kolejne czwartki do 06.01 (także 12.11) — 19:05–20:35 po saunie
-  const thu = { from: '19:05', to: '19:30' }, thuZl = { from: '17:45', to: '18:40' }, thuNoJ = { from: '19:05', to: '20:35' }, jan = { from: '15:30', to: '16:00' };
-  assert.deepEqual(nextShopping('2026-09-29', 10), { date: '2026-10-15', inDays: 16, ...thu }, 'dni przed 12.10 wykreślone z kalendarza');
-  assert.deepEqual(nextShopping('2026-10-12', 10), { date: '2026-10-15', inDays: 3, ...thu });
-  assert.deepEqual(nextShopping('2026-10-15', 19, 29), { date: '2026-10-15', inDays: 0, ...thu });
-  assert.deepEqual(nextShopping('2026-10-15', 19, 30), { date: '2026-10-22', inDays: 7, ...thuZl }, '22.10 bez sauny: zakupy 17:45–18:40 (D-103)');
+  // D-103, D-103b: pierwsze zakupy 22.10 (15.10 usunięty z kalendarza), 22 i 29.10 zakupy 17:45–18:40 bez sauny; 05.11 i 24.12 bez zakupów; kolejne czwartki do 06.01 (także 12.11) — 19:05–20:35 po saunie
+  const thuZl = { from: '17:45', to: '18:40' }, thuNoJ = { from: '19:05', to: '20:35' }, jan = { from: '15:30', to: '16:00' };
+  assert.deepEqual(nextShopping('2026-09-29', 10), { date: '2026-10-22', inDays: 23, ...thuZl }, 'dni przed 16.10 wykreślone z kalendarza');
+  assert.deepEqual(nextShopping('2026-10-12', 10), { date: '2026-10-22', inDays: 10, ...thuZl }, '15.10 usunięty z kalendarza (D-103b) — pierwsze zakupy 22.10');
+  assert.deepEqual(nextShopping('2026-10-15', 10), { date: '2026-10-22', inDays: 7, ...thuZl });
+  assert.deepEqual(nextShopping('2026-10-22', 18, 39), { date: '2026-10-22', inDays: 0, ...thuZl }, 'do końca slotu 17:45–18:40 — dziś');
   assert.deepEqual(nextShopping('2026-10-29', 20), { date: '2026-11-12', inDays: 14, ...thuNoJ }, '05.11 bez zakupów — następne 12.11 (nominalnie, 19:05–20:35)');
   assert.deepEqual(nextShopping('2026-11-11', 10), { date: '2026-11-12', inDays: 1, ...thuNoJ });
   assert.deepEqual(nextShopping('2026-11-12', 20, 35), { date: '2026-11-19', inDays: 7, ...thuNoJ });
@@ -134,4 +135,22 @@ test('lista zakupów: maxLimit, pełne opakowania, pomija suplementy czasowe i c
   assert.equal(kefir.packs, 3);
   assert.equal(kefir.toBuy, 1200);
   assert.ok(!list.some(x => x.id === 'glukozamina' || x.id === 'cynk'));
+});
+
+test('D-104: skyr 75 g (śniadanie + lunch) — zużycie 150 g dziennie w prognozie, liście zakupów i limicie zapasu', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  assert.equal(catalogById.skyr.daily_v31, 150);
+  assert.equal(catalogById.skyr.maxLimit, 1800, '12 dni × 150 g');
+  // 1200 g (3 opakowania po 400 g) starcza na 8 dni po 150 g (wtorek 20.10 → wtorek 27.10), a nie na 6 dni po 200 g
+  const fc = forecast('skyr', 1200, '2026-10-19');
+  assert.equal(fc.days, 8);
+  assert.equal(fc.lastCovered, '2026-10-27');
+  assert.equal(fc.runOut, '2026-10-28');
+  // lista zakupów: cel 7 dni = 1050 g → 3 pełne opakowania (1200 g) w limicie 1800 g (było 4 opakowania po 200 g dziennie)
+  await s.record('inv.count', { prod: 'skyr', qty: 0, date: '2026-10-19' });
+  const sk = shoppingList(s.state.inv, '2026-10-19', allItems()).find(x => x.id === 'skyr');
+  assert.deepEqual([sk.raw, sk.packs, sk.toBuy, sk.overLimit ?? false], [1050, 3, 1200, false]);
+  // stan 1800 g = limit: nic do kupienia
+  await s.record('inv.count', { prod: 'skyr', qty: 1800, date: '2026-10-19' });
+  assert.ok(!shoppingList(s.state.inv, '2026-10-19', allItems()).some(x => x.id === 'skyr' && x.toBuy > 0));
 });
