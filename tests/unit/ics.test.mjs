@@ -30,7 +30,8 @@ test('treść: dawki, 11 bloków CFA (A–I, M, J), recall, trening 18:15–19:1
   assert.match(mon, /SUMMARY:CFA blok J: /);
   assert.match(unfold(planEvents('2026-10-23', ALL, NOW).join('\r\n')), /SUMMARY:CFA blok I: /, 'piątek 23.10 (bez J i M): A–I, K, L');
   assert.equal((unfold(planEvents('2026-10-23', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 11);
-  assert.equal((unfold(planEvents('2026-10-16', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 9, '16.10 — A–I');
+  for (const d of ['2026-10-16', '2026-10-17']) assert.deepEqual(planEvents(d, ALL, NOW), [], `${d} — poza planem (D-103c): bez wydarzeń (bloki CFA tylko w module CFA)`);
+  assert.equal((unfold(planEvents('2026-10-18', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 11, '18.10 — A–I, M, J');
   assert.match(mon, /SUMMARY:CFA Active Recall/);
   assert.match(mon, /SUMMARY:Trening siłowy: UPPER 1/);
   assert.equal((mon.match(/SUMMARY:Suplementy/g) || []).length, scheduleFor('2026-10-19').length);
@@ -38,9 +39,7 @@ test('treść: dawki, 11 bloków CFA (A–I, M, J), recall, trening 18:15–19:1
   assert.match(zl, /DTSTART;TZID=Europe\/Warsaw:20261022T174500/);
   assert.match(zl, /DTEND;TZID=Europe\/Warsaw:20261022T184000/);
   assert.deepEqual(planEvents('2026-12-24', ['shop'], NOW), [], '24.12 — bez zakupów (D-103)');
-  const thu = unfold(planEvents('2026-10-15', ['shop'], NOW).join('\r\n'));
-  assert.match(thu, /DTSTART;TZID=Europe\/Warsaw:20261015T190500/);
-  assert.match(thu, /DTEND;TZID=Europe\/Warsaw:20261015T193000/, 'D-101: zakupy 19:05–19:30');
+  assert.deepEqual(planEvents('2026-10-15', ALL, NOW), [], '15.10 — usunięty z kalendarza (D-103b): bez wydarzeń');
   assert.deepEqual(planEvents('2026-11-05', ['shop'], NOW), [], '05.11 — bez zakupów (D-101)');
   assert.match(unfold(planEvents('2026-11-12', ['shop'], NOW).join('\r\n')), /DTEND;TZID=Europe\/Warsaw:20261112T203500/, '12.11 — zakupy jak dotąd (19:05–20:35)');
   assert.match(unfold(planEvents('2027-01-07', ['shop'], NOW).join('\r\n')), /DTSTART;TZID=Europe\/Warsaw:20270107T153000/, 'od 07.01 — 15:30');
@@ -55,10 +54,10 @@ test('treść: dawki, 11 bloków CFA (A–I, M, J), recall, trening 18:15–19:1
   // D-101: dni do 11.10 — bez wydarzeń; trening zaczyna się 12.10 (UPPER 1 jak w nominalnym poniedziałku); 03–11.11 bez treningu; 12–14.11 nowy trening
   for (const d of ['2026-09-29', '2026-09-30', '2026-10-07', '2026-10-11']) assert.deepEqual(planEvents(d, ALL, NOW), [], d);
   assert.match(unfold(planEvents('2026-10-19', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: UPPER 1/);
-  const t17 = unfold(planEvents('2026-10-17', ['train'], NOW).join('\r\n'));
-  assert.match(t17, /SUMMARY:Trening siłowy: LOWER 2/, '17.10 — pierwszy trening (D-103)');
-  assert.match(t17, /DTEND;TZID=Europe\/Warsaw:20261017T191500/, 'trening do 19:15 w dni z blokiem M');
-  assert.ok(!/SUMMARY:Sauna/.test(t17), 'bez sauny w dni z blokiem M');
+  const t19 = unfold(planEvents('2026-10-19', ['train'], NOW).join('\r\n'));
+  assert.match(t19, /DTEND;TZID=Europe\/Warsaw:20261019T191500/, 'trening do 19:15 w dni z blokiem M (D-103)');
+  assert.ok(!/SUMMARY:Sauna/.test(t19), 'bez sauny w dni z blokiem M');
+  for (const d of ['2026-10-17', '2026-11-01', '2026-11-02']) assert.ok(!/SUMMARY:(Trening|Basen)/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: wyjątkowo bez treningu (D-103b)`);
   assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents('2026-10-16', ['train'], NOW).join('\r\n'))), '16.10 — bez treningu (D-103)');
   for (const d of ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-23']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu (D-101)`);
   for (const d of ['2026-11-03', '2026-11-05', '2026-11-07', '2026-11-11']) assert.ok(!/SUMMARY:Trening/.test(unfold(planEvents(d, ['train'], NOW).join('\r\n'))), `${d}: bez treningu`);

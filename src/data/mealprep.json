@@ -152,7 +152,7 @@
      "type": "steps",
      "items": [
       "Wyjmij owsiankę z lodówki.",
-      "Dodaj skyr 100 g, borówki {borowki}, cynamon 3 g i orzechy włoskie 15 g.",
+      "Dodaj skyr {skyr}, borówki {borowki}, cynamon 3 g i orzechy włoskie 15 g.",
       "Dodaj askorbinian sodu 100 mg.",
       "Wymieszaj, zamknij."
      ]
@@ -546,7 +546,7 @@
    "id": "d-termos",
    "title": "Krok 4 Termos i rozdzielenie skyru",
    "body": [
-    "Dlaczego skyr nie wchodzi do termosu. 100 g produktu chłodzonego obniża temperaturę ~300 g bazy o kilkanaście stopni. Skyr dodany rano obniżyłby temperaturę dania, które przez kilka godzin musi utrzymać się powyżej progu bezpiecznego przechowywania na gorąco (63 °C). Sześć godzin w zakresie 40–55 °C to warunki, w których Bacillus cereus wytwarza cereulid — toksynę termostabilną, której nie da się już usunąć.",
+    "Dlaczego skyr nie wchodzi do termosu. 75 g produktu chłodzonego obniża temperaturę ~300 g bazy o kilkanaście stopni. Skyr dodany rano obniżyłby temperaturę dania, które przez kilka godzin musi utrzymać się powyżej progu bezpiecznego przechowywania na gorąco (63 °C). Sześć godzin w zakresie 40–55 °C to warunki, w których Bacillus cereus wytwarza cereulid — toksynę termostabilną, której nie da się już usunąć.",
     "Rozdzielenie rozwiązuje problem u źródła i daje lepszy sos, bez ryzyka zwarzenia białka przy podgrzewaniu.",
     "Trzy wkłady chłodzące, nie dwa. Wkład o wymiarach 15 × 8 × 2 cm to ok. 240 g żelu, czyli 94 kJ zdolności chłodniczej przy przejściu z −18 °C do +5 °C. Napływ ciepła do torby 6 l przez sześć godzin przy typowej izolacji wynosi ok. 190 kJ, do czego dochodzi ok. 14 kJ na schłodzenie pojemników i trzykrotne otwarcie torby.",
     "Wkłady Zdolność Zapas nad obciążeniem ~204 kJ Ocena 2 189 kJ −15 kJ Niewystarczające 3 283 kJ +79 kJ Wystarczające z zapasem 4 377 kJ +173 kJ Zapas na upał lub słabszą torbę",

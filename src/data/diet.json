@@ -134,25 +134,26 @@
        "order": 7,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:T_F0#breakfast/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       }
      ],
      "total": {
-      "kcal": 629.0,
-      "p": 32.1,
-      "c": 58.9,
+      "kcal": 612.0,
+      "p": 29.1,
+      "c": 58.0,
       "f": 26.5
      }
     },
@@ -181,19 +182,20 @@
        "order": 9,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:T_F0#lunch/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       },
       {
        "order": 10,
@@ -266,9 +268,9 @@
       }
      ],
      "total": {
-      "kcal": 465.0,
-      "p": 30.5,
-      "c": 46.4,
+      "kcal": 448.0,
+      "p": 27.5,
+      "c": 45.5,
       "f": 13.2
      }
     },
@@ -850,16 +852,16 @@
     }
    ],
    "total": {
-    "kcal": 2629.0,
-    "p": 190.5,
-    "c": 267.9,
+    "kcal": 2595.0,
+    "p": 184.5,
+    "c": 266.1,
     "f": 78.0
    },
-   "atwater_kcal": 2535.6,
+   "atwater_kcal": 2504.4,
    "pct": {
-    "p": 30.1,
-    "c": 42.3,
-    "f": 27.7
+    "p": 29.5,
+    "c": 42.5,
+    "f": 28.0
    },
    "spices_raw": [
     "Cynamon",
@@ -1097,25 +1099,26 @@
        "order": 7,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:T_F1#breakfast/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       }
      ],
      "total": {
-      "kcal": 682.0,
-      "p": 34.0,
-      "c": 67.4,
+      "kcal": 665.0,
+      "p": 31.0,
+      "c": 66.5,
       "f": 27.4
      }
     },
@@ -1144,19 +1147,20 @@
        "order": 9,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:T_F1#lunch/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       },
       {
        "order": 10,
@@ -1229,9 +1233,9 @@
       }
      ],
      "total": {
-      "kcal": 514.0,
-      "p": 33.2,
-      "c": 54.1,
+      "kcal": 497.0,
+      "p": 30.2,
+      "c": 53.2,
       "f": 13.6
      }
     },
@@ -1813,16 +1817,16 @@
     }
    ],
    "total": {
-    "kcal": 2784.0,
-    "p": 196.3,
-    "c": 295.8,
+    "kcal": 2750.0,
+    "p": 190.3,
+    "c": 294.0,
     "f": 79.4
    },
-   "atwater_kcal": 2683.0,
+   "atwater_kcal": 2651.8,
    "pct": {
-    "p": 29.3,
-    "c": 44.1,
-    "f": 26.6
+    "p": 28.7,
+    "c": 44.3,
+    "f": 26.9
    },
    "spices_raw": [
     "Cynamon",
@@ -2060,25 +2064,26 @@
        "order": 7,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:T_F2#breakfast/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       }
      ],
      "total": {
-      "kcal": 682.0,
-      "p": 34.0,
-      "c": 67.4,
+      "kcal": 665.0,
+      "p": 31.0,
+      "c": 66.5,
       "f": 27.4
      }
     },
@@ -2107,19 +2112,20 @@
        "order": 9,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:T_F2#lunch/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       },
       {
        "order": 10,
@@ -2192,9 +2198,9 @@
       }
      ],
      "total": {
-      "kcal": 564.0,
-      "p": 35.9,
-      "c": 61.7,
+      "kcal": 547.0,
+      "p": 32.9,
+      "c": 60.8,
       "f": 14.1
      }
     },
@@ -2776,16 +2782,16 @@
     }
    ],
    "total": {
-    "kcal": 2965.0,
-    "p": 202.4,
-    "c": 330.1,
+    "kcal": 2931.0,
+    "p": 196.4,
+    "c": 328.3,
     "f": 80.6
    },
-   "atwater_kcal": 2855.4,
+   "atwater_kcal": 2824.2,
    "pct": {
-    "p": 28.4,
-    "c": 46.2,
-    "f": 25.4
+    "p": 27.8,
+    "c": 46.5,
+    "f": 25.7
    },
    "spices_raw": [
     "Cynamon",
@@ -3023,25 +3029,26 @@
        "order": 7,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:NT_F0#breakfast/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       }
      ],
      "total": {
-      "kcal": 629.0,
-      "p": 32.1,
-      "c": 58.9,
+      "kcal": 612.0,
+      "p": 29.1,
+      "c": 58.0,
       "f": 26.5
      }
     },
@@ -3070,19 +3077,20 @@
        "order": 9,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:NT_F0#lunch/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       },
       {
        "order": 10,
@@ -3155,9 +3163,9 @@
       }
      ],
      "total": {
-      "kcal": 465.0,
-      "p": 30.5,
-      "c": 46.4,
+      "kcal": 448.0,
+      "p": 27.5,
+      "c": 45.5,
       "f": 13.2
      }
     },
@@ -3620,16 +3628,16 @@
     }
    ],
    "total": {
-    "kcal": 2332.0,
-    "p": 177.8,
-    "c": 227.4,
+    "kcal": 2298.0,
+    "p": 171.8,
+    "c": 225.6,
     "f": 68.7
    },
-   "atwater_kcal": 2239.1,
+   "atwater_kcal": 2207.9,
    "pct": {
-    "p": 31.8,
-    "c": 40.6,
-    "f": 27.6
+    "p": 31.1,
+    "c": 40.9,
+    "f": 28.0
    },
    "spices_raw": [
     "Cynamon",
@@ -3867,25 +3875,26 @@
        "order": 7,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:NT_F1#breakfast/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       }
      ],
      "total": {
-      "kcal": 682.0,
-      "p": 34.0,
-      "c": 67.4,
+      "kcal": 665.0,
+      "p": 31.0,
+      "c": 66.5,
       "f": 27.4
      }
     },
@@ -3914,19 +3923,20 @@
        "order": 9,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:NT_F1#lunch/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       },
       {
        "order": 10,
@@ -3999,9 +4009,9 @@
       }
      ],
      "total": {
-      "kcal": 514.0,
-      "p": 33.2,
-      "c": 54.1,
+      "kcal": 497.0,
+      "p": 30.2,
+      "c": 53.2,
       "f": 13.6
      }
     },
@@ -4464,16 +4474,16 @@
     }
    ],
    "total": {
-    "kcal": 2487.0,
-    "p": 183.6,
-    "c": 255.3,
+    "kcal": 2453.0,
+    "p": 177.6,
+    "c": 253.5,
     "f": 70.1
    },
-   "atwater_kcal": 2386.5,
+   "atwater_kcal": 2355.3,
    "pct": {
-    "p": 30.8,
-    "c": 42.8,
-    "f": 26.4
+    "p": 30.2,
+    "c": 43.1,
+    "f": 26.8
    },
    "spices_raw": [
     "Cynamon",
@@ -4711,25 +4721,26 @@
        "order": 7,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:NT_F2#breakfast/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       }
      ],
      "total": {
-      "kcal": 682.0,
-      "p": 34.0,
-      "c": 67.4,
+      "kcal": 665.0,
+      "p": 31.0,
+      "c": 66.5,
       "f": 27.4
      }
     },
@@ -4758,19 +4769,20 @@
        "order": 9,
        "name_src": "Skyr naturalny",
        "name": "Skyr",
-       "label": "100",
-       "kcal": 67.0,
-       "p": 12.0,
-       "c": 3.8,
+       "label": "75",
+       "kcal": 50.0,
+       "p": 9.0,
+       "c": 2.9,
        "f": 0.0,
        "prod": "skyr",
        "src": "PDF:NT_F2#lunch/Skyr naturalny",
        "name_decision": "D-020",
        "use": {
-        "qty": 100.0,
+        "qty": 75.0,
         "unit": "g",
         "basis": "PDF: waga [g]"
-       }
+       },
+       "portion_decision": "D-104"
       },
       {
        "order": 10,
@@ -4843,9 +4855,9 @@
       }
      ],
      "total": {
-      "kcal": 564.0,
-      "p": 35.9,
-      "c": 61.7,
+      "kcal": 547.0,
+      "p": 32.9,
+      "c": 60.8,
       "f": 14.1
      }
     },
@@ -5308,16 +5320,16 @@
     }
    ],
    "total": {
-    "kcal": 2668.0,
-    "p": 189.7,
-    "c": 289.6,
+    "kcal": 2634.0,
+    "p": 183.7,
+    "c": 287.8,
     "f": 71.3
    },
-   "atwater_kcal": 2558.9,
+   "atwater_kcal": 2527.7,
    "pct": {
-    "p": 29.7,
-    "c": 45.3,
-    "f": 25.1
+    "p": 29.1,
+    "c": 45.5,
+    "f": 25.4
    },
    "spices_raw": [
     "Cynamon",

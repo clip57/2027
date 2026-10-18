@@ -51,6 +51,18 @@ UPGRADE = [
     ("Faza 1 od 23.10.2026", "Faza 1 od 12.11.2026", "D-103"),
     ("Faza 2 (od 23.11)", "Faza 2 (od 11.12)", "D-103"),
     ("od 23.11", "od 11.12", "D-103"),
+    # D-103c: początek całego planu 18.10 (Faza 0 18.10–02.11)
+    ("Faza 0 (17.10–02.11)", "Faza 0 (18.10–02.11)", "D-103c"),
+    ("17.10–02.11", "18.10–02.11", "D-103c"),
+    # D-104: skyr 75 g (śniadanie i lunch) — sumy dobowe i wyliczone pochodne (tabele składu w rekomp.json aktualizuje tools/extract/diet_skyr75.py)
+    ("100 g skyru pakujesz osobno", "75 g skyru pakujesz osobno", "D-104"),
+    ("Dodanie 100 g produktu chłodzonego", "Dodanie 75 g produktu chłodzonego", "D-104"),
+    ("2629 kcal w dni treningowe i cardio, 2332 kcal w dzień nietreningowy, średnia 2587 kcal/tydz. To o 179 kcal mniej niż punkt wyjścia",
+     "2595 kcal w dni treningowe i cardio, 2298 kcal w dzień nietreningowy, średnia 2553 kcal/tydz. To o 213 kcal mniej niż punkt wyjścia", "D-104"),
+    ("średnia tygodniowa rośnie z 2587 kcal w Fazie 0 do 2742 kcal w Fazie 1 i 2923 kcal w Fazie 2", "średnia tygodniowa rośnie z 2553 kcal w Fazie 0 do 2708 kcal w Fazie 1 i 2889 kcal w Fazie 2", "D-104"),
+    ("~6% (Faza 0) → ~7% (Faza 1) → ~6% (Faza 2)", "~7% (Faza 0) → ~8% (Faza 1) → ~7% (Faza 2)", "D-104"),
+    ("Deficyt jest niewielki (~6% w Fazie 0)", "Deficyt jest niewielki (~7% w Fazie 0)", "D-104"),
+    ("Czwartek to 2332 kcal", "Czwartek to 2298 kcal", "D-104"),
 ]
 REVIEW = re.compile(r"\b\d{1,2}\.\d{2}(?:\.\d{4})?\b|tydzie|tygod|tydz\.", re.I)
 

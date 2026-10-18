@@ -49,7 +49,7 @@
       ],
       [
        "Kaloryczność startowa",
-       "2587 kcal śr. tyg.",
+       "2553 kcal śr. tyg.",
        "Decyzja praktyczna, nie wynik obliczeń"
       ]
      ],
@@ -85,13 +85,13 @@
      "type": "box",
      "kind": "go",
      "label": "Wdrożyć",
-     "text": "Kaloryczność startowa (Faza 0): 2629 kcal w dni treningowe i cardio, 2332 kcal w dzień nietreningowy, średnia 2587 kcal/tydz. To o 179 kcal mniej niż punkt wyjścia. W Fazie 1 i 2 rośnie zgodnie z tabelą w sekcji 3. Oczekiwane tempo: −0,3 do −0,5% masy tygodniowo = −0,27 do −0,45 kg/tydz. Po 12 tygodniach: 84–86 kg. Po 24: 78–83 kg. Przy udanej rekompozycji spadek na wadze będzie mniejszy niż te liczby, a talia będzie spadać szybciej — i to jest scenariusz pożądany."
+     "text": "Kaloryczność startowa (Faza 0): 2595 kcal w dni treningowe i cardio, 2298 kcal w dzień nietreningowy, średnia 2553 kcal/tydz. To o 213 kcal mniej niż punkt wyjścia. W Fazie 1 i 2 rośnie zgodnie z tabelą w sekcji 3. Oczekiwane tempo: −0,3 do −0,5% masy tygodniowo = −0,27 do −0,45 kg/tydz. Po 12 tygodniach: 84–86 kg. Po 24: 78–83 kg. Przy udanej rekompozycji spadek na wadze będzie mniejszy niż te liczby, a talia będzie spadać szybciej — i to jest scenariusz pożądany."
     },
     {
      "type": "box",
      "kind": "cal",
      "label": "Kalorie rosną wraz z fazą — z założenia, nie z konieczności korekty",
-     "text": "Dieta ma wbudowaną progresję: średnia tygodniowa rośnie z 2587 kcal w Fazie 0 do 2742 kcal w Fazie 1 i 2923 kcal w Fazie 2. Różnica między fazami pochodzi wyłącznie ze zwiększenia porcji węglowodanów — owsa, makaronu i ryżu — dokładnie zgodnie z zasadą „węglowodany są regulatorem\" (sekcja 3). Białko i tłuszcz pozostają praktycznie stałe. Efekt: deficyt nie eskaluje z czasem, tylko oscyluje w wąskim paśmie ~6% (Faza 0) → ~7% (Faza 1) → ~6% (Faza 2) względem prawdopodobnego TDEE każdej fazy (2750 / 2950 / 3100 kcal). Gdyby dieta zostawała płaska przy rosnącej objętości treningowej, deficyt wspinałby się do kilkunastu procent w Fazie 2 — poziomu niepotrzebnie agresywnego przy priorytecie jakości treningu i regeneracji w okresie egzaminów. Ta progresja zapobiega temu z góry, bez czekania na korektę w tygodniu 4 czy 8. TDEE pozostaje modelem, nie wartością zmierzoną (zakres niepewności ±300–400 kcal) — dlatego mimo zaplanowanej progresji kalorii algorytm z sekcji 3 nadal obowiązuje jako zabezpieczenie na wypadek, gdyby rzeczywisty TDEE odbiegał od modelu. Empirycznego TDEE nie da się wyznaczyć wprost, bo nie ma danych o rzeczywistej dotychczasowej podaży energii; z trendu masy można oszacować wyłącznie nadwyżkę (~410–440 kcal/d w ostatnich 3 miesiącach). Nie stosuję uproszczenia 7700 kcal/kg jako dokładnego modelu."
+     "text": "Dieta ma wbudowaną progresję: średnia tygodniowa rośnie z 2553 kcal w Fazie 0 do 2708 kcal w Fazie 1 i 2889 kcal w Fazie 2. Różnica między fazami pochodzi wyłącznie ze zwiększenia porcji węglowodanów — owsa, makaronu i ryżu — dokładnie zgodnie z zasadą „węglowodany są regulatorem\" (sekcja 3). Białko i tłuszcz pozostają praktycznie stałe. Efekt: deficyt nie eskaluje z czasem, tylko oscyluje w wąskim paśmie ~7% (Faza 0) → ~8% (Faza 1) → ~7% (Faza 2) względem prawdopodobnego TDEE każdej fazy (2750 / 2950 / 3100 kcal). Gdyby dieta zostawała płaska przy rosnącej objętości treningowej, deficyt wspinałby się do kilkunastu procent w Fazie 2 — poziomu niepotrzebnie agresywnego przy priorytecie jakości treningu i regeneracji w okresie egzaminów. Ta progresja zapobiega temu z góry, bez czekania na korektę w tygodniu 4 czy 8. TDEE pozostaje modelem, nie wartością zmierzoną (zakres niepewności ±300–400 kcal) — dlatego mimo zaplanowanej progresji kalorii algorytm z sekcji 3 nadal obowiązuje jako zabezpieczenie na wypadek, gdyby rzeczywisty TDEE odbiegał od modelu. Empirycznego TDEE nie da się wyznaczyć wprost, bo nie ma danych o rzeczywistej dotychczasowej podaży energii; z trendu masy można oszacować wyłącznie nadwyżkę (~410–440 kcal/d w ostatnich 3 miesiącach). Nie stosuję uproszczenia 7700 kcal/kg jako dokładnego modelu."
     }
    ]
   },
@@ -107,7 +107,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 0 (17.10–02.11)"
+     "text": "Faza 0 (18.10–02.11)"
     },
     {
      "type": "table",
@@ -120,21 +120,21 @@
      "rows": [
       [
        "Energia",
-       "2629 kcal",
-       "2332 kcal",
-       "2587 kcal"
+       "2595 kcal",
+       "2298 kcal",
+       "2553 kcal"
       ],
       [
        "Białko",
-       "190,5 g · 2,18 g/kg",
-       "177,8 g · 2,03 g/kg",
-       "188,7 g · 2,16 g/kg"
+       "184,5 g · 2,11 g/kg",
+       "171,8 g · 1,97 g/kg",
+       "182,7 g · 2,09 g/kg"
       ],
       [
        "Węglowodany",
-       "267,9 g · 3,07 g/kg",
-       "227,4 g · 2,60 g/kg",
-       "262,1 g · 3,00 g/kg"
+       "266,1 g · 3,04 g/kg",
+       "225,6 g · 2,58 g/kg",
+       "260,3 g · 2,98 g/kg"
       ],
       [
        "Tłuszcz",
@@ -154,7 +154,7 @@
       ],
       [
        "Tygodniowa podaż",
-       "18106 kcal"
+       "17868 kcal"
       ]
      ],
      "caption": null
@@ -174,21 +174,21 @@
      "rows": [
       [
        "Energia",
-       "2784 kcal",
-       "2487 kcal",
-       "2742 kcal"
+       "2750 kcal",
+       "2453 kcal",
+       "2708 kcal"
       ],
       [
        "Białko",
-       "196,3 g · 2,25 g/kg",
-       "183,6 g · 2,10 g/kg",
-       "194,5 g · 2,23 g/kg"
+       "190,3 g · 2,18 g/kg",
+       "177,6 g · 2,03 g/kg",
+       "188,5 g · 2,16 g/kg"
       ],
       [
        "Węglowodany",
-       "295,8 g · 3,38 g/kg",
-       "255,3 g · 2,92 g/kg",
-       "290,0 g · 3,32 g/kg"
+       "294,0 g · 3,36 g/kg",
+       "253,5 g · 2,90 g/kg",
+       "288,2 g · 3,30 g/kg"
       ],
       [
        "Tłuszcz",
@@ -204,11 +204,11 @@
       ],
       [
        "Rozkład energii",
-       "B 28% · W 42% · T 26%"
+       "B 28% · W 43% · T 26%"
       ],
       [
        "Tygodniowa podaż",
-       "19191 kcal"
+       "18953 kcal"
       ]
      ],
      "caption": null
@@ -228,21 +228,21 @@
      "rows": [
       [
        "Energia",
-       "2965 kcal",
-       "2668 kcal",
-       "2923 kcal"
+       "2931 kcal",
+       "2634 kcal",
+       "2889 kcal"
       ],
       [
        "Białko",
-       "202,4 g · 2,32 g/kg",
-       "189,7 g · 2,17 g/kg",
-       "200,6 g · 2,30 g/kg"
+       "196,4 g · 2,25 g/kg",
+       "183,7 g · 2,10 g/kg",
+       "194,6 g · 2,23 g/kg"
       ],
       [
        "Węglowodany",
-       "330,1 g · 3,78 g/kg",
-       "289,6 g · 3,31 g/kg",
-       "324,3 g · 3,71 g/kg"
+       "328,3 g · 3,76 g/kg",
+       "287,8 g · 3,29 g/kg",
+       "322,5 g · 3,69 g/kg"
       ],
       [
        "Tłuszcz",
@@ -258,11 +258,11 @@
       ],
       [
        "Rozkład energii",
-       "B 27% · W 44% · T 24%"
+       "B 27% · W 45% · T 25%"
       ],
       [
        "Tygodniowa podaż",
-       "20458 kcal"
+       "20220 kcal"
       ]
      ],
      "caption": null
@@ -335,7 +335,7 @@
     },
     {
      "type": "h3",
-     "text": "Faza 0 (17.10–02.11) wdrożyć"
+     "text": "Faza 0 (18.10–02.11) wdrożyć"
     },
     {
      "type": "h4",
@@ -428,19 +428,19 @@
       ],
       [
        "Skyr naturalny",
-       "100 g",
+       "75 g",
        "—",
-       "67",
-       "12,0",
-       "3,8",
+       "50",
+       "9,0",
+       "2,9",
        "0",
        "0"
       ],
       [
        "Razem śniadanie",
-       "629",
-       "32,1",
-       "58,9",
+       "612",
+       "29,1",
+       "58,0",
        "26,5",
        "15,9"
       ],
@@ -526,11 +526,11 @@
       ],
       [
        "Skyr naturalny",
-       "100 g",
+       "75 g",
        "—",
-       "67",
-       "12,0",
-       "3,8",
+       "50",
+       "9,0",
+       "2,9",
        "0",
        "0"
       ],
@@ -576,9 +576,9 @@
       ],
       [
        "Razem lunch",
-       "465",
-       "30,5",
-       "46,4",
+       "448",
+       "27,5",
+       "45,5",
        "13,2",
        "9,1"
       ],
@@ -800,9 +800,9 @@
       ],
       [
        "RAZEM DZIEŃ TRENINGOWY / CARDIO",
-       "2629",
-       "190,5",
-       "267,9",
+       "2595",
+       "184,5",
+       "266,1",
        "78,0",
        "53,1"
       ]
@@ -849,9 +849,9 @@
       ],
       [
        "RAZEM DZIEŃ NIETRENINGOWY",
-       "2332",
-       "177,8",
-       "227,4",
+       "2298",
+       "171,8",
+       "225,6",
        "68,7",
        "42,8"
       ]
@@ -957,19 +957,19 @@
       ],
       [
        "Skyr naturalny",
-       "100 g",
+       "75 g",
        "—",
-       "67",
-       "12,0",
-       "3,8",
+       "50",
+       "9,0",
+       "2,9",
        "0",
        "0"
       ],
       [
        "Razem śniadanie",
-       "682",
-       "34,0",
-       "67,4",
+       "665",
+       "31,0",
+       "66,5",
        "27,4",
        "17,3"
       ],
@@ -1055,11 +1055,11 @@
       ],
       [
        "Skyr naturalny",
-       "100 g",
+       "75 g",
        "—",
-       "67",
-       "12,0",
-       "3,8",
+       "50",
+       "9,0",
+       "2,9",
        "0",
        "0"
       ],
@@ -1105,9 +1105,9 @@
       ],
       [
        "Razem lunch",
-       "514",
-       "33,2",
-       "54,1",
+       "497",
+       "30,2",
+       "53,2",
        "13,6",
        "9,6"
       ],
@@ -1329,9 +1329,9 @@
       ],
       [
        "RAZEM DZIEŃ TRENINGOWY / CARDIO",
-       "2784",
-       "196,3",
-       "295,8",
+       "2750",
+       "190,3",
+       "294,0",
        "79,4",
        "55,2"
       ]
@@ -1378,9 +1378,9 @@
       ],
       [
        "RAZEM DZIEŃ NIETRENINGOWY",
-       "2487",
-       "183,6",
-       "255,3",
+       "2453",
+       "177,6",
+       "253,5",
        "70,1",
        "44,9"
       ]
@@ -1486,19 +1486,19 @@
       ],
       [
        "Skyr naturalny",
-       "100 g",
+       "75 g",
        "—",
-       "67",
-       "12,0",
-       "3,8",
+       "50",
+       "9,0",
+       "2,9",
        "0",
        "0"
       ],
       [
        "Razem śniadanie",
-       "682",
-       "34,0",
-       "67,4",
+       "665",
+       "31,0",
+       "66,5",
        "27,4",
        "17,3"
       ],
@@ -1584,11 +1584,11 @@
       ],
       [
        "Skyr naturalny",
-       "100 g",
+       "75 g",
        "—",
-       "67",
-       "12,0",
-       "3,8",
+       "50",
+       "9,0",
+       "2,9",
        "0",
        "0"
       ],
@@ -1634,9 +1634,9 @@
       ],
       [
        "Razem lunch",
-       "564",
-       "35,9",
-       "61,7",
+       "547",
+       "32,9",
+       "60,8",
        "14,1",
        "10,0"
       ],
@@ -1858,9 +1858,9 @@
       ],
       [
        "RAZEM DZIEŃ TRENINGOWY / CARDIO",
-       "2965",
-       "202,4",
-       "330,1",
+       "2931",
+       "196,4",
+       "328,3",
        "80,6",
        "58,4"
       ]
@@ -1907,9 +1907,9 @@
       ],
       [
        "RAZEM DZIEŃ NIETRENINGOWY",
-       "2668",
-       "189,7",
-       "289,6",
+       "2634",
+       "183,7",
+       "287,8",
        "71,3",
        "48,1"
       ]
@@ -2008,8 +2008,8 @@
       ],
       [
        "Termos z gorącym lunchem",
-       "Skyr nie wchodzi do termosu. Do termosu trafia wyłącznie gorąca baza (makaron, szpinak, pomidory, oliwa, przyprawy), prosto z patelni . 100 g skyru pakujesz osobno, w chłodzie , i wmieszujesz dopiero przy posiłku",
-       "Dodanie 100 g produktu chłodzonego obniżało temperaturę ~300 g bazy o kilkanaście stopni — dodanie skyru rano zbijało temperaturę dania poniżej progu bezpiecznego przechowywania na gorąco (63 °C). Sześć godzin w zakresie 40–55 °C to warunki produkcji cereulidu, toksyny termostabilnej . Rozdzielenie usuwa problem u źródła i daje lepszy sos, bez ryzyka zwarzenia białka. Skyr musi pozostać w chłodzie — pojemnik z nabiałem w temperaturze pokojowej przez 6 h byłby gorszy niż stan wyjściowy",
+       "Skyr nie wchodzi do termosu. Do termosu trafia wyłącznie gorąca baza (makaron, szpinak, pomidory, oliwa, przyprawy), prosto z patelni . 75 g skyru pakujesz osobno, w chłodzie , i wmieszujesz dopiero przy posiłku",
+       "Dodanie 75 g produktu chłodzonego obniżało temperaturę ~300 g bazy o kilkanaście stopni — dodanie skyru rano zbijało temperaturę dania poniżej progu bezpiecznego przechowywania na gorąco (63 °C). Sześć godzin w zakresie 40–55 °C to warunki produkcji cereulidu, toksyny termostabilnej . Rozdzielenie usuwa problem u źródła i daje lepszy sos, bez ryzyka zwarzenia białka. Skyr musi pozostać w chłodzie — pojemnik z nabiałem w temperaturze pokojowej przez 6 h byłby gorszy niż stan wyjściowy",
        "wdrożyć"
       ],
       [
@@ -2293,7 +2293,7 @@
        "UPPER 1",
        "—",
        "✓ 20 min po treningu",
-       "2629",
+       "2595",
        "8–10 tys."
       ],
       [
@@ -2301,7 +2301,7 @@
        "LOWER 1",
        "—",
        "—",
-       "2629",
+       "2595",
        "8–10 tys."
       ],
       [
@@ -2309,7 +2309,7 @@
        "ABS",
        "Rower 55 min",
        "✓ 20 min po sesji",
-       "2629",
+       "2595",
        "8–10 tys."
       ],
       [
@@ -2317,7 +2317,7 @@
        "wolne",
        "—",
        "✓ 2 × 20 min jedna wizyta, dwie rundy",
-       "2332",
+       "2298",
        "8–10 tys."
       ],
       [
@@ -2325,7 +2325,7 @@
        "UPPER 2",
        "—",
        "—",
-       "2629",
+       "2595",
        "8–10 tys."
       ],
       [
@@ -2333,7 +2333,7 @@
        "LOWER 2",
        "—",
        "✓ 20 min po treningu",
-       "2629",
+       "2595",
        "8–10 tys."
       ],
       [
@@ -2341,7 +2341,7 @@
        "—",
        "Basen 55 min",
        "—",
-       "2629",
+       "2595",
        "8–10 tys."
       ]
      ],
@@ -2375,7 +2375,7 @@
      "rows": [
       [
        "Faza 0 wejściowa",
-       "17.10–02.11",
+       "18.10–02.11",
        "~34 góra 20 · dół 10 · core 4",
        "Góra: przypomnienie wzorców, znalezienie obciążeń. Dół: nauka ruchu i ustalenie tolerancji kolana. Sukces = ukończenie Fazy 0 bez objawów, nie ciężar na sztandze",
        "Ukończona Faza 0 · ≥80% sesji zrealizowanych · kolano zielone przez cały czas · brak DOMS utrzymującego się >72 h"
@@ -4148,7 +4148,7 @@
     },
     {
      "type": "small",
-     "text": "Wtorek i sobota (LOWER 1 i LOWER 2) różnią się jedną rzeczą: wpisem o kolanie w dzienniku — ból 0–10 w trakcie i nazajutrz rano. Czwartek to 2332 kcal, bez posiłku potreningowego, przekąska to orzech brazylijski, białko WPC o 20:15 po saunie; kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni."
+     "text": "Wtorek i sobota (LOWER 1 i LOWER 2) różnią się jedną rzeczą: wpisem o kolanie w dzienniku — ból 0–10 w trakcie i nazajutrz rano. Czwartek to 2298 kcal, bez posiłku potreningowego, przekąska to orzech brazylijski, białko WPC o 20:15 po saunie; kolagen, witamina C i tauryna o 17:15 jak w pozostałe dni."
     }
    ]
   },
@@ -4188,7 +4188,7 @@
     },
     {
      "type": "p",
-     "text": "{private:25} Najnowszy pomiar (18. {private:26} Deficyt jest niewielki (~6% w Fazie 0), bo priorytetem pozostaje jakość treningu, regeneracja i wydajność poznawcza w okresie egzaminów, a nie tempo. Przy ~20% tkanki tłuszczowej reguła Forbesa działa na korzyść — im więcej zapasu tłuszczu, tym większy jego udział w utracie masy przy deficycie. Longland i wsp. wykazali przyrost masy beztłuszczowej nawet przy głębokim deficycie z wysokim białkiem, więc niewielki deficyt nie blokuje odpowiedzi „newbie\" w treningu nóg."
+     "text": "{private:25} Najnowszy pomiar (18. {private:26} Deficyt jest niewielki (~7% w Fazie 0), bo priorytetem pozostaje jakość treningu, regeneracja i wydajność poznawcza w okresie egzaminów, a nie tempo. Przy ~20% tkanki tłuszczowej reguła Forbesa działa na korzyść — im więcej zapasu tłuszczu, tym większy jego udział w utracie masy przy deficycie. Longland i wsp. wykazali przyrost masy beztłuszczowej nawet przy głębokim deficycie z wysokim białkiem, więc niewielki deficyt nie blokuje odpowiedzi „newbie\" w treningu nóg."
     },
     {
      "type": "h4",

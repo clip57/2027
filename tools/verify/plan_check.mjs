@@ -60,6 +60,7 @@ for (let d = D.stat.start < PLAN_START ? D.stat.start : PLAN_START; d <= (PLAN_E
   // recall: widok ⇔ harmonogram
   const wantRecall = D.nightDates.includes(d);
   if (!!r.cfa.recall !== wantRecall) err(`${d}: recall w widoku=${!!r.cfa.recall}, w harmonogramie=${wantRecall}`);
+  if (r.outside) continue;   // dni poza planem (D-103c: 16–17.10 mają tylko bloki CFA): widok „Dziś” pokazuje „Poza planem”, układ slotów i karty „Teraz” nie istnieją
   // sloty dnia: kolejność i nakładanie (poza snem, który przechodzi przez północ)
   const rolesOf = Object.fromEntries(r.slots.map(s => [s.id, s]));
   const sl = r.slots.filter(s => s.to > s.from).map(s => ({ id: s.id, f: toMin(s.from), t: toMin(s.to), title: s.title }));
