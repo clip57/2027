@@ -27,6 +27,11 @@ def synthetic_zapasy(last_sync=None):
         daily = it.get('daily_v31') or 1
         stocks[it['id']] = round(daily * CYCLE[n % len(CYCLE)], 2)
         products.append({'id': it['id'], 'name': it['name'], 'unit': it['unit'], 'packSize': it['packSize'], 'daily': daily})
+    # Fikcyjne braki w składnikach Meal Prep; testy magazynu mogą kupić dowolną pierwszą pozycję.
+    prep = json.loads((ROOT / 'src/data/mealprep.json').read_text(encoding='utf8'))
+    prep_ids = {pid for card in prep['cards'] for pid in re.findall(r'\{(\w+)\}', json.dumps(card)) if pid in stocks}
+    for pid in prep_ids:
+        stocks[pid] = 0
     obj = {'app': 'Spizarnia_Dieta_2027T', 'version': 31, '_note': 'SYNTETYCZNE DANE TESTOWE — wartości fikcyjne',
            'lastSyncDate': last_sync.isoformat(), 'exportDate': f'{last_sync.isoformat()}T21:00:00.000Z',
            'products': products, 'stocks': stocks,
@@ -75,8 +80,8 @@ def synthetic_care_plan():
         step(3, 'rano', 'Jama ustna', 'krok poranny 3', product='p.t4', slot='slot.0700'),
         step(4, 'dzien', 'Twarz', 'krok doraźny', asNeeded=True),
         step(5, 'dzien', 'Twarz', 'krok w ciągu dnia'),
-        step(6, 'wieczor', 'Włosy', 'krok PN i PT do 11.10', product='p.t2', days=[1, 5], until='2026-10-11', slot='slot.2035'),
-        step(7, 'wieczor', 'Włosy', 'krok PN od 12.10', product='p.t2', days=[1], **{'from': '2026-10-12'}, slot='slot.2035'),
+        step(6, 'wieczor', 'Włosy', 'krok PN i PT do 25.10', product='p.t2', days=[1, 5], until='2026-10-25', slot='slot.2100'),
+        step(7, 'wieczor', 'Włosy', 'krok PN od 26.10', product='p.t2', days=[1], **{'from': '2026-10-26'}, slot='slot.2100'),
         step(8, 'wieczor', 'Ciało', 'krok ŚR i ND', product='p.t3', days=[3, 7]),
         step(9, 'wieczor', 'Ciało', 'krok niedzielny', days=[7], slot='slot.2015n'),
         step(10, 'wieczor', 'Twarz', 'krok wieczorny', product='p.t1', slot='slot.2145'),
