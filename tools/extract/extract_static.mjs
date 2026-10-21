@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const SRC = process.env.SOURCES_DIR;
@@ -171,4 +172,7 @@ if (want('trening')) {
   write('training.json', out);
   console.log('training.json +', Object.keys(INFO).length, 'opisów techniki,', Object.keys(VIZ).length, 'wizualizacji,',
     Object.values(warmup).filter(Boolean).length, 'rozgrzewek,', sheets.length, 'arkuszy');
+  // D-105: arkusze (System kolana, Sauna), rozgrzewka i schłodzenie jako dane ustrukturyzowane (czytelne okna i listy); skrypt dowodzi, że struktura odtwarza oryginał, i przerywa, gdy HTML się zmienił
+  try { console.log(execFileSync('python3', [path.join(path.dirname(fileURLToPath(import.meta.url)), 'training_sheets.py')], { encoding: 'utf8' }).trim()); }
+  catch (e) { console.error('UWAGA: tools/extract/training_sheets.py nie przeszedł — arkusze zostaną pokazane w dawnej, spłaszczonej postaci:\n' + String(e.stderr || e.message).trim()); process.exitCode = 1; }
 }

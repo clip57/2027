@@ -865,3 +865,46 @@ a.chip.sp-low-link { display: inline-flex; align-items: center; gap: var(--s-1);
 .cloud-banner .row .btn, .cloud-banner .row button { min-height: 44px; }
 /* Cele dotykowe ≥ 44 px dla rozwijanych szczegółów (wykryte testem Fazy 5) */
 .sf-more > summary, .rk-orig > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; }
+
+/* ---- Trening: arkusze (System kolana, Sauna), listy rozgrzewki i schłodzenia, notatki dnia (D-105) ---- */
+.lv-g { --lv: var(--success); } .lv-y { --lv: var(--warning); } .lv-r { --lv: var(--danger); }
+.sh-h { margin: var(--s-3) 0 var(--s-1); font-size: var(--fs-md); }
+.ks-legend { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: 0; }
+.lv-tag { display: inline-flex; align-items: center; gap: var(--s-1); padding: 2px var(--s-3); border: 2px solid var(--lv, var(--border)); border-radius: var(--r-full); font-size: var(--fs-sm); font-weight: 600; }
+.ks-crit-list { display: grid; gap: var(--s-3); }
+.ks-crit { border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--s-3); background: var(--surface); }
+.ks-crit h4 { margin: 0 0 var(--s-2); font-size: var(--fs-md); }
+.ks-rows { margin: 0; display: grid; gap: var(--s-1); }
+.ks-row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: var(--s-2); align-items: baseline; padding: var(--s-2) var(--s-3); border-left: 4px solid var(--lv); border-radius: var(--r-sm); background: var(--sunken); background: color-mix(in srgb, var(--lv) 9%, var(--surface)); }
+.ks-row dt, .ks-row strong { margin: 0; font-size: var(--fs-sm); font-weight: 700; }
+.ks-row dd { margin: 0; }
+.ks-actions { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.ks-alert { margin-top: var(--s-3); padding: var(--s-3); border: 2px solid var(--danger); border-radius: var(--r-md); background: var(--sunken); background: color-mix(in srgb, var(--danger) 8%, var(--surface)); }
+.ks-alert ul { margin: var(--s-1) 0 0; padding-left: 1.25rem; }
+.ks-tip { margin: var(--s-3) 0 0; padding: var(--s-3); border-radius: var(--r-md); background: var(--sunken); }
+.sa-sum { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2); }
+.sa-card { padding: var(--s-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); }
+.sa-card dt { margin: 0 0 var(--s-1); color: var(--muted); font-size: var(--fs-sm); font-weight: 600; }
+.sa-card dd { margin: 0; display: grid; gap: var(--s-1); }
+.sa-card dd strong { font-size: var(--fs-md); }
+.sa-card dd .muted { font-size: var(--fs-sm); }
+.sa-phase h3 { margin-top: var(--s-4); }
+.sa-steps, .sa-timeline { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-2); counter-reset: sa; }
+.sa-steps li { display: grid; gap: 2px; padding: var(--s-2) var(--s-3); border-radius: var(--r-sm); background: var(--sunken); }
+.sa-steps li.is-alert { border-left: 4px solid var(--danger); background: var(--sunken); background: color-mix(in srgb, var(--danger) 9%, var(--surface)); }
+.sa-timeline li { counter-increment: sa; display: flex; gap: var(--s-2); align-items: baseline; padding: var(--s-2) var(--s-3); border-radius: var(--r-sm); background: var(--sunken); }
+.sa-timeline li::before { content: counter(sa); flex: none; min-width: 1.5em; font-weight: 700; color: var(--muted); }
+.sa-total { margin: var(--s-2) 0 0; font-weight: 700; }
+.sa-list { margin: 0; padding-left: 1.25rem; display: grid; gap: var(--s-1); }
+.sa-notes { margin-top: var(--s-3); padding-top: var(--s-3); border-top: 1px solid var(--border); }
+.ph-list { margin: 0; padding-left: 1.5rem; display: grid; gap: var(--s-3); }
+.ph-list li { padding-left: var(--s-1); }
+.ph-list li > span { display: block; }
+.ph-name { font-weight: 600; }
+.ph-en { font-size: var(--fs-sm); }
+.dn { margin: 0 0 var(--s-3); padding: var(--s-3) var(--s-4); border: 1px solid var(--border); border-left: 4px solid var(--train); border-radius: var(--r-md); background: var(--surface); }
+.dn h3 { margin: 0 0 var(--s-1); font-size: var(--fs-md); }
+.dn p { margin: 0; }
+.dn-phases { margin: var(--s-2) 0 0; padding: 0; list-style: none; display: grid; gap: var(--s-2); }
+.dn-phases li { display: grid; gap: 2px; }
+@media (max-width: 420px) { .ks-rows .ks-row { grid-template-columns: 6.6rem minmax(0, 1fr); } .ks-actions .ks-row { grid-template-columns: 1fr; gap: 2px; } .sa-card { padding: var(--s-2) var(--s-3); } }

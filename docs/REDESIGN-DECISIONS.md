@@ -90,6 +90,12 @@ grupy panelu jw. „o ile analiza kodu potwierdzi” — **potwierdzone** polem 
 … (ale domyślnie dark)” — **interpretacja: domyślnie ciemny + przełącznik z opcją systemowego — zatwierdzona przez użytkownika 24.09.2026**; akcent indygo dobrany wg WCAG; Lucide; Inter tylko przy
 nieistotnym wzroście paczki — spełnione przez podzbiór.
 
+## C6. Decyzje Fazy 5 — arkusze treningu (D-105)
+
+- Arkusze i instrukcje ćwiczeń są renderowane z danych ustrukturyzowanych, z nazwami i opisami tekstowymi obok oznaczeń kolorystycznych.
+- Ekstraktor zachowuje oryginalne źródła i sprawdza, czy struktura odtwarza ich treść; zmianę formatu źródła traktuje jako błąd wymagający przeglądu.
+- Rozszerzenie dotyczy prezentacji danych treningowych; dziennik treningu i jego model zdarzeń pozostają bez zmian.
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.

@@ -13,6 +13,7 @@ import { resolveDay, dayPlan, PLAN_START, PLAN_END, TRAIN_START } from '../core/
 import { addDays, weekday, longDate, shortDate } from '../core/dates.js';
 import muscles from '../data/muscles.json' with { type: 'json' };
 import { region, swap } from '../ui/patch.js';
+import { sheetBody, phaseList, phaseLabel, dayNoteCard } from './trening_sheets.js';
 
 const T = SRC.training;
 const M = muscles.exercises;
@@ -173,7 +174,10 @@ function renderSession(root, ctx) {
   derive();
   const sessionMuscles = { primary: [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.primary || []))] };
   sessionMuscles.secondary = [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.secondary || []))].filter(m => !sessionMuscles.primary.includes(m));
-  const sheets = T.sheets.filter(s => s.length > 5);
+  // Arkusze (System kolana, Sauna): z danych ustrukturyzowanych (D-105); awaryjnie — dawny, spłaszczony tekst
+  const sheets = T.sheetsData
+    ? T.sheetsData.map(sh => ({ label: `${sh.icon} ${sh.title}`, open: () => sheetDialog(`${sh.icon} ${sh.title}`, ...sheetBody(sh)) }))
+    : T.sheets.filter(s => s.length > 5).map(sh => ({ label: sh.split('✕')[0].trim(), open: () => infoDialog(sh) }));
   // „Ostatnio” = wyniki z dni wcześniejszych niż ten dzień — zapisy tego dnia ich nie zmieniają, więc liczone raz na widok (P2)
   const lastMemo = new Map();
   const lastOf = exId => { if (!lastMemo.has(exId)) lastMemo.set(exId, lastResult(log, exId, date)); return lastMemo.get(exId); };
@@ -195,7 +199,7 @@ function renderSession(root, ctx) {
       h('h1', {}, r.sessionLabel),
       r.note && h('p', {}, r.note),
       total > 0 && h('p', { class: 'muted' }, `${exercises.filter((_, i) => plan[i].n > 0).length} ćwiczeń · ${total} ${serie(total)}`),
-      h('div', { class: 'row' }, sheets.map(sh => h('button', { class: 'chip-b', onclick: () => infoDialog(sh) }, sh.split('✕')[0].trim())))),
+      h('div', { class: 'row' }, sheets.map(sh => h('button', { class: 'chip-b', onclick: sh.open }, sh.label)))),
     total > 0 && h('div', { class: 'hero-tr-side' }, progressRing(done, total, 'Wykonane serie'), h('span', { class: 'muted' }, `${done} / ${total} serii`)),
     // Następna seria z planu albo podsumowanie ukończonej sesji (wyłącznie z dziennika — D-069)
     total > 0 && (nx
@@ -234,9 +238,14 @@ function renderSession(root, ctx) {
           h('span', { class: 'set-copy-sp' })))),
       rows.length < 10 && h('button', { class: 'opt-add', onclick: () => save(e.id, rows.length + 1, { done: false, opt: true }, true) }, '+ Dodaj serię (opcjonalnie)'));
   }
-  const phaseBlock = (label, text) => text && h('details', { class: 'meal' }, h('summary', {}, h('span', { class: 'meal-n' }, label)),
-    h('div', { class: 'why-body' }, h('p', {}, text.replace(/^(Rozgrzewka|Schłodzenie) 10 min ▾\s*/, ''))));
-  add(root, phaseBlock('🔥 Rozgrzewka · 10 min', T.warmup[key]));
+  // Rozgrzewka i schłodzenie: numerowana lista (D-105); teksty następnego dnia, doklejone przez ekstrakcję na końcu schłodzenia, są w notatkach właściwego dnia
+  const phaseBlock = (kind, label) => {
+    const p = T[`${kind}Data`]?.[key], text = T[kind][key];
+    if (!p && !text) return null;
+    return h('details', { class: 'meal' }, h('summary', {}, h('span', { class: 'meal-n' }, p ? phaseLabel(kind, p) : label)),
+      h('div', { class: 'why-body' }, p ? phaseList(p) : h('p', {}, text.replace(/^(Rozgrzewka|Schłodzenie) 10 min ▾\s*/, ''))));
+  };
+  add(root, dayNoteCard(T.dayNotes?.[key], key), phaseBlock('warmup', '🔥 Rozgrzewka · 10 min'));
 
   const article = ({ e, n }, idx) => {
     const rom = e.raw ? spec(e) : null;
@@ -282,7 +291,7 @@ function renderSession(root, ctx) {
   const arts = new Map();
   add(root, h('div', { class: 'ex-list' }, plan.map((x, idx) => { const el = article(x, idx); arts.set(x.e.id, { el, x, idx }); return el; })));
   const restBox = region(() => (rest?.date === date ? restBar() : null));
-  add(root, phaseBlock('❄️ Schłodzenie · 10 min', T.cooldown[key]), restBox.el);
+  add(root, phaseBlock('cooldown', '❄️ Schłodzenie · 10 min'), restBox.el);
   // P2: po odhaczeniu serii — nagłówek sesji, karta tego ćwiczenia, wyróżnienie następnego ćwiczenia i licznik przerwy
   function refresh(exId) {
     log = store.state.train;

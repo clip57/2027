@@ -2699,5 +2699,473 @@
   "🦵 System kolana ✕ 🟢 Zielone 🟡 Żółte 🔴 Czerwone Ból w trakcie 0–3/10, stabilny 3–5/10 &gt;5/10 lub rośnie Ból po (24 h) wraca do wyjścia podwyższony, mija do wieczora trwa &gt;24 h Obrzęk brak minimalny wyraźny / nawrotowy „Luz\" / niestabilność brak rzadkie, bez uginania epizod uginania Trend tygodniowy stabilny / lepszy plateau gorszy 🟢 Progresuj normalnie — zakres i obciążenie wg planu dnia. 🟡 Zatrzymaj obciążenie i zakres. Powtórz sesję identycznie, bez progresji. 🔴 −30–50% obciążenia lub mniejszy zakres. Utrzymuje się &gt;2 sesje → fizjoterapeuta. Konsultacja natychmiast, bez czekania Obrzęk stawu · zablokowanie · rzeczywisty epizod uginania · ból nocny. Rozgrzewka LOWER: zapisz ból wyjściowy 0–10 przed 1. serią roboczą. To punkt odniesienia na dziś.",
   "♨️ Sauna ✕ Kiedy 5×/tydz. Pon·Śr·Cz×2·Sob. Zawsze po treningu, nigdy przed Czas 20 min Stała długość, nie zakres Temperatura 80–100°C Ta, którą ma obiekt — bez znaczenia dokładna wartość Koniec −1,5 h Najpóźniej tyle przed snem 30 min przed 250–500 ml wody. Nie tuż po obfitym posiłku Prysznic przed — z mydłem, całe ciało Woda ciepła. Potem wytrzyj się do sucha Przed wejściem Zdejmij metal i biżuterię. Ręcznik do siedzenia W kabinie — 20 min Niższa ławka, jeśli za intensywnie Wyjście awaryjne Zawroty głowy / nudności / kołatanie serca → wyjdź od razu Wychłodzenie — 10–15 min Chłodne miejsce, spoczynek, 250–500 ml wody. Nie od razu pod prysznic Prysznic po — bez mydła Woda letnia do chłodnej Po prysznicu 500–750 ml wody. Balsam teraz, nie wcześniej Pon / Śr / Sob — dni treningowe Wychładzaj się chłodnym powietrzem i letnim prysznicem . Bez zimnej kąpieli / morsowania — tłumi hipertrofię w tym oknie czasowym. W czwartek (dzień wolny) kontrast jest bez problemu. Czwartek, 2 rundy: prysznic z mydłem → 20′ → wychłodzenie 10–15′ + 250–500 ml → 20′ → wychłodzenie 10–15′ → prysznic bez mydła → 500–750 ml. Razem ~70–80 min. Po każdej sesji: uzupełnij płyny i sód. Nie mierz BIA po saunie ani treningu.",
   "✕"
- ]
+ ],
+ "sheetsData": [
+  {
+   "id": "kolano",
+   "icon": "🦵",
+   "title": "System kolana",
+   "kind": "traffic",
+   "levels": [
+    {
+     "id": "green",
+     "label": "Zielone"
+    },
+    {
+     "id": "yellow",
+     "label": "Żółte"
+    },
+    {
+     "id": "red",
+     "label": "Czerwone"
+    }
+   ],
+   "criteria": [
+    {
+     "name": "Ból w trakcie",
+     "green": "0–3/10, stabilny",
+     "yellow": "3–5/10",
+     "red": ">5/10 lub rośnie"
+    },
+    {
+     "name": "Ból po (24 h)",
+     "green": "wraca do wyjścia",
+     "yellow": "podwyższony, mija do wieczora",
+     "red": "trwa >24 h"
+    },
+    {
+     "name": "Obrzęk",
+     "green": "brak",
+     "yellow": "minimalny",
+     "red": "wyraźny / nawrotowy"
+    },
+    {
+     "name": "„Luz\" / niestabilność",
+     "green": "brak",
+     "yellow": "rzadkie, bez uginania",
+     "red": "epizod uginania"
+    },
+    {
+     "name": "Trend tygodniowy",
+     "green": "stabilny / lepszy",
+     "yellow": "plateau",
+     "red": "gorszy"
+    }
+   ],
+   "actions": [
+    {
+     "level": "green",
+     "text": "Progresuj normalnie — zakres i obciążenie wg planu dnia."
+    },
+    {
+     "level": "yellow",
+     "text": "Zatrzymaj obciążenie i zakres. Powtórz sesję identycznie, bez progresji."
+    },
+    {
+     "level": "red",
+     "text": "−30–50% obciążenia lub mniejszy zakres. Utrzymuje się >2 sesje → fizjoterapeuta."
+    }
+   ],
+   "alert": {
+    "title": "Konsultacja natychmiast, bez czekania",
+    "items": [
+     "Obrzęk stawu",
+     "zablokowanie",
+     "rzeczywisty epizod uginania",
+     "ból nocny"
+    ]
+   },
+   "tip": "Rozgrzewka LOWER: zapisz ból wyjściowy 0–10 przed 1. serią roboczą. To punkt odniesienia na dziś."
+  },
+  {
+   "id": "sauna",
+   "icon": "♨️",
+   "title": "Sauna",
+   "kind": "protocol",
+   "summary": [
+    {
+     "label": "Kiedy",
+     "value": "5×/tydz. Pon·Śr·Cz×2·Sob.",
+     "note": "Zawsze po treningu, nigdy przed"
+    },
+    {
+     "label": "Czas",
+     "value": "20 min",
+     "note": "Stała długość, nie zakres"
+    },
+    {
+     "label": "Temperatura",
+     "value": "80–100°C",
+     "note": "Ta, którą ma obiekt — bez znaczenia dokładna wartość"
+    },
+    {
+     "label": "Koniec",
+     "value": "−1,5 h",
+     "note": "Najpóźniej tyle przed snem"
+    }
+   ],
+   "phases": [
+    {
+     "name": "Przed",
+     "steps": [
+      {
+       "label": "30 min przed",
+       "text": "250–500 ml wody. Nie tuż po obfitym posiłku"
+      },
+      {
+       "label": "Prysznic przed — z mydłem, całe ciało",
+       "text": "Woda ciepła. Potem wytrzyj się do sucha"
+      },
+      {
+       "label": "Przed wejściem",
+       "text": "Zdejmij metal i biżuterię. Ręcznik do siedzenia"
+      }
+     ]
+    },
+    {
+     "name": "Sauna",
+     "steps": [
+      {
+       "label": "W kabinie — 20 min",
+       "text": "Niższa ławka, jeśli za intensywnie"
+      },
+      {
+       "label": "Wyjście awaryjne",
+       "text": "Zawroty głowy / nudności / kołatanie serca → wyjdź od razu",
+       "alert": true
+      }
+     ]
+    },
+    {
+     "name": "Po saunie",
+     "steps": [
+      {
+       "label": "Wychłodzenie — 10–15 min",
+       "text": "Chłodne miejsce, spoczynek, 250–500 ml wody. Nie od razu pod prysznic"
+      },
+      {
+       "label": "Prysznic po — bez mydła",
+       "text": "Woda letnia do chłodnej"
+      },
+      {
+       "label": "Po prysznicu",
+       "text": "500–750 ml wody. Balsam teraz, nie wcześniej"
+      }
+     ]
+    }
+   ],
+   "trainingDays": {
+    "label": "Pon / Śr / Sob — dni treningowe",
+    "lines": [
+     "Wychładzaj się chłodnym powietrzem i letnim prysznicem.",
+     "Bez zimnej kąpieli / morsowania — tłumi hipertrofię w tym oknie czasowym.",
+     "W czwartek (dzień wolny) kontrast jest bez problemu."
+    ]
+   },
+   "thursday": {
+    "label": "Czwartek, 2 rundy",
+    "steps": [
+     "prysznic z mydłem",
+     "20′",
+     "wychłodzenie 10–15′ + 250–500 ml",
+     "20′",
+     "wychłodzenie 10–15′",
+     "prysznic bez mydła",
+     "500–750 ml"
+    ],
+    "total": "Razem ~70–80 min."
+   },
+   "notes": [
+    "Po każdej sesji: uzupełnij płyny i sód.",
+    "Nie mierz BIA po saunie ani treningu."
+   ]
+  }
+ ],
+ "warmupData": {
+  "pon": {
+   "title": "Rozgrzewka",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower stacjonarny, lekki opór",
+     "en": "Stationary Bike, Light Resistance",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Krążenia ramion + band pull-apart",
+     "en": "Arm Circles + Band Pull-Apart",
+     "dose": "15 powt. każde ~1,5′"
+    },
+    {
+     "n": 3,
+     "name": "Wyciskanie leżąc — seria rozgrzewkowa",
+     "en": "Bench Press Warm-up Set",
+     "dose": "50% ciężaru × 8 ~1,5′"
+    },
+    {
+     "n": 4,
+     "name": "Wyciskanie leżąc — seria rozgrzewkowa",
+     "en": "Bench Press Warm-up Set",
+     "dose": "70% ciężaru × 3–5 ~2′"
+    }
+   ]
+  },
+  "wt": {
+   "title": "Rozgrzewka",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower, siodełko wysoko, lekki–umiark.",
+     "en": "Stationary Bike, High Saddle",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Odwodzenie biodra w leżeniu bokiem",
+     "en": "Side-Lying Hip Abduction",
+     "dose": "12 powt./stronę ~1,5′"
+    },
+    {
+     "n": 3,
+     "name": "Przysiady bez obciążenia",
+     "en": "Bodyweight Squat",
+     "dose": "w dzisiejszym tolerowanym zakresie · 10 powt. ~1,5′"
+    },
+    {
+     "n": 4,
+     "name": "Suwnica — seria rozgrzewkowa",
+     "en": "Leg Press Warm-up Set",
+     "dose": "bardzo lekki ciężar × 10 ~2′"
+    }
+   ]
+  },
+  "pt": {
+   "title": "Rozgrzewka",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower stacjonarny, lekki opór",
+     "en": "Stationary Bike, Light Resistance",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Krążenia ramion + band pull-apart",
+     "en": "Arm Circles + Band Pull-Apart",
+     "dose": "15 powt. każde ~1,5′"
+    },
+    {
+     "n": 3,
+     "name": "Wyciskanie na skosie — seria rozgrz.",
+     "en": "Incline Bench Press Warm-up Set",
+     "dose": "50% ciężaru × 8 ~1,5′"
+    },
+    {
+     "n": 4,
+     "name": "Wyciskanie na skosie — seria rozgrz.",
+     "en": "Incline Bench Press Warm-up Set",
+     "dose": "70% ciężaru × 3–5 ~2′"
+    }
+   ]
+  },
+  "sob": {
+   "title": "Rozgrzewka",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower, siodełko wysoko, lekki opór",
+     "en": "Stationary Bike, High Saddle",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Glute bridge bez obciążenia",
+     "en": "Bodyweight Glute Bridge",
+     "dose": "12 powt. ~1,5′"
+    },
+    {
+     "n": 3,
+     "name": "Odwodzenie biodra z taśmą",
+     "en": "Banded Hip Abduction",
+     "dose": "12 powt./stronę ~1,5′"
+    },
+    {
+     "n": 4,
+     "name": "Hip thrust — seria rozgrzewkowa",
+     "en": "Hip Thrust Warm-up Set",
+     "dose": "lekki ciężar × 10 ~2′"
+    }
+   ]
+  }
+ },
+ "cooldownData": {
+  "pon": {
+   "title": "Schłodzenie",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower, bardzo lekki opór, swobodnie",
+     "en": "Easy Bike Cool-down",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Rozciąganie klatki w futrynie",
+     "en": "Doorway Chest Stretch",
+     "dose": "2×30″/str."
+    },
+    {
+     "n": 3,
+     "name": "Rozciąganie tricepsa nad głową",
+     "en": "Overhead Triceps Stretch",
+     "dose": "2×20″/r."
+    },
+    {
+     "n": 4,
+     "name": "Rozciąganie górnej części pleców",
+     "en": "Upper Back Stretch",
+     "dose": "1×30″"
+    }
+   ]
+  },
+  "wt": {
+   "title": "Schłodzenie",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower, siodełko wysoko, b. lekki opór",
+     "en": "Easy Bike Cool-down, High Saddle",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Rozciąganie łydki przy ścianie",
+     "en": "Wall Calf Stretch",
+     "dose": "2×30″/n."
+    },
+    {
+     "n": 3,
+     "name": "Rozciąganie hamstringu, kolano proste",
+     "en": "Straight-Leg Hamstring Stretch",
+     "dose": "2×30″/n."
+    },
+    {
+     "n": 4,
+     "name": "Rozciąganie czworogłowego",
+     "en": "Quadriceps Stretch",
+     "dose": "tylko przy 🟢 zielonym — inaczej pomiń 2×20″/n."
+    }
+   ]
+  },
+  "sr": {
+   "title": "Rozciąganie",
+   "minutes": 5,
+   "items": [
+    {
+     "n": 1,
+     "name": "Pozycja „kobra\"",
+     "en": "Cobra Pose",
+     "dose": "2×20″"
+    },
+    {
+     "n": 2,
+     "name": "Rotacja kręgosłupa w leżeniu",
+     "en": "Supine Spinal Twist",
+     "dose": "2×20″/str."
+    },
+    {
+     "n": 3,
+     "name": "Pozycja dziecka",
+     "en": "Child's Pose",
+     "dose": "1×30″"
+    },
+    {
+     "n": 4,
+     "name": "Rozciąganie zginaczy biodra",
+     "en": "Hip Flexor Stretch",
+     "dose": "1×20″/str."
+    }
+   ]
+  },
+  "pt": {
+   "title": "Schłodzenie",
+   "minutes": 10,
+   "items": [
+    {
+     "n": 1,
+     "name": "Rower, bardzo lekki opór, swobodnie",
+     "en": "Easy Bike Cool-down",
+     "dose": "5 min"
+    },
+    {
+     "n": 2,
+     "name": "Rozciąganie klatki w futrynie",
+     "en": "Doorway Chest Stretch",
+     "dose": "2×30″/str."
+    },
+    {
+     "n": 3,
+     "name": "Rozciąganie najszerszego grzbietu",
+     "en": "Lat Stretch",
+     "dose": "2×20″/str."
+    },
+    {
+     "n": 4,
+     "name": "Rozciąganie tricepsa nad głową",
+     "en": "Overhead Triceps Stretch",
+     "dose": "1×20″/r."
+    }
+   ]
+  }
+ },
+ "dayNotes": {
+  "wt": {
+   "label": "Akcent kolanowy",
+   "title": "LOWER 1 18:05–19:35 · akcent kolanowy",
+   "note": "Przed pierwszą serią: zapisz wyjściowy ból kolana 0–10. Sprawdzaj światła (🦵 u góry) po każdym ćwiczeniu."
+  },
+  "sr": {
+   "label": "Rower — struktura sesji",
+   "title": "Rower + ABS",
+   "meta": "55 min rower · sauna po",
+   "device": "Rower stacjonarny (Stationary Bike)",
+   "phases": [
+    {
+     "name": "Rozgrzewka",
+     "minutes": 5,
+     "text": "Niski opór, dochodzenie do strefy"
+    },
+    {
+     "name": "Właściwa część",
+     "minutes": 45,
+     "text": "65–70% HRmax (~125–135 bpm), siodełko wyżej niż intuicyjnie"
+    },
+    {
+     "name": "Schłodzenie",
+     "minutes": 5,
+     "text": "Redukcja oporu"
+    }
+   ],
+   "heading": "ABS"
+  },
+  "czw": {
+   "title": "😌 Dzień wolny od treningu",
+   "text": "2 sesje sauny po 20 min, jedna wizyta, dwie rundy z wychłodzeniem między nimi. Szczegóły protokołu: przycisk ♨️ u góry. Kolagen i witamina C — dowolna pora. Tauryna odpada."
+  },
+  "pt": {
+   "title": "UPPER 2 18:05–19:35"
+  },
+  "sob": {
+   "label": "Biodro / tylny łańcuch",
+   "title": "LOWER 2 18:05–19:35 · biodro/tylny łańcuch · sauna po",
+   "note": "Mniejsza dominacja kolanowa niż LOWER 1 — jeśli wtorek sprawił trudność, sobota zwykle nadal będzie tolerowana. Sprawdzaj światła (🦵)."
+  }
+ }
 }
