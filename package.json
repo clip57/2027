@@ -11,7 +11,8 @@
     "e2e": "python3 tests/e2e/e2e.py",
     "a11y": "python3 tests/e2e/a11y.py",
     "e2e:sync": "python3 tests/e2e/sync_update.py",
-    "e2e:cloud": "python3 tests/e2e/cloud_sync.py"
+    "e2e:cloud": "python3 tests/e2e/cloud_sync.py",
+    "e2e:trening": "python3 tests/e2e/trening_sheets.py && python3 tests/e2e/trening_log.py"
   },
   "devDependencies": {
     "axe-core": "^4.13.0",

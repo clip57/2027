@@ -20,19 +20,21 @@ export function sets(train) {
   });
 }
 
-export function sessions(train, sess = {}) {
+// `details` (D-106): dokumenty szczegółów sesji — dzień z wpisem basenu lub roweru liczy się jako sesja także bez serii i czasu (kolano i sauna same nie czynią dnia treningowym).
+export function sessions(train, sess = {}, details = {}) {
   const byDate = {};
   for (const s of sets(train)) (byDate[s.date] ||= []).push(s);
-  const dates = new Set([...Object.keys(byDate), ...Object.keys(sess).filter(d => d >= TRAIN_FROM && sess[d]?.minutes > 0)]);
+  const dates = new Set([...Object.keys(byDate), ...Object.keys(sess).filter(d => d >= TRAIN_FROM && sess[d]?.minutes > 0),
+    ...Object.keys(details).filter(d => d >= TRAIN_FROM && (details[d]?.swim || details[d]?.bike))]);
   return [...dates].sort().map(date => {
     const list = byDate[date] || [];
-    return { date, minutes: sess[date]?.minutes ?? null, sets: list.length, volume: r1(list.reduce((a, s) => a + s.volume, 0)),
+    return { date, minutes: sess[date]?.minutes ?? null, detail: details[date] ?? null, sets: list.length, volume: r1(list.reduce((a, s) => a + s.volume, 0)),
       reps: list.reduce((a, s) => a + (s.reps || 0), 0), exercises: [...new Set(list.map(s => s.name))], optional: list.filter(s => s.opt).length };
   });
 }
 
-export function weekly(train, sess = {}, weeks = 12, today) {
-  const all = sessions(train, sess);
+export function weekly(train, sess = {}, weeks = 12, today, details = {}) {
+  const all = sessions(train, sess, details);
   const out = [];
   let w = weekStart(today);
   for (let i = 0; i < weeks; i++, w = addDays(w, -7)) {

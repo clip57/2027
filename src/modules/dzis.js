@@ -107,7 +107,7 @@ function mpwCard(r, ctx) {
 
 // Siatka aktywności: ostatnie 6 tygodni × 7 dni; kropka = dzień z zapisanym treningiem (seria lub czas)
 function activityGrid(store, today) {
-  const days = new Set(sessions(store?.state?.train || {}, store?.state?.trainSessions || {}).map(s => s.date));
+  const days = new Set(sessions(store?.state?.train || {}, store?.state?.trainSessions || {}, store?.state?.trainDetails || {}).map(s => s.date));
   const start = addDays(weekStart(today), -35);
   const cols = [...Array(6)].map((_, w) => [...Array(7)].map((_, d) => addDays(start, w * 7 + d)));
   const n = [...days].filter(d => d >= start && d <= today).length;

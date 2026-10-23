@@ -33,6 +33,7 @@ function legacyReduce(events) {
     train: Object.fromEntries(pick('train:').map(e => [`${e.d.date}|${e.d.ex}|${e.d.set}`, e.d])),
     settings: Object.fromEntries(pick('setting:').map(e => [e.d.key, e.d.value])),
     trainSessions: Object.fromEntries(pick('trainsess:').map(e => [e.d.date, e.d])),
+    trainDetails: Object.fromEntries(pick('traindet:').map(e => [e.d.date, e.d])),   // D-106: szczegóły sesji (jeden dokument na dzień, ostatni zapis wygrywa)
     prep: Object.fromEntries(pick('prep:').map(e => [`${e.d.date}|${e.d.card}|${e.d.idx}`, e.d.done])),
     prepTests: Object.fromEntries(pick('preptest:').map(e => [e.d.id, e.d])),
     privatePack: st.lww.get('private.pack')?.d.pack || null,
@@ -74,6 +75,7 @@ function randomEvent(r, i, ms) {
     () => ['train.set', { date: day, ex: pick(['przysiad', 'wiosla']), set: 1 + Math.floor(r() * 4), done: r() < 0.8, kg: Math.floor(r() * 80), reps: 8, rir: null }],
     () => ['setting', { key: pick(['shopWeekday', 'zapasy.hidden', `cfa.recall:${day}`]), value: Math.floor(r() * 7) }],
     () => ['train.session', { date: day, minutes: Math.floor(r() * 90) }],
+    () => ['train.detail', { date: day, ...(r() < 0.5 ? { swim: { dist: 25 * (1 + Math.floor(r() * 80)) } } : { knee: { before: Math.floor(r() * 10) } }), ...(r() < 0.3 ? { note: `n${i}` } : {}) }],
     () => ['prep.step', { date: day, card: pick(['a', 'b']), idx: Math.floor(r() * 6), done: r() < 0.6 }],
     () => ['prep.test', { id: pick(['t1', 't2']), date: day, pass: r() < 0.5 }],
     () => ['private.pack', { pack: { format: '2027-private', sections: [], n: i } }],

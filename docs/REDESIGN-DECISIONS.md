@@ -96,6 +96,13 @@ nieistotnym wzroście paczki — spełnione przez podzbiór.
 - Ekstraktor zachowuje oryginalne źródła i sprawdza, czy struktura odtwarza ich treść; zmianę formatu źródła traktuje jako błąd wymagający przeglądu.
 - Rozszerzenie dotyczy prezentacji danych treningowych; dziennik treningu i jego model zdarzeń pozostają bez zmian.
 
+## C7. Dziennik szczegółów sesji (D-106, 23.10.2026)
+
+- Nowy typ zdarzenia `train.detail` (zgoda użytkownika): jeden dokument na dzień, „ostatni zapis wygrywa”; serie, stoper i ich zdarzenia bez zmian.
+- Walidacja w magazynie tylko daty i zwykłego JSON (zgodność w przód, jak D-056) — szczegóły pól sprawdza formularz (`fieldOk`), odczyt toleruje wartości nieznane.
+- Panel „Dziennik sesji” w widoku Trening: sekcje zwijane (`details.tl-sec`), wybory jako przyciski z `aria-pressed`/`aria-checked` i znakiem ✓ (stan nie tylko kolorem), pola ≥ 44 px, zapis po zmianie pola bez przerysowania (fokus zostaje).
+- Bez automatycznej oceny kolana i bez metryk bez danych (zasada 6); waga, sen, obwody — poza zakresem (G-20).
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.
@@ -106,7 +113,7 @@ nieistotnym wzroście paczki — spełnione przez podzbiór.
 7. Zmiana wymagająca naruszenia powyższych → zatrzymaj się i zapytaj użytkownika.
 
 ## E. Punkty otwarte (nierozstrzygnięte)
-- G-20: dziennik kolana i monitoring (waga, sen, obwody) — brak decyzji, czy mają trafić do aplikacji.
+- G-20: dziennik kolana i monitoring (waga, sen, obwody) — kolano w dzienniku sesji (D-106); waga, sen, obwody — brak decyzji.
 - D-031: import postępu i error logu CFA v3 od użytkownika — funkcje gotowe, pliki nie zostały dostarczone.
 - ~~Potwierdzenie wyglądu na iPhonie (Safari i PWA)~~ — **potwierdzone przez użytkownika 24.09.2026** dla wersji `4e68589` (wszystkie punkty `REDESIGN-TESTING.md` §5).
   naprawy synchronizacji, wersji sprzed redesignu).

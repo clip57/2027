@@ -17,6 +17,7 @@ export function lwwKey(e) {
     case 'train.set': return `train:${e.d.date}|${e.d.ex}|${e.d.set}`;
     case 'setting': return `setting:${e.d.key}`;
     case 'train.session': return `trainsess:${e.d.date}`;
+    case 'train.detail': return `traindet:${e.d.date}`;   // D-106: szczegóły sesji (basen, rower, kolano, sauna) — jeden dokument na dzień
     case 'prep.step': return `prep:${e.d.date}|${e.d.card}|${e.d.idx}`;
     case 'prep.test': return `preptest:${e.d.id}`;
     case 'private.pack': return 'private.pack';
@@ -40,6 +41,7 @@ const OBJ = {
   train: ['train', e => `${e.d.date}|${e.d.ex}|${e.d.set}`, e => e.d],
   setting: ['settings', e => e.d.key, e => e.d.value],
   trainsess: ['trainSessions', e => e.d.date, e => e.d],
+  traindet: ['trainDetails', e => e.d.date, e => e.d],
   prep: ['prep', e => `${e.d.date}|${e.d.card}|${e.d.idx}`, e => e.d.done],
   preptest: ['prepTests', e => e.d.id, e => e.d],
   'care.done': ['careDone', e => `${e.d.date}|${e.d.step}`, e => e.d.done],
@@ -126,7 +128,7 @@ export class Reducer {
 
 const byHlc = (a, b) => (a.hlc < b.hlc ? -1 : a.hlc > b.hlc ? 1 : 0);
 // Kolejność pól stanu jak dotąd (czytelność w narzędziach deweloperskich)
-const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed', 'careDefs', 'careDone', 'mpwDone', 'mpwErrors'];
+const FIELDS = ['inv', 'cfaDone', 'cfaErrors', 'train', 'settings', 'trainSessions', 'trainDetails', 'prep', 'prepTests', 'privatePack', 'catalogUser', 'archive', 'superseded', 'unprocessed', 'careDefs', 'careDone', 'mpwDone', 'mpwErrors'];
 const order = s => Object.fromEntries(FIELDS.map(f => [f, s[f]]));
 
 export function reduceInto(events) {

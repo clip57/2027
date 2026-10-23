@@ -40,6 +40,10 @@ const PAYLOAD = {
   'setting': d => isId(d.key) && plain(d.value),
   'train.session': d => isValidDay(d.date) && ['minutes'].every(k => d[k] == null || (isNum(d[k]) && d[k] >= 0 && d[k] < 1440))
     && ['start', 'end'].every(k => d[k] == null || isStr(d[k])) && (d.note == null || typeof d.note === 'string'),
+  // Szczegóły sesji (D-106): basen, rower, kolano, sauna, notatka — jeden dokument na dzień. Celowo tylko data i zwykły JSON:
+  // nowsza wersja może dodać pole lub poszerzyć zakres, a starsza nie może wtedy odrzucać importu ani wierszy z chmury.
+  // Pola i zakresy sprawdza formularz przed zapisem (fieldOk w core/trainlog.js); odczyt toleruje wartości nieznane.
+  'train.detail': d => isValidDay(d.date) && plain(d),
   'prep.step': d => isValidDay(d.date) && isId(d.card) && Number.isInteger(d.idx) && d.idx >= 0 && d.idx < 200 && typeof d.done === 'boolean',
   'prep.test': d => isId(d.id) && isValidDay(d.date) && typeof d.pass === 'boolean' && (d.value == null || isStr(d.value)),
   'private.pack': d => isObj(d.pack) && d.pack.format === '2027-private' && plain(d.pack),

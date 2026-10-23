@@ -78,11 +78,12 @@ Dane: `tools/extract/day_plan_d101.py`. Raport: `docs/RAPORT_D101.md`.
 
 **D-103 (16.10.2026):** plan CFA **V44** (313 bloków, 16.10–11.11, SchweserNotes 2026 + Practice CFA; J/M poza 16/23/25.10, K/L 23.10 i 03–11.11, L także 22/29.10; recall z `nightRecall`), `CFA_PLAN_VERSION` = 15; treningi od 17.10, Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12;
 dni treningowe z blokiem M (`mTrainDay`, 13 dni): trening 18:15–19:15, powrót z posiłkiem 19:15, prysznic i mycie głowy 19:25–19:40, bez sauny (`trainingBeforeM`, szablon `mTraining`); czwartki 22/29.10 — `czwartek_zl` (bez sauny, zakupy 17:45–18:40); 23.10 bez treningu; 24.12 bez zakupów (`czwartek_bz`), 25.12 wolny; okno „Wolne” pod K/L/M przycinane (`trimTrainWindow`).
+**D-106:** dziennik szczegółów sesji — zdarzenie `train.detail` (jeden dokument na dzień, LWW; stan `trainDetails`), pola basenu, roweru, kolana i sauny wg protokołów (`src/core/trainlog.js` — definicja pól, `fieldOk` w formularzu, `src/modules/trening_log.js` — panel „Dziennik sesji”); w magazynie walidacja **tylko daty i zwykłego JSON** (zgodność w przód — nie zaostrzaj); odczyt toleruje nieznane pola i wartości. Testy: `npm run e2e:trening`. Raport: `docs/RAPORT_D106.md`.
 **D-105:** arkusze treningu (System kolana, Sauna) i listy rozgrzewki/schłodzenia z danych ustrukturyzowanych w `training.json` (`sheetsData`, `warmupData`, `cooldownData`, `dayNotes`; `tools/extract/training_sheets.py` po ekstrakcji, `src/modules/trening_sheets.js`).
 **D-103c (17.10.2026):** początek całego planu 18.10 (15–17.10 poza planem; plan CFA V44 ma własny zakres od 16.10), `tools/extract/day_plan_d103c.py`. **D-104:** skyr 75 g w śniadaniu i lunchu — przeliczone sumy diety (T/NT: 2595/2298, 2750/2453, 2931/2634 kcal), zapasy (150 g dziennie, limit 1800 g), Rekompozycja, meal prep (`tools/extract/diet_skyr75.py` po `extract_diet.py`).
 **D-103b (17.10.2026):** 15.10 usunięty z kalendarza (plan od 16.10); wyjątkowo bez treningu 17.10, 01.11 i 02.11 (dieta NT) — dni treningowe z blokiem M: 10 dni 18–31.10; kreatyna w niedzielę bez treningu z posiłkiem 20:15 (`tools/extract/day_plan_d103b.py`, uruchamiać po `day_plan_d103.py`).
 Dane: `tools/extract/day_plan_d103.py`. Kontrola: `node tools/verify/plan_check.mjs`, `python3 tests/e2e/cfa_smoke.py`. Raport: `docs/RAPORT_D103.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-105).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-106).
 
 ---
 
@@ -108,7 +109,7 @@ przeliczany funkcją `reduce()` w `src/core/storage/store.js` (akumulator `Reduc
 
 Typy zdarzeń (walidacja w `src/core/storage/validate.js`, `SCHEMA = 1`):
 `inv.count, inv.dayshift, inv.move, cat.upsert, cat.delete, cfa.done, cfa.err.put, cfa.err.del, train.set, setting,
-train.session, prep.step, prep.test, private.pack, archive, care.def, care.done, mpw.done, mpw.err.put, mpw.err.del` (`care.*` — D-094, `mpw.*` — D-095).
+train.session, train.detail, prep.step, prep.test, private.pack, archive, care.def, care.done, mpw.done, mpw.err.put, mpw.err.del` (`care.*` — D-094, `mpw.*` — D-095, `train.detail` — D-106).
 
 ## 2. Komendy
 
@@ -119,6 +120,7 @@ npm test                  # testy jednostkowe (node --test)
 npm run e2e               # testy w przeglądarce: Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
 npm run e2e:sync          # synchronizacja między 2 profilami + aktualizacja kodu za zgodą (kilka razy przebudowuje dist/)
 npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py)
+npm run e2e:trening       # arkusze treningu (D-105) i dziennik sesji (D-106): 390/1100 px, ciemny/jasny, axe
 npm run a11y              # axe-core WCAG 2.1 A/AA: 26 widoków + 22 stany × 390/1280 px × jasny/ciemny + przewijanie w poziomie
 npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika, w tym PLAN_NAUKI_CFA_LEVEL_I.html), bez nich nie działa
 ```

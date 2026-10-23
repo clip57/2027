@@ -50,7 +50,8 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
 
   // Start treningów (D-088, D-100): serie i czasy treningu sprzed 12.10.2026 zostają w dzienniku, poza statystykami
   const pre = Object.values(state.train || {}).filter(s => s.date < TRAIN_START).length
-    + Object.keys(state.trainSessions || {}).filter(d => d < TRAIN_START).length;
+    + Object.keys(state.trainSessions || {}).filter(d => d < TRAIN_START).length
+    + Object.keys(state.trainDetails || {}).filter(d => d < TRAIN_START).length;   // D-106: szczegóły sesji
   if (pre) push('pre-start', 'info', `Wpisy treningowe sprzed startu planu: ${pre}`, `Zachowane w dzienniku i w synchronizacji; statystyki i historia liczone od ${TRAIN_START} (D-088, D-100).`);
 
   // Pakiet prywatny (D-091): czy pasuje do danych aplikacji (znaczniki) i do bieżącej wersji planu

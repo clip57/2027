@@ -14,6 +14,8 @@ import { addDays, weekday, longDate, shortDate } from '../core/dates.js';
 import muscles from '../data/muscles.json' with { type: 'json' };
 import { region, swap } from '../ui/patch.js';
 import { sheetBody, phaseList, phaseLabel, dayNoteCard } from './trening_sheets.js';
+import { sessionLog } from './trening_log.js';
+import { summarize } from '../core/trainlog.js';
 
 const T = SRC.training;
 const M = muscles.exercises;
@@ -219,9 +221,10 @@ function renderSession(root, ctx) {
   if (!exercises.length) {
     add(root, h('div', { class: 'panel' },
       h('p', {}, r.dayType === 'rest_sauna2' ? 'Dzień bez treningu. Dwie rundy sauny według protokołu (arkusz „Sauna”). Kolagen, witamina C i tauryna przed sauną — godziny w Suplementacji.'
-        : r.dayType === 'swim' ? 'Basen 55 min.' : r.zero ? `Dzień zero — bez treningu. Treningi od ${longDate(addDays(date, 1))}.`
+        : r.dayType === 'swim' ? 'Basen 55 min (5 rozgrzewka + 45 właściwa część + 5 schłodzenie).' : r.zero ? `Dzień zero — bez treningu. Treningi od ${longDate(addDays(date, 1))}.`
           : r.after ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.` : r.outside ? (PLAN_START === TRAIN_START ? `Poza planem — plan i treningi zaczynają się ${longDate(PLAN_START)}.` : `Poza planem — plan zaczyna się ${longDate(PLAN_START)}, treningi od ${longDate(TRAIN_START)}.`)
           : r.dayType === 'free' ? (date < TRAIN_START ? `Dzień bez treningu. Treningi od ${longDate(TRAIN_START)}.` : 'Dzień bez treningu.') : 'Brak zaplanowanych ćwiczeń.')));
+    add(root, sessionLog(store, date, r, ctx, msg));   // D-106: basen (niedziela), czwartek z sauną, dni wolne — dziennik szczegółów
     return;
   }
   // Ćwiczenie spoza aktywnej fazy: zapis dobrowolny, wyraźnie oznaczony (opt: true).
@@ -245,7 +248,7 @@ function renderSession(root, ctx) {
     return h('details', { class: 'meal' }, h('summary', {}, h('span', { class: 'meal-n' }, p ? phaseLabel(kind, p) : label)),
       h('div', { class: 'why-body' }, p ? phaseList(p) : h('p', {}, text.replace(/^(Rozgrzewka|Schłodzenie) 10 min ▾\s*/, ''))));
   };
-  add(root, dayNoteCard(T.dayNotes?.[key], key), phaseBlock('warmup', '🔥 Rozgrzewka · 10 min'));
+  add(root, dayNoteCard(T.dayNotes?.[key], key), sessionLog(store, date, r, ctx, msg), phaseBlock('warmup', '🔥 Rozgrzewka · 10 min'));
 
   const article = ({ e, n }, idx) => {
     const rom = e.raw ? spec(e) : null;
@@ -308,7 +311,7 @@ function renderSession(root, ctx) {
 function renderStats(root, ctx) {
   const { store, today } = ctx;
   const train = store?.state?.train || {}, sess = store?.state?.trainSessions || {};
-  const all = sessions(train, sess);
+  const all = sessions(train, sess, store?.state?.trainDetails || {});
   if (!all.length) {
     add(root, h('div', { class: 'panel' }, h('h2', {}, 'Statystyki'),
       h('p', {}, 'Brak zapisanych treningów. Statystyki pojawią się po zapisaniu pierwszych serii lub czasu treningu.')));
@@ -317,7 +320,7 @@ function renderStats(root, ctx) {
   const withMin = all.filter(s => s.minutes);
   const totalMin = withMin.reduce((a, s) => a + s.minutes, 0);
   const vol = all.reduce((a, s) => a + s.volume, 0);
-  const wk = weekly(train, sess, 12, today);
+  const wk = weekly(train, sess, 12, today, store?.state?.trainDetails || {});
   const wkLabel = w => shortDate(w.week);
   const range = ctx.params.get('r') || '7';
   const from = addDays(today, -(Number(range) - 1));
@@ -371,12 +374,13 @@ function renderStats(root, ctx) {
 // ---------------- Historia sesji ----------------
 function renderHistory(root, ctx) {
   const { store } = ctx;
-  const all = sessions(store?.state?.train || {}, store?.state?.trainSessions || {}).reverse();
+  const all = sessions(store?.state?.train || {}, store?.state?.trainSessions || {}, store?.state?.trainDetails || {}).reverse();
   add(root, all.length === 0 ? h('div', { class: 'panel' }, h('p', {}, 'Brak zapisanych treningów.')) :
     h('div', { class: 'hist-list' }, all.map(s => h('a', { class: 'hist-item', href: `#/trening?d=${s.date}` },
       h('div', { class: 'hist-h' }, h('strong', {}, `${dayPlan(s.date).sessionName} · ${shortDate(s.date)}`),
         h('span', { class: 'muted' }, s.minutes ? `${s.minutes} min` : 'czas nie zapisany')),
       h('p', { class: 'hist-k' }, h('span', {}, `${s.sets} ${plural(s.sets, 'seria', 'serie', 'serii')}`), h('span', {}, `${fmt(Math.round(s.volume))} kg`), h('span', {}, `${fmt(s.reps)} powt.`),
         s.optional > 0 && h('span', { class: 'opt-tag' }, `${s.optional} ${plural(s.optional, 'opcjonalna', 'opcjonalne', 'opcjonalnych')}`)),
+      s.detail && summarize(s.detail) && h('p', { class: 'hist-d' }, summarize(s.detail)),
       h('p', { class: 'muted small' }, s.exercises.join(' · '))))));
 }
