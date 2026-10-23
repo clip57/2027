@@ -91,4 +91,5 @@ CFA nie. Potrzebne: godzina egzaminu i układ dnia (czy sauna i zakupy zostają)
 - Synchronizacja: import idempotentny, suma kontrolna; chmura — AES-GCM-256 z AAD, PBKDF2 600 000, HMAC identyfikatorów, klucze nieeksportowalne, odrzucanie kluczy sekretnych; RLS wymuszone, wiersze bez edycji, brak uprawnień `anon`.
 - DOM wyłącznie przez `h()` — brak `innerHTML`/`eval` w `src/`; CSP w wariancie web.
 - Plan dnia: każda dawka i każdy posiłek w dokładnie jednym slocie przez cały plan; jedyne nakładania — 2 znane i zaakceptowane (D-101).
-- Dni poza planem mają w danych resolvera posiłki i kcal, ale żaden widok ani obliczenie ich nie używa (sprawdzone: Dziś, Zapasy, zużycie).
+- Dni poza planem mają w danych resolvera posiłki i kcal, ale Dziś, Zapasy, zużycie, Kalendarz i `.ics` je pomijają. Wyjątek (drobny):
+  Meal Prep dla dat po 28.03 nadal pokazuje karty z ilościami jadłospisu.
