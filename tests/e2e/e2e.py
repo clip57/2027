@@ -38,7 +38,7 @@ def expected_stock(start, per_day, since=_dt.date(2026, 9, 22)):
 if BACKUP and BACKUP.exists():
     DATA = {'label': '', 'path': BACKUP, 'events': 55, 'ban': 240, 'since': _dt.date(2026, 9, 22)}
 else:
-    _obj, _n, _stocks = fixtures.synthetic_zapasy()
+    _obj, _n, _stocks = fixtures.synthetic_zapasy(TODAY() - _dt.timedelta(days=1))   # względem zegara testu, nie daty uruchomienia
     DATA = {'label': ' (dane syntetyczne)', 'path': fixtures.write(_obj, 'zapasy_syntetyczne.json'), 'events': _n,
             'ban': _stocks['banan'], 'since': _dt.date.fromisoformat(_obj['lastSyncDate'])}
 BANAN = lambda: expected_stock(DATA['ban'], lambda d: 0 if diet_of(d) == 'NT' else 120, DATA['since'])   # dzień NT bez banana
