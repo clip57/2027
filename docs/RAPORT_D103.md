@@ -51,8 +51,9 @@ Rejestr: `docs/DECYZJE_2027.md` → D-103. Dane: `tools/extract/day_plan_d103.py
 6. Teksty Rekompozycji o kreatynie „codziennie o 20:15” nie są zmieniane (w dniach z blokiem M aplikacja pokazuje 19:15).
 
 ## 6. Do zrobienia
-- **E2E (`tests/e2e/e2e.py`):** nadal przestarzały (zegar 05.10, dzień mocka 30.10, setki wartości kalendarza V3). Poprawiony tylko błąd selektora w linii 94. Migracja na kalendarz V44 to osobne zadanie.
-- **`tools/verify/verify_all.py`:** kontrole CFA nadal dla v9 (400 bloków, mocki 30.10) — wymaga przepisania i plików źródłowych użytkownika.
+- ~~**E2E (`tests/e2e/e2e.py`):** migracja na kalendarz V44~~ — **wykonane** (20.10.2026, commit „odśwież regresję E2E”; 23.10.2026: data syntetycznej kopii ZAPASY liczona od zegara testu `TODAY()`, nie od daty uruchomienia — wcześniej po 20.10 trzy kontrole Zapasów kończyły się błędem).
+- ~~**`tools/verify/verify_all.py`:** kontrole CFA dla v9~~ — **wykonane** (kontrole V44: 313 bloków, 16.10–11.11; porównanie ze źródłami `PLAN_CFA_FINAL_V44.html`/`MASTER_CFA_FINAL_V44.csv` wymaga `SOURCES_DIR`).
+- Wyniki 23.10.2026 (bez plików użytkownika, dane syntetyczne): `npm test` 214/215 (1 pominięty), `npm run e2e` 1386/1386, `npm run a11y` 0 naruszeń, `npm run e2e:sync` 23/23, `npm run e2e:cloud` 100/100, `cfa_smoke.py` i `trening_sheets.py` 0 błędów, `plan_check.mjs` 0 błędów (3 znane ostrzeżenia), `verify_all.py --data-only` 13 kontroli, 0 błędów, 1 pominięta.
 - Publikacja: commit, push i wdrożenie na `main` wyłącznie na polecenie użytkownika.
 
 ## 7. Uzupełnienie D-103b (17.10.2026) — osobny patch `d103b.patch`

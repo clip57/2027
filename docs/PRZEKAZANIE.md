@@ -32,6 +32,8 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
 Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 
 ## 4. Niedokończone po D-097 (kolejność zalecana)
+> **Stan 23.10.2026:** punkty 1, 3 i 4 wykonane — E2E i `verify_all.py` na kalendarzu V44, wyniki w `RAPORT_D103.md` §6. Punkt 2 (`UPGRADE`) — sprawdzić przy następnej zmianie planu.
+
 1. **`tests/e2e/e2e.py` — oczekiwania sprzed D-097** (E2E nieuruchamiane od D-096: wtedy 1382/1382). Znane miejsca:
    - start planu 27.09 → Dzień zero 29.09 (`#/dzis?d=2026-09-27/28`, linie ~86–125, ~343–348, `d=2026-09-27` w przejściu „poza planem”);
    - soboty z zakupami `#slot\.1213z` / „12:13 Zakupy” (~104–105, ~1135–1138, Tydzień „Zakupy 12:13” ~795) → zakupy w czwartek (`slot.1905c`, od 07.01 `slot.1530j`), sobota z blokiem E;

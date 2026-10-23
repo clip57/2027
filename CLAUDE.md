@@ -5,7 +5,7 @@ meal prep, trening, nauka CFA, bezpieczeństwo żywności, plan rekompozycji. Je
 iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych), przeglądarka na komputerze.
 Język interfejsu i dokumentacji: **polski**.
 
-**Bieżące zadanie (16.10.2026): plan CFA V44 wdrożony (D-103); E2E (`tests/e2e/e2e.py`) i `verify_all.py` wymagają migracji na kalendarz V44 (`docs/RAPORT_D103.md` §6); do potwierdzenia: sauna w dni z blokiem M, trening 23.10, posiłek 20:15 w czwartki z blokiem M.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
+**Bieżące zadanie (16.10.2026): plan CFA V44 wdrożony (D-103); E2E (`tests/e2e/e2e.py`) i `verify_all.py` przeniesione na kalendarz V44 (20.10; 23.10 — data syntetycznej kopii ZAPASY względem zegara testu; `docs/RAPORT_D103.md` §6); do potwierdzenia: sauna w dni z blokiem M, trening 23.10, posiłek 20:15 w czwartki z blokiem M.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) otwarte.
 Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
 24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
 następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
