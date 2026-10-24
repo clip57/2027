@@ -53,11 +53,13 @@ Nowe testy — sprawdzone na kodzie sprzed zmian: R1, R3, R4 i U1 zawodzą; R2 (
 
 ## 4. Wyniki (24.10.2026, bez plików użytkownika — dane syntetyczne)
 
+Ostatni pełny przebieg — po poprawce R3 (klucze kroków w dotychczasowej walidacji) i zmianach planu D-109 (`docs/RAPORT_D109.md`), commit `d5ec55d`:
+
 | Zestaw | Wynik |
 |---|---|
 | `npm test` | 243 / 244 (1 pominięty — wymaga kopii ZAPASY z `SOURCES_DIR`) |
-| `npm run build` | `app.*.js` **1023 KB** (przed zmianą 1531 KB) + `plan-mpw.*.json` 119 KB wczytywany w module MPW; `dist/single/2027.html` 1324 KB (było 1711 KB) |
-| `npm run e2e` | **1483 / 1483** (w tym 55 kontroli `run_d108`). Pierwszy przebieg: 1482 / 1483 — axe uruchomiony w trakcie animacji otwierania okna na telefonie (200 ms od przezroczystości 0) zgłaszał za niski kontrast; test czeka teraz na koniec animacji (`47e943e`) |
+| `npm run build` | `app.*.js` **1024 KB** (przed zmianą 1531 KB) + `plan-mpw.*.json` 119 KB wczytywany w module MPW; `dist/single/2027.html` 1325 KB (było 1711 KB) |
+| `npm run e2e` | **1489 / 1489** (w tym 61 kontroli `run_d108`, z nich 6 dla D-109). Wcześniejszy przebieg (przed D-109): 1483 / 1483; pierwszy: 1482 / 1483 — axe uruchomiony w trakcie animacji otwierania okna na telefonie (200 ms od przezroczystości 0) zgłaszał za niski kontrast; test czeka teraz na koniec animacji (`47e943e`) |
 | `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
 | `npm run e2e:trening` | 0 błędów |
 | `npm run e2e:sync` | 23 / 23 |
