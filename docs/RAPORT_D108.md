@@ -53,10 +53,23 @@ Nowe testy — sprawdzone na kodzie sprzed zmian: R1, R3, R4 i U1 zawodzą; R2 (
 
 ## 4. Wyniki (24.10.2026, bez plików użytkownika — dane syntetyczne)
 
-Uzupełniane po zakończeniu pełnej regresji (osobny commit).
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 243 / 244 (1 pominięty — wymaga kopii ZAPASY z `SOURCES_DIR`) |
+| `npm run build` | `app.*.js` **1023 KB** (przed zmianą 1531 KB) + `plan-mpw.*.json` 119 KB wczytywany w module MPW; `dist/single/2027.html` 1324 KB (było 1711 KB) |
+| `npm run e2e` | **1483 / 1483** (w tym 55 kontroli `run_d108`). Pierwszy przebieg: 1482 / 1483 — axe uruchomiony w trakcie animacji otwierania okna na telefonie (200 ms od przezroczystości 0) zgłaszał za niski kontrast; test czeka teraz na koniec animacji (`47e943e`) |
+| `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
+| `npm run e2e:trening` | 0 błędów |
+| `npm run e2e:sync` | 23 / 23 |
+| `npm run e2e:cloud` | 100 / 100 (build testowy z CSP dla lokalnego serwera; po teście zwykły build — CSP bez `localhost`) |
+| `node tools/verify/plan_check.mjs`, `python3 tests/e2e/cfa_smoke.py` | 0 błędów (3 znane ostrzeżenia planu — D-101) |
+| `python3 tools/verify/verify_all.py --data-only` | 13 kontroli, 0 błędów, 1 pominięta (źródła) |
+| CI „Testy 2027” (GitHub, ubuntu-latest, U2) | [run #2](https://github.com/clip57/2027/actions/runs/40089601985) (`47e943e`) — **wszystkie kroki zaliczone** (≈ 12 min: jednostkowe, kontrola planu i danych, budowa, Chromium, CFA, E2E, a11y, Trening, synchronizacja plikiem i w chmurze); [run #1](https://github.com/clip57/2027/actions/runs/40089440266) (`181fc55`) — E2E 1482 / 1483, ten sam efekt animacji (okno przywracania U8) |
+| Zrzuty (375 / 1280 px, jasny i ciemny) | Trening (tydzień, przyciski tygodni), „Dziś” po 11.11 („Czas własny”, „Nauka MPW”) — bez przewijania w poziomie; przewinięcie paska dni nie przesuwa strony (sprawdzone po zapisie serii) |
 
 ## 5. Ograniczenia
 - U6: plany CFA i MPW (część stała) nadal są w pakiecie — resolver potrzebuje ich synchronicznie dla każdego dnia (także historii w Kalendarzu);
   na żądanie wczytywane są zadania bloków MPW. Pole planu potrzebne w przyszłości = usunięcie go z listy `DROP` (test wskaże użycie).
 - U8: przywracane są tylko stany Zapasów; pozycja bez stanu w kopii zostaje bez zmian (brak zdarzenia „bez stanu” — jak „Cofnij”, B1).
-- U2: pierwsze uruchomienie workflow „Testy 2027” na GitHubie — wynik w §4.
+- U2: pełne testy wydłużają publikację na `main` o ok. 12 min (wdrożenie dopiero po zaliczeniu). GitHub ostrzega, że akcje `checkout@v4`,
+  `setup-node@v4`, `setup-python@v5` działają na Node 20 (wycofywany) — dziś tylko ostrzeżenie, bez wpływu na wynik; te same wersje w `pages.yml`.
