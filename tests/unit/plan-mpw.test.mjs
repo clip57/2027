@@ -9,7 +9,7 @@ import { Store } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
 import { resolveDay } from '../../src/core/resolver.js';
 import { byId, isTab, modulesOn } from '../../src/modules/registry.js';
-import { mpwSources, mpwFreeDays } from '../../src/core/calc/mpw.js';
+import { mpwSources, mpwFreeDays, mpwDaySpan } from '../../src/core/calc/mpw.js';
 import { attention } from '../../src/core/calc/attention.js';
 import { cfaPace } from '../../src/core/calc/cfa.js';
 import { planEvents } from '../../src/core/ics.js';
@@ -161,4 +161,15 @@ test('Synchronizacja plikiem: postęp i error log MPW między urządzeniami (for
   assert.deepEqual([[...phone.state.mpwDone].sort(), [...mac.state.mpwDone].sort()], [[1, 2], [1, 2]]);
   assert.deepEqual(mac.state.mpwErrors.map(e => e.temat), ['[TEST] A']);
   assert.equal((await preview(mac, file)).fresh.length, 0);
+});
+
+test('B6 (audyt 23.10.2026): czas nauki MPW dnia z godzin bloków — czwartki od 07.01 o 16:00, symulacje, P1–P7', () => {
+  const s = d => mpwDaySpan(mpwByDay[d]);
+  assert.deepEqual(s('2026-11-16').all, { n: 3, from: '15:30', to: '18:23', min: 159 }, 'zwykły dzień: A–C od 15:30');
+  assert.equal(s('2026-11-16').sim, null);
+  assert.deepEqual(s('2027-01-07').all, { n: 3, from: '16:00', to: '18:53', min: 159 }, 'czwartek od 07.01: od 16:00 (D-097)');
+  assert.deepEqual([s('2027-02-21').sim, s('2027-02-21').rest], [{ n: 3, from: '15:30', to: '18:30', min: 180 }, null], 'symulacja 180 min');
+  assert.deepEqual([s('2027-03-06').rest.from, s('2027-03-06').rest.n, s('2027-03-06').sim.from], ['08:00', 7, '15:30'], 'P1–P7 i symulacja');
+  assert.deepEqual(mpwDaySpan([]), { all: null, sim: null, rest: null });
+  for (const [d, bl] of Object.entries(mpwByDay)) assert.equal(s(d).all.from, bl[0].godz.slice(0, 5), d);
 });

@@ -4,11 +4,15 @@
 import { h, fmt, add, plural } from '../ui/dom.js';
 import { section } from '../ui/components.js';
 import { SRC, mpwByDay, mpwBloki } from '../core/data.js';
-import { longDate, shortDate, dayShort } from '../core/dates.js';
+import { longDate, shortDate, dayShort, weekday } from '../core/dates.js';
 import { renderStudy, modeStats } from './study.js';
 import { mpwSources, mpwFreeDays } from '../core/calc/mpw.js';
 
 const D = { ...SRC.mpw.D, bloki: mpwBloki };   // godziny wg decyzji (D-097: czwartki od 07.01 +30 min)
+// Godziny bloków w dni przesunięte (D-097, `week.mpwShift`) — z danych, do opisu planu (B6)
+const MS = SRC.week.mpwShift, WD = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
+const shiftDay = MS && Object.keys(mpwByDay).sort().find(d => d >= MS.from && MS.weekdays.includes(weekday(d)) && mpwByDay[d].some(b => !b.blok.startsWith('P')));
+const shiftNote = shiftDay ? `; w dni: ${MS.weekdays.map(w => WD[w - 1]).join(', ')} od ${shortDate(MS.from)} — ${mpwByDay[shiftDay].filter(b => !b.blok.startsWith('P')).map(b => `${b.blok} ${b.godz.slice(0, 5)}`).join(', ')}` : '';
 // Tryby planu v8 (D-096) i wcześniejszych wersji (D-095) — nieznany tryb bez koloru (BUFOR)
 const MODE_CLASS = { 'PRAWO – FIRST PASS': 'm-fp', 'LITERATURA – FIRST PASS': 'm-fp', 'PRAWO – 2. PRZEJŚCIE': 'm-co', 'AUDYT PRAWNY': 'm-co',
   'POWTÓRKA CAŁOŚCI': 'm-co',
@@ -39,7 +43,7 @@ function plan(root, { done, pace, late }) {
     Object.entries(D.faza).map(([k, f], i) => [h('dt', {}, `Faza ${i + 1}`),
       h('dd', {}, `${shortDate(f.od)}–${longDate(f.do)} · ${f.dni} dni · ${f.bl} bloków · wykonane ${blocksOf(done, D.bloki.filter(b => b.data >= f.od && b.data <= f.do))}${k === 'f1' ? ` · koniec pierwszego przejścia ${longDate(D.fpEnd)}` : ''}`)]))),
   section('h-stat', 'Statystyki planu', h('dl', { class: 'kv' },
-    h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad}; A 15:30, B 16:30, C 17:30${long.length ? `; ${long.map(shortDate).join(', ')} także P1–P7 8:00–15:23` : ''})`),
+    h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad}; A 15:30, B 16:30, C 17:30${shiftNote}${long.length ? `; ${long.map(shortDate).join(', ')} także P1–P7 8:00–15:23` : ''})`),
     h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h`),
     h('dt', {}, 'Dni wolne'), h('dd', {}, free.map(r => (r[0] === r[1] ? shortDate(r[0]) : `${shortDate(r[0])}–${shortDate(r[1])}`)).join(', ') || 'brak'),
     h('dt', {}, 'Egzamin'), h('dd', {}, `${dayShort(SRC.mpw.exam)} ${longDate(SRC.mpw.exam)}, godz. ${SRC.mpw.examTime}`),

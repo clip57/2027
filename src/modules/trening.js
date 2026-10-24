@@ -67,9 +67,17 @@ function sessionTimer(store, date, ctx, msg) {
   if (!store) return null;
   const cur = store.state.trainSessions[date] || {};
   const running = cur.start && !cur.end;
-  const saveSess = async patch => {
-    try { await store.record('train.session', { date, start: cur.start ?? null, end: cur.end ?? null, minutes: cur.minutes ?? null, ...patch }); ctx.rerender(); }
+  const saveSess = async (patch, note = null) => {
+    try { await store.record('train.session', { date, start: cur.start ?? null, end: cur.end ?? null, minutes: cur.minutes ?? null, ...patch }); ctx.rerender(); if (note) ctx.flash(note, 'info'); }
     catch (e) { clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
+  };
+  // B4 (audyt 23.10.2026): stoper zapomniany na ponad MAX_MIN (jak pole ręczne) dawał ≥ 1440 min — zapis odrzucany, stopera nie dało się zatrzymać.
+  // Teraz zatrzymanie zawsze się zapisuje; czas nierealny (lub nieczytelny początek) — bez minut, z prośbą o wpis ręczny.
+  const MAX_MIN = 600;
+  const stop = () => {
+    const end = new Date().toISOString(), m = Math.max(1, Math.round((Date.parse(end) - Date.parse(cur.start)) / 60000));
+    if (Number.isFinite(m) && m <= MAX_MIN) return saveSess({ end, minutes: m });
+    return saveSess({ end, minutes: cur.minutes ?? null }, `Stoper działał ${Number.isFinite(m) ? `${Math.floor(m / 60)} h ${m % 60} min` : 'zbyt długo'} — zatrzymany bez zapisu czasu. Wpisz czas treningu ręcznie (pole „lub wpisz”).`);
   };
   const clock = h('strong', { class: 'tm-clock' });
   if (running) {
@@ -77,14 +85,14 @@ function sessionTimer(store, date, ctx, msg) {
     tick(); const id = setInterval(() => (clock.isConnected ? tick() : clearInterval(id)), 1000);
   }
   const minutes = h('input', { type: 'number', min: '0', max: '600', step: '1', inputmode: 'numeric', value: cur.minutes ?? '', placeholder: 'min', 'aria-label': 'Czas treningu w minutach',
-    onchange: e => { const v = e.target.value === '' ? null : Math.round(Number(e.target.value)); if (v === null || (v >= 0 && v < 1440)) saveSess({ minutes: v }); } });
+    // Wpis ręczny kończy też działający stoper (B4) — inaczej zostawał „start” bez „end” i stoper biegł dalej
+    onchange: e => { const v = e.target.value === '' ? null : Math.round(Number(e.target.value)); if (v === null || (v >= 0 && v < 1440)) saveSess({ minutes: v, ...(running && { end: new Date().toISOString() }) }); } });
   return h('div', { class: 'hero-tr-map tm' },
     h('div', {}, h('p', { class: 'eyebrow' }, 'Czas treningu'),
       running ? h('p', { class: 'tm-run' }, clock, h('span', { class: 'muted' }, ` od ${new Date(cur.start).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}`))
         : h('p', { class: 'muted' }, cur.minutes ? `Zapisano: ${cur.minutes} min` : 'Nie zapisano czasu')),
     h('div', { class: 'row' },
-      running ? h('button', { class: 'primary', onclick: () => { const end = new Date().toISOString();
-          saveSess({ end, minutes: Math.max(1, Math.round((Date.parse(end) - Date.parse(cur.start)) / 60000)) }); } }, icon('square', { size: 18 }), h('span', {}, 'Zakończ trening'))
+      running ? h('button', { class: 'primary', onclick: stop }, icon('square', { size: 18 }), h('span', {}, 'Zakończ trening'))
         : h('button', { onclick: () => saveSess({ start: new Date().toISOString(), end: null }) }, icon('play', { size: 18 }), h('span', {}, cur.minutes ? 'Uruchom ponownie' : 'Rozpocznij trening')),
       h('label', { class: 'tm-man' }, h('span', {}, 'lub wpisz:'), minutes, h('span', {}, 'min'))));
 }
@@ -310,8 +318,8 @@ function renderSession(root, ctx) {
 // ---------------- Statystyki (styl Hevy) ----------------
 function renderStats(root, ctx) {
   const { store, today } = ctx;
-  const train = store?.state?.train || {}, sess = store?.state?.trainSessions || {};
-  const all = sessions(train, sess, store?.state?.trainDetails || {});
+  const train = store?.state?.train || {}, sess = store?.state?.trainSessions || {}, details = store?.state?.trainDetails || {};
+  const all = sessions(train, sess, details);
   if (!all.length) {
     add(root, h('div', { class: 'panel' }, h('h2', {}, 'Statystyki'),
       h('p', {}, 'Brak zapisanych treningów. Statystyki pojawią się po zapisaniu pierwszych serii lub czasu treningu.')));
@@ -320,7 +328,8 @@ function renderStats(root, ctx) {
   const withMin = all.filter(s => s.minutes);
   const totalMin = withMin.reduce((a, s) => a + s.minutes, 0);
   const vol = all.reduce((a, s) => a + s.volume, 0);
-  const wk = weekly(train, sess, 12, today, store?.state?.trainDetails || {});
+  const wk = weekly(train, sess, 12, today, details);
+  const streak = streakWeeks(train, sess, today, details);
   const wkLabel = w => shortDate(w.week);
   const range = ctx.params.get('r') || '7';
   const from = addDays(today, -(Number(range) - 1));
@@ -336,7 +345,7 @@ function renderStats(root, ctx) {
 
   add(root,
     statGrid(
-      stat('Treningi', String(all.length), `seria: ${streakWeeks(train, sess, today)} ${plural(streakWeeks(train, sess, today), 'tydzień', 'tygodnie', 'tygodni')} z rzędu`),
+      stat('Treningi', String(all.length), `seria: ${streak} ${plural(streak, 'tydzień', 'tygodnie', 'tygodni')} z rzędu`),
       stat('Czas łącznie', totalMin >= 60 ? `${Math.floor(totalMin / 60)} h ${totalMin % 60} min` : `${totalMin} min`, withMin.length ? `średnio ${Math.round(totalMin / withMin.length)} min (${withMin.length} z czasem)` : 'brak zapisanego czasu'),
       (() => { const ns = all.reduce((a, s) => a + s.sets, 0);
         return stat('Objętość', `${fmt(Math.round(vol))} kg`, `${fmt(ns)} ${plural(ns, 'seria', 'serie', 'serii')} · ${fmt(all.reduce((a, s) => a + s.reps, 0))} powt.`); })(),

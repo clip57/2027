@@ -19,7 +19,7 @@ const out = {};
 for (const n of NAMES) {
   const svg = fs.readFileSync(path.join(DIR, `${n}.svg`), 'utf8');
   out[n] = [...svg.matchAll(/<(path|circle|rect|line|polyline|polygon|ellipse)\b([^>]*?)\/?>/g)].map(([, tag, attrs]) =>
-    [tag, Object.fromEntries([...attrs.matchAll(/([a-z-]+)="([^"]*)"/g)].map(m => [m[1], m[2]]))]);
+    [tag, Object.fromEntries([...attrs.matchAll(/([a-z][a-z0-9-]*)="([^"]*)"/g)].map(m => [m[1], m[2]]))]);
   if (!out[n].length) throw new Error(`Pusta ikona: ${n}`);
 }
 fs.writeFileSync(path.join(ROOT, 'src/ui/icons.js'), `// Wygenerowane przez tools/icons.mjs — ikony Lucide (ISC, https://lucide.dev). Nie edytuj ręcznie.

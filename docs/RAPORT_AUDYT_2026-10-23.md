@@ -4,6 +4,8 @@ Stan kodu: `main` = `790bcef` (D-106). Audyt od zera: przeczytany cały kod apli
 dynamiczna kontrola każdego dnia planu w resolverze i w przeglądarce, testy podejrzeń w Chromium z zegarem Playwright.
 Bez plików źródłowych użytkownika (dane syntetyczne). **Kod nie był zmieniany** — raport to lista do decyzji.
 
+> **Stan 24.10.2026:** błędy **B1–B10 naprawione** (D-107, `docs/RAPORT_D107.md`). Decyzje D1–D3, ryzyka R1–R4 i ulepszenia U1–U8 — bez zmian, do decyzji użytkownika.
+
 ## 1. Metoda
 
 | Obszar | Jak sprawdzone |
@@ -47,7 +49,7 @@ CFA nie. Potrzebne: godzina egzaminu i układ dnia (czy sauna i zakupy zostają)
 - **01.01 (piątek)**: UPPER 2 + 3 bloki MPW; **06.01 (środa)**: rower + sauna — dni ustawowo wolne (siłownia/sauna mogą być zamknięte).
 - Informacyjnie (zgodne z decyzjami): bez zakupów w tygodniu 02–08.11 (05.11 — D-101), więc 29.10 → 12.11 = 14 dni.
 
-## 3. Błędy (potwierdzone)
+## 3. Błędy (potwierdzone) — naprawione 24.10.2026 (D-107)
 
 | # | Waga | Gdzie | Błąd i dowód |
 |---|---|---|---|

@@ -16,6 +16,16 @@ export function mpwSources() {
   return (SOURCES = [...m.values()]);
 }
 
+// Czas nauki MPW w dniu z godzin bloków (B6, audyt 23.10.2026) — bez godzin wpisanych na sztywno: czwartki od 07.01 o 16:00 (D-097),
+// powtórka P1–P7 od 8:00 (D-096), symulacje po 60 min. `all` — wszystkie bloki, `sim` — bloki symulacji, `rest` — pozostałe; null = brak.
+const mins = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+const span = list => (list.length ? { n: list.length, from: list[0].godz.slice(0, 5), to: list[list.length - 1].godz.slice(-5),
+  min: list.reduce((a, b) => a + mins(b.godz.slice(-5)) - mins(b.godz.slice(0, 5)), 0) } : null);
+export function mpwDaySpan(blocks = []) {
+  const sim = blocks.filter(b => b.tryb === 'SYMULACJA');
+  return { all: span(blocks), sim: span(sim), rest: span(blocks.filter(b => b.tryb !== 'SYMULACJA')) };
+}
+
 // Dni wolne w okresie planu (bez bloków) jako przedziały [od, do]
 export function mpwFreeDays() {
   const out = [];

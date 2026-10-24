@@ -2,7 +2,8 @@
 // na nowej architekturze — stan liczony z inwentaryzacji i planu (D-003, D-027), zapis zdarzeniami,
 // bez dat zakodowanych na sztywno i bez wstawiania danych do innerHTML.
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
-import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway } from '../core/calc/inventory.js';
+import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation } from '../core/calc/inventory.js';
+import { randomId } from '../core/ids.js';
 import { icon } from '../ui/icons.js';
 import { sheet as dialog } from '../ui/components.js';
 import { parseReceipt } from '../core/receipt.js';
@@ -54,12 +55,20 @@ export function renderZapasy(root, ctx) {
   };
   // Wiele zmian naraz (operacje zbiorcze, plan zakupów, paragon, przywrócenie stanu): jedna transakcja i jedno przeliczenie (B8)
   const many = list => store.recordMany(list);
+  // Zapis zbiorczy jako JEDNA operacja (B1): wspólny `op` w zdarzeniach zapasów — „Cofnij” cofa całość, nie tylko ostatnią pozycję
+  const manyOp = list => { const op = `op:${randomId(10)}`; return many(list.map(([t, d]) => (INV_TYPES.includes(t) ? [t, { ...d, op }] : [t, d]))); };
+  const nameOf = id => catalogById[id]?.name || (store.state.catalogUser || []).find(c => c.id === id)?.name || id;
+  const desc = e => (e.t === 'inv.count' ? `${nameOf(e.d.prod)}: stan ${fmt(e.d.qty, 1)}`
+    : e.t === 'inv.move' ? `${nameOf(e.d.prod)}: ${e.d.qty > 0 ? '+' : ''}${fmt(e.d.qty, 1)} (${e.d.kind === 'purchase' ? 'zakup' : 'korekta'})`
+      : `korekta dnia ${e.d.date} (${e.d.dir > 0 ? 'cofnięcie zużycia' : 'odliczenie dnia'})`) + (e.d.undo ? ' · cofnięcie' : '');
+  const opText = op => (op.events.length === 1 ? desc(op.events[0]) : `${op.events.length} zmian naraz (${[...new Set(op.events.map(e => nameOf(e.d.prod || '')).filter(Boolean))].slice(0, 3).join(', ')}${op.events.length > 3 ? '…' : ''})`);
 
   const items = [...allItems(), ...(store.state.catalogUser || [])];
   const day = resolveDay(today);
   const shop = nextShopping(today, new Date().getHours(), new Date().getMinutes());
-  const INV_T = ['inv.count', 'inv.move', 'inv.dayshift'];
-  const undoable = () => store.allEvents().filter(e => INV_T.includes(e.t)).sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
+  // B3: po końcu slotu zakupów najbliższe zakupy przesuwają się — prognozy „przed zakupami” liczone od nowa (przerysowanie w tle)
+  ctx.tick?.(() => { const x = new Date(); if (nextShopping(today, x.getHours(), x.getMinutes()).date !== shop.date) ctx.soft?.(); });
+  const undoable = () => store.allEvents().filter(e => INV_TYPES.includes(e.t)).sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
   const days = r => (r.fc ? r.fc.days : Infinity);
   const cmp = { days: (a, b) => days(a) - days(b), most: (a, b) => days(b) - days(a),
     urgent: (a, b) => rank[a.status] - rank[b.status] || days(a) - days(b),
@@ -80,9 +89,8 @@ export function renderZapasy(root, ctx) {
     shopIds = new Set(list.map(x => x.id));
     counts = rows.reduce((m, r) => ((m[r.status] = (m[r.status] || 0) + 1), m), {});
     soonest = rows.filter(r => r.fc?.runOut).sort((a, b) => (a.fc.runOut < b.fc.runOut ? -1 : 1))[0];
-    // Ostatnia zmiana zapasów (do „Cofnij”) = zdarzenie o najwyższym HLC — bez sortowania całego dziennika
-    last = undefined;
-    for (const e of store.allEvents()) if (INV_T.includes(e.t) && (!last || e.hlc > last.hlc)) last = e;
+    // Ostatnia operacja na zapasach do „Cofnij” (B1): najnowsza niecofnięta; zapis zbiorczy = jedna operacja, same cofnięcia pomijane
+    last = lastOperation(store.allEvents());
     packs = list.reduce((n, x) => n + x.packs, 0);
     known = rows.filter(r => r.st != null && r.it.tracked !== false).length;
     // Kolejność listy zakupów wg pilności (najwcześniejszy brak najpierw) — ta sama lista co w oknie planu zakupów
@@ -119,7 +127,7 @@ export function renderZapasy(root, ctx) {
     act('shopping-cart', 'Zakupy', () => shopDialog(), { class: 'zp-act primary' }),
     act('plus', 'Dodaj', () => addDialog()),
     act('receipt', 'Paragon', () => receiptDialog()),
-    act('undo-2', 'Cofnij', () => undo(last), { disabled: !last }),
+    act('undo-2', 'Cofnij', () => undo(last), { disabled: !last, title: last ? `Cofnij: ${opText(last)}` : 'Brak zmian do cofnięcia' }),
     act('history', 'Historia', () => historyDialog()),
     act('bot', 'Status AI', () => aiStatus()),
     act('save', 'Kopia', () => backupDialog())));
@@ -220,7 +228,14 @@ export function renderZapasy(root, ctx) {
             h('label', { class: 'inv-set' }, h('span', { class: 'sr-only' }, 'Stan'),
               h('input', { type: 'number', inputmode: 'decimal', step: 'any', min: '0', value: r.st == null ? '' : String(r.st),
                 'aria-label': `Stan: ${it.name}`, 'aria-describedby': 'zp-stan-hint', title: 'Stan na koniec dzisiejszego dnia',
-                onchange: e => { const v = Number(e.target.value); if (Number.isFinite(v) && v >= 0) save('inv.count', { prod: it.id, qty: v, date: today }, `${it.name}: stan ${fmt(v, 1)} ${it.unit}`); } }),
+                // B2 (audyt 23.10.2026): puste albo nieczytelne pole (np. przecinek, którego przeglądarka nie przyjęła) NIE jest zerem —
+                // Number('') === 0 zapisywało „⛔ BRAK”; wtedy stan bez zmian, pole wraca do wartości z planu
+                onchange: e => {
+                  const raw = e.target.value.trim(), v = raw === '' ? NaN : Number(raw);
+                  if (Number.isFinite(v) && v >= 0) return save('inv.count', { prod: it.id, qty: v, date: today }, `${it.name}: stan ${fmt(v, 1)} ${it.unit}`);
+                  e.target.value = r.st == null ? '' : String(r.st);
+                  ctx.flash(raw === '' ? `${it.name}: puste pole „Stan” — stan bez zmian. Brak pozycji wpisz jako 0.` : `${it.name}: niepoprawna wartość — stan bez zmian.`, 'info');
+                } }),
               h('span', {}, it.unit)),
             h('button', { class: 'zp-pack', 'aria-label': `+ opakowanie (${fmt(it.packSize || 1)} ${it.unit}): ${it.name}`,
               onclick: () => save('inv.move', { prod: it.id, qty: it.packSize || 1, date: today, kind: 'purchase' }, `${it.name}: +${fmt(it.packSize || 1)} ${it.unit}`) },
@@ -271,7 +286,7 @@ export function renderZapasy(root, ctx) {
   add(zmain, h('details', { class: 'zp-bulk' }, h('summary', {}, 'Operacje zbiorcze'), h('div', { class: 'row bulk' },
     h('button', { class: 'danger', onclick: async () => {
       if (!confirm('Wyzerować stany wszystkich pozycji? Zmianę można cofnąć w historii.')) return;
-      try { await many(rows.filter(r => r.it.tracked !== false).map(r => ['inv.count', { prod: r.it.id, qty: 0, date: today }]));
+      try { await manyOp(rows.filter(r => r.it.tracked !== false).map(r => ['inv.count', { prod: r.it.id, qty: 0, date: today }]));
         ctx.flash('Wyzerowano stany.'); ctx.rerender(); } catch (e) { err(e); }
     } }, 'Zeruj stany'),
     h('button', { onclick: async () => {
@@ -286,16 +301,17 @@ export function renderZapasy(root, ctx) {
   add(root, h('div', { class: 'zp-layout' }, zmain, h('aside', { class: 'zp-aside', 'aria-label': 'Zakupy i korekty' }, shopCard.el, dayFix)));
 
   // ================= okna =================
-  function undo(ev) {
-    const name = id => catalogById[id]?.name || (store.state.catalogUser.find(c => c.id === id)?.name) || id;
-    if (ev.t === 'inv.move') return save('inv.move', { prod: ev.d.prod, qty: -ev.d.qty, date: today, kind: 'adjust' }, `Cofnięto: ${name(ev.d.prod)}`);
-    if (ev.t === 'inv.dayshift') return save('inv.dayshift', { date: ev.d.date, dir: -ev.d.dir }, 'Cofnięto korektę dnia.');
-    if (ev.t === 'inv.count') {
-      const prev = store.allEvents().filter(e => e.t === 'inv.count' && e.d.prod === ev.d.prod && e.hlc < ev.hlc)
-        .sort((a, b) => (a.hlc < b.hlc ? -1 : 1)).pop();
-      if (!prev) return ctx.flash('Nie ma wcześniejszego stanu do przywrócenia.') || ctx.rerender();
-      return save('inv.count', { prod: ev.d.prod, qty: prev.d.qty, date: today }, `Przywrócono stan: ${name(ev.d.prod)}`);
-    }
+  // „Cofnij” (B1): cała ostatnia operacja, stan liczony tak, jakby jej nie było (z zużyciem od poprzedniej inwentaryzacji) — core/calc/inventory.js
+  async function undo(op) {
+    if (!op) return;
+    const { list, unknown } = undoOperation(store.state.inv, op, today);
+    const prods = [...new Set(op.events.map(e => e.d.prod).filter(Boolean))];
+    try {
+      await many(list);
+      const names = unknown.map(nameOf), few = names.slice(0, 3).join(', ') + (names.length > 3 ? ` i ${names.length - 3} innych` : '');
+      ctx.flash(`Cofnięto: ${opText(op)}${unknown.length ? `. Bez wcześniejszego stanu (stan bez zmian): ${few}` : ''}`);
+      if (prods.length === 1 && !op.events.some(e => e.t === 'inv.dayshift')) refresh(prods); else ctx.rerender();
+    } catch (e) { err(e); }
   }
 
   // Dodanie albo edycja (U-c) własnej pozycji: edycja = ten sam identyfikator, nowe `cat.upsert` (wygrywa późniejsza zmiana)
@@ -311,7 +327,7 @@ export function renderZapasy(root, ctx) {
       field('Trwałość', select('shelf', [['short', 'Świeże (≤ 7 dni, alert < 2 dni)'], ['long', 'Trwałe (> 7 dni, alert < 7 dni)']], edit?.shelfLife)),
       field('Jednostka', select('unit', UNITS.map(u => [u, u]), edit?.unit)),
       field('Zużycie dzienne', input('daily', { type: 'number', step: 'any', min: '0', placeholder: 'np. 5 lub 0.3', value: val(edit?.daily_v31) })),
-      !edit && field('Stan początkowy', input('stock', { type: 'number', step: 'any', min: '0', placeholder: '0' })),
+      !edit && field('Stan początkowy', input('stock', { type: 'number', step: 'any', min: '0', placeholder: 'puste = bez stanu' })),
       field('Opakowanie', input('pack', { type: 'number', step: 'any', min: '1', placeholder: 'np. 400 lub 500', value: val(edit?.packSize) })),
       field('Limit (opcjonalnie)', input('max', { type: 'number', step: 'any', min: '0', placeholder: 'brak', value: val(edit?.maxLimit) })),
       field('Notatka', input('note', { placeholder: 'np. rano na czczo', value: val(edit?.note) })),
@@ -325,9 +341,12 @@ export function renderZapasy(root, ctx) {
         if (Number(f.max.value) > 0) item.maxLimit = Number(f.max.value);
         if (f.note.value.trim()) item.note = f.note.value.trim();
         try {
-          const q = edit ? NaN : Number(f.stock.value);
-          await many([['cat.upsert', { item }], ...(Number.isFinite(q) && q >= 0 ? [['inv.count', { prod: id, qty: q, date: today }]] : [])]);
-          dlg.close(); ctx.flash(edit ? `Zapisano zmiany: ${name}.` : `Dodano pozycję: ${name}.`); ctx.rerender();
+          // B2: puste pole = pozycja bez stanu (nie 0 — „⛔ BRAK” i od razu na liście zakupów)
+          const raw = edit ? '' : f.stock.value.trim(), q = raw === '' ? NaN : Number(raw);
+          if (raw !== '' && !(Number.isFinite(q) && q >= 0)) { dlg.error(new Error('Stan początkowy: podaj liczbę ≥ 0 albo zostaw pole puste.')); f.stock.focus(); return; }
+          const withStock = Number.isFinite(q) && q >= 0;
+          await manyOp([['cat.upsert', { item }], ...(withStock ? [['inv.count', { prod: id, qty: q, date: today }]] : [])]);
+          dlg.close(); ctx.flash(edit ? `Zapisano zmiany: ${name}.` : `Dodano pozycję: ${name}${withStock ? '' : ' (bez stanu — ustaw go polem „Stan”)'}.`); ctx.rerender();
         } catch (e) { dlg.error(e); }
       } }, edit ? 'Zapisz zmiany' : 'Zapisz pozycję'));
   }
@@ -353,7 +372,7 @@ export function renderZapasy(root, ctx) {
           const chosen = checked.size ? list.filter(x => checked.has(x.id)) : list;
           if (!confirm(checked.size ? `Dodać ${chosen.length} zaznaczonych pozycji do stanu magazynu?` : `Dodać wszystkie ${chosen.length} wyliczone zakupy do stanu magazynu?`)) return;
           try {
-            await many(chosen.map(x => ['inv.move', { prod: x.id, qty: x.toBuy, date: today, kind: 'purchase' }]));
+            await manyOp(chosen.map(x => ['inv.move', { prod: x.id, qty: x.toBuy, date: today, kind: 'purchase' }]));
             dlg.close(); ctx.flash(`Zaktualizowano stany dla ${chosen.length} pozycji.`, 'info'); ctx.rerender();
           } catch (e) { dlg.error(e); }
         } }, icon('check', { size: 18 }), 'Zaktualizuj stan'),
@@ -396,7 +415,7 @@ export function renderZapasy(root, ctx) {
     const apply = async mode => {
       if (!parsed?.rows.length) return dlg.error(new Error('Najpierw sprawdź paragon — nie rozpoznano żadnej pozycji.'));
       try {
-        await many(parsed.rows.map(x => (mode === 'add' ? ['inv.move', { prod: x.item.id, qty: x.qty, date: today, kind: 'purchase' }]
+        await manyOp(parsed.rows.map(x => (mode === 'add' ? ['inv.move', { prod: x.item.id, qty: x.qty, date: today, kind: 'purchase' }]
           : ['inv.count', { prod: x.item.id, qty: x.qty, date: today }])));
         dlg.close();
         ctx.flash(`Paragon: ${parsed.rows.length} pozycji${parsed.unknown.length ? `, pominięto: ${parsed.unknown.length}` : ''}.`, 'info');
@@ -416,10 +435,6 @@ export function renderZapasy(root, ctx) {
   }
 
   function historyDialog() {
-    const name = id => catalogById[id]?.name || (store.state.catalogUser.find(c => c.id === id)?.name) || id;
-    const desc = e => e.t === 'inv.count' ? `${name(e.d.prod)}: stan ${fmt(e.d.qty, 1)}`
-      : e.t === 'inv.move' ? `${name(e.d.prod)}: ${e.d.qty > 0 ? '+' : ''}${fmt(e.d.qty, 1)} (${e.d.kind === 'purchase' ? 'zakup' : 'korekta'})`
-      : `korekta dnia ${e.d.date} (${e.d.dir > 0 ? 'cofnięcie zużycia' : 'odliczenie dnia'})`;
     const hidden = new Set(store.state.settings['zapasy.hidden'] || []);
     const clearedAt = store.state.settings['zapasy.clearedAt'] || '';
     const evs = undoable().filter(e => !hidden.has(e.id) && e.hlc > clearedAt).slice(-120).reverse();
@@ -427,7 +442,7 @@ export function renderZapasy(root, ctx) {
       if (!confirm(`⚠️ PEŁNE PRZYWRÓCENIE STANU\n\nMagazyn wróci do stanu z chwili: ${new Date(e.at).toLocaleString('pl-PL')}.\nZmiany wprowadzone później zostaną zastąpione.\n(Możesz to cofnąć przyciskiem „↩ Cofnij”).\n\nKontynuować?`)) return;
       const past = reduce(store.allEvents().filter(x => x.hlc <= e.hlc));
       try {
-        await many(items.filter(it => it.tracked !== false).map(it => [it, stockAt(past.inv, it.id, today)]).filter(([, q]) => q != null)
+        await manyOp(items.filter(it => it.tracked !== false).map(it => [it, stockAt(past.inv, it.id, today)]).filter(([, q]) => q != null)
           .map(([it, q]) => ['inv.count', { prod: it.id, qty: Math.max(0, q), date: today }]));
         dlg.close(); ctx.flash(`Przywrócono stan z: ${new Date(e.at).toLocaleString('pl-PL')}`); ctx.rerender();
       } catch (x) { dlg.error(x); }

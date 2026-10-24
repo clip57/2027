@@ -79,9 +79,9 @@ export function records(train) {
   return Object.values(out).sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 }
 
-// Liczba kolejnych tygodni (do bieżącego włącznie) z co najmniej jedną sesją.
-export function streakWeeks(train, sess, today) {
-  const ws = new Set(sessions(train, sess).map(s => weekStart(s.date)));
+// Liczba kolejnych tygodni (do bieżącego włącznie) z co najmniej jedną sesją — sesje jak w `sessions` (z wpisami basenu i roweru, D-106).
+export function streakWeeks(train, sess, today, details = {}) {
+  const ws = new Set(sessions(train, sess, details).map(s => weekStart(s.date)));
   let n = 0, w = weekStart(today);
   if (!ws.has(w)) w = addDays(w, -7); // bieżący tydzień może być jeszcze pusty
   while (ws.has(w)) { n++; w = addDays(w, -7); }

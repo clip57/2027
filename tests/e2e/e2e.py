@@ -1188,6 +1188,138 @@ async def run_mpw(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
 
+# --- D-107: poprawki audytu z 23.10.2026 (B1–B10) — zachowanie w przeglądarce
+INV_JS = """p => new Promise(res => { const r = indexedDB.open('p2027'); r.onsuccess = () => { const q = r.result.transaction('events').objectStore('events').getAll();
+  q.onsuccess = () => { res(q.result.filter(e => e.t.startsWith('inv.') && e.d.prod === p).sort((a, b) => (a.hlc < b.hlc ? -1 : 1)).map(e => [e.t, e.d.qty, e.d.date, e.d.undo || null, e.d.op || null])); r.result.close(); }; }; })"""
+
+async def run_d107(pw, name, url, mobile):
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-107]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw', accept_downloads=True)
+    await ctx.add_init_script('delete Navigator.prototype.share; delete Navigator.prototype.canShare;')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 10, 26))
+    inv = lambda p: pg.evaluate(INV_JS, p)
+    toast = lambda: pg.inner_text('#toast')
+    # B8: seria tygodni liczy też dzień z samym wpisem basenu (D-106)
+    await pg.goto(url + '#/trening?d=2026-10-25'); await pg.wait_for_selector('.tlog')
+    el = pg.get_by_label('Basen: Dystans, m', exact=True); await el.fill('1500'); await el.press('Tab'); await pg.wait_for_timeout(400)
+    await pg.goto(url + '#/trening?v=stat'); await pg.wait_for_selector('.stats')
+    ok('seria: 1 tydzień z rzędu' in await pg.inner_text('.stats'), f'{tag} B8: seria tygodni z wpisem basenu ({(await pg.inner_text(".stats"))[:60]!r})')
+    # B2: puste pole „Stan” nie zapisuje zera
+    await pg.goto(url + '#/zapasy?q=Banan'); await pg.wait_for_selector('.inv-item')
+    st = lambda: pg.get_by_label('Stan: Banan', exact=True)
+    await st().fill('1000'); await st().press('Tab'); await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', '1000')
+    n0 = len(await inv('banan'))
+    await st().fill(''); await st().press('Tab'); await pg.wait_for_timeout(500)
+    ok(len(await inv('banan')) == n0 and await st().input_value() == '1000' and 'puste pole' in await toast(),
+       f'{tag} B2: puste pole „Stan” — bez zapisu, wartość przywrócona, komunikat')
+    # B1: „Cofnij” po pomyłce — stan z zużyciem od poprzedniej inwentaryzacji; drugie „Cofnij” nie przywraca pomyłki
+    await pg.clock.set_system_time(at(2026, 10, 29)); await pg.goto(url + '#/zapasy?q=Banan&x=1'); await pg.wait_for_selector('.inv-item')
+    v29 = await st().input_value()
+    await st().fill('5'); await st().press('Tab'); await pg.wait_for_selector('#toast >> text=Banan: stan 5')   # zapis zakończony (pole pokazuje wpis od razu)
+    undo = pg.locator('.actions').get_by_role('button', name='Cofnij', exact=True)
+    tip = await undo.get_attribute('title') or ''
+    ok('Banan: stan 5' in tip, f'{tag} B1: podpowiedź „Cofnij” mówi, co zostanie cofnięte ({tip!r})')
+    await undo.click(); await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', v29)
+    ok(v29 == '760', f'{tag} B1: „Cofnij” przywraca stan z zużyciem od 26.10 ({v29} g, nie 1000 g)')
+    await undo.click(); await pg.wait_for_timeout(500)
+    ok(await st().input_value() == '760' and 'Bez wcześniejszego stanu' in await toast() and await undo.is_disabled(),
+       f'{tag} B1: drugie „Cofnij” nie przywraca pomyłki (pierwsza inwentaryzacja — stan bez zmian, przycisk nieaktywny)')
+    ev = await inv('banan')
+    ok([e[1] for e in ev[-2:]] == [760, 760] and all(e[3] for e in ev[-2:]), f'{tag} B1: cofnięcia oznaczone polem `undo` ({ev[-2:]})')
+    # B1: zapis zbiorczy cofany w całości
+    await st().fill('900'); await st().press('Tab'); await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', '900')
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+    pg.once('dialog', lambda d: asyncio.ensure_future(d.accept()))
+    await pg.locator('.zp-bulk > summary').click(); await pg.get_by_role('button', name='Zeruj stany').click(); await pg.wait_for_selector('text=Wyzerowano stany')
+    ok((await inv('banan'))[-1][1] == 0 and (await inv('banan'))[-1][4], f'{tag} B1: zerowanie jako jedna operacja (`op`)')
+    await undo.click(); await pg.wait_for_selector('#toast >> text=zmian naraz')
+    msg = await toast()
+    await pg.goto(url + '#/zapasy?q=Banan'); await pg.wait_for_selector('.inv-item')
+    ok(await st().input_value() == '900' and 'Bez wcześniejszego stanu' in msg, f'{tag} B1: „Cofnij” po zerowaniu przywraca stany całej operacji (banan {await st().input_value()})')
+    # B4: stoper zapomniany na ponad dobę — zatrzymanie zapisuje się; wpis ręczny kończy działający stoper
+    await pg.clock.set_system_time(at(2026, 10, 26, 18, 15))
+    await pg.goto(url + '#/trening?d=2026-10-26'); await pg.wait_for_selector('.hero-tr')
+    await pg.get_by_role('button', name='Rozpocznij trening').click(); await pg.wait_for_selector('text=Zakończ trening')
+    await pg.clock.set_system_time(at(2026, 10, 27, 19, 30)); await pg.goto(url + '#/trening?d=2026-10-26&x=1'); await pg.wait_for_selector('.hero-tr')
+    await pg.get_by_role('button', name='Zakończ trening').click(); await pg.wait_for_timeout(600)
+    ok(await pg.locator('main .banner.err').count() == 0 and await pg.get_by_role('button', name='Zakończ trening').count() == 0 and 'bez zapisu czasu' in await toast(),
+       f'{tag} B4: stoper po 25 h zatrzymany, bez błędu walidacji, z prośbą o wpis czasu')
+    await pg.get_by_role('button', name='Rozpocznij trening').click(); await pg.wait_for_selector('text=Zakończ trening')
+    m = pg.get_by_label('Czas treningu w minutach'); await m.fill('50'); await m.press('Tab'); await pg.wait_for_timeout(600)
+    ok(await pg.get_by_role('button', name='Zakończ trening').count() == 0 and 'Zapisano: 50 min' in await pg.inner_text('.tm'), f'{tag} B4: wpis ręczny kończy działający stoper')
+    # B5: plik .ics — basen w niedzielę, 2 rundy sauny w czwartek, sauna po treningu
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-ics')
+    await pg.select_option('.dn-ics select', '30')
+    async with pg.expect_download() as dl:
+        await pg.get_by_role('button', name='Pobierz plik .ics').click()
+    ics = pathlib.Path(await (await dl.value).path()).read_bytes().decode('utf8').replace('\r\n ', '')   # bajty: read_text zamieniłby CRLF na LF
+    have = [x for x in ('\r\nSUMMARY:Basen 55 min\r\n', '\r\nSUMMARY:2 rundy sauny wg protokołu\r\n', '\r\nSUMMARY:Sauna\r\n') if x in ics]
+    ok(len(have) == 3, f'{tag} B5: .ics z basenem, 2 rundami sauny i sauną po treningu ({have}, {len(ics)} B, {ics.count("BEGIN:VEVENT")} wydarzeń)')
+    # B6: MPW w czwartki od 07.01 o 16:00 (bez godzin na sztywno)
+    await pg.goto(url + '#/dzis?d=2027-01-07'); await pg.wait_for_selector('.dz-kpis')
+    ok('159 min · od 16:00' in await pg.inner_text('.dz-kpis'), f'{tag} B6: Dziś — MPW w czwartek od 16:00')
+    await pg.goto(url + '#/dzis?v=tydzien&d=2027-01-07'); await pg.wait_for_selector('.wk-grid')
+    wk = await pg.inner_text('.wk-grid')
+    ok('MPW: 3 bloki · 16:00' in wk and 'MPW: 3 bloki · 15:30' in wk, f'{tag} B6: Tydzień — godziny bloków MPW z planu')
+    # B7: ikony z kompletnymi liniami (motyw „Systemowy” — monitor)
+    await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('main .theme-switch')
+    lines = await pg.eval_on_selector_all('main button[aria-label="Motyw: Systemowy"] svg line', 'e => e.map(x => x.getAttribute("x1"))')
+    ok(len(lines) == 2 and all(lines), f'{tag} B7: ikona „monitor” z liniami ({lines})')
+    # B9: lista slotów w Pielęgnacji — bez „(sobota)”, każdy raz, sloty czwartkowe z dniami z kalendarza
+    await pg.goto(url + '#/pielegnacja?v=plan'); await pg.wait_for_selector('.pg-tools')
+    await pg.get_by_role('button', name='Dodaj krok').click(); await pg.wait_for_selector('dialog[open]')
+    opts = await pg.eval_on_selector_all('dialog select', 'e => [...e[e.length - 1].options].map(o => [o.value, o.textContent])')
+    ok(not any('sobota' in t for _, t in opts) and len({v for v, _ in opts}) == len(opts) and any(t == '17:45 · Zakupy (czw, 22.10–29.10)' for _, t in opts),
+       f'{tag} B9: sloty do przypięcia kroku ({len(opts)} pozycji)')
+    await pg.keyboard.press('Escape')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await ctx.close()
+
+    # B3: „Dziś” z upływem czasu — „Teraz” aktualizowane w miejscu, zmiana dnia przerysowuje widok (także po powrocie do aplikacji)
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    await pg.clock.install(time=at(2026, 11, 16, 10, 2) + _dt.timedelta(seconds=20))
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    t1 = await pg.inner_text('.nowcard-t')
+    await pg.evaluate("document.querySelector('main').dataset.mark = '1'")
+    await pg.clock.fast_forward(65_000); await pg.wait_for_timeout(300)   # fast_forward wywołuje zegar co 30 s najwyżej raz — po 10:03
+    t2 = await pg.inner_text('.nowcard-t')
+    ok(t1 != t2 and t2 == 'Przerwa kognitywna' and await pg.evaluate("document.querySelector('main').dataset.mark") == '1'
+       and 'is-now' in (await pg.get_attribute('#slot\\.1003', 'class')) and 'is-now' not in (await pg.get_attribute('#slot\\.0910', 'class')),
+       f'{tag} B3: „Teraz” zmienia się o 10:03 w miejscu, bez przerysowania strony ({t1} → {t2})')
+    await pg.clock.set_system_time(at(2026, 11, 16, 23, 59) + _dt.timedelta(seconds=40)); await pg.clock.fast_forward(65_000); await pg.wait_for_timeout(500)
+    ok('17 listopada 2026' in await pg.inner_text('.dz-head .date'), f'{tag} B3: o północy widok „Dziś” przechodzi na nowy dzień')
+    await pg.clock.set_system_time(at(2026, 11, 18, 8, 50))   # aplikacja „w tle” do rana — bez zegarów; powrót na ekran
+    await pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); await pg.wait_for_timeout(500)
+    ok('18 listopada 2026' in await pg.inner_text('.dz-head .date') and await pg.inner_text('.nowcard-t') != 'Sen (8 h)',
+       f'{tag} B3: po powrocie do aplikacji następnego dnia — nowa data i bieżący punkt planu ({await pg.inner_text(".nowcard-t")})')
+    ok(not errs, f'{tag} B3: brak błędów ({errs[:2]})')
+    await ctx.close()
+
+    # B10: zmiana w innej karcie — doczytanie do tej samej instancji, bez nowego połączenia z IndexedDB (BroadcastChannel: wariant web)
+    if name == 'web':
+        ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+        await ctx.add_init_script("(() => { const o = indexedDB.open.bind(indexedDB); window.__opens = 0; indexedDB.open = (...a) => { window.__opens++; return o(...a); }; })()")
+        A, B = await ctx.new_page(), await ctx.new_page(); errs = []
+        for p in (A, B): p.on('pageerror', lambda e: errs.append(str(e)))
+        for p in (A, B): await p.clock.install(time=at(2026, 10, 26)); await p.goto(url + '#/zapasy?q=Kefir'); await p.wait_for_selector('.inv-item')
+        kef = lambda p: p.locator('.inv-item').first.locator('input[type=number]')
+        for v in ('100', '200', '300'):
+            await kef(A).fill(v); await kef(A).press('Tab')
+            await wait_js(B, 'v => document.querySelector(".inv-item input[type=number]")?.value === v', v)
+        ok(await B.evaluate('window.__opens') == 1, f'{tag} B10: karta B widzi zmiany z A bez nowych połączeń z bazą (otwarć: {await B.evaluate("window.__opens")})')
+        await kef(B).fill('333'); await kef(B).press('Tab')
+        await wait_js(A, 'v => document.querySelector(".inv-item input[type=number]")?.value === v', '333')
+        ok(await A.evaluate('window.__opens') == 1 and not errs, f'{tag} B10: zapis w karcie B po doczytaniu działa i dociera do A ({errs[:1]})')
+        await ctx.close()
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -1208,6 +1340,8 @@ async def main():
         await run_care(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_mpw(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_mpw(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d107(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d107(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

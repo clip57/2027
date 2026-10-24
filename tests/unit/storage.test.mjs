@@ -85,3 +85,21 @@ test('recordMany (B8): te same zdarzenia co kolejne record(), jedna transakcja, 
   assert.equal(s.events.size, 2, 'nic nie zapisano przy błędzie jednej treści');
   assert.deepEqual(await s.recordMany([]), []);
 });
+
+test('B10 (audyt 23.10.2026): reload() — zmiany z innej karty doczytane do tej samej instancji, bez powiadamiania słuchaczy', async () => {
+  const db = new MemoryAdapter();   // wspólna baza dwóch kart
+  const a = await new Store(db).open(), b = await new Store(db).open();
+  let heard = 0;
+  b.on(() => { heard++; });
+  await a.record('inv.count', { prod: 'banan', qty: 300, date: '2026-10-26' });
+  assert.equal(b.state.inv.counts.banan, undefined, 'przed doczytaniem — stan karty B bez zmiany z A');
+  assert.equal(await b.reload(), true);
+  assert.equal(b.state.inv.counts.banan[0].qty, 300, 'po doczytaniu — zmiana z karty A');
+  assert.equal(heard, 0, 'doczytanie nie powiadamia słuchaczy (bez odbijania powiadomienia do drugiej karty)');
+  assert.equal(await b.reload(), false, 'nic nowego — bez przeliczenia');
+  await b.record('inv.count', { prod: 'banan', qty: 250, date: '2026-10-27' });
+  assert.equal(heard, 1, 'własny zapis karty B nadal powiadamia');
+  await a.reload();
+  assert.deepEqual(a.state.inv.counts.banan.map(c => c.qty), [300, 250]);
+  assert.ok(b.allEvents().every(e => a.events.has(e.id)) && a.allEvents().length === b.allEvents().length, 'obie karty z tym samym dziennikiem');
+});

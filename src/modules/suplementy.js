@@ -26,6 +26,9 @@ export function renderSuplementy(root, ctx) {
   const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   const isToday = date === ctx.today;
   const nextTime = isToday ? groups.find(g => g.time >= hhmm)?.time : null;
+  // B3: z upływem czasu „następna pora” i minione pory liczone od nowa (przerysowanie w tle, gdy się zmienią)
+  if (isToday) ctx.tick?.(() => { const x = new Date(), t = `${String(x.getHours()).padStart(2, '0')}:${String(x.getMinutes()).padStart(2, '0')}`;
+    if (groups.find(g => g.time >= t)?.time !== nextTime) ctx.soft?.(); });
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
 
   // Zapas preparatów (ten sam dziennik co moduł Zapasy): stan, prognoza, status v31 (suplementy: < 10 / < 20 dni)

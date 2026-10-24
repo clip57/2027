@@ -211,7 +211,8 @@ export function resolveDay(date) {
     const items = (s.items || []).filter(i => i.kind === 'task' || (i.kind === 'meal' && !noDiet)).map(i => i.kind === 'meal'
       ? { kind: 'meal', meal: i.meal, time: i.time, text: `${mealName(i.meal)} (${i.time})`, kcal: p.meals.find(m => m.id === i.meal)?.total.kcal ?? null }
       : { kind: 'task', text: i.text, decision: i.decision });
-    const out = { id: s.id, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items, shop: !!s.shop,
+    // `key` — rola slotu w szablonie (np. aktywność: warmup / main / sauna, posiłek: id posiłku); także w wariantach dnia o innych identyfikatorach slotów
+    const out = { id: s.id, key: s.key ?? null, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items, shop: !!s.shop,
       doses: doses.filter(d => d.time >= s.from && (s.to < s.from || d.time < s.to)) };
     if (s.role === 'cfa') {
       const letter = isMock && SRC.week.mock.replace[s.key] ? SRC.week.mock.replace[s.key] : s.key;

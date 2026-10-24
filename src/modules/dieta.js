@@ -39,6 +39,9 @@ export function renderDieta(root, ctx) {
   const d = new Date();
   const hhmm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   const next = isToday ? nextMeal(s.meals, times, hhmm) : null;
+  // B3: „Następny posiłek” z upływem czasu (przerysowanie w tle, gdy się zmieni)
+  if (isToday) ctx.tick?.(() => { const x = new Date(), t = `${String(x.getHours()).padStart(2, '0')}:${String(x.getMinutes()).padStart(2, '0')}`;
+    if (nextMeal(s.meals, times, t)?.id !== next?.id) ctx.soft?.(); });
   // Posiłki w kolejności godzin z planu dnia (jak przebiega dzień); bez godziny (napoje) — na końcu. Wartości bez zmian.
   const meals = s.meals.slice().sort((a, b) => (times[a.id] || '99') < (times[b.id] || '99') ? -1 : (times[a.id] || '99') > (times[b.id] || '99') ? 1 : 0);
 

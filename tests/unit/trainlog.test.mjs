@@ -6,7 +6,7 @@ import { LOG, SECTIONS, NOTE_MAX, mainKind, validateDetail, fieldOk, withValue, 
 import { classifyEvent, EVENT_TYPES } from '../../src/core/storage/validate.js';
 import { Store } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
-import { sessions, weekly } from '../../src/core/calc/training.js';
+import { sessions, weekly, streakWeeks } from '../../src/core/calc/training.js';
 import { diagnose } from '../../src/core/calc/diagnostics.js';
 import { SRC } from '../../src/core/data.js';
 
@@ -133,6 +133,10 @@ test('sesje: dzień z wpisem basenu lub roweru liczy się jako sesja także bez 
   assert.deepEqual(sessions({}, {}, {}), []);
   const wk = weekly({}, {}, 4, '2026-10-26', det);
   assert.equal(wk.at(-2).sessions, 2, 'tydzień 19–25.10: rower i basen');
+  // B8 (audyt 23.10.2026): seria tygodni liczy te same sesje co „Treningi” i wykres tygodniowy
+  assert.equal(streakWeeks({}, {}, '2026-10-26', det), 1, 'tydzień 19–25.10 z basenem i rowerem — seria 1 tydzień');
+  assert.equal(streakWeeks({}, {}, '2026-10-26'), 0, 'bez wpisów dziennika — brak sesji');
+  assert.equal(streakWeeks({}, {}, '2026-10-26', { '2026-10-20': { date: '2026-10-20', knee: { before: 2 } } }), 0, 'samo kolano nie jest sesją');
 });
 
 test('diagnostyka: wpisy dziennika sesji sprzed startu planu zliczane razem z czasami treningu', async () => {

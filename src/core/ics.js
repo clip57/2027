@@ -4,11 +4,9 @@
 // UID stały dla dnia i punktu planu: ponowny import po zmianie planu aktualizuje wydarzenia zamiast je dublować.
 import { resolveDay, cfaSourceLine } from './resolver.js';
 import { scheduleFor } from './calc/supplements.js';
-import { SRC } from './data.js';
 import { addDays } from './dates.js';
 
 export const ICS_KINDS = [['supp', 'Suplementy (pory dawek)'], ['cfa', 'Bloki CFA i recall'], ['mpw', 'Bloki MPW'], ['train', 'Trening, basen i sauna'], ['shop', 'Zakupy w czwartek']];
-const KEY = Object.fromEntries(SRC.dayTemplate.slots.map(s => [s.id, s.key]));
 const TZ = ['BEGIN:VTIMEZONE', 'TZID:Europe/Warsaw',
   'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'TZNAME:CEST', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'END:DAYLIGHT',
   'BEGIN:STANDARD', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0100', 'TZNAME:CET', 'DTSTART:19701025T030000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'END:STANDARD',
@@ -53,8 +51,10 @@ export function planEvents(date, kinds, now = new Date()) {
         desc: s.cfa.map(b => `${b.temat}\n${cfaSourceLine(b)}`).join('\n\n') }));
     if (kinds.includes('cfa') && s.role === 'recall' && s.recall)
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT5M', summary: 'CFA Active Recall', desc: s.desc }));
-    if (kinds.includes('train') && s.role === 'activity' && KEY[s.id] === 'main' && r.dayType !== 'free' && s.title !== 'Wolne')
-      ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT30M', summary: s.title, desc: [r.sessionLabel, s.desc].filter(Boolean).join('\n') }));
+    // Trening główny (także basen w niedzielę i 2 rundy sauny w czwartek — sloty wariantów dnia mają ten sam klucz `main`, B5) i sauna po treningu
+    if (kinds.includes('train') && s.role === 'activity' && r.dayType !== 'free' && s.title !== 'Wolne' && (s.key === 'main' || (s.key === 'sauna' && r.sauna > 0)))
+      ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: s.key === 'main' ? '-PT30M' : '-PT5M', summary: s.title,
+        desc: s.key === 'main' ? [r.sessionLabel, s.desc].filter(Boolean).join('\n') : 'Sauna po treningu — protokół w module Trening (arkusz „Sauna”).' }));
     if (kinds.includes('shop') && s.shop)
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT15M', summary: 'Zakupy', desc: 'Lista „Do kupienia” w module Zapasy.' }));
   }

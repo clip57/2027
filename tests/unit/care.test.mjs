@@ -94,3 +94,23 @@ test('import planu (format 2027-care): podgląd, zapis, ponowny import bez zmian
   await apply(s, pv2);
   assert.equal(careModel(s.state.careDefs).product['p.a'].status, 'skonczony');
 });
+
+test('B9 (audyt 23.10.2026): sloty do przypięcia kroku — każdy raz, dni z kalendarza planu (bez „(sobota)” dla slotów czwartkowych)', async () => {
+  const { SRC } = await import('../../src/core/data.js');
+  const { templateFor, PLAN_START, PLAN_END } = await import('../../src/core/resolver.js');
+  const { range } = await import('../../src/core/dates.js');
+  const { slotOptions } = await import('../../src/core/calc/care.js');
+  const defs = [...SRC.dayTemplate.slots, ...Object.values(SRC.dayTemplate.variants).flatMap(v => v.slots), SRC.dayTemplate.mTraining.home, SRC.dayTemplate.mTraining.wash];
+  const o = slotOptions([...range(PLAN_START, PLAN_END)], templateFor, defs);
+  const label = id => o.find(x => x[0] === id)?.[1];
+  assert.equal(new Set(o.map(x => x[0])).size, o.length, 'bez powtórzeń');
+  assert.ok(!o.some(x => /sobota/.test(x[1])), 'żaden slot nie jest opisany „sobota”');
+  for (const s of SRC.dayTemplate.slots) assert.ok(label(s.id), `slot szablonu ${s.id} na liście`);
+  assert.equal(label('slot.0700'), '07:00 · Pobudka', 'slot codzienny bez opisu dni');
+  assert.match(label('slot.1745z'), /^17:45 · Zakupy \(czw, 22\.10–29\.10\)$/);
+  assert.match(label('slot.1530j'), /\(czw, 07\.01–25\.03\)$/);
+  assert.match(label('slot.2015n'), /\(nd, /);
+  assert.match(label('slot.1905b'), /\(czw, 24\.12\)$/, 'jeden dzień — jedna data');
+  assert.equal(label('slot.1940c'), undefined, 'slot nieużywany w planie (wariant czwartek_k) — poza listą wyboru');
+  assert.ok(!o.some(x => /\.\d+$/.test(x[0].split('.').slice(2).join('.'))), 'części przyciętych slotów („slot.1745.1”) jako ten sam slot');
+});

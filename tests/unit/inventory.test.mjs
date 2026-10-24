@@ -5,7 +5,7 @@ import path from 'node:path';
 import { Store } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
 import { preview, apply } from '../../src/core/sync/bundle.js';
-import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, setCustomItems } from '../../src/core/calc/inventory.js';
+import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, setCustomItems, lastOperation, undoOperation } from '../../src/core/calc/inventory.js';
 import { consumptionForDay } from '../../src/core/calc/consumption.js';
 import { catalogById } from '../../src/core/data.js';
 
@@ -153,4 +153,78 @@ test('D-104: skyr 75 g (śniadanie + lunch) — zużycie 150 g dziennie w progno
   // stan 1800 g = limit: nic do kupienia
   await s.record('inv.count', { prod: 'skyr', qty: 1800, date: '2026-10-19' });
   assert.ok(!shoppingList(s.state.inv, '2026-10-19', allItems()).some(x => x.id === 'skyr' && x.toBuy > 0));
+});
+
+// B1 (audyt 23.10.2026): „Cofnij” w Zapasach — operacja (także zbiorcza) cofana tak, jakby jej nie było; bez przełączania tam i z powrotem
+test('B1: cofnięcie pomyłki w stanie — stan z poprzedniej inwentaryzacji minus zużycie od niej; drugie „Cofnij” sięga dalej', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  const use = d => consumptionForDay(d).banan || 0;
+  await s.record('inv.count', { prod: 'banan', qty: 1000, date: '2026-10-26' });
+  const expected = 1000 - use('2026-10-27') - use('2026-10-28') - use('2026-10-29');
+  assert.equal(expected, 760, 'wt i śr po 120 g, czwartek 29.10 bez banana (NT)');
+  await s.record('inv.count', { prod: 'banan', qty: 5, date: '2026-10-29' });   // pomyłka
+  let op = lastOperation(s.allEvents());
+  assert.deepEqual(op.events.map(e => e.d.qty), [5]);
+  let u = undoOperation(s.state.inv, op, '2026-10-29');
+  assert.deepEqual(u.list, [['inv.count', { prod: 'banan', qty: 760, date: '2026-10-29', undo: op.key }]]);
+  await s.recordMany(u.list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), 760, 'po „Cofnij” — 760 g (wcześniej 1000 g)');
+  op = lastOperation(s.allEvents());
+  assert.deepEqual(op.events.map(e => e.d.qty), [1000], 'drugie „Cofnij” = wcześniejsza operacja, nie ponowna pomyłka');
+  u = undoOperation(s.state.inv, op, '2026-10-29');
+  assert.deepEqual(u.unknown, ['banan'], 'pierwsza inwentaryzacja — brak wcześniejszego stanu');
+  await s.recordMany(u.list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), 760, 'pozycja bez wcześniejszego stanu — stan bez zmian');
+  assert.equal(lastOperation(s.allEvents()), null, 'wszystko cofnięte — „Cofnij” nieaktywne');
+});
+
+test('B1: zakup z wcześniejszą datą cofany ruchem z tą samą datą; korekta dnia — odwrotną korektą', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  const use = d => consumptionForDay(d).banan || 0;
+  await s.record('inv.count', { prod: 'banan', qty: 500, date: '2026-10-26' });
+  await s.record('inv.move', { prod: 'banan', qty: 1200, date: '2026-10-27', kind: 'purchase' });   // wpisany później, z datą 27.10
+  const base = 500 - use('2026-10-27') - use('2026-10-28') - use('2026-10-29');
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), base + 1200);
+  let op = lastOperation(s.allEvents());
+  let u = undoOperation(s.state.inv, op, '2026-10-29');
+  assert.deepEqual(u.list, [['inv.move', { prod: 'banan', qty: -1200, date: '2026-10-27', kind: 'adjust', undo: op.key }]]);
+  await s.recordMany(u.list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), base);
+  await s.record('inv.dayshift', { date: '2026-10-29', dir: -1 });
+  op = lastOperation(s.allEvents());
+  assert.equal(op.events[0].t, 'inv.dayshift');
+  await s.recordMany(undoOperation(s.state.inv, op, '2026-10-29').list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), base, 'korekta dnia cofnięta');
+});
+
+test('B1: zapis zbiorczy (wspólne `op`) cofany w całości; pole `op`/`undo` nie zmienia stanu', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  await s.recordMany([['inv.count', { prod: 'banan', qty: 900, date: '2026-10-26' }], ['inv.count', { prod: 'kefir', qty: 2000, date: '2026-10-26' }]]);
+  const before = ['banan', 'kefir', 'skyr'].map(p => stockAt(s.state.inv, p, '2026-10-28'));
+  await s.recordMany(['banan', 'kefir', 'skyr'].map(p => ['inv.count', { prod: p, qty: 0, date: '2026-10-28', op: 'op:test' }]));   // „Zeruj stany”
+  assert.deepEqual(['banan', 'kefir', 'skyr'].map(p => stockAt(s.state.inv, p, '2026-10-28')), [0, 0, 0], 'pole `op` nie wpływa na stan');
+  const op = lastOperation(s.allEvents());
+  assert.equal(op.key, 'op:test');
+  assert.equal(op.events.length, 3, 'cała operacja, nie ostatnia pozycja');
+  const u = undoOperation(s.state.inv, op, '2026-10-28');
+  assert.deepEqual(u.unknown, ['skyr']);
+  await s.recordMany(u.list);
+  assert.deepEqual(['banan', 'kefir'].map(p => stockAt(s.state.inv, p, '2026-10-28')), before.slice(0, 2), 'stany sprzed zerowania');
+  assert.equal(stockAt(s.state.inv, 'skyr', '2026-10-28'), 0, 'skyr bez wcześniejszego stanu — bez zmian');
+  const next = lastOperation(s.allEvents());
+  assert.deepEqual(next.events.map(e => [e.d.prod, e.d.qty]), [['kefir', 2000]], 'następne „Cofnij” — ostatnia wcześniejsza operacja (zapis bez `op` = osobne operacje)');
+});
+
+test('B1: stos cofnięć — zakup cofany po cofnięciu późniejszej pomyłki (późniejsza inwentaryzacja nie przesłania cofnięcia)', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  const use = d => consumptionForDay(d).banan || 0;
+  await s.record('inv.count', { prod: 'banan', qty: 500, date: '2026-10-26' });
+  await s.record('inv.move', { prod: 'banan', qty: 1200, date: '2026-10-27', kind: 'purchase' });
+  await s.record('inv.count', { prod: 'banan', qty: 5, date: '2026-10-29' });   // pomyłka
+  const base = 500 - use('2026-10-27') - use('2026-10-28') - use('2026-10-29');
+  for (let i = 0; i < 2; i++) await s.recordMany(undoOperation(s.state.inv, lastOperation(s.allEvents()), '2026-10-29').list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), base, 'po dwóch „Cofnij”: bez pomyłki i bez zakupu');
+  await s.recordMany(undoOperation(s.state.inv, lastOperation(s.allEvents()), '2026-10-29').list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), base, 'trzecie „Cofnij” — pierwsza inwentaryzacja: bez wcześniejszego stanu, stan bez zmian');
+  assert.equal(lastOperation(s.allEvents()), null);
 });

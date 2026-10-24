@@ -176,6 +176,22 @@ export class Store {
     return this;
   }
 
+  // Ponowny odczyt dziennika z bazy po zmianie w innej karcie (B10, audyt 23.10.2026): to samo połączenie i ta sama instancja — słuchacze
+  // i odwołania w otwartych widokach i oknach zostają (wcześniej każda zmiana w innej karcie otwierała nowe połączenie z IndexedDB i nowy
+  // magazyn, a stare połączenia nie były zamykane). Dziennik tylko rośnie, więc wystarczy dołożyć zdarzenia nieznane tej karcie.
+  // Bez powiadamiania słuchaczy — zmiana pochodzi z innej karty (powiadomienie wróciłoby do niej). Wynik: czy coś doszło.
+  async reload() {
+    if (!this.health.ok) return false;
+    let added = 0;
+    for (const e of await this.adapter.getAllEvents()) {
+      if (this.events.has(e.id)) continue;
+      const c = classifyEvent(e);
+      if (c === 'ok' || c === 'future') { this.events.set(e.id, e); observe(e.hlc); added++; }
+    }
+    if (added) this.rebuild();
+    return added > 0;
+  }
+
   on(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
   // Pełne przeliczenie stanu z całego dziennika (otwarcie, import, synchronizacja, zdarzenia starsze od najnowszego).
   rebuild() { this.reducer = reduceInto(this.events.values()); this.state = this.reducer.state; }

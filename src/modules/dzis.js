@@ -2,6 +2,7 @@
 // Suplementy pochodzą wyłącznie z SUPLEMENTACJI (D-001) — tekst źródłowy PLAN_DNIA ich nie powtarza.
 import { h, add, fmt, plural } from '../ui/dom.js';
 import { progressRing } from '../ui/components.js';
+import { region, swap } from '../ui/patch.js';
 import { icon } from '../ui/icons.js';
 import { recallDone } from '../core/calc/recall.js';
 import { attention } from '../core/calc/attention.js';
@@ -13,9 +14,14 @@ import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
 import { sessions, weekStart } from '../core/calc/training.js';
 import { careModel, stepsFor, progress, slotProgress } from '../core/calc/care.js';
+import { mpwDaySpan } from '../core/calc/mpw.js';
 import { byId, isTab } from './registry.js';
 
 const suppName = id => SRC.supplements.supplements[id]?.name || id;
+// Czas nauki MPW dnia z godzin bloków (B6): „159 min · od 16:00” w czwartki od 07.01, „symulacja 180 min · 15:30–18:30”, z P1–P7 — od 8:00
+const mpwHint = bl => { const s = mpwDaySpan(bl);
+  return s.sim ? [s.rest && `${s.rest.min} min od ${s.rest.from}`, `symulacja ${s.sim.min} min · ${s.sim.from}–${s.sim.to}`].filter(Boolean).join(' · ')
+    : `${s.all.min} min · od ${s.all.from}`; };
 
 function cfaBlock(b, slot) {
   return h('div', { class: 'cfa-block' },
@@ -178,7 +184,9 @@ function renderWeek(root, ctx, date) {
           h('span', { class: 'wk-l' }, icon('utensils', { size: 14 }), x.noDiet ? 'bez diety' : `${x.diet} · ${x.kcal} kcal`),
           x.cfa > 0 && h('span', { class: 'wk-l' }, icon('graduation-cap', { size: 14 }), x.mock ? `Mock CFA · ${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}` : `${x.cfa} ${plural(x.cfa, 'blok', 'bloki', 'bloków')}${x.recall ? ' + recall' : ''}`),
           x.blocks && h('span', { class: 'wk-l wk-blocks' }, icon('book-open', { size: 14 }), x.blocks),
-          x.mpw > 0 && h('span', { class: 'wk-l' }, icon('landmark', { size: 14 }), x.mpwSim ? 'Symulacja MPW 15:30' : `MPW: ${x.mpw} ${plural(x.mpw, 'blok', 'bloki', 'bloków')}`),
+          x.mpw > 0 && h('span', { class: 'wk-l' }, icon('landmark', { size: 14 }), x.mpwSpan.sim
+            ? (x.mpwSpan.rest ? `MPW: ${x.mpwSpan.rest.n} ${plural(x.mpwSpan.rest.n, 'blok', 'bloki', 'bloków')} od ${x.mpwSpan.rest.from} + symulacja ${x.mpwSpan.sim.from}` : `Symulacja MPW ${x.mpwSpan.sim.from}`)
+            : `MPW: ${x.mpw} ${plural(x.mpw, 'blok', 'bloki', 'bloków')} · ${x.mpwSpan.all.from}`),
           x.shopping && h('span', { class: 'wk-l' }, icon('shopping-cart', { size: 14 }), `Zakupy ${x.shopping}`),
           x.phase != null && x.date === mon && h('span', { class: 'wk-l muted' }, `Faza ${x.phase}`),
           x.note && h('span', { class: 'wk-note' }, x.note)])))));
@@ -224,9 +232,11 @@ export function renderDzis(root, ctx) {
       h('a', { class: 'btn primary', href: `#/dzis?d=${target}` }, `Przejdź do ${shortDate(target)}`)));
     return;
   }
-  const d = new Date();
-  const hhmm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  const now = date === ctx.today ? currentSlot(r.slots, hhmm) : null;
+  // B3 (audyt 23.10.2026): „Teraz”, wyróżnienie bieżącego slotu i następna pora dawek aktualizowane z upływem czasu (ctx.tick, w miejscu —
+  // bez przerysowania strony, przewinięcie i rozwinięte sekcje zostają); podział na „Minione punkty” — z chwili wyświetlenia
+  const hm = () => { const x = new Date(); return `${String(x.getHours()).padStart(2, '0')}:${String(x.getMinutes()).padStart(2, '0')}`; };
+  let hhmm = hm();
+  let now = date === ctx.today ? currentSlot(r.slots, hhmm) : null;
   const t = plan(r.dietVariant, r.phase ?? 0).total;
   const D = dayData(r, date, ctx.store, ctx.today);
   const cfaMin = r.cfa.blocks.length * 53;
@@ -234,7 +244,7 @@ export function renderDzis(root, ctx) {
   const mpwNow = isTab(byId.mpw, date), MD = SRC.mpw.D;
   const slotIdx = now?.current ? r.slots.indexOf(now.current) : -1;
   const allDoses = r.slots.flatMap(s => s.doses);
-  const nextDose = allDoses.find(x => x.time >= hhmm);
+  const nextDose = () => allDoses.find(x => x.time >= hhmm);
   const kpi = (label, value, hint, extra, cls = '') => h('div', { class: `stat dz-kpi ${cls}` },
     h('span', { class: 'stat-l' }, label), h('strong', { class: 'stat-v' }, value), hint && h('span', { class: 'stat-h' }, hint), extra);
   const bar = (v, max, dom) => h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%`, background: `var(--${dom})` } }));
@@ -242,6 +252,19 @@ export function renderDzis(root, ctx) {
   const cm = careModel(ctx.store?.state?.careDefs || []), cDone = ctx.store?.state?.careDone || {};
   const care = cm.empty ? null : { date, ...slotProgress(cm, cDone, date) };
   const careP = cm.empty ? null : progress(stepsFor(cm, date), cDone, date);
+  const nowBox = region(() => {
+    if (!now || !(now.current || now.next)) return null;
+    const idx = now.current ? r.slots.indexOf(now.current) : -1;
+    return h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz' },
+      h('div', { class: 'dz-now-main' },
+        h('p', { class: 'nowcard-l' }, now.current ? `Teraz · ${now.current.from}–${now.current.to}` : 'Za chwilę'),
+        h('p', { class: 'nowcard-t' }, (now.current || now.next).title),
+        now.next && h('p', { class: 'muted' }, `Następnie ${now.next.from} · ${now.next.title}`),
+        now.current && h('a', { class: 'btn', href: `#${now.current.id}` }, 'Pokaż w planie')),
+      idx >= 0 && h('div', { class: 'dz-now-side' }, progressRing(idx + 1, r.slots.length, 'Postęp dnia'), h('span', { class: 'muted' }, `punkt ${idx + 1} z ${r.slots.length}`)));
+  });
+  const suppFoot = region(() => { const nd = nextDose();
+    return h('p', { class: 'dz-foot' }, date !== ctx.today ? 'Szczegóły w planie dnia poniżej.' : nd ? `Następna pora: ${nd.time} — szczegóły w planie dnia.` : 'Wszystkie dzisiejsze dawki za Tobą.'); });
 
   add(root,
     h('header', { class: 'dz-head' },
@@ -269,13 +292,7 @@ export function renderDzis(root, ctx) {
       careP && h('a', { class: 'btn ql', href: `#/pielegnacja?d=${date}` }, icon('sparkles', { size: 18 }), h('span', {}, 'Pielęgnacja'))),
     h('div', { class: 'dz-grid' },
       date === ctx.today && attentionCard(ctx),
-      now && (now.current || now.next) ? h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz' },
-        h('div', { class: 'dz-now-main' },
-          h('p', { class: 'nowcard-l' }, now.current ? `Teraz · ${now.current.from}–${now.current.to}` : 'Za chwilę'),
-          h('p', { class: 'nowcard-t' }, (now.current || now.next).title),
-          now.next && h('p', { class: 'muted' }, `Następnie ${now.next.from} · ${now.next.title}`),
-          now.current && h('a', { class: 'btn', href: `#${now.current.id}` }, 'Pokaż w planie')),
-        slotIdx >= 0 && h('div', { class: 'dz-now-side' }, progressRing(slotIdx + 1, r.slots.length, 'Postęp dnia'), h('span', { class: 'muted' }, `punkt ${slotIdx + 1} z ${r.slots.length}`))) : null,
+      nowBox.el,
       h('div', { class: 'stats dz-kpis' },
         r.noDiet ? kpi('Dieta', 'Bez diety', `dieta od ${longDate(DIET_START)}`)
           : kpi('Dieta', `${r.kcal} kcal`, `${r.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · B ${fmt(t.p)} / W ${fmt(t.c)} / T ${fmt(t.f)} g`,
@@ -284,7 +301,7 @@ export function renderDzis(root, ctx) {
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
           D.planned ? bar(D.done, D.planned, 'train') : null),
         mpwNow ? kpi('MPW', r.mpw.blocks.length ? `${D.mpwToday} / ${r.mpw.blocks.length} bloków` : r.mpw.inPlan ? 'dzień wolny' : date < MD.stat.start ? `od ${shortDate(MD.stat.start)}` : 'po planie',
-          r.mpw.blocks.length ? (r.mpw.isSim ? 'symulacja 180 min · 15:30–18:30' : `${r.mpw.blocks.length * 53} min · od 15:30`) : null,
+          r.mpw.blocks.length ? mpwHint(r.mpw.blocks) : null,
           r.mpw.blocks.length ? bar(D.mpwToday, r.mpw.blocks.length, 'cfa') : null) :
         kpi('CFA', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length} bloków` : 'poza planem',
           r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null, r.cfa.inPlan ? bar(D.cfaToday, r.cfa.blocks.length, 'cfa') : null),
@@ -295,7 +312,7 @@ export function renderDzis(root, ctx) {
         // Tylko podsumowanie (liczba dawek, następna pora) — nazwy dawek są w planie dnia; bez dublowania (D-041)
         card('Suplementy', 'pill', `#/suplementy?d=${date}`,
           h('div', { class: 'dz-prog' }, h('strong', {}, String(allDoses.length)), h('span', { class: 'muted' }, `${plural(allDoses.length, 'dawka', 'dawki', 'dawek')} w ${new Set(allDoses.map(x => x.time)).size} porach`)),
-          h('p', { class: 'dz-foot' }, date !== ctx.today ? 'Szczegóły w planie dnia poniżej.' : nextDose ? `Następna pora: ${nextDose.time} — szczegóły w planie dnia.` : 'Wszystkie dzisiejsze dawki za Tobą.')),
+          suppFoot.el),
         careP && card('Pielęgnacja', 'sparkles', `#/pielegnacja?d=${date}`,
           h('div', { class: 'dz-prog' }, h('strong', {}, `${careP.done} / ${careP.total}`), h('span', { class: 'muted' }, 'kroków dziś')), bar(careP.done, careP.total, 'care')),
         card('Meal prep', 'chef-hat', '#/mealprep',
@@ -319,5 +336,21 @@ export function renderDzis(root, ctx) {
           h('summary', {}, icon('chevron-down', { size: 16 }), `Minione punkty (${slotIdx}) · ${r.slots[0].from}–${r.slots[slotIdx - 1].to}`),
           h('div', { class: 'day' }, r.slots.slice(0, slotIdx).map(s => slotView(s, now, care)))),
         h('div', { class: 'day' }, r.slots.slice(Math.max(0, slotIdx)).map(s => slotView(s, now, care))))));
+
+  if (date !== ctx.today) return;
+  const shopDay = D.inv?.shop.date;
+  ctx.tick?.(() => {
+    const x = new Date(), t = hm();
+    // Koniec slotu zakupów (najbliższe zakupy przesuwają się) — „Do kupienia”, KPI i „Wymaga uwagi” liczone od nowa (przerysowanie w tle)
+    if (D.inv && nextShopping(ctx.today, x.getHours(), x.getMinutes()).date !== shopDay) { ctx.soft?.(); return; }
+    const prev = now, dose = nextDose()?.time;
+    hhmm = t;
+    const n = currentSlot(r.slots, t);
+    if (n.current !== prev.current || n.next !== prev.next) {
+      now = n; nowBox.refresh();
+      for (const s of new Set([prev.current, n.current].filter(Boolean))) { const el = document.getElementById(s.id); if (el) swap(el, slotView(s, now, care)); }
+    }
+    if (nextDose()?.time !== dose) suppFoot.refresh();
+  });
 }
 let pastOpen = false;

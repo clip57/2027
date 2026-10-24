@@ -7,16 +7,20 @@ import { segmented, progressRing, sheet } from '../ui/components.js';
 import { icon } from '../ui/icons.js';
 import { region } from '../ui/patch.js';
 import { SRC } from '../core/data.js';
-import { inPlan, PLAN_START, PLAN_END } from '../core/resolver.js';
-import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.js';
-import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, weekGrid, PORY, AREAS, STATUS, DAY_SHORT } from '../core/calc/care.js';
+import { inPlan, PLAN_START, PLAN_END, templateFor } from '../core/resolver.js';
+import { addDays, longDate, shortDate, dayShort, weekday, range } from '../core/dates.js';
+import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, weekGrid, slotOptions, PORY, AREAS, STATUS, DAY_SHORT } from '../core/calc/care.js';
 
 const VIEWS = [{ value: 'dzien', label: 'Dzień' }, { value: 'tydzien', label: 'Tydzień' }, { value: 'produkty', label: 'Produkty' }, { value: 'plan', label: 'Plan' }];
 const STATUS_LABEL = Object.fromEntries(STATUS);
 const AREA_LABEL = Object.fromEntries(AREAS);
-// Sloty planu dnia, do których można przypiąć krok (postęp widoczny w „Dziś”): szablon + warianty (sobota, niedziela)
-const SLOTS = [...SRC.dayTemplate.slots, ...Object.values(SRC.dayTemplate.variants || {}).flatMap(v => v.slots)]
-  .map(s => [s.id, `${s.from} · ${s.title_src}${s.id.endsWith('n') ? ' (niedziela)' : s.id.endsWith('z') ? ' (sobota)' : ''}`]);
+// Sloty planu dnia, do których można przypiąć krok (postęp widoczny w „Dziś”): szablon, warianty dnia i układ dni z blokiem M — każdy raz,
+// z dniami wyliczonymi z kalendarza planu (B9); lista liczona przy pierwszym użyciu
+const SLOT_DEFS = [...SRC.dayTemplate.slots, ...Object.values(SRC.dayTemplate.variants || {}).flatMap(v => v.slots),
+  ...['home', 'wash'].map(k => SRC.dayTemplate.mTraining?.[k]).filter(Boolean)];
+let slotList = null;
+const SLOTS = () => (slotList ||= slotOptions([...range(PLAN_START, PLAN_END)], templateFor, SLOT_DEFS));
+const slotLabel = id => SLOTS().find(x => x[0] === id)?.[1] || (d => (d ? `${d.from} · ${d.title_src} (nie występuje w planie)` : id))(SLOT_DEFS.find(x => x.id === id));
 
 // Licznik „odczekaj N min” — stan wyłącznie interfejsu (jak przerwa w Treningu, D-068): nie trafia do dziennika ani synchronizacji
 let timer = null;   // { label, start, sec }
@@ -208,7 +212,7 @@ export function renderPielegnacja(root, ctx) {
               h('span', { class: 'pg-rule' }, ruleText(s)),
               s.warn && h('span', { class: 'pg-warn' }, icon('triangle-alert', { size: 14 }), h('span', {}, s.warn)),
               s.wait > 0 && h('span', { class: 'muted' }, `odczekaj ${s.wait} min`),
-              s.slot && h('span', { class: 'muted' }, `plan dnia: ${SLOTS.find(x => x[0] === s.slot)?.[1] || s.slot}`)),
+              s.slot && h('span', { class: 'muted' }, `plan dnia: ${slotLabel(s.slot)}`)),
             h('button', { class: 'pg-edit', 'aria-label': `Edytuj krok: ${s.text}`, onclick: () => stepDialog(s) }, icon('pencil', { size: 16 })))))))));
     }
   }
@@ -270,7 +274,8 @@ export function renderPielegnacja(root, ctx) {
       warn: h('input', { value: s?.warn || '', placeholder: 'np. Nie płucz po szczotkowaniu' }),
       wait: h('input', { type: 'number', min: '0', step: '1', value: s?.wait || '', placeholder: 'min' }),
       note: h('input', { value: s?.note || '' }),
-      slot: h('select', {}, opts([['', '— bez powiązania —'], ...SLOTS], s?.slot || '')),
+      // dotychczasowe powiązanie zostaje na liście także wtedy, gdy slotu nie ma już w planie (zapis nie może go po cichu usunąć)
+      slot: h('select', {}, opts([['', '— bez powiązania —'], ...SLOTS(), ...(s?.slot && !SLOTS().some(x => x[0] === s.slot) ? [[s.slot, slotLabel(s.slot)]] : [])], s?.slot || '')),
     };
     const dayBoxes = DAY_SHORT.map((l, i) => h('label', { class: 'chk pg-day' },
       h('input', { type: 'checkbox', checked: days.has(i + 1) || null, onchange: e => (e.target.checked ? days.add(i + 1) : days.delete(i + 1)) }), ` ${l}`));

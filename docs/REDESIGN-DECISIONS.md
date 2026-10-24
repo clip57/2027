@@ -103,6 +103,14 @@ nieistotnym wzroście paczki — spełnione przez podzbiór.
 - Panel „Dziennik sesji” w widoku Trening: sekcje zwijane (`details.tl-sec`), wybory jako przyciski z `aria-pressed`/`aria-checked` i znakiem ✓ (stan nie tylko kolorem), pola ≥ 44 px, zapis po zmianie pola bez przerysowania (fokus zostaje).
 - Bez automatycznej oceny kolana i bez metryk bez danych (zasada 6); waga, sen, obwody — poza zakresem (G-20).
 
+## C8. Poprawki audytu z 23.10.2026 (D-107, 24.10.2026)
+
+- „Cofnij” w Zapasach cofa całą operację (także zapis zbiorczy) i liczy stan tak, jakby jej nie było; kolejne „Cofnij” sięga dalej (stos), cofnięcie nie wraca. Podpowiedź przycisku mówi, co zostanie cofnięte; w Historii dopisek „cofnięcie”.
+- Pole liczbowe zapisujące dane: puste ≠ 0 (stan bez zmian i komunikat w obszarze `#toast`).
+- Widok zależny od daty i godziny odświeża się sam: zmiana dnia → przerysowanie w tle (`softRender`); „Teraz” w „Dziś” aktualizowane w miejscu (punktowo, jak P2) — przewinięcie, fokus i rozwinięte sekcje zostają.
+- Zmiana w innej karcie: doczytanie do tej samej instancji magazynu i przerysowanie w tle — wpis w polu i otwarte okno nie giną.
+- Teksty z godzinami (MPW, sloty Pielęgnacji) wyłącznie z danych planu, bez godzin i dni wpisanych na sztywno.
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.

@@ -141,10 +141,22 @@ function nav(current) {
   ];
 }
 
+// Upływ czasu (B3, audyt 23.10.2026): widok zależny od daty i godziny nie może zostać „wczorajszy” (aplikacja z ekranu początkowego jest
+// wznawiana, a nie uruchamiana od nowa). Zmiana dnia → przerysowanie w tle; w ciągu dnia moduł może zgłosić własne sprawdzenie (`ctx.tick`),
+// np. „Teraz” w „Dziś”. Co 30 s, przy powrocie do aplikacji i przy powrocie do okna — tylko gdy strona jest widoczna. To nie jest
+// synchronizacja danych (bez zapytań do sieci i bez zapisów).
+let renderedDay = null, tick = null;
+function clockTick() {
+  if (document.visibilityState === 'hidden' || !renderedDay) return;
+  if (today() !== renderedDay) { softRender(); return; }
+  try { tick?.(); } catch (e) { console.error(e); }
+}
+
 async function render(keepFocus = false) {
   const app = document.getElementById('app');
   const focus = keepFocus === true ? focusKey() : null;
   const { id, params } = route();
+  renderedDay = today(); tick = null;
   setCustomItems(ctx.store?.state?.catalogUser || []);
   const main = h('main', { class: 'main', id: 'main', tabindex: '-1' });
   clear(app).append(...nav(id), main);
@@ -173,7 +185,8 @@ async function render(keepFocus = false) {
       h('section', { class: 'more-sec' }, h('p', { class: 'side-gl' }, 'Wygląd'), themeSwitch(false)));
   } else {
     const mod = byId[id];
-    const c = { ...ctx, params, today: today(), rerender: () => render(true), flash: (text, cls = 'warn') => toast(text, cls) };
+    const c = { ...ctx, params, today: renderedDay, rerender: () => render(true), flash: (text, cls = 'warn') => toast(text, cls),
+      soft: softRender, tick: fn => { tick = fn; } };
     try { await (RENDER[id] || ((r) => renderPlaceholder(r, mod)))(main, c); }
     catch (e) { main.append(h('div', { class: 'banner err', role: 'alert' }, `Błąd modułu: ${e.message}`)); console.error(e); }
   }
@@ -215,8 +228,16 @@ async function boot() {
   try {
     ctx.store = attachStore(await new Store(new IdbAdapter()).open());
   } catch (e) { ctx.storeError = e.message; console.error(e); }
-  // Inna karta/okno zmieniło dane -> przeładuj z bazy zamiast nadpisywać (ochrona przed równoległą edycją).
-  chan?.addEventListener('message', async () => { if (!ctx.store) return; ctx.store = attachStore(await new Store(new IdbAdapter()).open()); render(true); });
+  // Inna karta/okno zmieniło dane -> doczytanie nowych zdarzeń z bazy do TEJ SAMEJ instancji magazynu (B10: bez nowego połączenia z IndexedDB
+  // przy każdej zmianie; słuchacze i odwołania w otwartych oknach zostają) i przerysowanie w tle (softRender — wpis w polu i otwarte okno
+  // nie giną). Powiadomienia w trakcie odczytu łączone w jeden kolejny odczyt.
+  let reloading = null, again = false;
+  chan?.addEventListener('message', () => {
+    if (!ctx.store?.health?.ok) return;
+    if (reloading) { again = true; return; }
+    reloading = (async () => { do { again = false; if (await ctx.store.reload()) softRender(); } while (again); })()
+      .catch(e => console.error(e)).finally(() => { reloading = null; });
+  });
   addEventListener('hashchange', () => render());
   // Synchronizacja automatyczna w chmurze (D-084) i automatyczne pobieranie zmian (D-085): działają tylko po skonfigurowaniu
   // chmury i przy włączonych przełącznikach. Telefon (wskaźnik dotykowy) sprawdza zmiany rzadziej (60 s) niż komputer (30 s).
@@ -234,6 +255,10 @@ async function boot() {
   addEventListener('focus', () => ctx.cloudAuto.focus());
   for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, () => ctx.cloudAuto.activity(), { capture: true, passive: true });
   await render();
+  setInterval(clockTick, 30000);
+  document.addEventListener('visibilitychange', clockTick);
+  addEventListener('pageshow', clockTick);
+  addEventListener('focus', clockTick);
   ctx.cloudAuto.boot();
   if (!globalThis.__SINGLE__ && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     try { setupUpdates(await navigator.serviceWorker.register('./sw.js')); } catch (e) { console.warn('Service worker:', e.message); }

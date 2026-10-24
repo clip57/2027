@@ -65,6 +65,20 @@ test('treść: dawki, 11 bloków CFA (A–I, M, J), recall, trening 18:15–19:1
   assert.match(unfold(planEvents('2026-11-14', ['train'], NOW).join('\r\n')), /SUMMARY:Trening siłowy: LOWER 2/, '14.11 — nominalna sobota');
 });
 
+test('B5 (audyt 23.10.2026): „Trening, basen i sauna” — basen w niedzielę, 2 rundy sauny w czwartek, sauna po treningu; bez sauny w dni z blokiem M', () => {
+  const tr = d => unfold(planEvents(d, ['train'], NOW).join('\r\n'));
+  const sums = d => (tr(d).match(/^SUMMARY:.*$/gm) || []).map(l => l.slice(8));
+  assert.deepEqual(sums('2026-10-25'), ['Basen 55 min'], 'niedziela — basen (wariant „basen”)');
+  assert.match(tr('2026-10-25'), /DTSTART;TZID=Europe\/Warsaw:20261025T181500/);
+  assert.deepEqual(sums('2026-11-12'), ['2 rundy sauny wg protokołu'], 'czwartek — 2 rundy sauny (wariant „czwartek”)');
+  assert.match(tr('2026-11-12'), /DTSTART;TZID=Europe\/Warsaw:20261112T175500/);
+  assert.deepEqual(sums('2027-01-07'), ['2 rundy sauny wg protokołu'], 'czwartek od 07.01 (wariant „czwartek_st”)');
+  assert.deepEqual(sums('2026-11-16'), ['Trening siłowy: UPPER 1', 'Sauna'], 'poniedziałek — trening i sauna po treningu');
+  assert.deepEqual(sums('2026-11-17'), ['Trening siłowy: LOWER 1'], 'wtorek — bez sauny');
+  assert.deepEqual(sums('2026-10-26'), ['Trening siłowy: UPPER 1'], 'dzień z blokiem M — bez sauny (D-103)');
+  for (const d of ['2026-10-22', '2026-12-25', '2026-11-01']) assert.deepEqual(sums(d), [], `${d}: dzień bez treningu`);
+});
+
 test('kodowanie tekstu i zawijanie wielobajtowych znaków', () => {
   assert.equal(icsText('a,b;c\\d\ne'), String.raw`a\,b\;c\\d\ne`);
   const long = 'SUMMARY:' + 'ąęść'.repeat(40);

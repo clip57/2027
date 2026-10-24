@@ -105,6 +105,33 @@ export function upcomingChanges(model, today, horizon = 14) {
   return out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 }
 
+// Sloty planu dnia do przypięcia kroku (B9, audyt 23.10.2026): każdy identyfikator raz, godzina i nazwa z definicji w szablonie; slot, który
+// nie występuje w większości dni (warianty dnia: czwartek, niedziela z basenem, dni z blokiem M), z opisem dni wyliczonym z kalendarza planu —
+// dni tygodnia i okres (wcześniej opis zgadywany z końcówki identyfikatora: sloty czwartkowe „(sobota)”, część pozycji powtórzona).
+// `dates` — dni planu, `templateOf(date)` — sloty szablonu tego dnia, `defs` — definicje slotów (`id`, `from`, `title_src`). Wynik: [[id, etykieta]].
+const WD = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
+export function slotOptions(dates, templateOf, defs) {
+  const def = new Map();
+  for (const s of defs) if (!def.has(s.id)) def.set(s.id, s);
+  const used = new Map();
+  for (const d of dates) for (const s of templateOf(d)) {
+    const p = s.id.split('.');   // „slot.1745.1” — druga część slotu przyciętego wokół bloku (okno „Wolne”) — ten sam slot co „slot.1745”
+    const id = p.length > 2 && /^\d+$/.test(p[p.length - 1]) ? p.slice(0, -1).join('.') : s.id;
+    if (!def.has(id)) continue;
+    const l = used.get(id) || used.set(id, []).get(id);
+    if (l[l.length - 1] !== d) l.push(d);
+  }
+  const perWd = {};
+  for (const d of dates) perWd[weekday(d)] = (perWd[weekday(d)] || 0) + 1;
+  return [...used].map(([id, days]) => {
+    const s = def.get(id), wds = [...new Set(days.map(weekday))].sort((a, b) => a - b);
+    const every = wds.reduce((n, w) => n + perWd[w], 0) === days.length;   // każdy taki dzień tygodnia w planie
+    const period = days.length === 1 ? shortDate(days[0]) : `${shortDate(days[0])}–${shortDate(days[days.length - 1])}`;
+    const hint = days.length >= dates.length * 0.6 ? '' : ` (${wds.map(w => WD[w - 1]).join(', ')}${every ? '' : `, ${period}`})`;
+    return { id, from: s.from, label: `${s.from} · ${s.title_src}${hint}` };
+  }).sort((a, b) => (a.from < b.from ? -1 : a.from > b.from ? 1 : 0)).map(x => [x.id, x.label]);
+}
+
 // Plik importu planu (format `2027-care`) — tworzony poza repozytorium z dokumentu użytkownika
 export const isCarePlan = o => !!o && o.format === '2027-care' && Array.isArray(o.steps) && Array.isArray(o.products);
 export function careDefsFromPlan(o) {

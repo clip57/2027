@@ -2,6 +2,7 @@
 // recall, MPW, zakupy (czwartki — D-097), wyjątki dat D-087, dni poza planem D-088). Bez nowych danych.
 import { resolveDay } from '../resolver.js';
 import { addDays, weekday } from '../dates.js';
+import { mpwDaySpan } from './mpw.js';
 
 export const mondayOf = date => addDays(date, 1 - weekday(date));
 
@@ -14,7 +15,7 @@ export function weekSummary(date) {
       training: r.sessionLabel, dayType: r.dayType, sauna: r.sauna,
       diet: r.dietVariant, kcal: r.kcal, noDiet: r.noDiet,   // D-100: dni przed startem diety
       cfa: r.cfa.blocks.length, mock: r.cfa.isMock, recall: r.cfa.recall,
-      mpw: r.mpw.blocks.length, mpwSim: r.mpw.isSim,   // plan MPW (D-095)
+      mpw: r.mpw.blocks.length, mpwSim: r.mpw.isSim, mpwSpan: mpwDaySpan(r.mpw.blocks),   // plan MPW (D-095); godziny z bloków (B6)
       blocks: r.blocks?.short || null,                  // weekendy 8:00–15:23 (D-096)
       shopping: r.slots.find(s => s.shop)?.from || null,   // godzina zakupów (D-097: czwartki)
       note: r.note, exception: r.exception && r.exception !== 'D-088' ? r.exception : null,

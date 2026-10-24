@@ -31,6 +31,55 @@ export function stockAt(inv, prod, date) {
   return round(q);
 }
 
+// ---- Cofanie zmian zapasów (B1, audyt 23.10.2026) ----
+// „Cofnij” cofa ostatnią OPERACJĘ: pojedynczą zmianę (stan, zakup, korekta, korekta dnia) albo zapis zbiorczy — zdarzenia ze wspólnym `d.op`
+// (plan zakupów, paragon, zerowanie, przywrócenie stanu z historii). Zdarzenia cofające niosą `d.undo` (klucz cofniętej operacji): same nie są
+// cofane, a cofnięta operacja nie wraca do „Cofnij” (wcześniej drugie „Cofnij” przywracało błąd). Pola `op` i `undo` są pomocnicze i opcjonalne —
+// reduce() i starsze wersje aplikacji je pomijają, więc stan istniejących danych się nie zmienia.
+export const INV_TYPES = ['inv.count', 'inv.move', 'inv.dayshift'];
+export const opKey = e => e.d?.op || e.id;
+
+export function lastOperation(events) {
+  const inv = events.filter(e => INV_TYPES.includes(e.t));
+  const undone = new Set(inv.map(e => e.d.undo).filter(Boolean));
+  let last = null;
+  for (const e of inv) if (!e.d.undo && !undone.has(opKey(e)) && (!last || e.hlc > last.hlc)) last = e;
+  if (!last) return null;
+  const key = opKey(last);
+  return { key, events: inv.filter(e => !e.d.undo && opKey(e) === key).sort((a, b) => (a.hlc < b.hlc ? -1 : 1)) };
+}
+
+// Zdarzenia cofające operację (jeden zapis `recordMany`) i pozycje bez wcześniejszego stanu. Cofanie działa jak stos: wszystko, co zapisano
+// po tej operacji, to operacje już cofnięte i ich cofnięcia — stan „jakby operacji nie było” liczony jest bez niej i bez nich:
+//  • korekta dnia → odwrotna korekta tego samego dnia;
+//  • zakup / korekta ilości → ruch odwrotny z TĄ SAMĄ datą (znosi się dokładnie, także ruch wpisany z wcześniejszą datą);
+//  • stan (inwentaryzacja) — oraz pozycja, której późniejsza (cofnięta) inwentaryzacja przesłoniłaby ruch odwrotny → stan na dziś bez tej
+//    operacji: wcześniejsza inwentaryzacja + ruchy − zużycie z planu (wcześniej wracała sama ilość poprzedniej inwentaryzacji, bez zużycia od
+//    tamtego dnia). Pozycja bez wcześniejszego stanu nie może wrócić do „brak stanu” — zostaje bieżący stan (`unknown`), a zapis tylko oznacza
+//    operację jako cofniętą.
+// Stany zapisywane po ruchach i korektach dnia — nowa inwentaryzacja jest ostatnia, więc nic z tej operacji nie liczy się po niej podwójnie.
+export function undoOperation(inv, op, today) {
+  const ids = new Set(op.events.map(e => e.id)), lastHlc = op.events[op.events.length - 1].hlc;
+  const gone = x => ids.has(x.id) || x.hlc > lastHlc;
+  const keep = rows => Object.fromEntries(Object.entries(rows || {}).map(([p, l]) => [p, l.filter(x => !gone(x))]));
+  const without = { counts: keep(inv.counts), moves: keep(inv.moves), shifts: (inv.shifts || []).filter(x => !gone(x)) };
+  const later = new Set(Object.entries(inv.counts || {}).filter(([, l]) => l.some(x => x.hlc > lastHlc)).map(([p]) => p));
+  const shift = op.events.some(e => e.t === 'inv.dayshift');
+  const counted = new Set([...op.events.filter(e => e.t === 'inv.count' || (e.t === 'inv.move' && later.has(e.d.prod))).map(e => e.d.prod),
+    ...(shift ? later : [])]);
+  const undo = op.key, list = [], unknown = [];
+  for (const e of op.events) {
+    if (e.t === 'inv.dayshift') list.push(['inv.dayshift', { date: e.d.date, dir: -e.d.dir, undo }]);
+    else if (e.t === 'inv.move' && !counted.has(e.d.prod)) list.push(['inv.move', { prod: e.d.prod, qty: -e.d.qty, date: e.d.date, kind: 'adjust', undo }]);
+  }
+  for (const prod of counted) {
+    const q = stockAt(without, prod, today);
+    if (q == null) unknown.push(prod);
+    list.push(['inv.count', { prod, qty: Math.max(0, q ?? stockAt(inv, prod, today) ?? 0), date: today, undo }]);
+  }
+  return { list, unknown };
+}
+
 // Symulacja w przód: ile dni pokryje stan (z uwzględnieniem typów dni i faz).
 // lastCovered = ostatni dzień w pełni pokryty („Wystarczy do” w v31); runOut = pierwszy dzień braku.
 export function forecast(prod, stock, fromDate, maxDays = 400) {
