@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101, D-103, D-103b, D-103c",
+ "decision": "D-018 (+ REKOMPOZYCJA s.7, TRENING), D-100, D-101, D-103, D-103b, D-103c, D-109",
  "days": {
   "1": {
    "dayType": "strength_sauna",
@@ -281,6 +281,21 @@
    "diet": "NT",
    "note": "Boże Narodzenie: dzień całkowicie wolny — bez bloków i treningu (dieta NT)",
    "variant": null
+  },
+  "2026-12-31": {
+   "decision": "D-109",
+   "variant": "czwartek_bz",
+   "note": "Sylwester: bez zakupów (D-109) — sauna, powrót do domu z posiłkiem 20:15; następne zakupy 07.01"
+  },
+  "2027-01-01": {
+   "decision": "D-109",
+   "dayType": "free",
+   "session": null,
+   "sessionName": "Bez treningu",
+   "sauna": 0,
+   "diet": "NT",
+   "variant": null,
+   "note": "Nowy Rok: bez treningu (D-109), dieta NT; bloki MPW bez zmian"
   },
   "2027-01-07": {
    "decision": "D-097",

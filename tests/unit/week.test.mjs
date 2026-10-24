@@ -17,7 +17,7 @@ test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (28 t
       assert.equal(x.date, r.date);
       assert.deepEqual([x.training, x.diet, x.kcal, x.cfa, x.recall, x.mock, x.outside], [r.sessionLabel, r.dietVariant, r.kcal, r.cfa.blocks.length, r.cfa.recall, r.cfa.isMock, r.outside], x.date);
       // D-097: zakupy w czwartki (19:05 do 06.01, 15:30 od 07.01), także w pierwszy czwartek planu 08.10 (D-100); bez zakupów poza planem; soboty bez zakupów
-      const exp = r.weekday !== 4 || r.outside || r.cfa.isMock || ['2026-11-05', '2026-12-24'].includes(x.date) ? null : ['2026-10-22', '2026-10-29'].includes(x.date) ? '17:45' : x.date >= '2027-01-07' ? '15:30' : '19:05';   // D-101: 05.11 bez zakupów; D-103: 22 i 29.10 zakupy 17:45, 24.12 bez zakupów
+      const exp = r.weekday !== 4 || r.outside || r.cfa.isMock || ['2026-11-05', '2026-12-24', '2026-12-31'].includes(x.date) ? null : ['2026-10-22', '2026-10-29'].includes(x.date) ? '17:45' : x.date >= '2027-01-07' ? '15:30' : '19:05';   // D-101: 05.11 bez zakupów; D-103: 22 i 29.10 zakupy 17:45, 24.12 bez zakupów; D-109: 31.12 bez zakupów
       assert.equal(x.shopping, exp, `${x.date}: zakupy w czwartek (D-097)`);
       assert.equal(x.zero, false, `${x.date}: Dzień zero usunięty z kalendarza (D-100)`);
       assert.equal(!!x.noDiet, !!r.noDiet, x.date);

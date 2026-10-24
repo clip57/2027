@@ -110,7 +110,7 @@ test('B9 (audyt 23.10.2026): sloty do przypięcia kroku — każdy raz, dni z ka
   assert.match(label('slot.1745z'), /^17:45 · Zakupy \(czw, 22\.10–29\.10\)$/);
   assert.match(label('slot.1530j'), /\(czw, 07\.01–25\.03\)$/);
   assert.match(label('slot.2015n'), /\(nd, /);
-  assert.match(label('slot.1905b'), /\(czw, 24\.12\)$/, 'jeden dzień — jedna data');
+  assert.match(label('slot.1905b'), /\(czw, 24\.12–31\.12\)$/, 'dni wariantu z kalendarza: 24.12 i 31.12 bez zakupów (D-103, D-109)');
   assert.equal(label('slot.1940c'), undefined, 'slot nieużywany w planie (wariant czwartek_k) — poza listą wyboru');
   assert.ok(!o.some(x => /\.\d+$/.test(x[0].split('.').slice(2).join('.'))), 'części przyciętych slotów („slot.1745.1”) jako ten sam slot');
 });

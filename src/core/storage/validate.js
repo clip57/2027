@@ -14,8 +14,9 @@ export const CFA_BLOCKS = 432;
 export const CFA_PLAN_VERSION = 15;
 // Plan MPW (D-095): 354 bloki; limit z zapasem na aktualizacje planu (tak jak CFA — nie zmniejszamy). Test: plan z mpw.json mieści się w limicie.
 export const MPW_BLOCKS = 400;
-// Meal Prep (R3): klucz kroku w zdarzeniu `prep.step` — limit bez zmniejszania (zdarzenia zapisane przy dłuższej karcie nie mogą trafić do kwarantanny)
-export const PREP_IDX_LIMIT = 10000;
+// Meal Prep: górna granica klucza kroku w zdarzeniu `prep.step` — bez zmian od Etapu 4 (R3, audyt 23.10.2026: klucze kart mieszczą się w niej zawsze —
+// `prepKey` w mealprep.js; zmiana granicy rozjechałaby walidację między wersjami aplikacji)
+export const PREP_IDX_LIMIT = 200;
 const isStr = v => typeof v === 'string' && v.length > 0 && v.length < 5000;
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
 const isId = v => isStr(v) && /^[A-Za-z0-9_.:\-|]{1,200}$/.test(v);
@@ -46,8 +47,7 @@ const PAYLOAD = {
   // nowsza wersja może dodać pole lub poszerzyć zakres, a starsza nie może wtedy odrzucać importu ani wierszy z chmury.
   // Pola i zakresy sprawdza formularz przed zapisem (fieldOk w core/trainlog.js); odczyt toleruje wartości nieznane.
   'train.detail': d => isValidDay(d.date) && plain(d),
-  // Krok karty Meal Prep: `idx` = numer bloku karty × 100 + numer kroku w bloku (mealprep.js, `PREP_IDX`). R3 (audyt 23.10.2026): limit 10 000
-  // (100 bloków × 100 kroków) zamiast 200 — karta z trzecim blokiem kroków byłaby niezapisywalna; zgodność kluczy wszystkich kart — mealprep.test.mjs.
+  // Krok karty Meal Prep: klucz z `prepKey` (mealprep.js) — bloki 0–1: numer bloku × 100 + numer kroku; dalsze bloki: karta `<id>.b<blok>` i numer kroku
   'prep.step': d => isValidDay(d.date) && isId(d.card) && Number.isInteger(d.idx) && d.idx >= 0 && d.idx < PREP_IDX_LIMIT && typeof d.done === 'boolean',
   'prep.test': d => isId(d.id) && isValidDay(d.date) && typeof d.pass === 'boolean' && (d.value == null || isStr(d.value)),
   'private.pack': d => isObj(d.pack) && d.pack.format === '2027-private' && plain(d.pack),

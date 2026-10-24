@@ -1427,6 +1427,18 @@ async def run_d108(pw, name, url, mobile):
     await pg.locator('.actions').get_by_role('button', name='Cofnij', exact=True).click()
     await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', '5')
     ok(await st().input_value() == '5', f'{tag} U8: „Cofnij” w Zapasach cofa przywrócenie z kopii')
+    # D-109 (D3 audytu): Sylwester bez zakupów (sauna zostaje), zakupy 17.12 → 07.01; Nowy Rok bez treningu, bloki MPW bez zmian
+    await pg.goto(url + '#/dzis?d=2026-12-31'); await pg.wait_for_selector('.dz-plan-h')
+    await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    titles = await pg.eval_on_selector_all('.dz-plan .slot-title', 'e => e.map(x => x.firstChild.textContent.trim())')
+    ok('Zakupy' not in titles and '2 rundy sauny wg protokołu' in titles and 'Sylwester: bez zakupów' in await pg.inner_text('main'), f'{tag} D-109: 31.12 — sauna, bez zakupów')
+    await pg.goto(url + '#/dzis?d=2027-01-01'); await pg.wait_for_selector('.dz-plan-h')
+    await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    titles = await pg.eval_on_selector_all('.dz-plan .slot-title', 'e => e.map(x => x.firstChild.textContent.trim())')
+    ok(not any(t.startswith('Trening') for t in titles) and await pg.locator('.dz-mpw .cfa-row').count() == 3 and 'Nowy Rok: bez treningu' in await pg.inner_text('main'),
+       f'{tag} D-109: 01.01 — bez treningu, 3 bloki MPW')
+    await pg.goto(url + '#/trening?d=2027-01-01'); await pg.wait_for_selector('.hero-tr')
+    ok('Bez treningu' in await pg.inner_text('.hero-tr h1'), f'{tag} D-109: Trening 01.01 — bez treningu')
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await ctx.close(); await b.close()
 

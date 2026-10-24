@@ -58,18 +58,23 @@ test('{private:N} zastępowane treścią z pakietu, bez pakietu — komunikat', 
   assert.equal(resolveText(t, 0, 'T', pack), 'Uzasadnienie TREŚĆ dalej.');
 });
 
-test('R3 (audyt 23.10.2026): klucze kroków wszystkich kart Meal Prep są unikalne i mieszczą się w walidacji prep.step', async () => {
-  const { PREP_IDX } = await import('../../src/modules/mealprep.js');
+test('R3 (audyt 23.10.2026): klucze kroków Meal Prep — unikalne, bloki 0–1 bez zmian, dalsze bloki w walidacji każdej wersji (idx < 200)', async () => {
+  const { prepKey } = await import('../../src/modules/mealprep.js');
   const { PREP_IDX_LIMIT, validateEvent } = await import('../../src/core/storage/validate.js');
+  assert.equal(PREP_IDX_LIMIT, 200, 'granica walidacji prep.step bez zmian (zgodność między wersjami aplikacji)');
+  const ev = k => ({ id: `prep.step:t${k.card}${k.idx}`, hlc: '1790000000000:0000:dtest', dev: 'dtest', t: 'prep.step', d: { date: '2026-11-02', card: k.card, idx: k.idx, done: true }, at: '2026-11-02T10:00:00Z', v: 1 });
+  const keysOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((_, i) => { assert.ok(i < 100, `${c.id}: najwyżej 100 kroków w bloku`); return prepKey(c.id, bi, i); }));
   for (const c of SRC.mealprep.cards.filter(x => x.id)) {
-    assert.ok(c.blocks.length <= 100, `${c.id}: najwyżej 100 bloków`);
-    const keys = c.blocks.flatMap((b, bi) => (b.items || []).map((_, i) => { assert.ok(i < 100, `${c.id}: najwyżej 100 kroków w bloku`); return PREP_IDX(bi, i); }));
-    assert.equal(new Set(keys).size, keys.length, `${c.id}: klucze kroków bez powtórzeń`);
-    assert.ok(keys.every(k => k < PREP_IDX_LIMIT), c.id);
+    const keys = keysOf(c), txt = keys.map(k => `${k.card}|${k.idx}`);
+    assert.equal(new Set(txt).size, txt.length, `${c.id}: klucze kroków bez powtórzeń`);
+    for (const k of keys) assert.equal(validateEvent(ev(k)), null, `${c.id}: ${k.card}|${k.idx}`);
   }
-  const ev = idx => ({ id: `prep.step:t${idx}`, hlc: '1790000000000:0000:dtest', dev: 'dtest', t: 'prep.step', d: { date: '2026-11-02', card: 'k4', idx, done: true }, at: '2026-11-02T10:00:00Z', v: 1 });
-  assert.equal(validateEvent(ev(PREP_IDX(2, 5))), null, 'trzeci blok kroków karty — zapisywalny (wcześniej idx < 200)');
-  assert.equal(validateEvent(ev(PREP_IDX(99, 99))), null);
-  assert.match(validateEvent(ev(PREP_IDX_LIMIT)), /prep\.step/);
-  assert.match(validateEvent(ev(-1)), /prep\.step/);
+  // dotychczasowe klucze (bloki 0–1) bez zmian — zapisane odhaczenia nadal pasują do kroków
+  assert.deepEqual([prepKey('k2', 0, 2), prepKey('k2', 1, 0), prepKey('k4', 0, 11)], [{ card: 'k2', idx: 2 }, { card: 'k2', idx: 100 }, { card: 'k4', idx: 11 }]);
+  // karta z kolejnymi blokami kroków (np. po zmianie planu) — klucze nadal unikalne i w granicy 200
+  const big = { id: 'k9', blocks: [{ items: ['a', 'b'] }, { items: ['c'] }, { items: ['d', 'e'] }, { text: 'uwaga' }, { items: ['f'] }] };
+  const keys = keysOf(big);
+  assert.deepEqual(keys.map(k => `${k.card}|${k.idx}`), ['k9|0', 'k9|1', 'k9|100', 'k9.b2|0', 'k9.b2|1', 'k9.b4|0']);
+  assert.ok(keys.every(k => validateEvent(ev(k)) === null && k.idx < PREP_IDX_LIMIT));
+  assert.match(validateEvent(ev({ card: 'k9', idx: 200 })), /prep\.step/, 'walidacja bez zmian: 200 odrzucane');
 });

@@ -28,9 +28,12 @@ export function resolveText(text, phase, variant, pack) {
 // Produkty katalogu użyte w karcie (znaczniki {produkt} w krokach i notatkach)
 const cardProds = c => [...new Set([...JSON.stringify(c.blocks).matchAll(/\{(\w+)\}/g)].map(m => m[1]).filter(k => catalogById[k]))];
 
-// Klucz kroku karty w zdarzeniu `prep.step` (bez zmian od Etapu 4): numer bloku karty × 100 + numer kroku w bloku. R3: każda karta musi mieścić się
-// w limicie walidacji (`PREP_IDX_LIMIT`, 100 bloków × 100 kroków) — test w mealprep.test.mjs sprawdza wszystkie karty planu.
-export const PREP_IDX = (block, item) => block * 100 + item;
+// Klucz kroku karty w zdarzeniu `prep.step` (Etap 4): numer bloku karty × 100 + numer kroku w bloku — bez zmian dla bloków 0–1 (wszystkie dotychczasowe
+// karty i zapisane odhaczenia). R3 (audyt 23.10.2026): dalsze bloki kroków (od trzeciego) zapisują się jako karta `<id>.b<numer bloku>` z numerem kroku,
+// więc `idx` jest zawsze < 200 — mieści się w walidacji każdej wersji aplikacji (`PREP_IDX_LIMIT`) i zapis z pliku lub chmury nie trafia
+// na starszym urządzeniu do kwarantanny. Test w mealprep.test.mjs: klucze wszystkich kart planu unikalne i zgodne z walidacją.
+export const prepKey = (card, block, item) => (block < 2 ? { card, idx: block * 100 + item } : { card: `${card}.b${block}`, idx: item });
+const prepKeyText = (date, k) => `${date}|${k.card}|${k.idx}`;
 const timerMin = text => { const m = text.match(/(\d+)(?:–(\d+))?\s*min/); return m ? Number(m[2] || m[1]) : null; };
 
 function timer(minutes, label) {
@@ -74,7 +77,7 @@ export function renderMealPrep(root, ctx) {
   const byId = Object.fromEntries(SRC.mealprep.cards.map(c => [c.id, c]));
   const eveIds = new Set(SRC.mealprep.phases[EVE].cards);
   const textOf = (c, t) => (eveIds.has(c.id) ? TN(t) : T(t));
-  const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${date}|${c.id}|${PREP_IDX(bi, i)}`, text: it, card: c })));
+  const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: prepKeyText(date, prepKey(c.id, bi, i)), text: it, card: c })));
   // D-100: w dniu bez diety (08–11.10) tylko wieczorne przygotowanie na jutro (11.10 → 12.10) — a gdy i jutro bez diety (08–10.10), brak kart
   const order = r.noDiet ? (rt.noDiet ? [] : [EVE]) : ORDER;
   const allSteps = order.flatMap(i => SRC.mealprep.phases[i].cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
@@ -154,11 +157,11 @@ export function renderMealPrep(root, ctx) {
         c.blocks.map((b, bi) => {
           if (b.items) {
             return h('ul', { class: `prep-list ${b.type}` }, b.items.map((it, i) => {
-              const key = `${date}|${c.id}|${PREP_IDX(bi, i)}`;
+              const pk = prepKey(c.id, bi, i), key = prepKeyText(date, pk);
               const mins = timerMin(it);
               return h('li', {},
                 h('label', {}, h('input', { type: 'checkbox', checked: !!state[key], disabled: !store,
-                  onchange: e => toggle(c.id, PREP_IDX(bi, i), e.target.checked) }), h('span', {}, textOf(c, it))),
+                  onchange: e => toggle(pk.card, pk.idx, e.target.checked) }), h('span', {}, textOf(c, it))),
                 mins ? timer(mins, c.title) : null);
             }));
           }

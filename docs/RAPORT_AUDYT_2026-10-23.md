@@ -4,7 +4,7 @@ Stan kodu: `main` = `790bcef` (D-106). Audyt od zera: przeczytany cały kod apli
 dynamiczna kontrola każdego dnia planu w resolverze i w przeglądarce, testy podejrzeń w Chromium z zegarem Playwright.
 Bez plików źródłowych użytkownika (dane syntetyczne). **Kod nie był zmieniany** — raport to lista do decyzji.
 
-> **Stan 24.10.2026:** błędy **B1–B10 naprawione** (D-107, `docs/RAPORT_D107.md`); ryzyka **R1–R4 usunięte** i ulepszenia **U1–U8 wdrożone** (D-108, `docs/RAPORT_D108.md`). Decyzje D1–D3 — bez zmian, do decyzji użytkownika.
+> **Stan 24.10.2026:** błędy **B1–B10 naprawione** (D-107, `docs/RAPORT_D107.md`); ryzyka **R1–R4 usunięte** i ulepszenia **U1–U8 wdrożone** (D-108, `docs/RAPORT_D108.md`). **D3 rozstrzygnięte** (D-109, `docs/RAPORT_D109.md`: 31.12 bez zakupów, zakupy 17.12 → 07.01, 01.01 bez treningu z MPW, 06.01 bez zmian); **D2** — bez zmian z wyboru użytkownika („Czas własny” 12.11); **D1** — decyzja później.
 
 ## 1. Metoda
 
@@ -38,12 +38,12 @@ Kolizje w **108 ze 119 dni MPW**:
 Symulacje MPW 15:30–18:30 (np. sob. 27.02, śr. 17.03) zachodzą na trening o 18:15. **Potrzebny nowy rozkład popołudnia od 16.11**
 (np. trening później albo blok C wcześniej) — wtedy wprowadzę go jak poprzednie decyzje (`tools/extract/day_plan_d1xx.py`).
 
-### D2. Egzamin CFA 12.11 nie jest widoczny w „Dziś” (za 20 dni)
+### D2. Egzamin CFA 12.11 nie jest widoczny w „Dziś” (za 20 dni) — bez zmian z wyboru użytkownika (24.10.2026)
 `cfa.exam` = 2026-11-12 (czwartek). Kalendarz i moduł CFA go pokazują, ale plan dnia 12.11 to zwykły czwartek: od 8:00 sloty
 „Brak bloku CFA — Poza okresem planu nauki”, 2 rundy sauny 17:55, zakupy 19:05. Egzamin MPW (21.03) jest w planie dnia jako blok —
 CFA nie. Potrzebne: godzina egzaminu i układ dnia (czy sauna i zakupy zostają).
 
-### D3. Święta i zakupy
+### D3. Święta i zakupy — rozstrzygnięte 24.10.2026 (D-109)
 - **31.12 (czwartek)**: zakupy 19:05–20:35 — w Sylwestra sklepy zwykle zamykają wcześnie. Razem z 24.12 bez zakupów (D-103)
   przerwa między zakupami może wynieść **17.12 → 07.01 (21 dni)**.
 - **01.01 (piątek)**: UPPER 2 + 3 bloki MPW; **06.01 (środa)**: rower + sauna — dni ustawowo wolne (siłownia/sauna mogą być zamknięte).

@@ -269,11 +269,11 @@ const extraBlocks = d => (byDay[d] || []).filter(b => !/^([A-I]|S\d)$/.test(b.bl
 const filled = (d, from, to) => { const ex = extraBlocks(d); let at = from; for (let moved = true; moved && at < to;) { moved = false; for (const [f, e] of ex) if (f <= at && e > at) { at = e; moved = true; } } return at >= to; };
 const continuous = (d, t) => t.forEach((s, i) => { const next = t[(i + 1) % t.length].from; assert.ok(s.to === next || filled(d, s.to, next), `${d} ${s.id}: ${s.to} → ${next}`); });
 
-test('Soboty bez zakupów (D-097): zwykły szablon z blokiem E; zakupy w czwartki — do 06.01 19:05–20:35 po saunie (22.10 i 29.10 — 17:45–18:40 bez sauny, D-103; 05.11 i 24.12 bez zakupów), od 07.01 15:30–16:00; 15.10 usunięty z kalendarza (D-103b)', () => {
+test('Soboty bez zakupów (D-097): zwykły szablon z blokiem E; zakupy w czwartki — do 06.01 19:05–20:35 po saunie (22.10 i 29.10 — 17:45–18:40 bez sauny, D-103; 05.11, 24.12 i 31.12 bez zakupów — D-101, D-103, D-109), od 07.01 15:30–16:00; 15.10 usunięty z kalendarza (D-103b)', () => {
   assert.equal(SRC.dayTemplate.variants.zakupy, undefined);
   assert.equal(SRC.week.days['6'].variant, undefined);
   assert.equal(SRC.week.days['4'].variant, 'czwartek');
-  const ZL = ['2026-10-22', '2026-10-29'], NO_SHOP = ['2026-11-05', '2026-12-24'];
+  const ZL = ['2026-10-22', '2026-10-29'], NO_SHOP = ['2026-11-05', '2026-12-24', '2026-12-31'];
   assert.ok(!Object.values(SRC.week.exceptions).some(e => e.variant === 'czwartek_k'), 'wariant czwartek_k (dawniej 15.10) nieużywany od D-103b');
   for (const d of range(PLAN0, PLAN_END)) {
     const t = templateFor(d);
@@ -317,7 +317,7 @@ test('Soboty bez zakupów (D-097): zwykły szablon z blokiem E; zakupy w czwartk
   assert.equal(resolveDay('2026-10-17').slots.find(s => s.id === 'slot.1220').title, 'CFA blok E', 'sobota: blok E');
 });
 
-test('Wyjątki dat (D-096, D-097, D-101, D-102, D-103, D-103b, D-103c): plan od 18.10 (basen), bez sauny w dni z blokiem M, czwartki 22/29.10, 23.10, 01–02.11 i 03–11.11 bez treningu z dietą NT, 12–15.11 nominalnie, święta (25.12 wolny), czwartki od 07.01', () => {
+test('Wyjątki dat (D-096, D-097, D-101, D-102, D-103, D-103b, D-103c, D-109): plan od 18.10 (basen), bez sauny w dni z blokiem M, czwartki 22/29.10, 23.10, 01–02.11 i 03–11.11 bez treningu z dietą NT, 12–15.11 nominalnie, święta (25.12 wolny), 31.12 bez zakupów, 01.01 bez treningu, czwartki od 07.01', () => {
   const row = d => { const r = resolveDay(d); return [r.dayType, r.sessionLabel, r.dietVariant, r.sauna, r.training ? r.training.length > 0 : null]; };
   for (const d of ['2026-10-08', '2026-10-11', '2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15']) assert.equal(resolveDay(d).sessionLabel, 'Poza planem', `${d}: dni przed startem planu 18.10 — historia (D-102, D-103c)`);
   // 16–17.10 usunięte z kalendarza (D-103c): poza planem, bez wyjątków dat; pierwszy dzień planu i trening 18.10 (basen)
@@ -369,8 +369,20 @@ assert.deepEqual(['2026-10-24', '2026-10-25', '2026-10-26', '2026-10-30', '2026-
   assert.deepEqual(row('2026-12-24'), ['rest_sauna2', 'Bez treningu, 2 × sauna', 'NT', 2, null]);
   for (const d of ['2026-12-25', '2026-12-26', '2026-12-27']) { assert.deepEqual(row(d), ['free', 'Bez treningu', 'NT', 0, null], d); assert.equal(resolveDay(d).blocks?.kind, 'wolne', `${d}: bez bloków`); assert.ok(!resolveDay(d).slots.some(s => s.shop), d); }
   assert.deepEqual({ ...SRC.week.blocks['2026-12-25'], decision: null }, { ...SRC.week.blocks['2026-12-26'], decision: null }, '25.12 jak 26.12 (bloki weekendowe: wolne)');
+  // D-109 (D3 audytu): Sylwester bez zakupów (sauna jak w czwartek), zakupy 17.12 → 07.01; Nowy Rok bez treningu z dietą NT, bloki MPW bez zmian; 06.01 bez zmian
+  assert.deepEqual(row('2026-12-31'), ['rest_sauna2', 'Bez treningu, 2 × sauna', 'NT', 2, null]);
+  assert.equal(dayPlan('2026-12-31').variant, 'czwartek_bz');
+  assert.ok(!resolveDay('2026-12-31').slots.some(s => s.shop), '31.12: bez zakupów');
+  assert.ok(resolveDay('2026-12-17').slots.some(s => s.shop) && resolveDay('2027-01-07').slots.some(s => s.shop), 'zakupy 17.12 i 07.01');
+  assert.ok([...range('2026-12-18', '2027-01-06')].every(d => !resolveDay(d).slots.some(s => s.shop)), 'bez zakupów 18.12–06.01');
+  assert.deepEqual(row('2027-01-01'), ['free', 'Bez treningu', 'NT', 0, null]);
+  assert.equal(resolveDay('2027-01-01').kcal, plan('NT', resolveDay('2027-01-01').phase).total.kcal, '01.01: dieta NT');
+  assert.deepEqual(resolveDay('2027-01-01').mpw.blocks.map(b => b.blok), ['A', 'B', 'C'], '01.01: bloki MPW bez zmian');
+  assert.ok(!resolveDay('2027-01-01').slots.some(s => /Trening|Rozgrzewka/.test(s.title)), '01.01: bez treningu');
+  assert.equal(SRC.week.exceptions['2027-01-06'], undefined, '06.01 — rower i sauna bez zmian');
+  assert.deepEqual(row('2027-01-06'), row('2027-01-13'), '06.01 jak zwykła środa');
   const thu = [...range('2027-01-07', PLAN_END)].filter(d => weekday(d) === 4);
-  const dates = ['2026-10-22', '2026-10-23', '2026-10-29', '2026-11-01', '2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07', '2026-11-08', '2026-11-09', '2026-11-10', '2026-11-11', '2026-12-24', '2026-12-25', '2026-12-26', '2026-12-27'];
+  const dates = ['2026-10-22', '2026-10-23', '2026-10-29', '2026-11-01', '2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07', '2026-11-08', '2026-11-09', '2026-11-10', '2026-11-11', '2026-12-24', '2026-12-25', '2026-12-26', '2026-12-27', '2026-12-31', '2027-01-01'];
   assert.deepEqual(Object.keys(SRC.week.exceptions), [...dates, ...thu, '2027-03-27', '2027-03-28'].sort());
   for (const d of thu) assert.equal(dayPlan(d).variant, 'czwartek_st', d);
 });

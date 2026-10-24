@@ -243,15 +243,15 @@ test('R1 (audyt 23.10.2026): wiersz z chmury, którego ta wersja nie przyjmuje, 
   await B.sync();
   q = await B.store.adapter.getQuarantine();
   assert.equal(q.length, 1);
-  // Aktualizacja aplikacji: wpis odłożony przez starszą wersję, który ta wersja przyjmuje (R3: krok Meal Prep idx ≥ 200 — starsza walidacja
-  // go odrzucała), wraca do dziennika przy otwarciu bazy; Diagnostyka liczy tylko wpisy nieodzyskane
-  const prep = { ...A.store.makeEvent('prep.step', { date: '2026-11-02', card: 'k4', idx: 205, done: true }), id: 'prep.step:starsza-walidacja' };
-  assert.equal(await B.store.quarantine([{ raw: prep, reason: 'niepoprawna treść zdarzenia prep.step' }], 'cloud'), 1);
-  assert.equal(await B.store.quarantine([{ raw: prep, reason: 'x' }], 'cloud'), 0, 'bez powtórzeń');
+  // Aktualizacja aplikacji: wpis odłożony przez starszą wersję, który ta wersja przyjmuje (np. szczegóły sesji z polem dodanym w nowszej wersji —
+  // pierwsza wersja D-106 odrzucała nieznane pola), wraca do dziennika przy otwarciu bazy; Diagnostyka liczy tylko wpisy nieodzyskane
+  const det = { ...A.store.makeEvent('train.detail', { date: '2026-11-02', pool: { min: 40 }, rowing: { min: 20 } }), id: 'train.detail:starsza-walidacja' };
+  assert.equal(await B.store.quarantine([{ raw: det, reason: 'niepoprawna treść zdarzenia train.detail' }], 'cloud'), 1);
+  assert.equal(await B.store.quarantine([{ raw: det, reason: 'x' }], 'cloud'), 0, 'bez powtórzeń');
   const reopened = await new Store(B.store.adapter).open();
-  assert.ok(reopened.events.has(prep.id));
+  assert.ok(reopened.events.has(det.id));
   assert.equal(reopened.health.restored, 1);
-  assert.equal(reopened.state.prep['2026-11-02|k4|205'], true);
+  assert.deepEqual(reopened.state.trainDetails['2026-11-02'].rowing, { min: 20 });
   assert.equal(await reopened.quarantinePending(), 1, 'odzyskany wpis nie jest liczony; zostaje wpis z blokiem 500');
   assert.equal((await reopened.adapter.getQuarantine()).length, 2, 'surowe kopie zostają w kwarantannie');
 });

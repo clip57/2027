@@ -118,7 +118,9 @@ test('najbliższe zakupy wg planu dnia (D-097): czwartek po saunie 19:05–20:35
   assert.deepEqual(nextShopping('2026-11-12', 20, 35), { date: '2026-11-19', inDays: 7, ...thuNoJ });
   assert.deepEqual(nextShopping('2026-10-16', 10), { date: '2026-10-22', inDays: 6, ...thuZl }, 'piątek i sobota bez zakupów');
   assert.deepEqual(nextShopping('2026-10-22', 18, 41), { date: '2026-10-29', inDays: 7, ...thuZl }, 'po zakupach 22.10 — kolejne 29.10');
-  assert.deepEqual(nextShopping('2026-12-23', 10), { date: '2026-12-31', inDays: 8, ...thuNoJ }, '24.12 bez zakupów (D-103) — następne 31.12');
+  assert.deepEqual(nextShopping('2026-12-23', 10), { date: '2027-01-07', inDays: 15, ...jan }, '24.12 i 31.12 bez zakupów (D-103, D-109) — następne 07.01');
+  assert.deepEqual(nextShopping('2026-12-17', 20, 36), { date: '2027-01-07', inDays: 21, ...jan }, 'po zakupach 17.12 — następne dopiero 07.01 (D-109)');
+  assert.deepEqual(nextShopping('2026-12-17', 19), { date: '2026-12-17', inDays: 0, ...thuNoJ }, '17.12 — ostatnie zakupy przed świętami');
   assert.deepEqual(nextShopping('2027-01-05', 8), { date: '2027-01-07', inDays: 2, ...jan });
   assert.deepEqual(nextShopping('2027-01-07', 15, 59), { date: '2027-01-07', inDays: 0, ...jan });
   assert.deepEqual(nextShopping('2027-01-07', 16), { date: '2027-01-14', inDays: 7, ...jan });
