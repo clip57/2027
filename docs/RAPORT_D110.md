@@ -165,6 +165,8 @@ stałych 200 ms; próg elementów dotykowych 43,5 px zamiast 44 (`e2e.py` ×2, `
 ## 8. Weryfikacja ręczna (urządzenia — poza zasięgiem testów automatycznych; środowisko nie ma WebKit)
 iPhone (Safari i aplikacja z ekranu początkowego): pływający pasek dolny nad wskaźnikiem Home (nie zasłania treści, chowa się przy
 klawiaturze), pasek tytułu po przewinięciu, arkusze — uchwyt i zamykanie przeciągnięciem, szkło (rozmycie) w PWA, oś czasu i odliczanie
-w „Teraz”, nowa ikona po ponownym dodaniu do ekranu początkowego (iOS przechowuje starą ikonę do ponownego dodania), Ustawienia →
-Dostępność → „Ogranicz przezroczystość” / „Zwiększ kontrast” / „Ogranicz ruch” — aplikacja bez szkła / bez animacji.
+w „Teraz”, Ustawienia → Dostępność → „Ogranicz przezroczystość” / „Zwiększ kontrast” / „Ogranicz ruch” — aplikacja bez szkła / bez animacji.
+**Ikona na ekranie początkowym:** iOS zostawia starą ikonę do ponownego dodania aplikacji, a **usunięcie aplikacji z ekranu początkowego
+usuwa jej bazę danych** (osobną od Safari). Nowa ikona nie jest potrzebna do działania — jeśli ma się pojawić: najpierw „Synchronizuj teraz”
+(chmura) albo eksport pliku synchronizacji w Dane, dopiero potem usunięcie i ponowne dodanie, potem synchronizacja lub import.
 MacBook (Safari i Chrome): pływający panel boczny, poświata pod kursorem, odsłonięcie motywu, ⌘K u góry ekranu.

@@ -280,8 +280,9 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
 13. **System 2.0 (D-110)** — na iPhonie (Safari i PWA osobno): pływający pasek dolny nad wskaźnikiem Home (nie zasłania ostatniej
    treści, chowa się przy klawiaturze i wraca), pasek tytułu po przewinięciu (tytuł modułu, w „Dziś” — dnia), arkusze: uchwyt, zamknięcie
    przeciągnięciem w dół, krótkie przeciągnięcie wraca; szkło (rozmycie) paska dolnego, paska tytułu i liczników; „Dziś”: „Teraz” z „zostało
-   N min”, oś czasu, pas podsumowań przewijany w poziomie; zmiana modułu otwiera go od góry, „Wstecz” wraca do miejsca; nowa ikona po
-   ponownym dodaniu do ekranu początkowego; Ustawienia → Dostępność: „Ogranicz ruch” (bez animacji), „Ogranicz przezroczystość”
+   N min”, oś czasu, pas podsumowań przewijany w poziomie; zmiana modułu otwiera go od góry, „Wstecz” wraca do miejsca; nowa ikona dopiero po
+   ponownym dodaniu do ekranu początkowego — **usunięcie aplikacji z ekranu początkowego usuwa jej bazę**: wcześniej synchronizacja w chmurze
+   albo eksport pliku (RAPORT_D110 §8); Ustawienia → Dostępność: „Ogranicz ruch” (bez animacji), „Ogranicz przezroczystość”
    i „Zwiększ kontrast” (bez szkła i poświat). **Do wykonania przez użytkownika.**
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
