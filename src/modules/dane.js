@@ -54,6 +54,9 @@ export async function renderDane(root, ctx) {
   const sensitive = [store?.state?.privatePack && 'zaimportowany pakiet prywatny', store?.state?.careDefs?.length && 'plan pielęgnacji'].filter(Boolean);
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const say = (text, cls = 'warn') => { clear(msg).append(h('div', { class: `banner ${cls}` }, text)); };
+  // Sekcja chmury (asynchroniczna) gotowa przed wstawieniem treści: synchronizacja — pierwsza sekcja — pojawia się razem z resztą,
+  // bez wskakiwania nad „Stan zapisu” (skok układu; test kolejności sekcji odczytywał stronę w tej chwili)
+  const cloudEl = await cloudSection(ctx);
 
   // --- Stan zapisu
   const health = store?.health || { ok: false, error: ctx.storeError };
@@ -112,7 +115,7 @@ export async function renderDane(root, ctx) {
     h('p', { class: `dn-plain${sensitive.length ? ' banner warn' : ' muted'}` }, icon('lock', { size: 16 }),
       h('span', {}, `Plik 2027-sync.json nie jest szyfrowany${sensitive.length ? ` i zawiera ${sensitive.join(' oraz ')}` : ''}. Trzymaj go tylko w swoim iCloud Drive i włącz Zaawansowaną ochronę danych iCloud (Ustawienia → Twoje imię → iCloud). Synchronizacja w chmurze szyfruje dane na urządzeniu.`))),
     // Synchronizacja w chmurze (D-078, Etap 2) — niezależna od pliku; ręczna, przyciskiem
-    await cloudSection(ctx));
+    cloudEl);
 
   async function onFile(file) {
     if (!file) return;

@@ -1,7 +1,7 @@
 # REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0, Fazie 5 (wszystkie moduły) i Etapach 0–3 audytu — 25.09.2026
 
 > **System 2.0 (D-110, 24.10.2026):** nowy wygląd całej aplikacji — `docs/RAPORT_D110.md`, specyfikacja `REDESIGN-SPEC.md` (§1, §2, §4, §5).
-> **Stan bieżący (29.09.2026):** `main` = `redesign-faza4` = `b3b4edc` (D-097). Aktualny stan, zasady i niedokończone zadania: `docs/PRZEKAZANIE.md`.
+> **Stan bieżący (24.10.2026):** `main` = `a824797` (D-109); D-110 na gałęzi `claude/eager-newton-j2309e`. Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
 > Poniższe zapisy o commitach (`69d5d94`, `b65b9fa`, `4e68589`) są historyczne.
 
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).

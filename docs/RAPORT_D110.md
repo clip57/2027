@@ -162,6 +162,13 @@ stałych 200 ms; próg elementów dotykowych 43,5 px zamiast 44 (`e2e.py` ×2, `
 „Teraz” jest teraz na pierwszym ekranie; plan dnia o ok. 1,2 ekranu wyżej (podsumowania w przewijanym pasie, zwarta lista
 „Wymaga uwagi”, nagłówek w jednym wierszu).
 
+**CI i poprawka po przebiegu (24.10.2026):** „Testy 2027” dla `c80d6ea` — zielone. Kolejny przebieg (`b47a566`, tylko dokumentacja)
+— 1516/1517: „Dane: synchronizacja jako pierwsza sekcja” odczytała `['Stan zapisu', 'Aktualizacja aplikacji']`. Przyczyna (sprzed D-110):
+`renderDane` wstawiał stronę z pustym miejscem na synchronizację i wypełniał je dopiero po `await cloudSection(ctx)` — sekcja
+wskakiwała nad „Stan zapisu” (skok układu widoczny także dla użytkownika), a test czytał stronę w tej chwili. Odtworzone lokalnie przy
+6-krotnym spowolnieniu CPU (3 / 20 przejść). Poprawka w `src/modules/dane.js`: sekcja chmury liczona przed wstawieniem treści —
+pierwsza sekcja pojawia się razem z resztą (0 / 20); test bez zmian.
+
 ## 8. Weryfikacja ręczna (urządzenia — poza zasięgiem testów automatycznych; środowisko nie ma WebKit)
 iPhone (Safari i aplikacja z ekranu początkowego): pływający pasek dolny nad wskaźnikiem Home (nie zasłania treści, chowa się przy
 klawiaturze), pasek tytułu po przewinięciu, arkusze — uchwyt i zamykanie przeciągnięciem, szkło (rozmycie) w PWA, oś czasu i odliczanie
