@@ -237,6 +237,9 @@ export function describeError(e, during = 'sync') {
 export function describeResult(r) {
   let text = r.applied || r.pushed ? `Synchronizacja zakończona. Pobrane z chmury: ${r.applied}, wysłane: ${r.pushed}.` : 'Synchronizacja zakończona — wszystko aktualne.';
   if (r.backup) text += ' Przed dopisaniem zapisano kopię stanu.';
-  if (r.rejected?.length) text += ` Pominięto ${r.rejected.length} wpisów z chmury, których nie da się odczytać (inne hasło szyfrowania albo uszkodzony wpis) — dane lokalne bez zmian.`;
+  const held = (r.rejected || []).filter(x => x.held).length, unreadable = (r.rejected?.length || 0) - held;
+  if (unreadable) text += ` Pominięto ${unreadable} wpisów z chmury, których nie da się odczytać (inne hasło szyfrowania albo uszkodzony wpis) — dane lokalne bez zmian.`;
+  // R1: wpisy, których ta wersja aplikacji nie przyjmuje — w kwarantannie; po aktualizacji aplikacji wracają przy uruchomieniu
+  if (held) text += ` ${held} wpisów z chmury odłożono do kwarantanny — ta wersja aplikacji ich nie przyjmuje. Zaktualizuj aplikację na tym urządzeniu: po aktualizacji wrócą automatycznie.`;
   return text;
 }

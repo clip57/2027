@@ -98,6 +98,11 @@ dialog::backdrop { background: var(--scrim); }
 .nowcard .muted { color: color-mix(in srgb, var(--paper) 72%, transparent); font-size: var(--fs-sm); }
 .nowcard .btn { margin-top: var(--s-2); justify-self: start; background: transparent; color: var(--paper); border-color: color-mix(in srgb, var(--paper) 45%, transparent); text-decoration: none; display: inline-flex; align-items: center; }
 .slot.is-now { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+/* U1: „Czas własny” — slot bez bloku nauki poza planem CFA: mniejszy, bez koloru domeny; dawki i podpunkty bez zmian */
+.slot.is-own { --dc: var(--line); padding-block: .55rem; }
+.slot.is-own .slot-title { font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); }
+.slot.is-own .slot-time time { font-size: var(--fs-sm); }
+.slot.is-own .slot-items li::before { background: var(--text-2); }
 .now-tag { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: var(--ink); color: var(--paper); border-radius: var(--r-full); padding: .1rem var(--s-2); }
 
 .macros { display: inline-flex; flex-wrap: wrap; gap: var(--s-1); align-items: baseline; font-size: var(--fs-xs); }
@@ -294,6 +299,17 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
   color: var(--ink); text-decoration: none; min-height: 56px; }
 .ds-d { font-family: var(--font-round); font-weight: 800; font-size: var(--fs-md); }
 .ds-s { font-size: var(--fs-xs); color: var(--ink-2); line-height: 1.2; }
+.ds-t { font-size: var(--fs-2xs); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ds.is-on .ds-t { color: var(--text-2); }
+.tr-weeknav.daynav { align-items: center; margin-bottom: var(--s-3); }
+.tr-week { font-weight: 600; color: var(--text-2); font-variant-numeric: tabular-nums; }
+/* Telefon: w pierwszym wierszu zakres tygodnia i „Ten tydzień”, w drugim — poprzedni / następny (krótkie etykiety; pełna nazwa w aria-label) */
+@media (max-width: 599px) {
+  .tr-week { flex: 1 1 auto; order: -2; }
+  .tr-weeknav .dz-nav.tr-now { order: -1; flex: 0 0 auto; }
+  .tr-weeknav .dz-nav.tr-step { flex: 1 1 40%; }
+  .tr-long { display: none; }
+}
 .ds.is-today .ds-d::after { content: " • dziś"; font-size: var(--fs-2xs); font-weight: 600; color: var(--train); }
 .ds.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
 .ds.is-on .ds-s { color: var(--text-2); }

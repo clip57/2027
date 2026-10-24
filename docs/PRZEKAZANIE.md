@@ -32,7 +32,7 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
 Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 
 ## 4. Niedokończone po D-097 (kolejność zalecana)
-> **Stan 23.10.2026:** punkty 1, 3 i 4 wykonane — E2E i `verify_all.py` na kalendarzu V44, wyniki w `RAPORT_D103.md` §6. Punkt 2 (`UPGRADE`) — sprawdzić przy następnej zmianie planu.
+> **Stan 24.10.2026:** punkty 1–4 wykonane — E2E i `verify_all.py` na kalendarzu V44 (wyniki w `RAPORT_D103.md` §6); punkt 2 (`UPGRADE` w `private_pack_lib.py`) — reguły do D-103c i D-104 (potwierdzone w audycie 23.10.2026, U5). Przy następnej zmianie planu dopisz nowe reguły.
 
 1. **`tests/e2e/e2e.py` — oczekiwania sprzed D-097** (E2E nieuruchamiane od D-096: wtedy 1382/1382). Znane miejsca:
    - start planu 27.09 → Dzień zero 29.09 (`#/dzis?d=2026-09-27/28`, linie ~86–125, ~343–348, `d=2026-09-27` w przejściu „poza planem”);
@@ -42,7 +42,7 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
    - Suplementacja: okres „od 2026-09-30 do 2027-03-28” (~197), Trening/Suplementy 28.09 (~195, ~263);
    - pakiet prywatny „plan od 2026-09-27” (~508–510) → 2026-09-29;
    - dodać: Kalendarz (klik dnia), Dzień zero (`.dz-zero`), czwartek (sauna/zakupy, od 07.01 przesunięte MPW w `run_mpw`), nowy wygląd „Wymaga uwagi” (`.dz-attn a` nadal działa).
-2. **`tools/extract/private_pack_lib.py` → `UPGRADE`**: dopisać reguły D-097 (Faza 0 „27.09–11.10” → „30.09–11.10”, „ostatni dzień 21.03.2027” → „28.03.2027”);
+2. ~~**`tools/extract/private_pack_lib.py` → `UPGRADE`**~~ — **wykonane** (reguły do D-103c i D-104). Pierwotnie: dopisać reguły D-097 (Faza 0 „27.09–11.10” → „30.09–11.10”, „ostatni dzień 21.03.2027” → „28.03.2027”);
    potem użytkownik aktualizuje swój pakiet (Diagnostyka pokaże pakiet dla planu od 27.09 jako nieaktualny).
 3. **`tools/verify/verify_all.py`** — kontrole sprzed D-097: suplementy 27.09–21.03 (~55), CFA 400/45 dni/28.09 (~108–115 → 387, 43 dni, 30.09–11.11, v12),
    wariant „zakupy” (~144 → warianty „czwartek”/„czwartek_st”), wyjątki `["2026-09-27"]` (~147 → 01.10, święta, tydzień 28.09–03.10, czwartki 07.01–25.03).

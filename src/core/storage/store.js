@@ -192,6 +192,25 @@ export class Store {
     return added > 0;
   }
 
+  // Kwarantanna zdarzeń spoza bazy (R1, audyt 23.10.2026): wiersz z chmury o poprawnej kopercie i znanym typie, którego treści ta wersja aplikacji
+  // nie przyjmuje (np. zapisany przez nowszą wersję o poszerzonej walidacji), trafia tu zamiast przepaść — numer wiersza jest już „widziany”,
+  // więc chmura nie poda go ponownie. Po aktualizacji aplikacji wraca przy otwarciu bazy (odzyskiwanie w `open()`); kopia zostaje nienaruszona.
+  // Bez powtórzeń: zdarzenie o `id` obecnym w kwarantannie albo w dzienniku nie jest dopisywane drugi raz. Wynik: liczba dopisanych.
+  async quarantine(list, src) {
+    const have = new Set((await this.adapter.getQuarantine()).map(q => q?.raw?.id).filter(Boolean));
+    let n = 0;
+    for (const { raw, reason } of list) {
+      if (!raw?.id || have.has(raw.id) || this.events.has(raw.id)) continue;
+      await this.adapter.addQuarantine({ at: new Date().toISOString(), reason, raw, src });
+      have.add(raw.id); n++;
+    }
+    return n;
+  }
+  // Wpisy kwarantanny, których dziennik nie zawiera (nieodzyskane) — liczba do Diagnostyki
+  async quarantinePending() {
+    return (await this.adapter.getQuarantine()).filter(q => !(q?.raw?.id && this.events.has(q.raw.id))).length;
+  }
+
   on(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
   // Pełne przeliczenie stanu z całego dziennika (otwarcie, import, synchronizacja, zdarzenia starsze od najnowszego).
   rebuild() { this.reducer = reduceInto(this.events.values()); this.state = this.reducer.state; }

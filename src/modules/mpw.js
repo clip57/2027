@@ -7,6 +7,7 @@ import { SRC, mpwByDay, mpwBloki } from '../core/data.js';
 import { longDate, shortDate, dayShort, weekday } from '../core/dates.js';
 import { renderStudy, modeStats } from './study.js';
 import { mpwSources, mpwFreeDays } from '../core/calc/mpw.js';
+import { planTasks, loadPlanTasks } from '../core/plan-tasks.js';
 
 const D = { ...SRC.mpw.D, bloki: mpwBloki };   // godziny wg decyzji (D-097: czwartki od 07.01 +30 min)
 // Godziny bloków w dni przesunięte (D-097, `week.mpwShift`) — z danych, do opisu planu (B6)
@@ -60,9 +61,15 @@ export const MPW_PLAN = {
   mock: { word: 'Symulacja', day: simLabel },
   // Punkty zakresu KNF i priorytet bloku (z planu)
   meta: b => [b.knf && h('span', { class: 'muted' }, `KNF ${b.knf}`), b.priorytet && h('span', { class: `mw-prio mw-p-${b.priorytet.toLowerCase().replace(/[^a-z]+/g, '-')}` }, b.priorytet)],
-  tasks: true, searchHint: 'temat, źródło, artykuły, punkt KNF, data',
+  // Zadania bloków (U6): poza pakietem aplikacji — wczytywane przy otwarciu modułu (renderMPW)
+  tasks: true, taskOf: b => planTasks('mpw')?.[b.nr] || null, tasksReady: () => !!planTasks('mpw'),
+  searchHint: 'temat, źródło, artykuły, punkt KNF, data',
   log: { placeholder: 'np. KSH — art. 301, próg 5%', csv: 'error-log-mpw.csv', importV3: false },
   plan,
 };
 
-export const renderMPW = (root, ctx) => renderStudy(root, ctx, MPW_PLAN);
+// U6: zadania bloków wczytywane przy pierwszym otwarciu modułu (potem z pamięci karty); błąd wczytania nie blokuje widoku
+export async function renderMPW(root, ctx) {
+  if (!planTasks('mpw')) await loadPlanTasks('mpw').catch(e => console.warn('Zadania bloków MPW:', e?.message || e));
+  return renderStudy(root, ctx, MPW_PLAN);
+}

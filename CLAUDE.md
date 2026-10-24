@@ -80,11 +80,12 @@ Dane: `tools/extract/day_plan_d101.py`. Raport: `docs/RAPORT_D101.md`.
 dni treningowe z blokiem M (`mTrainDay`, 13 dni): trening 18:15–19:15, powrót z posiłkiem 19:15, prysznic i mycie głowy 19:25–19:40, bez sauny (`trainingBeforeM`, szablon `mTraining`); czwartki 22/29.10 — `czwartek_zl` (bez sauny, zakupy 17:45–18:40); 23.10 bez treningu; 24.12 bez zakupów (`czwartek_bz`), 25.12 wolny; okno „Wolne” pod K/L/M przycinane (`trimTrainWindow`).
 **D-106:** dziennik szczegółów sesji — zdarzenie `train.detail` (jeden dokument na dzień, LWW; stan `trainDetails`), pola basenu, roweru, kolana i sauny wg protokołów (`src/core/trainlog.js` — definicja pól, `fieldOk` w formularzu, `src/modules/trening_log.js` — panel „Dziennik sesji”); w magazynie walidacja **tylko daty i zwykłego JSON** (zgodność w przód — nie zaostrzaj); odczyt toleruje nieznane pola i wartości. Testy: `npm run e2e:trening`. Raport: `docs/RAPORT_D106.md`.
 **D-107 (24.10.2026, poprawki audytu B1–B10 — `docs/RAPORT_D107.md`):** „Cofnij” w Zapasach cofa całą operację (stos; `lastOperation`/`undoOperation` w `core/calc/inventory.js`, zapisy zbiorcze przez `manyOp` z polem `op`, cofnięcia z polem `undo` — pola pomocnicze, `reduce()` je pomija); puste pole liczbowe ≠ 0; upływ czasu — `clockTick` w `app.js` (zmiana dnia → `softRender`) i `ctx.tick` modułu („Teraz” w „Dziś” w miejscu); stoper > 600 min zatrzymuje się bez minut; `.ics` po `slot.key` (warianty dnia); godziny MPW z bloków (`mpwDaySpan`); ikony — regex atrybutów z cyframi; seria tygodni z D-106; sloty Pielęgnacji z kalendarza (`slotOptions`); zmiana w innej karcie — `store.reload()` (ta sama instancja). Testy: `run_d107` w `e2e.py`.
+**D-108 (24.10.2026, ryzyka R1–R4 i ulepszenia U1–U8 z audytu — `docs/RAPORT_D108.md`):** wiersz z chmury, którego walidacja tej wersji nie przyjmuje → kwarantanna (`Store.quarantine`), wraca po aktualizacji przy otwarciu bazy (R1); import `postep-nauki.json` związany z wersją planu — inna wersja zablokowana, poprzednia przeliczana wg `progressRequirements` (`cfaProgressPlan`, R2); `prep.step` `idx < PREP_IDX_LIMIT` (10 000), klucz `PREP_IDX` (R3); kopia przed chmurą raz na dobę lokalną (R4); sloty nauki bez bloku po 11.11 — „Czas własny” (`own`, `.slot.is-own`), slot w czasie bloków MPW — „Nauka MPW” z godzinami (U1); workflow „Testy 2027” (`testy.yml`) przed publikacją (U2); skróty `g k/p/e/n` (U3); Trening — tydzień wybranego dnia i przełączanie tygodni (U4); **plany nauki w pakiecie bez pól z `DROP` w `src/core/plan-split.js`, zadania MPW tylko przez `planTasks`/`loadPlanTasks` (`plan-tasks.js`, w przeglądarce `plan-tasks.web.js`)** (U6); `localhost` w CSP tylko w buildzie `BUILD_LOCAL_API=1` (U7); „Przywróć stany Zapasów” z kopii w Dane (`restoreRows`, U8). Testy: `run_d108` w `e2e.py`, `plan-split.test.mjs`.
 **D-105:** arkusze treningu (System kolana, Sauna) i listy rozgrzewki/schłodzenia z danych ustrukturyzowanych w `training.json` (`sheetsData`, `warmupData`, `cooldownData`, `dayNotes`; `tools/extract/training_sheets.py` po ekstrakcji, `src/modules/trening_sheets.js`).
 **D-103c (17.10.2026):** początek całego planu 18.10 (15–17.10 poza planem; plan CFA V44 ma własny zakres od 16.10), `tools/extract/day_plan_d103c.py`. **D-104:** skyr 75 g w śniadaniu i lunchu — przeliczone sumy diety (T/NT: 2595/2298, 2750/2453, 2931/2634 kcal), zapasy (150 g dziennie, limit 1800 g), Rekompozycja, meal prep (`tools/extract/diet_skyr75.py` po `extract_diet.py`).
 **D-103b (17.10.2026):** 15.10 usunięty z kalendarza (plan od 16.10); wyjątkowo bez treningu 17.10, 01.11 i 02.11 (dieta NT) — dni treningowe z blokiem M: 10 dni 18–31.10; kreatyna w niedzielę bez treningu z posiłkiem 20:15 (`tools/extract/day_plan_d103b.py`, uruchamiać po `day_plan_d103.py`).
 Dane: `tools/extract/day_plan_d103.py`. Kontrola: `node tools/verify/plan_check.mjs`, `python3 tests/e2e/cfa_smoke.py`. Raport: `docs/RAPORT_D103.md`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-107).
+Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-108).
 
 ---
 
@@ -120,7 +121,7 @@ npm run build             # dist/web + dist/single/2027.html (wymagane przed tes
 npm test                  # testy jednostkowe (node --test)
 npm run e2e               # testy w przeglądarce: Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
 npm run e2e:sync          # synchronizacja między 2 profilami + aktualizacja kodu za zgodą (kilka razy przebudowuje dist/)
-npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py)
+npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py); sam buduje wariant z CSP dla localhost (BUILD_LOCAL_API=1) i przywraca zwykły build
 npm run e2e:trening       # arkusze treningu (D-105) i dziennik sesji (D-106): 390/1100 px, ciemny/jasny, axe
 npm run a11y              # axe-core WCAG 2.1 A/AA: 26 widoków + 22 stany × 390/1280 px × jasny/ciemny + przewijanie w poziomie
 npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika, w tym PLAN_NAUKI_CFA_LEVEL_I.html), bez nich nie działa
@@ -131,7 +132,7 @@ Zmienne opcjonalne: `SOURCES_DIR` (katalog z plikami źródłowymi, m.in. `zapas
 z tekstami „[DANE TESTOWE] …”, pliki tylko w katalogu tymczasowym). Tylko `npm run verify` i test migracji kopii ZAPASY
 wymagają plików użytkownika (raportowane jako „pominięte”). Nigdy nie próbuj odtwarzać ani wymyślać plików użytkownika;
 nie dopisuj do fixtures wartości „podobnych do prawdziwych” — wyłącznie wzór z katalogu i teksty zastępcze.
-Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test` → `npm run build` → publikacja `dist/web`.
+Workflow GitHub: `.github/workflows/testy.yml` („Testy 2027”, D-108/U2 — jednostkowe, `plan_check`, `verify_all --data-only`, budowa, `cfa_smoke`, E2E, a11y, Trening, `e2e:sync`, `e2e:cloud`; push poza `main` i PR) oraz `.github/workflows/pages.yml` (push do `main`: najpierw „Testy 2027”, potem Node 22, `npm ci` → `npm test` → `npm run build` → publikacja `dist/web`; błąd testów zatrzymuje publikację).
 
 ## 3. ZASADY BEZWZGLĘDNE (nie naruszaj bez wyraźnej zgody użytkownika)
 
@@ -227,3 +228,5 @@ Workflow GitHub (`.github/workflows/pages.yml`): Node 22, `npm ci` → `npm test
 | Test czytający pobrany plik przez `read_text()` | `\r\n` zamienione na `\n` — fałszywy błąd przy kontroli `.ics` | `read_bytes().decode('utf8')` |
 | `clock.fast_forward(t)` w Playwright przy zegarze co 30 s | zegar wywołany najwyżej raz — sprawdzenie „po 10:03” nie zachodzi | przeskok ≥ 60 s albo `run_for` |
 | Stałe (`const`) zdefiniowane w module po `return <widok>()` | `ReferenceError` przy kliknięciu (okno edycji Pielęgnacji się nie otwierało) | pomocnicze stałe i fragmenty (`region`) przed wyborem widoku; funkcje (`function`) mogą być niżej |
+| Pole planu nauki z listy `DROP` (`src/core/plan-split.js`) albo `zadania` użyte wprost w kodzie | w Node (testy) pole jest, w przeglądarce — `undefined` (build podaje plan bez niego) | nowe użycie = usunięcie pola z `DROP`; zadania MPW tylko przez `planTasks`/`loadPlanTasks`; strażnik `plan-split.test.mjs` |
+| Test chmury w wariancie web z produkcyjną CSP | `connect-src` bez `localhost` (U7) blokuje lokalny serwer testowy | `e2e:cloud` (`cloud_sync.py`) sam buduje wariant `BUILD_LOCAL_API=1`; nie dodawaj `localhost` do CSP publikowanej wersji |

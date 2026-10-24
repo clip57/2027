@@ -199,3 +199,59 @@ test('konfiguracja: odrzuca adres inny niż https (poza localhost) i brak klucza
   assert.throws(() => createCloudClient({ url: 'http://example.com', anonKey: 'k', storage: memoryStorage() }), { code: 'bad-config' });
   assert.throws(() => createCloudClient({ url: 'https://x.supabase.co', anonKey: '', storage: memoryStorage() }), { code: 'bad-config' });
 });
+
+test('R4 (audyt 23.10.2026): „raz dziennie” dla kopii przed pobraniem z chmury liczone wg doby lokalnej, nie UTC', async () => {
+  const tz = process.env.TZ;
+  process.env.TZ = 'Europe/Warsaw';
+  try {
+    const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
+    const A = await device(srv), B = await device(srv);
+    // 28.09 23:30 i 29.09 00:30 czasu polskiego — w UTC oba to 28.09 (wcześniej druga kopia była pomijana)
+    const late = () => new Date('2026-09-28T21:30:00Z'), midnight = () => new Date('2026-09-28T22:30:00Z'), later = () => new Date('2026-09-29T06:00:00Z');
+    await A.store.record('cfa.done', { block: 1, done: true, plan: 15 }); await A.sync();
+    assert.equal((await B.sync({ now: late })).backup, true);
+    assert.equal(await B.store.adapter.getMeta(META.lastBackup), '2026-09-28');
+    await A.store.record('cfa.done', { block: 2, done: true, plan: 15 }); await A.sync();
+    assert.equal((await B.sync({ now: midnight })).backup, true, 'nowa doba lokalna — nowa kopia');
+    assert.equal(await B.store.adapter.getMeta(META.lastBackup), '2026-09-29');
+    await A.store.record('cfa.done', { block: 3, done: true, plan: 15 }); await A.sync();
+    assert.equal((await B.sync({ now: later })).backup, false, 'ta sama doba lokalna — bez kolejnej kopii');
+  } finally { if (tz === undefined) delete process.env.TZ; else process.env.TZ = tz; }
+});
+
+test('R1 (audyt 23.10.2026): wiersz z chmury, którego ta wersja nie przyjmuje, trafia do kwarantanny (raz) i wraca po aktualizacji aplikacji', async () => {
+  const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
+  const A = await device(srv), B = await device(srv);
+  // A — „nowsza wersja”: znany typ z treścią spoza walidacji tej wersji (numer bloku CFA ponad limit); zapis z pominięciem walidacji
+  const wide = { ...A.store.makeEvent('cfa.done', { block: 500, done: true, plan: 16 }), id: 'cfa.done:nowsza-wersja' };
+  A.store.events.set(wide.id, wide);
+  await A.store.record('cfa.done', { block: 3, done: true, plan: 15 });
+  await A.sync();
+  const r = await B.sync();
+  assert.deepEqual([r.applied, r.held, r.rejected.length, r.rejected[0].held], [1, 1, 1, true]);
+  assert.ok(!B.store.events.has(wide.id), 'nie trafia do dziennika ani stanu');
+  let q = await B.store.adapter.getQuarantine();
+  assert.deepEqual(q.map(x => [x.raw.id, x.src]), [[wide.id, 'cloud']]);
+  assert.match(q[0].reason, /cfa\.done/);
+  assert.equal(await B.store.quarantinePending(), 1);
+  const { describeResult } = await import('../../src/core/sync/cloud-local.js');
+  assert.match(describeResult(r), /1 wpisów z chmury odłożono do kwarantanny/);
+  assert.doesNotMatch(describeResult(r), /nie da się odczytać/);
+  // kolejne rundy i przerwana runda (kursor i okno „widzianych” od nowa) — bez powtórzeń w kwarantannie
+  assert.equal((await B.sync()).held, 0);
+  await B.store.adapter.setMeta(META.cursor, 0); await B.store.adapter.setMeta(META.seen, []);
+  await B.sync();
+  q = await B.store.adapter.getQuarantine();
+  assert.equal(q.length, 1);
+  // Aktualizacja aplikacji: wpis odłożony przez starszą wersję, który ta wersja przyjmuje (R3: krok Meal Prep idx ≥ 200 — starsza walidacja
+  // go odrzucała), wraca do dziennika przy otwarciu bazy; Diagnostyka liczy tylko wpisy nieodzyskane
+  const prep = { ...A.store.makeEvent('prep.step', { date: '2026-11-02', card: 'k4', idx: 205, done: true }), id: 'prep.step:starsza-walidacja' };
+  assert.equal(await B.store.quarantine([{ raw: prep, reason: 'niepoprawna treść zdarzenia prep.step' }], 'cloud'), 1);
+  assert.equal(await B.store.quarantine([{ raw: prep, reason: 'x' }], 'cloud'), 0, 'bez powtórzeń');
+  const reopened = await new Store(B.store.adapter).open();
+  assert.ok(reopened.events.has(prep.id));
+  assert.equal(reopened.health.restored, 1);
+  assert.equal(reopened.state.prep['2026-11-02|k4|205'], true);
+  assert.equal(await reopened.quarantinePending(), 1, 'odzyskany wpis nie jest liczony; zostaje wpis z blokiem 500');
+  assert.equal((await reopened.adapter.getQuarantine()).length, 2, 'surowe kopie zostają w kwarantannie');
+});

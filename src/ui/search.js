@@ -4,6 +4,7 @@ import { sheet } from './components.js';
 import { icon } from './icons.js';
 import { buildIndex, search, kindLabel } from '../core/search.js';
 import { today } from '../core/dates.js';
+import { modulesOn, byId } from '../modules/registry.js';
 
 let cache = { state: undefined, day: '', index: null };
 const indexFor = state => {
@@ -43,16 +44,21 @@ export function openSearch(getState, initial = '') {
 }
 
 // Skróty: ⌘K / Ctrl+K lub „/” — szukaj; ← → — poprzedni / następny dzień (tydzień); g + litera — moduł; ? — lista skrótów.
-const GO = { d: 'dzis', w: 'dzis?v=tydzien', i: 'dieta', s: 'suplementy', z: 'zapasy', m: 'mealprep', t: 'trening', c: 'cfa', b: 'bezpieczenstwo', r: 'rekompozycja', a: 'dane' };
-const NAMES = { d: 'Dziś', w: 'Tydzień', i: 'Dieta', s: 'Suplementacja', z: 'Zapasy', m: 'Meal Prep', t: 'Trening', c: 'CFA', b: 'Bezpieczeństwo', r: 'Rekompozycja', a: 'Dane' };
+// U3 (audyt 23.10.2026): każdy moduł ma skrót (także Kalendarz, Pielęgnacja, MPW); „g n” — bieżący plan nauki tak jak zakładka na pasku
+// (`modulesOn`: CFA do 11.11, od 12.11 MPW), „g c” i „g e” — zawsze CFA i MPW. Nazwy z rejestru modułów.
+const GO = { d: 'dzis', w: 'dzis?v=tydzien', k: 'kalendarz', p: 'pielegnacja', i: 'dieta', s: 'suplementy', z: 'zapasy', m: 'mealprep', t: 'trening',
+  r: 'rekompozycja', n: null, c: 'cfa', e: 'mpw', b: 'bezpieczenstwo', a: 'dane' };
+const studyNow = () => modulesOn(today()).find(m => m.group === 'Nauka' && m.tab)?.id || 'cfa';
+const target = k => GO[k] ?? (k === 'n' ? studyNow() : null);
+const nameOf = k => (k === 'w' ? 'Tydzień' : k === 'n' ? `Nauka — bieżący plan (teraz: ${byId[studyNow()].name})` : byId[GO[k]].name);
 const isField = el => el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName));
 
 function helpSheet() {
   if (document.querySelector('dialog.gs-help')) return;
   const row = (k, t) => [h('dt', {}, h('kbd', {}, k)), h('dd', {}, t)];
   const d = sheet('Skróty klawiaturowe', h('dl', { class: 'kv gs-help-list' },
-    row('⌘ K  lub  /', 'Szukaj w aplikacji'), row('← →', 'Poprzedni / następny dzień (Dziś, Tydzień, CFA, Meal Prep)'),
-    Object.entries(NAMES).map(([k, n]) => row(`g ${k}`, n)), row('?', 'Ta lista'), row('Esc', 'Zamknij okno')));
+    row('⌘ K  lub  /', 'Szukaj w aplikacji'), row('← →', 'Poprzedni / następny dzień (Dziś, CFA, MPW, Meal Prep, Pielęgnacja) albo tydzień (Tydzień, Trening)'),
+    Object.keys(GO).map(k => row(`g ${k}`, nameOf(k))), row('?', 'Ta lista'), row('Esc', 'Zamknij okno')));
   d.el.classList.add('gs-help');
 }
 
@@ -64,7 +70,7 @@ export function setupShortcuts(getState) {
     if (e.key === '/') { e.preventDefault(); openSearch(getState); return; }
     if (e.key === '?') { e.preventDefault(); helpSheet(); return; }
     if (e.key === 'g') { gAt = Date.now(); return; }
-    if (gAt && Date.now() - gAt < 1500 && GO[e.key]) { gAt = 0; e.preventDefault(); location.hash = `#/${GO[e.key]}`; return; }
+    if (gAt && Date.now() - gAt < 1500 && target(e.key)) { gAt = 0; e.preventDefault(); location.hash = `#/${target(e.key)}`; return; }
     gAt = 0;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       const want = e.key === 'ArrowLeft' ? /^Poprzedni (dzień|tydzień)$/ : /^Następny (dzień|tydzień)$/;

@@ -4,7 +4,7 @@ Stan kodu: `main` = `790bcef` (D-106). Audyt od zera: przeczytany cały kod apli
 dynamiczna kontrola każdego dnia planu w resolverze i w przeglądarce, testy podejrzeń w Chromium z zegarem Playwright.
 Bez plików źródłowych użytkownika (dane syntetyczne). **Kod nie był zmieniany** — raport to lista do decyzji.
 
-> **Stan 24.10.2026:** błędy **B1–B10 naprawione** (D-107, `docs/RAPORT_D107.md`). Decyzje D1–D3, ryzyka R1–R4 i ulepszenia U1–U8 — bez zmian, do decyzji użytkownika.
+> **Stan 24.10.2026:** błędy **B1–B10 naprawione** (D-107, `docs/RAPORT_D107.md`); ryzyka **R1–R4 usunięte** i ulepszenia **U1–U8 wdrożone** (D-108, `docs/RAPORT_D108.md`). Decyzje D1–D3 — bez zmian, do decyzji użytkownika.
 
 ## 1. Metoda
 
@@ -64,7 +64,7 @@ CFA nie. Potrzebne: godzina egzaminu i układ dnia (czy sauna i zakupy zostają)
 | B9 | niska | Pielęgnacja → edycja kroku | Lista „Powiązanie z planem dnia”: sloty czwartkowe (`…z`, wariant `czwartek_zl`) opisane „(sobota)”; powtórzone pozycje (17:45 ×3, mycie głowy ×3 z różnymi godzinami). |
 | B10 | niska | Wiele kart/okien | Zmiana w innej karcie otwiera nowe połączenie IndexedDB i pełne przeliczenie stanu; poprzednie połączenia nie są zamykane (`app.js`, kanał `p2027`). Przy długiej pracy w dwóch oknach — narastające zużycie pamięci (wniosek z kodu, nie mierzone). |
 
-## 4. Ryzyka ukryte (dziś bez skutków)
+## 4. Ryzyka ukryte (dziś bez skutków) — usunięte 24.10.2026 (D-108)
 
 | # | Opis |
 |---|---|
@@ -73,7 +73,7 @@ CFA nie. Potrzebne: godzina egzaminu i układ dnia (czy sauna i zakupy zostają)
 | R3 | Meal Prep: klucz kroku `blok × 100 + krok`, walidacja `prep.step` `idx < 200` — karta z 3 blokami kroków byłaby niezapisywalna (dziś maks. 102). |
 | R4 | Kopia przed pobraniem z chmury liczona „raz na dzień” wg daty UTC (`toISOString`) — nieszkodliwe przesunięcie o 1–2 h. |
 
-## 5. Ulepszenia (propozycje)
+## 5. Ulepszenia (propozycje) — wdrożone 24.10.2026 (D-108)
 
 | # | Propozycja |
 |---|---|

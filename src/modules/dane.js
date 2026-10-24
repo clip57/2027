@@ -3,7 +3,10 @@ import { h, clear, fmt, add } from '../ui/dom.js';
 import { exportBundle, preview, previewEvents, apply } from '../core/sync/bundle.js';
 import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
 import { sha256 } from '../core/hash.js';
-import { stockAt, forecast, status, allItems } from '../core/calc/inventory.js';
+import { stockAt, forecast, status, allItems, restoreRows } from '../core/calc/inventory.js';
+import { reduce } from '../core/storage/store.js';
+import { randomId } from '../core/ids.js';
+import { sheet } from '../ui/components.js';
 import { shortDate } from '../core/dates.js';
 import { icon } from '../ui/icons.js';
 import { cloudSection } from './dane-cloud.js';
@@ -133,6 +136,8 @@ export async function renderDane(root, ctx) {
         ? `Pakiet przygotowany dla planu od ${p.plan.start}${p.plan.start === PLAN_START ? ' (bieżący)' : ` — bieżący plan zaczyna się ${PLAN_START}`}.`
         : `Pakiet bez oznaczenia wersji planu${p.created ? ` (utworzony ${p.created})` : ''} — zaktualizuj go skryptem private_pack_lib.py (Diagnostyka danych).`); })(),
       pv.file && h('p', {}, `Plik wyeksportowany ${when(pv.file.exportedAt)} na urządzeniu ${pv.file.device || '—'}${pv.file.device === store.device ? ' (to urządzenie)' : ''}.`),
+      // R2: postęp CFA — z którego planu pochodzi plik i które bloki zostaną oznaczone
+      pv.notice && h('div', { class: `banner ${pv.notice.level} dn-pv-note` }, pv.notice.text),
       pv.file?.exportedAt && meta.imp?.file?.exportedAt && pv.file.exportedAt < meta.imp.file.exportedAt &&
         h('div', { class: 'banner warn' }, `Ten plik jest STARSZY niż ostatnio wczytany (${when(meta.imp.file.exportedAt)}). W iCloud Drive może być nowsza kopia, np. „2027-sync 2.json”.`),
       pv.future?.count > 0 && h('div', { class: 'banner warn' },
@@ -194,7 +199,7 @@ export async function renderDane(root, ctx) {
   // --- Diagnostyka (I8): kontrola spójności danych, tylko odczyt
   if (store) {
     const cloud = await cloudStatus(store).catch(() => null);
-    const quarantined = (await store.adapter.getQuarantine().catch(() => [])).length;
+    const quarantined = await store.quarantinePending().catch(() => 0);   // R1: bez wpisów już odzyskanych
     const checks = diagnose(store.state, { today: ctx.today, custom: store.state.catalogUser || [], quarantined, health: store.health, cloud });
     const bad = checks.filter(c => c.level === 'warn').length;
     add(root, h('section', { class: 'panel dn-diag', 'aria-labelledby': 'h-diag' }, h('h2', { id: 'h-diag' }, icon('activity', { size: 18 }), 'Diagnostyka danych'),
@@ -205,10 +210,35 @@ export async function renderDane(root, ctx) {
           c.href && h('a', { href: c.href }, 'Przejdź')))))));
   }
 
-  // --- Kopie automatyczne
-  add(root, h('section', { class: 'panel', 'aria-labelledby': 'h-bk' }, h('h2', { id: 'h-bk' }, 'Kopie automatyczne'),
-    h('p', { class: 'muted' }, 'Aplikacja zapisuje stan sprzed każdego importu (ostatnie 5).'),
+  // --- Kopie automatyczne (U8, audyt 23.10.2026: opis działania i przywracanie stanów Zapasów z kopii)
+  add(root, h('section', { class: 'panel dn-bk', 'aria-labelledby': 'h-bk' }, h('h2', { id: 'h-bk' }, 'Kopie automatyczne'),
+    h('p', { class: 'muted' }, 'Aplikacja zapisuje dziennik zmian sprzed każdego importu pliku i — najwyżej raz dziennie — sprzed pobrania zmian z chmury (ostatnie 5 kopii).'),
+    h('p', { class: 'muted' }, '„Pobierz” zapisuje kopię jako plik 2027-sync.json. Jego import scala zmiany jak każda synchronizacja — nie cofa zmian zapisanych później. „Przywróć stany Zapasów” ustawia stany magazynu z chwili kopii (z odliczeniem zużycia z planu do dziś) jako jedną operację, którą „Cofnij” w Zapasach cofa w całości; pozostałe dane (bloki nauki, treningi, ustawienia, pielęgnacja) zostają bez zmian.'),
     !(meta.backups?.length) ? h('p', {}, 'Brak kopii.') :
-      h('ul', {}, meta.backups.sort((a, b) => (a.at < b.at ? 1 : -1)).map(b => h('li', {}, `${new Date(b.at).toLocaleString('pl-PL')} · ${b.reason} · ${b.events.length} zmian `,
-        h('button', { onclick: async () => shareOrDownload(JSON.stringify({ ...(await exportBundle({ allEvents: () => b.events, device: store.device })) }), `2027-kopia-${b.at.slice(0, 10)}.json`) }, 'Pobierz'))))));
+      h('ul', { class: 'dn-bk-list' }, meta.backups.sort((a, b) => (a.at < b.at ? 1 : -1)).map(b => h('li', {}, h('span', {}, `${new Date(b.at).toLocaleString('pl-PL')} · ${b.reason} · ${b.events.length} zmian`),
+        h('span', { class: 'row' },
+          h('button', { onclick: async () => shareOrDownload(JSON.stringify({ ...(await exportBundle({ allEvents: () => b.events, device: store.device })) }), `2027-kopia-${b.at.slice(0, 10)}.json`) }, 'Pobierz'),
+          store?.health?.ok && h('button', { onclick: () => restoreDialog(b) }, icon('undo-2', { size: 16 }), 'Przywróć stany Zapasów')))))));
+
+  // Podgląd przywrócenia: pozycje, których stan się zmieni (bez zapisu do chwili potwierdzenia)
+  function restoreDialog(b) {
+    const items = [...allItems(), ...(store.state.catalogUser || [])];
+    const rows = restoreRows(reduce(b.events).inv, store.state.inv, items, ctx.today);
+    const at = new Date(b.at).toLocaleString('pl-PL');
+    if (!rows.length) { ctx.flash(`Stany Zapasów w kopii z ${at} są takie same jak obecne — nic do przywrócenia.`, 'info'); return; }
+    const val = (q, it) => (q == null ? 'brak stanu' : `${fmt(q, 2)} ${it.unit}`);
+    const dlg = sheet('Przywróć stany Zapasów',
+      h('p', {}, `Kopia z ${at} (${b.reason}). Zmieni się stan ${rows.length} pozycji:`),
+      h('ul', { class: 'dn-bk-rows' }, rows.map(r => h('li', {}, h('strong', {}, r.it.name), ` · ${val(r.from, r.it)} → ${val(r.to, r.it)}`))),
+      h('p', { class: 'muted' }, 'Pozycje bez stanu w kopii zostają bez zmian. Operację cofniesz przyciskiem „Cofnij” w Zapasach.'),
+      h('div', { class: 'row' },
+        h('button', { class: 'primary', onclick: async () => {
+          const op = `op:${randomId(10)}`;
+          try {
+            await store.recordMany(rows.map(r => ['inv.count', { prod: r.it.id, qty: r.to, date: ctx.today, op }]));
+            dlg.close(); ctx.flash(`Przywrócono stany ${rows.length} pozycji z kopii z ${at}. „Cofnij” w Zapasach cofa całą operację.`, 'info'); ctx.rerender();
+          } catch (e) { dlg.error(e); }
+        } }, `Przywróć (${rows.length})`),
+        h('button', { onclick: () => dlg.close() }, 'Anuluj')));
+  }
 }

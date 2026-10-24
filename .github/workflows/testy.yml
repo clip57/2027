@@ -1,0 +1,45 @@
+# Testy (U2, audyt 23.10.2026): jednostkowe, kontrola planu i danych, budowa oraz testy w przeglądarce (Python + Playwright + Chromium) na danych
+# syntetycznych (D-065 — bez plików użytkownika; testy wymagające SOURCES_DIR są pomijane). Uruchamiane przy każdym pushu poza main i w PR,
+# a przed publikacją na main — jako warunek wdrożenia (pages.yml wywołuje ten plik).
+name: Testy 2027
+on:
+  push: { branches-ignore: [main] }
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+permissions: { contents: read }
+jobs:
+  testy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: npm ci
+      - name: Testy jednostkowe
+        run: npm test
+      - name: Kontrola planu i danych (bez plików użytkownika)
+        run: |
+          node tools/verify/plan_check.mjs
+          python3 tools/verify/verify_all.py --data-only
+      - name: Budowa
+        run: npm run build
+      - name: Playwright i Chromium
+        run: |
+          python3 -m pip install playwright==1.56.0
+          python3 -m playwright install --with-deps chromium
+      - name: Test dymny CFA
+        run: python3 tests/e2e/cfa_smoke.py
+      - name: E2E (oba warianty buildu, 390 i 1280 px)
+        run: npm run e2e
+      - name: Dostępność (axe-core, jasny i ciemny motyw)
+        run: npm run a11y
+      - name: Trening — arkusze i dziennik sesji
+        run: npm run e2e:trening
+      - name: Synchronizacja plikiem i aktualizacja kodu
+        run: npm run e2e:sync
+      - name: Synchronizacja w chmurze (lokalny serwer testowy)
+        run: npm run e2e:cloud

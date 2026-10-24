@@ -104,7 +104,11 @@ test('Dzień z MPW: bloki w resolverze, szablon godzin bez zmian (decyzja 29.09.
   assert.deepEqual([r.mpw.inPlan, r.mpw.blocks.map(b => b.nr), r.mpw.isSim], [true, [4, 5, 6], false]);
   assert.deepEqual(r.slots.map(s => `${s.id} ${s.from}–${s.to}`), SRC.dayTemplate.slots.map(s => `${s.id} ${s.from}–${s.to}`));   // zwykły wtorek: szablon bez zmian (wtorek 10.11 z blokiem J ma inny wieczór — D-099)
   assert.ok(ref.slots.some(s => s.extra), '10.11 — jeszcze CFA z blokiem J');
-  assert.ok(!JSON.stringify(r.slots).includes('MPW'), 'bloki MPW A–C nie trafiają do slotów');
+  // bloki MPW A–C nie trafiają do slotów (karta „Nauka MPW”, D-095) — U1: slot w ich czasie jedynie je nazywa (bez treści bloków i odhaczania)
+  assert.ok(r.slots.every(s => !s.mpw && !(s.cfa || []).length), 'bloki MPW A–C nie trafiają do slotów');
+  assert.deepEqual(r.slots.filter(s => s.title === 'Nauka MPW').map(s => `${s.from} ${s.desc}`),
+    ['15:30 Blok A 15:30–16:23 — w karcie „Nauka MPW”', '16:40 Bloki B 16:30–17:23, C 17:30–18:23 — w karcie „Nauka MPW”']);
+  assert.ok(!JSON.stringify(r.slots).includes(r.mpw.blocks[0].temat), 'bez tematów bloków w slotach');
   assert.equal(resolveDay('2027-02-27').mpw.isSim, true);
   assert.deepEqual([resolveDay('2026-12-25').mpw.inPlan, resolveDay('2026-12-25').mpw.blocks.length], [true, 0]);
   assert.deepEqual([resolveDay('2026-11-15').mpw.inPlan, resolveDay('2026-11-16').mpw.inPlan, resolveDay('2027-03-21').mpw.inPlan], [false, true, false]);

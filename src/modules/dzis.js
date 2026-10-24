@@ -45,7 +45,8 @@ function slotView(s, now, care) {
   const title = s.title, titleKcal = lead?.kcal ?? null;
   const items = s.items.filter(i => i !== lead);
   const isNow = now && now.current === s;
-  return h('article', { class: `slot${isNow ? ' is-now' : ''}`, 'data-domain': s.domain, 'aria-labelledby': `t-${s.id}`, id: s.id },
+  // U1: „Czas własny” (slot nauki bez bloku poza planem CFA) — lżej, bez koloru domeny
+  return h('article', { class: `slot${isNow ? ' is-now' : ''}${s.own ? ' is-own' : ''}`, 'data-domain': s.domain, 'aria-labelledby': `t-${s.id}`, id: s.id },
     h('div', { class: 'slot-time' }, h('time', {}, s.from), h('span', { class: 'to' }, `–${s.to}`)),
     h('div', { class: 'slot-body' },
       h('h3', { class: 'slot-title', id: `t-${s.id}` }, title, titleKcal != null && h('span', { class: 'kcal' }, `${titleKcal} kcal`),

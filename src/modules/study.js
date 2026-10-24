@@ -19,7 +19,8 @@ const harmoPast = {};   // U-b: rozwinięcie minionych dni harmonogramu (pamię�
 
 /* P — konfiguracja planu:
    id, name, D, byDay, exam, eyebrow, types { done, errPut, errDel }, fields { done, errors }, modeClass,
-   recall (CFA: { days, key, done, stats } | null), mock { word, day(date) }, meta(b), tasks, log { placeholder, csv, importV3 },
+   recall (CFA: { days, key, done, stats } | null), mock { word, day(date) }, meta(b), tasks + taskOf(b) + tasksReady() (MPW: zadania bloków spoza
+   pakietu aplikacji — U6), log { placeholder, csv, importV3 },
    plan(root, s) — widok „Plan” (s: done, pace, late, rs, link). */
 export function renderStudy(root, ctx, P) {
   const { store, today } = ctx;
@@ -74,7 +75,9 @@ export function renderStudy(root, ctx, P) {
     h('div', { class: 'hero-tr-side' }, progressRing(doneCount, D.bloki.length, 'Wykonane bloki'))); });
   add(root, hero.el,
   msg,
-  h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))));
+  h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))),
+  // U6: zadania bloków nie wczytały się (np. brak połączenia przy pierwszym otwarciu wariantu web) — reszta planu działa
+  P.tasks && !P.tasksReady() && h('p', { class: 'banner warn cf-task-na' }, 'Zadania bloków są chwilowo niedostępne — połącz się z internetem i otwórz moduł ponownie. Harmonogram i odhaczanie działają.'));
 
   const blockRow = (b, next = false) => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}${next ? ' is-next' : ''}` },
     h('button', { class: 'set-toggle', 'aria-pressed': String(done.has(b.nr)), 'aria-label': `Blok ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`,
@@ -84,8 +87,8 @@ export function renderStudy(root, ctx, P) {
       h('p', { class: 'cfa-topic' }, b.temat),
       h('p', { class: 'cfa-meta' }, h('span', { class: `mode ${P.modeClass[b.tryb] || ''}` }, b.tryb), h('span', { class: 'muted' }, `${b.godz} · nr ${b.nr}`),
         P.meta?.(b)),
-      // Zadania bloku (MPW: instrukcja wykonania z planu) — zwinięte, bez przerysowania przy odhaczaniu innych bloków
-      P.tasks && b.zadania && h('details', { class: 'cf-task' }, h('summary', {}, 'Zadania bloku'), h('p', {}, b.zadania))));
+      // Zadania bloku (MPW: instrukcja wykonania z planu) — zwinięte, bez przerysowania przy odhaczaniu innych bloków; U6: tekst spoza pakietu (`taskOf`)
+      P.tasks && P.taskOf(b) && h('details', { class: 'cf-task' }, h('summary', {}, 'Zadania bloku'), h('p', {}, P.taskOf(b)))));
 
   // ---------------- Dzień
   if (view === 'dzien') {

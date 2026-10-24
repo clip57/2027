@@ -6,7 +6,7 @@ const cache = new Map();
 
 export function consumptionForDay(date) {
   if (cache.has(date)) return cache.get(date);
-  // Poza planem (D-088) i w Dniu zero (D-097) brak zużycia wg planu — inwentaryzacja sprzed startu jest odliczana od pierwszego dnia planu (12.10.2026 — D-101)
+  // Poza planem (D-088) i w Dniu zero (D-097) brak zużycia wg planu — inwentaryzacja sprzed startu jest odliczana od pierwszego dnia planu (`phases.start`, obecnie 18.10.2026)
   if (!inPlan(date) || dayPlan(date).zero) { const none = Object.freeze({}); cache.set(date, none); return none; }
   const dp = dayPlan(date), variant = dp.diet;   // z wyjątkami dat (D-087)
   const p = plan(variant, phaseFor(date) ?? 0);

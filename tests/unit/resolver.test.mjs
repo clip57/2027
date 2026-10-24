@@ -147,7 +147,7 @@ test('CFA V3: bloki A–I w slotach szablonu, J / K / L / M jako dodatkowe sloty
     if (d >= CFA0 && d <= '2026-11-11') assert.equal(n, SRC.cfa.D.bloki.filter(b => b.data === d).length, d); else assert.equal(n, 0, d);
     const extraLetters = [...new Set(r.cfa.blocks.filter(b => !/^[A-I]$|^S/.test(b.blok)).sort((a, b) => a.godz.localeCompare(b.godz)).map(b => b.blok))];
     assert.deepEqual(extraSlots.map(s => s.title), extraLetters.map(l => `CFA blok ${l}`), d);   // K 17:40, L 18:40, M 19:40, J 21:00 — wg planu
-    if (d < CFA0) assert.ok(cfaSlots.every(s => s.title === 'Brak bloku CFA'), d);
+    if (d < CFA0) assert.ok(cfaSlots.every(s => s.title === 'Czas własny' && s.own), d);   // U1 (audyt 23.10.2026)
     if (SRC.cfa.D.mockCFA.includes(d)) {
       assert.deepEqual(cfaSlots.slice(0, 4).map(s => s.title), ['Mock CFA — sesja 1', 'Mock CFA — sesja 1', 'Mock CFA — sesja 2', 'Mock CFA — sesja 2']);
       // E (12:20–13:13) = kontynuacja sesji 2 do 13:00 (D-086), F wolne (D-036)
@@ -359,4 +359,32 @@ test('D-101, D-103: mycie głowy tuż przed blokiem M — 19:33–19:40 między 
   }
   assert.deepEqual([at(resolveDay('2026-10-13'), 'slot.2035').from, at(resolveDay('2026-10-13'), 'slot.2035').to], ['20:35', '20:45'], 'dni bez bloku M — mycie jak dotąd');
   assert.deepEqual([at(resolveDay('2026-11-19'), 'slot.2035').from, at(resolveDay('2026-11-19'), 'slot.2035').to], ['20:35', '20:45'], 'po planie CFA — mycie jak dotąd');
+});
+
+test('U1 (audyt 23.10.2026): poza planem CFA sloty nauki bez bloku to „Czas własny”, a sloty w czasie bloków MPW A–C — „Nauka MPW” z godzinami bloków', () => {
+  const CFA_END = SRC.cfa.D.stat.end;
+  let own = 0, mpw = 0;
+  for (const d of range('2026-11-12', END)) {
+    const r = resolveDay(d), slots = r.slots.filter(s => s.role === 'cfa');
+    assert.ok(slots.every(s => s.title !== 'Brak bloku CFA' && s.desc !== 'Poza okresem planu nauki'), d);
+    const ac = (mpwByDay[d] || []).filter(b => !b.blok.startsWith('P'));
+    for (const s of slots) {
+      if (s.own) { own++; assert.deepEqual([s.title, s.desc, s.cfa.length], ['Czas własny', '', 0], `${d} ${s.from}`); }
+      if (s.title === 'Nauka MPW') {
+        mpw++;
+        const inSlot = ac.filter(b => b.godz.slice(0, 5) < s.to && b.godz.slice(6) > s.from);
+        assert.ok(inSlot.length > 0 && inSlot.every(b => s.desc.includes(`${b.blok} ${b.godz}`)), `${d} ${s.from}: ${s.desc}`);
+        assert.ok(!s.own);
+      }
+      // slot bez bloku nauki nie może nakładać się na blok MPW A–C pod nazwą „Czas własny”
+      if (s.own) assert.ok(!ac.some(b => b.godz.slice(0, 5) < s.to && b.godz.slice(6) > s.from), `${d} ${s.from}`);
+    }
+    // każdy blok MPW A–C dnia jest w slocie bloku (czwartki od 07.01 — D-097) albo w opisie slotu „Nauka MPW”
+    for (const b of ac) assert.ok(slots.some(s => s.mpw === b || (s.title === 'Nauka MPW' && s.desc.includes(`${b.blok} ${b.godz}`))), `${d} ${b.blok}`);
+    const recall = r.slots.find(s => s.role === 'recall');
+    if (d > CFA_END) assert.deepEqual([recall.title, recall.desc, recall.own], ['Wieczór wolny', '', true], d);
+  }
+  assert.ok(own > 600 && mpw > 200, `czas własny ${own}, nauka MPW ${mpw}`);
+  // w okresie planu CFA bez zmian: wolny slot to „Wolne” z opisem planu
+  assert.ok(resolveDay('2026-11-11').slots.filter(s => s.role === 'cfa').every(s => !s.own));
 });

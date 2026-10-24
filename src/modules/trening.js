@@ -148,8 +148,9 @@ export function renderTrening(root, ctx) {
 
 function renderSession(root, ctx) {
   const { store, today } = ctx;
-  const monday = addDays(today, 1 - weekday(today));
   const date = ctx.params.get('d') || today;
+  // U4 (audyt 23.10.2026): pasek dni z tygodnia WYBRANEGO dnia (np. otwartego z Kalendarza albo Historii), nie zawsze bieżącego
+  const monday = addDays(date, 1 - weekday(date)), thisMonday = addDays(today, 1 - weekday(today));
   const r = resolveDay(date);
   const key = r.session;   // sesja dnia z planu tygodnia i wyjątków dat (D-087); null = bez treningu
   const phase = r.phase ?? 0;
@@ -193,14 +194,27 @@ function renderSession(root, ctx) {
   const lastOf = exId => { if (!lastMemo.has(exId)) lastMemo.set(exId, lastResult(log, exId, date)); return lastMemo.get(exId); };
   const lastLine = e => { const l = lastOf(e.id); return l ? ` · ostatnio ${l.sets.map(x => `${x.kg ?? '–'} kg × ${x.reps ?? '–'}`).join(', ')}` : ''; };
 
-  // --- pasek dni z nazwami sesji
-  add(root, h('div', { class: 'day-strip', role: 'tablist', 'aria-label': 'Dzień tygodnia' },
+  // --- przełączanie tygodni (U4; w granicach planu, ← → na komputerze) i pasek dni z nazwami sesji
+  const wk = n => `#/trening?d=${addDays(date, 7 * n)}`;
+  add(root, h('div', { class: 'row daynav tr-weeknav' },
+    monday > addDays(PLAN_START, 1 - weekday(PLAN_START)) && h('a', { class: 'btn dz-nav tr-step', href: wk(-1), 'aria-label': 'Poprzedni tydzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni', h('span', { class: 'tr-long' }, ' tydzień'))),
+    h('span', { class: 'tr-week' }, `Tydzień ${shortDate(monday)}–${shortDate(addDays(monday, 6))}`),
+    monday !== thisMonday && h('a', { class: 'btn dz-nav tr-now', href: '#/trening' }, 'Ten tydzień'),
+    addDays(monday, 7) <= PLAN_END && h('a', { class: 'btn dz-nav tr-step', href: wk(1), 'aria-label': 'Następny tydzień' }, h('span', {}, 'Następny', h('span', { class: 'tr-long' }, ' tydzień')), icon('chevron-right', { size: 18 }))));
+  const days = h('div', { class: 'day-strip', role: 'tablist', 'aria-label': 'Dzień tygodnia' },
     TABS.map(([, lab, n]) => {
       const d = addDays(monday, n - 1), w = dayPlan(d);
       return h('a', { class: `ds${d === date ? ' is-on' : ''}${d === today ? ' is-today' : ''}`, href: `#/trening?d=${d}`, role: 'tab', 'aria-selected': String(d === date) },
-        h('span', { class: 'ds-d' }, lab), h('span', { class: 'ds-s' }, w.outside ? '—' : w.sessionName.replace('Bez treningu, ', '')));
-    })),
-    msg);
+        h('span', { class: 'ds-d' }, lab), h('span', { class: 'ds-t' }, shortDate(d)), h('span', { class: 'ds-s' }, w.outside ? '—' : w.sessionName.replace('Bez treningu, ', '')));
+    }));
+  add(root, days, msg);
+  // wybrany dzień widoczny także na wąskim ekranie: przewinięcie samego paska w poziomie (bez przewijania strony — przerysowanie po zapisie serii)
+  requestAnimationFrame(() => {
+    const on = days.querySelector('.ds.is-on');
+    if (!on || days.scrollWidth <= days.clientWidth) return;
+    const a = days.getBoundingClientRect(), r = on.getBoundingClientRect();
+    days.scrollLeft += r.left - a.left - (a.width - r.width) / 2;
+  });
 
   // --- nagłówek sesji
   const hero = region(() => h('section', { class: 'hero-tr' },

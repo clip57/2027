@@ -4,6 +4,7 @@
 import { classifyEvent } from '../storage/validate.js';
 import { cloudId, seal, open, newKeyInfo, deriveKeys, checkVerifier, MIN_ITERATIONS, KDF_ITERATIONS } from './crypto.js';
 import { CloudError } from './cloud-api.js';
+import { ymd } from '../dates.js';
 
 // Stan synchronizacji per urządzenie — w magazynie `meta` (bez zmiany struktury bazy; nie trafia do 2027-sync.json)
 // `seen` = numery kolejne z okna zapasu kursora, których treść urządzenie już ma (pobrane, wysłane lub odrzucone).
@@ -48,13 +49,13 @@ export async function syncOnce({ store, client, keys, now = () => new Date(), ov
   const acked = new Set((await meta.getMeta(META.acked)) || []);   // `id` zdarzeń potwierdzonych w chmurze
   const seenBefore = (await meta.getMeta(META.seen)) || [];
   const seen = new Set(seenBefore);
-  const out = { mode, pulled: 0, applied: 0, pushed: 0, rejected: [], cursor, backup: false };
+  const out = { mode, pulled: 0, applied: 0, pushed: 0, rejected: [], held: 0, cursor, backup: false };
   const ackedSize = acked.size;
   let maxSeq = cursor;
 
   if (mode === 'full') {
     // ---------- 1. pobieranie: lekki indeks od (kursor − zapas), treść tylko dla numerów niewidzianych; deduplikacja po `id`
-    const incoming = new Map();
+    const incoming = new Map(), hold = [];
     const take = async rows => {
       for (const row of rows) {
         maxSeq = Math.max(maxSeq, row.seq);
@@ -66,7 +67,8 @@ export async function syncOnce({ store, client, keys, now = () => new Date(), ov
         // identyfikator w chmurze musi wynikać z `id` zdarzenia (ochrona przed podmianą wierszy)
         if (!e || typeof e.id !== 'string' || await cloudId(keys, e.id) !== row.sid) { out.rejected.push({ seq: row.seq, reason: 'id-mismatch' }); continue; }
         const c = classifyEvent(e);   // 'future' = typ z nowszej wersji: przyjmowany i zachowywany (D-056)
-        if (c !== 'ok' && c !== 'future') { out.rejected.push({ seq: row.seq, reason: c }); continue; }
+        // R1: odszyfrowany wiersz, którego treści ta wersja nie przyjmuje — do kwarantanny (wraca po aktualizacji aplikacji), nie przepada
+        if (c !== 'ok' && c !== 'future') { out.rejected.push({ seq: row.seq, reason: c, held: true }); hold.push({ raw: e, reason: c }); continue; }
         out.pulled++; acked.add(e.id);
         if (!store.events.has(e.id)) incoming.set(e.id, e);
       }
@@ -90,9 +92,12 @@ export async function syncOnce({ store, client, keys, now = () => new Date(), ov
       }
     } else for (const part of chunks(fresh, FETCH_CHUNK)) await take(await client.pullBySeq(part));
     if (index.length) maxSeq = Math.max(maxSeq, index[index.length - 1]);
+    // kwarantanna zapisana przed przesunięciem kursora i okna „widzianych” (przerwanie = ponowne pobranie, bez powtórzeń w kwarantannie)
+    if (hold.length) out.held = await store.quarantine(hold, 'cloud');
     if (incoming.size) {
-      // Kopia przed dopisaniem zdarzeń z chmury — najwyżej raz dziennie (pełna kopia przy każdej rundzie byłaby zbędna)
-      const day = now().toISOString().slice(0, 10);
+      // Kopia przed dopisaniem zdarzeń z chmury — najwyżej raz dziennie (pełna kopia przy każdej rundzie byłaby zbędna).
+      // Dzień lokalny (R4, audyt 23.10.2026): data UTC przesuwała granicę doby o 1–2 h względem czasu w Polsce.
+      const day = ymd(now());
       out.backup = (await meta.getMeta(META.lastBackup)) !== day;
       out.applied = await store.appendMany([...incoming.values()], 'przed pobraniem z chmury', { backup: out.backup });
       if (out.backup) await meta.setMeta(META.lastBackup, day);

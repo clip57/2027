@@ -1,5 +1,6 @@
 # Publikacja na GitHub Pages (bezpłatnie dla repozytoriów publicznych — D-034).
-# Każdy push do gałęzi main: testy jednostkowe -> budowa -> publikacja dist/web.
+# Każdy push do gałęzi main: pełne testy (testy.yml — U2, audyt 23.10.2026: jednostkowe, kontrola planu, E2E, dostępność, synchronizacja)
+# -> budowa -> publikacja dist/web. Błąd testów zatrzymuje publikację (strona zostaje w poprzedniej wersji).
 name: Publikacja 2027
 on:
   push: { branches: [main] }
@@ -7,7 +8,11 @@ on:
 permissions: { contents: read, pages: write, id-token: write }
 concurrency: { group: pages, cancel-in-progress: true }
 jobs:
+  testy:
+    uses: ./.github/workflows/testy.yml
+    permissions: { contents: read }
   build:
+    needs: testy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -6,8 +6,10 @@ sekretnego), logowanie, hasło szyfrowania (pierwsze urządzenie z powtórzeniem
 haśle, ponowne otwarcie i powrót do aplikacji, powrót sieci, konflikt, dwie karty (poprawka A4), brak przerysowania w trakcie
 wpisywania, lekkie pobieranie (transfer), baner wstrzymanej synchronizacji, brak treści jawnej na serwerze, wygasły token,
 pamięć kluczy, wylogowanie, odłączenie, wariant jednoplikowy (file://), axe-core i cele dotykowe w każdym kroku.
-Uruchomienie: npm run build && python3 tests/e2e/cloud_sync.py"""
-import asyncio, time, os, pathlib, sys, threading, http.server
+Build testowy (U7): skrypt sam buduje wariant z CSP dopuszczającą lokalny serwer (BUILD_LOCAL_API=1) i na końcu przywraca zwykły build —
+publikowana CSP nie zawiera http://localhost.
+Uruchomienie: npm run e2e:cloud   (albo python3 tests/e2e/cloud_sync.py)"""
+import asyncio, time, os, pathlib, sys, threading, http.server, subprocess
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures
@@ -383,4 +385,11 @@ async def main():
     print(f'\nCHMURA E2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}')
     sys.exit(1 if bad else 0)
 
-asyncio.run(main())
+def build(local_api):
+    env = {**os.environ, **({'BUILD_LOCAL_API': '1'} if local_api else {})}
+    if not local_api: env.pop('BUILD_LOCAL_API', None)
+    subprocess.run(['node', 'tools/build.mjs'], cwd=ROOT, check=True, capture_output=True, env=env)
+
+build(True)
+try: asyncio.run(main())
+finally: build(False)   # przywrócenie zwykłego buildu (CSP bez lokalnego serwera)

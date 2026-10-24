@@ -6,20 +6,34 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { corePlan, lazyPart, PLAN_IDS } from '../src/core/plan-split.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const P = (...a) => path.join(ROOT, ...a);
 const hash = s => crypto.createHash('sha256').update(s).digest('hex').slice(0, 10);
 const pkg = JSON.parse(fs.readFileSync(P('package.json'), 'utf8'));
 
+// U6 (audyt 23.10.2026): plany nauki w pakiecie bez pól nieużywanych przez aplikację (src/core/plan-split.js), zadania bloków MPW — osobno:
+// wariant web — plik plan-<id>.<skrót>.json (lista SHELL, offline), 2027.html — <script type="application/json"> w stronie. src/data bez zmian.
+const PLAN_SRC = Object.fromEntries(PLAN_IDS.map(id => [id, JSON.parse(fs.readFileSync(P(`src/data/${id}.json`), 'utf8'))]));
+const LAZY = Object.fromEntries(PLAN_IDS.map(id => [id, lazyPart(id, PLAN_SRC[id])]).filter(([, v]) => v).map(([id, v]) => [id, JSON.stringify(v)]));
+const LAZY_FILES = Object.fromEntries(Object.entries(LAZY).map(([id, t]) => [id, `plan-${id}.${hash(t)}.json`]));
+const plans = { name: 'plany-nauki', setup(b) {
+  b.onLoad({ filter: /[\\/]src[\\/]data[\\/](cfa|mpw)\.json$/ }, a => ({ contents: JSON.stringify(corePlan(path.basename(a.path, '.json'), PLAN_SRC[path.basename(a.path, '.json')])), loader: 'json' }));
+  b.onResolve({ filter: /(^|[\\/])plan-tasks\.js$/ }, () => ({ path: P('src/core/plan-tasks.web.js') }));
+} };
+
 const res = await build({ entryPoints: [P('src/app.js')], bundle: true, format: 'iife', minify: true, write: false,
-  target: ['safari16', 'chrome110', 'firefox115'], legalComments: 'none', charset: 'utf8' });
+  target: ['safari16', 'chrome110', 'firefox115'], legalComments: 'none', charset: 'utf8',
+  plugins: [plans], define: { __PLAN_FILES__: JSON.stringify(LAZY_FILES) } });
 const js = res.outputFiles[0].text;
+for (const id of PLAN_IDS) if (!js.includes(PLAN_SRC[id].D.bloki[0].temat)) throw new Error(`Plan ${id} nie trafił do pakietu`);
+for (const [id, t] of Object.entries(LAZY)) if (js.includes(JSON.parse(t).values[Object.keys(JSON.parse(t).values)[0]].slice(0, 60))) throw new Error(`Zadania planu ${id} trafiły do pakietu`);
 // Arkusz = tokeny (jedyne źródło wartości) + style modułów + warstwa komponentów systemu projektowego
 const css = ['src/ui/tokens.css', 'src/ui/styles.css', 'src/ui/system.css'].map(f => fs.readFileSync(P(f), 'utf8')).join('\n');
 const FONTS = fs.readdirSync(P('public/fonts')).filter(f => f.endsWith('.woff2'));
 const tpl = fs.readFileSync(P('src/index.html'), 'utf8');
-const version = `${pkg.version}+${hash(js + css)}${process.env.BUILD_TAG ? `-${process.env.BUILD_TAG}` : ''}`;
+const version = `${pkg.version}+${hash(js + css + Object.values(LAZY).join(''))}${process.env.BUILD_TAG ? `-${process.env.BUILD_TAG}` : ''}`;
 const stamp = `<meta name="app-version" content="${version}">`;
 
 fs.rmSync(P('dist'), { recursive: true, force: true });
@@ -34,19 +48,22 @@ for (const f of fs.readdirSync(P('public/icons'))) fs.copyFileSync(P('public/ico
 fs.mkdirSync(P('dist/web/fonts'), { recursive: true });
 for (const f of fs.readdirSync(P('public/fonts'))) fs.copyFileSync(P('public/fonts', f), P('dist/web/fonts', f));
 fs.copyFileSync(P('public/manifest.webmanifest'), P('dist/web/manifest.webmanifest'));
+for (const [id, t] of Object.entries(LAZY)) fs.writeFileSync(P('dist/web', LAZY_FILES[id]), t);
 // Uwaga: podstawiamy funkcją, bo treść może zawierać wzorce $&, $` itp. (String.replace by je zinterpretował).
 const put = (text, mark, value) => text.replace(mark, () => value);
 // S1: Content-Security-Policy (tylko wariant web; w 2027.html cały kod jest wbudowany). Skrypt motywu w <head> — przez skrót
 // SHA-256; skrypty i style wyłącznie z tego samego źródła (style ustawiane przez CSSOM w h() nie wymagają 'unsafe-inline');
-// połączenia: ta sama domena + projekt Supabase (plan bezpłatny = *.supabase.co) + lokalny serwer testowy (e2e:cloud).
+// połączenia: ta sama domena + projekt Supabase (plan bezpłatny = *.supabase.co). U7 (audyt 23.10.2026): lokalny serwer testowy (e2e:cloud,
+// http://localhost / 127.0.0.1) tylko w buildzie testowym `BUILD_LOCAL_API=1` (uruchamia go tests/e2e/cloud_sync.py) — nie w publikowanej wersji.
 const themeJs = tpl.match(/<script>([\s\S]*?)<\/script>/)[1];
+const connect = ["'self'", 'https://*.supabase.co', ...(process.env.BUILD_LOCAL_API ? ['http://localhost:*', 'http://127.0.0.1:*'] : [])].join(' ');
 const csp = ["default-src 'self'", `script-src 'self' 'sha256-${crypto.createHash('sha256').update(themeJs).digest('base64')}'`,
-  "style-src 'self'", "img-src 'self' data: blob:", "font-src 'self'", "connect-src 'self' https://*.supabase.co http://localhost:* http://127.0.0.1:*",
+  "style-src 'self'", "img-src 'self' data: blob:", "font-src 'self'", `connect-src ${connect}`,
   "manifest-src 'self'", "worker-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'"].join('; ');
 fs.writeFileSync(P('dist/web/index.html'), put(put(put(tpl, '<meta charset="utf-8">', `<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="${csp}">`), '<!--HEAD-->',
   `${stamp}\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n<link rel="icon" href="icons/icon-192.png">\n<link rel="stylesheet" href="${cssName}">`),
   '<!--BODY-->', `<script src="${jsName}" defer></script>`));
-const shell = ['./', 'index.html', jsName, cssName, ...FONTS.map(f => `fonts/${f}`), 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
+const shell = ['./', 'index.html', jsName, cssName, ...Object.values(LAZY_FILES), ...FONTS.map(f => `fonts/${f}`), 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
 fs.writeFileSync(P('dist/web/sw.js'), `// Wygenerowane przez tools/build.mjs — wersja ${version}
 // Aktualizacja KODU aplikacji (nie danych). Nowa wersja czeka na zgodę użytkownika („Nowa wersja — odśwież”).
 const CACHE = 'p2027-v2-${hash(version)}';
@@ -75,11 +92,13 @@ const icon = 'data:image/png;base64,' + fs.readFileSync(P('public/icons/apple-to
 const inlineJs = js.replace(/<\/script/gi, () => '<\\/script');
 // Wariant jednoplikowy: fonty wbudowane jako data URI (bez zewnętrznych plików)
 const cssSingle = FONTS.reduce((c, f) => c.split(`url("fonts/${f}")`).join(`url("data:font/woff2;base64,${fs.readFileSync(P('public/fonts', f)).toString('base64')}")`), css);
+// U6: zadania bloków MPW wbudowane jako dane (bez wykonywania); „<” jako \u003c — tekst nie może zamknąć elementu <script>
+const inlinePlans = Object.entries(LAZY).map(([id, t]) => `<script type="application/json" id="plan-${id}">${t.replace(/</g, '\\u003c')}</script>`).join('\n');
 const single = put(put(tpl, '<!--HEAD-->', `${stamp}\n<link rel="apple-touch-icon" href="${icon}">\n<style>${cssSingle}</style>`),
-  '<!--BODY-->', `<script>window.__SINGLE__=true;</script>\n<script>${inlineJs}</script>`);
+  '<!--BODY-->', `<script>window.__SINGLE__=true;</script>\n${inlinePlans}\n<script>${inlineJs}</script>`);
 // Kontrola: wbudowany skrypt i arkusz muszą być kompletne (wcześniej wzorzec $& obcinał kod).
-if (!single.includes(inlineJs) || !single.includes(cssSingle)) throw new Error('Budowa wariantu jednoplikowego uszkodziła wbudowany kod');
+if (!single.includes(inlineJs) || !single.includes(cssSingle) || !single.includes(inlinePlans)) throw new Error('Budowa wariantu jednoplikowego uszkodziła wbudowany kod');
 fs.writeFileSync(P('dist/single/2027.html'), single);
 
 const size = f => (fs.statSync(f).size / 1024).toFixed(0) + ' KB';
-console.log(`wersja ${version}\n dist/web: ${jsName} ${size(P('dist/web', jsName))}, ${cssName}\n dist/single/2027.html ${size(P('dist/single/2027.html'))}`);
+console.log(`wersja ${version}\n dist/web: ${jsName} ${size(P('dist/web', jsName))}, ${cssName}${Object.values(LAZY_FILES).map(f => `, ${f} ${size(P('dist/web', f))}`).join('')}\n dist/single/2027.html ${size(P('dist/single/2027.html'))}`);

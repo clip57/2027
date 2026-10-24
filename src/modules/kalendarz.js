@@ -1,4 +1,4 @@
-// Moduł „Kalendarz” (D-097, D-101): miesiące planu (kalendarz i realny początek planu od 12.10.2026 – 28.03.2027) z podsumowaniem każdego dnia z resolvera
+// Moduł „Kalendarz” (D-097, D-101): miesiące planu (zakres z `phases.json`, obecnie 18.10.2026 – 28.03.2027) z podsumowaniem każdego dnia z resolvera
 // (trening, nauka CFA / MPW, weekendowe bloki, zakupy, święta, egzaminy). Kliknięcie dnia otwiera plan dnia w „Dziś”.
 // Tylko odczyt — bez nowych danych; na telefonie znaczniki kropkami, na komputerze krótkie opisy.
 import { h, add, plural } from '../ui/dom.js';
@@ -19,7 +19,7 @@ export function dayMarks(date) {
   if (r.outside) return { r, marks: [] };
   if (date === SRC.cfa.exam) out.push(['exam', 'Egzamin CFA']);
   if (r.blocks) out.push([r.blocks.kind === 'wolne' ? 'holiday' : r.blocks.kind === 'egzamin' ? 'exam' : 'block', r.blocks.kind === 'wolne' ? r.blocks.short : r.blocks.title === 'Egzamin MPW' ? 'Egzamin MPW' : r.blocks.short.replace(' 8:00–15:23', '')]);
-  if (r.preStart) out.push(['pre', 'Przed startem planu']);   // D-100: 08–11.10, realny początek planu 12.10
+  if (r.preStart) out.push(['pre', 'Przed startem planu']);   // D-100: dni planu przed realnym początkiem (`phases.realStart`; od D-103c brak takich dni)
   if (r.noDiet) out.push(['nodiet', 'Bez diety']);
   if (r.cfa.blocks.length) out.push(['cfa', r.cfa.isMock ? 'Mock CFA' : `CFA ${r.cfa.blocks.length}`]);
   if (r.mpw.blocks.length) out.push(['mpw', r.mpw.isSim ? 'Symulacja MPW' : `MPW ${r.mpw.blocks.length}`]);

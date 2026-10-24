@@ -5,7 +5,7 @@ import { lwwKey } from '../storage/store.js';
 import { migrateZapasyV31, isZapasyV31 } from '../migrate/zapasy-v31.js';
 import { isPrivatePack, privatePackEvent } from '../private.js';
 import { sha256 } from '../hash.js';
-import { cfaProgressEvents } from '../migrate/cfa.js';
+import { cfaProgressEvents, cfaProgressNotice } from '../migrate/cfa.js';
 import { isCarePlan, careDefsFromPlan } from '../calc/care.js';
 export { sha256 };
 
@@ -22,7 +22,7 @@ export async function exportBundle(store) {
 // Rozpoznaje plik: synchronizacja 2027, stara kopia ZAPASY v31 albo pakiet prywatny (D-035).
 export async function preview(store, obj) {
   const errors = [];
-  let kind, events = [];
+  let kind, events = [], notice = null;
   if (obj && obj.format === FORMAT) {
     kind = 'sync';
     if (!Array.isArray(obj.events)) errors.push('Plik nie zawiera listy zdarzeń');
@@ -46,14 +46,17 @@ export async function preview(store, obj) {
       events.push({ ...store.makeEvent('care.def', d), id: `care.def:${d.id}:${h}` });
     }
   } else if (obj && Array.isArray(obj.wykonane)) {
+    // R2: plik postępu z innego planu CFA jest blokowany; z poprzedniej wersji — przeliczany; bez wersji — import z ostrzeżeniem
     kind = 'cfa-progress';
-    events = cfaProgressEvents(obj);
+    notice = cfaProgressNotice(obj);
+    if (notice.blocked) { errors.push(notice.text); notice = null; } else events = cfaProgressEvents(obj);
   } else {
     return { ok: false, kind: 'unknown', errors: ['Nie rozpoznano pliku. Obsługiwane: kopia 2027 (2027-sync.json), kopia ZAPASY v31, postęp CFA (postep-nauki.json), error log CFA (error-log.csv), pakiet prywatny, plan pielęgnacji.'] };
   }
   const pv = previewEvents(store, events, kind, errors);
   // Informacje o pliku (pola istniejące w formacie od początku — bez zmiany formatu)
   if (kind === 'sync') pv.file = { exportedAt: obj.exportedAt || null, device: obj.device || null, schema: obj.schema ?? null };
+  if (notice) pv.notice = notice;
   return pv;
 }
 

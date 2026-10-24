@@ -80,6 +80,21 @@ export function undoOperation(inv, op, today) {
   return { list, unknown };
 }
 
+// Przywrócenie stanów z kopii automatycznej (U8, audyt 23.10.2026; Dane → „Kopie automatyczne”) — tak jak „Przywróć ten stan” w Historii Zapasów:
+// stan pozycji na dziś liczony z dziennika kopii (inwentaryzacja + ruchy − zużycie z planu do dziś), zapis jako jedna operacja (`op`), więc „Cofnij”
+// w Zapasach cofa całość. Tylko pozycje śledzone, których stan się różni; pozycja bez stanu w kopii zostaje bez zmian (brak zdarzenia „bez stanu”).
+export function restoreRows(pastInv, inv, items, today) {
+  const rows = [];
+  for (const it of items) {
+    if (it.tracked === false) continue;
+    const was = stockAt(pastInv, it.id, today);
+    if (was == null) continue;
+    const to = round(Math.max(0, was)), from = stockAt(inv, it.id, today);
+    if (from !== to) rows.push({ it, from, to });
+  }
+  return rows;
+}
+
 // Symulacja w przód: ile dni pokryje stan (z uwzględnieniem typów dni i faz).
 // lastCovered = ostatni dzień w pełni pokryty („Wystarczy do” w v31); runOut = pierwszy dzień braku.
 export function forecast(prod, stock, fromDate, maxDays = 400) {

@@ -1121,7 +1121,7 @@ async def run_mpw(pw, name, url, mobile):
     ok(await pg.locator('.dz-mpw .cfa-row').count() == 3 and '15:30–18:23 · 0 / 3 bloków' in card and 'Kodeks cywilny' in card, f'{tag} Dziś: karta „Nauka MPW” (3 bloki, 15:30–18:23)')
     ok('MPW' in await pg.inner_text('.dz-kpis') and '0 / 3 bloków' in await pg.inner_text('.dz-kpis') and 'Plan MPW' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: kafel MPW i karta „Plan MPW”')
     await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
-    ok(await pg.locator('.dz-plan .slot').count() == 34 and 'Brak bloku CFA' in await pg.inner_text('#slot\\.1530'), f'{tag} Dziś: szablon godzin bez zmian (34 punkty)')
+    ok(await pg.locator('.dz-plan .slot').count() == 34 and 'Nauka MPW' in await pg.inner_text('#slot\\.1530'), f'{tag} Dziś: szablon godzin bez zmian (34 punkty; U1 — slot 15:30 nazywa blok MPW)')
     await pg.get_by_role('button', name='Blok MPW 4 do wykonania').click(); await wait_js(pg, "() => document.querySelector('.dz-mpw')?.innerText.includes('1 / 3 bloków')")
     ok(await pg.locator('.dz-mpw .cfa-row.is-done').count() == 1, f'{tag} Dziś: odhaczenie bloku MPW')
     # Moduł: postęp niezależny od CFA, punktowe odświeżanie (P2), zadania bloku
@@ -1320,6 +1320,114 @@ async def run_d107(pw, name, url, mobile):
         await ctx.close()
     await b.close()
 
+AXE_SRC = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
+async def axe_audit(pg):
+    """axe-core WCAG 2.1 A/AA (wstrzyknięcie przez CDP — CSP wariantu web blokuje skrypty inline) i przewijanie w poziomie"""
+    cdp = await pg.context.new_cdp_session(pg); await cdp.send('Runtime.evaluate', {'expression': AXE_SRC}); await cdp.detach()
+    res = await pg.evaluate("axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a','wcag2aa','wcag21a','wcag21aa']}, resultTypes: ['violations']})")
+    sw, w = await pg.evaluate('[document.documentElement.scrollWidth, innerWidth]')
+    return [f"{x['id']} {x['nodes'][0]['target'][0]}" for x in res['violations']] + ([f'przewijanie w poziomie {sw}/{w}'] if sw > w else [])
+
+async def run_d108(pw, name, url, mobile):
+    """D-108: ryzyka R1–R4 i ulepszenia U1–U8 z audytu 23.10.2026 (R1, R3, R4 — testy jednostkowe)."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-108]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    await ctx.add_init_script("localStorage.setItem('p2027.theme', 'light')")
+    pg = await ctx.new_page(); errs = []; reqs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    pg.on('request', lambda r: reqs.append(r.url))
+    inv = lambda p: pg.evaluate(INV_JS, p)
+    toast = lambda: pg.inner_text('#toast')
+    st = lambda: pg.get_by_label('Stan: Banan', exact=True)
+    await pg.clock.install(time=at(2026, 10, 26))
+    # U7: publikowana CSP bez lokalnego serwera testowego
+    csp = (ROOT / 'dist/web/index.html').read_text(encoding='utf8')
+    ok('connect-src' in csp and 'localhost' not in csp and '127.0.0.1' not in csp, f'{tag} U7: CSP wariantu web bez http://localhost i 127.0.0.1')
+    # U6: zadania bloków MPW poza pakietem — wczytywane dopiero w module MPW (web: osobny plik; 2027.html: dane w stronie)
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    await pg.goto(url + '#/cfa?v=dzien&d=2026-10-27'); await pg.wait_for_selector('.cfa-row')
+    before = [r for r in reqs if 'plan-mpw' in r]
+    await pg.goto(url + '#/mpw?v=dzien&d=2026-11-17'); await pg.wait_for_selector('.cf-task')
+    await pg.locator('.cf-task summary').first.click()
+    after = [r for r in reqs if 'plan-mpw' in r]
+    ok('Przeczytaj' in await pg.inner_text('.cf-task[open]') and not before and len(after) == (1 if name == 'web' else 0) and await pg.locator('.cf-task-na').count() == 0,
+       f'{tag} U6: zadania bloków MPW wczytane przy otwarciu modułu (zapytania przed: {len(before)}, po: {len(after)})')
+    js = [r for r in reqs if r.endswith('.js')]
+    ok(name != 'web' or all('plan-' not in r for r in js), f'{tag} U6: plan nauki poza osobnym plikiem zadań — w pakiecie aplikacji')
+    # U4: Trening — tydzień wybranego dnia i przełączanie tygodni
+    await pg.goto(url + '#/trening?d=2026-11-26'); await pg.wait_for_selector('.day-strip')
+    on = await pg.inner_text('.ds.is-on')
+    ok('Tydzień 23.11–29.11' in await pg.inner_text('.tr-weeknav') and 'CZW' in on and '26.11' in on and await pg.locator('.ds.is-today').count() == 0
+       and await pg.get_by_role('link', name='Ten tydzień').count() == 1, f'{tag} U4: pasek dni z tygodnia wybranego dnia ({on!r})')
+    await pg.get_by_role('link', name='Następny tydzień').click(); await pg.wait_for_selector('text=Tydzień 30.11–06.12')
+    ok('03.12' in await pg.inner_text('.ds.is-on') and 'd=2026-12-03' in pg.url, f'{tag} U4: „Następny tydzień” — ten sam dzień tygodnia tydzień później')
+    if not mobile:
+        await pg.locator('main h1').click(); await pg.keyboard.press('ArrowLeft'); await pg.wait_for_selector('text=Tydzień 23.11–29.11')
+        ok('d=2026-11-26' in pg.url, f'{tag} U4: ← na komputerze — poprzedni tydzień')
+    await pg.get_by_role('link', name='Ten tydzień').click(); await pg.wait_for_selector('.ds.is-today')
+    ok('Tydzień 26.10–01.11' in await pg.inner_text('.tr-weeknav') and await pg.get_by_role('link', name='Ten tydzień').count() == 0, f'{tag} U4: „Ten tydzień” wraca do bieżącego tygodnia')
+    await pg.goto(url + '#/trening?d=2026-10-18'); await pg.wait_for_selector('.day-strip')
+    ok(await pg.get_by_role('link', name='Poprzedni tydzień').count() == 0 and await pg.get_by_role('link', name='Następny tydzień').count() == 1, f'{tag} U4: pierwszy tydzień planu — bez „Poprzedni tydzień”')
+    v = await axe_audit(pg); ok(not v, f'{tag} U4: Trening z przełączaniem tygodni — dostępność {v[:2]}')
+    # U3: skróty g + litera — każdy moduł; „g n” = bieżący plan nauki (CFA do 11.11, potem MPW)
+    async def keys(*k):
+        await pg.locator('main h1').first.click()
+        for x in k: await pg.keyboard.press(x)
+        await pg.wait_for_timeout(300)
+    for k, want in (('k', '#/kalendarz'), ('p', '#/pielegnacja'), ('e', '#/mpw'), ('n', '#/cfa'), ('c', '#/cfa')):
+        await pg.goto(url + '#/dane'); await pg.wait_for_selector('main h1')
+        await keys('g', k); ok(pg.url.endswith(want), f'{tag} U3: g {k} → {want} ({pg.url.split("#")[-1]})')
+    await pg.clock.set_system_time(at(2026, 11, 20)); await pg.goto(url + '#/dane'); await pg.wait_for_selector('main h1')
+    await keys('g', 'n'); ok(pg.url.endswith('#/mpw'), f'{tag} U3: od 12.11 „g n” → MPW')
+    await keys('?'); await pg.wait_for_selector('dialog.gs-help')
+    hl = await pg.inner_text('dialog.gs-help')
+    ok(all(x in hl for x in ('g k', 'Kalendarz', 'g p', 'Pielęgnacja', 'g e', 'g n', 'teraz: MPW')), f'{tag} U3: lista skrótów z nowymi modułami')
+    await pg.keyboard.press('Escape')
+    # U1: po 11.11 sloty nauki bez bloku — „Czas własny” (lżej), slot w czasie bloków MPW nazywa je wprost
+    await pg.clock.set_system_time(at(2026, 11, 17, 10, 30)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    own = await pg.locator('.dz-plan .slot.is-own').count()
+    ok(own == 8 and await pg.inner_text('.nowcard-t') == 'Czas własny' and 'Brak bloku CFA' not in await pg.inner_text('main'), f'{tag} U1: „Czas własny” w {own} slotach, „Teraz” o 10:30')
+    h1530 = await pg.inner_text('#slot\\.1530')
+    ok('Nauka MPW' in h1530 and 'Blok A 15:30–16:23' in h1530 and 'is-own' not in await pg.get_attribute('#slot\\.1530', 'class'), f'{tag} U1: slot 15:30 — blok MPW A')
+    v = await axe_audit(pg); ok(not v, f'{tag} U1: Dziś z „Czasem własnym” — dostępność {v[:2]}')
+    # R2 + U8: plik postępu CFA z innego planu zablokowany, z bieżącego — z opisem bloków; import tworzy kopię automatyczną,
+    # z której Dane przywracają stany Zapasów (jedna operacja, „Cofnij” w Zapasach)
+    await pg.clock.set_system_time(at(2026, 10, 26)); await pg.goto(url + '#/zapasy?q=Banan'); await pg.wait_for_selector('.inv-item')
+    await st().fill('1000'); await st().press('Tab'); await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', '1000')
+    other = fixtures.write({'wersja': 'CFA_20261013_326_CUR265_P31_A12_M0610_V3', 'zapis': '2026-10-14T20:00:00.000Z', 'wykonane': [1, 2]}, 'postep-nauki-inny.json')
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('#h-bk')
+    await pg.set_input_files('input[type=file]', str(other)); await pg.wait_for_selector('dialog[open]')
+    txt = await pg.inner_text('dialog[open]')
+    ok('Nie można zaimportować' in txt and 'import zablokowany' in txt and 'Scal dane' not in txt, f'{tag} R2: postęp z innego planu CFA — import zablokowany')
+    await pg.keyboard.press('Escape')
+    cur = fixtures.write({'wersja': CFA_D['version'], 'zapis': '2026-10-26T08:00:00.000Z', 'wykonane': [1, 2]}, 'postep-nauki.json')
+    await pg.set_input_files('input[type=file]', str(cur)); await pg.wait_for_selector('dialog[open]')
+    txt = await pg.inner_text('dialog[open]')
+    ok('Bloki do oznaczenia: 2 — od nr 1 (16.10 A) do nr 2 (16.10 B)' in txt and 'Scal dane' in txt, f'{tag} R2: postęp z bieżącego planu — opis bloków przed scaleniem')
+    v = await axe_audit(pg); ok(not v, f'{tag} R2: podgląd importu — dostępność {v[:2]}')
+    await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano 2 zmian')
+    await pg.goto(url + '#/zapasy?q=Banan&x=1'); await pg.wait_for_selector('.inv-item')
+    await st().fill('5'); await st().press('Tab'); await pg.wait_for_selector('#toast >> text=Banan: stan 5')
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('#h-bk')
+    ok('nie cofa zmian zapisanych później' in await pg.inner_text('.dn-bk'), f'{tag} U8: opis kopii automatycznych')
+    await pg.locator('.dn-bk-list').get_by_role('button', name='Przywróć stany Zapasów').first.click(); await pg.wait_for_selector('dialog[open] .dn-bk-rows')
+    rows = await pg.inner_text('dialog[open] .dn-bk-rows')
+    ok('Banan' in rows and '5 g → 1000 g' in rows and await pg.locator('dialog[open] .dn-bk-rows li').count() == 1, f'{tag} U8: podgląd przywrócenia ({rows!r})')
+    v = await axe_audit(pg); ok(not v, f'{tag} U8: okno przywrócenia — dostępność {v[:2]}')
+    await pg.get_by_role('button', name='Przywróć (1)').click(); await pg.wait_for_selector('#toast >> text=Przywrócono stany 1 pozycji')
+    await pg.goto(url + '#/zapasy?q=Banan&x=2'); await pg.wait_for_selector('.inv-item')
+    ev = await inv('banan')
+    ok(await st().input_value() == '1000' and ev[-1][4] and ev[-1][1] == 1000, f'{tag} U8: stan Banana przywrócony jako jedna operacja ({ev[-1]})')
+    await pg.locator('.actions').get_by_role('button', name='Cofnij', exact=True).click()
+    await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', '5')
+    ok(await st().input_value() == '5', f'{tag} U8: „Cofnij” w Zapasach cofa przywrócenie z kopii')
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await ctx.close(); await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -1342,6 +1450,8 @@ async def main():
         await run_mpw(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d107(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d107(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d108(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d108(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

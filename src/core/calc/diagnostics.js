@@ -42,13 +42,14 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
     mFuture.length ? mFuture.slice(0, 5).map(b => `nr ${b.nr} (${b.data})`).join(', ') : '', mFuture.length ? `#/mpw?v=dzien&d=${mFuture[0].data}` : null);
 
   // Dziennik: kwarantanna i zdarzenia z nowszej wersji
-  push('quarantine', quarantined ? 'warn' : 'ok', quarantined ? `W kwarantannie: ${quarantined} uszkodzonych wpisów` : 'Kwarantanna pusta',
-    quarantined ? 'Wpisy odłożone przy otwarciu bazy (surowa kopia zachowana). Nowsza wersja aplikacji może je odzyskać.' : '');
+  // `quarantined` — wpisy nieodzyskane (R1: także wiersze z chmury, których ta wersja nie przyjmuje); odzyskane wpisy nie są liczone
+  push('quarantine', quarantined ? 'warn' : 'ok', quarantined ? `W kwarantannie: ${quarantined} wpisów` : 'Kwarantanna pusta',
+    quarantined ? 'Wpisy uszkodzone albo zapisane przez nowszą wersję aplikacji (odłożone przy otwarciu bazy lub pobrane z chmury; surowa kopia zachowana). Po aktualizacji aplikacji rozpoznane wpisy wracają automatycznie przy uruchomieniu.' : '');
   const up = state.unprocessed?.count || 0;
   push('future', up ? 'warn' : 'ok', up ? `Zdarzenia z nowszej wersji aplikacji: ${up}` : 'Wszystkie zdarzenia rozpoznane',
     up ? `Zachowane, ale pomijane w obliczeniach (${Object.keys(state.unprocessed.types).join(', ')}). Zaktualizuj aplikację.` : '');
 
-  // Start treningów (D-088, D-100): serie i czasy treningu sprzed 12.10.2026 zostają w dzienniku, poza statystykami
+  // Start treningów (D-088, D-100): serie i czasy treningu sprzed startu treningów (`phases.trainStart`) zostają w dzienniku, poza statystykami
   const pre = Object.values(state.train || {}).filter(s => s.date < TRAIN_START).length
     + Object.keys(state.trainSessions || {}).filter(d => d < TRAIN_START).length
     + Object.keys(state.trainDetails || {}).filter(d => d < TRAIN_START).length;   // D-106: szczegóły sesji

@@ -111,6 +111,14 @@ nieistotnym wzroście paczki — spełnione przez podzbiór.
 - Zmiana w innej karcie: doczytanie do tej samej instancji magazynu i przerysowanie w tle — wpis w polu i otwarte okno nie giną.
 - Teksty z godzinami (MPW, sloty Pielęgnacji) wyłącznie z danych planu, bez godzin i dni wpisanych na sztywno.
 
+## C9. Ryzyka i ulepszenia z audytu 23.10.2026 (D-108, 24.10.2026)
+
+- „Czas własny”: slot nauki bez bloku poza planem CFA — mniejszy, bez koloru domeny (`.slot.is-own`), dawki i podpunkty bez zmian; slot w czasie bloków MPW nazywa je z godzinami, bloki zostają w karcie „Nauka MPW”.
+- Trening: pasek dni z tygodnia wybranego dnia (z datą każdego dnia) i przełączanie tygodni; na telefonie zakres tygodnia i „Ten tydzień” w pierwszym wierszu, krótkie „Poprzedni / Następny” w drugim (pełna nazwa w `aria-label`).
+- Dane → Kopie automatyczne: opis działania kopii i podgląd przed przywróceniem stanów Zapasów (okno `sheet()`), zapis jako jedna operacja do cofnięcia.
+- Podgląd importu postępu CFA mówi, z którego planu jest plik i które bloki zostaną oznaczone; plik z innego planu — „Nie można zaimportować”.
+- Zadania bloków MPW poza pakietem aplikacji (wczytywane w module); gdy się nie wczytają — baner, reszta planu działa.
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.

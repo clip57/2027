@@ -184,7 +184,8 @@ test('Numer bloku CFA: plan mieści się w limicie walidacji (1–432, limitu ni
   await s.record('cfa.done', { block: 432, done: true, plan: CFA_PLAN_VERSION });
   assert.ok(s.state.cfaDone.has(432));
   await assert.rejects(s.record('cfa.done', { block: 433, done: true, plan: CFA_PLAN_VERSION }));
-  assert.deepEqual(cfaProgressEvents({ wykonane: [1, 417, 432, 433, 0] }).map(e => e.d.block), [1, 417, 432]);
+  // R2: import pliku postępu bieżącego planu — tylko numery z zakresu planu (1–313); numery 314–432 nie istnieją w V44
+  assert.deepEqual(cfaProgressEvents({ wersja: D.version, wykonane: [1, 313, 314, 417, 432, 433, 0] }).map(e => e.d.block), [1, 313]);
 });
 
 test('D-103: plan CFA V44 — nowa numeracja (blok 1 = 16.10 A: SchweserNotes Book 1 QM, PDF 14–21), odhaczenia sprzed V44 nie liczą się', () => {
@@ -207,7 +208,7 @@ test('D-098, D-103: start od zera — odhaczenia z v12 (bez pola plan) i z V3 (p
   assert.equal(s.allEvents().filter(e => e.t === 'cfa.done').length, 5, 'wszystkie zdarzenia (także z v12 i V3) zostają w bazie i eksporcie');
   assert.equal(s.allEvents().filter(e => e.t === 'cfa.done' && e.d.plan == null).length, 1);
   // Import postep-nauki.json (wykonane: numery bloków) — świadoma decyzja użytkownika, więc zapisy są z bieżącego planu
-  const imp = cfaProgressEvents({ wykonane: [1, 2], zapis: '2026-10-06T10:00:00.000Z' });
+  const imp = cfaProgressEvents({ wykonane: [1, 2], zapis: '2026-10-20T10:00:00.000Z' });   // R2: plik bez wersji zapisany po powstaniu V44
   assert.ok(imp.every(e => e.d.plan === CFA_PLAN_VERSION));
   await s.appendMany(imp, 'import pliku');
   assert.deepEqual([...s.state.cfaDone].sort((a, b) => a - b), [1, 2, 6]);

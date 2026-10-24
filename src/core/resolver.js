@@ -17,13 +17,14 @@ const BLOCKS_END = '15:23';
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-102, D-103b): kalendarz, dieta, trening i realny początek planu od 16.10.2026 do 28.03.2027 (`phases.json` → `start`, `end`; plan CFA V44 zaczyna się tego samego dnia). Dni
+// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 18.10.2026–28.03.2027; plan CFA V44 ma własny zakres od 16.10 — `cfa.json`). Dni
 // wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
 export const PLAN_END = SRC.phases.end || '9999-12-31';
 export const DAY_ZERO = SRC.phases.zero || null;   // D-100: Dzień zero usunięty z kalendarza (zero: null) — obsługa zostaje w kodzie
-// D-100/D-101: start kalendarza, diety, treningu i realny początek planu 12.10.2026 (flaga `noDiet` — dni przed startem diety — przy starcie diety = starcie planu nie występuje)
+// D-100…D-103c: realny początek planu, start diety i treningów — z `phases.json` (`realStart`, `dietStart`, `trainStart`; obecnie wszystkie = `start`, 18.10.2026).
+// Flaga `noDiet` (dni planu przed startem diety) przy starcie diety = starcie planu nie występuje
 export const PLAN_REAL_START = SRC.phases.realStart || PLAN_START;
 export const DIET_START = SRC.phases.dietStart || PLAN_START;
 export const TRAIN_START = SRC.phases.trainStart || PLAN_START;
@@ -33,7 +34,7 @@ export const isZero = date => date === DAY_ZERO;
 export function phaseFor(date) {
   let ph = null;
   for (const p of SRC.phases.phases) if (date >= p.from) ph = p.phase;
-  return ph; // null = przed Fazą 0 (kalendarz i Faza 0 od 12.10.2026, Faza 1 od 19.10, Faza 2 od 23.11 — D-088, D-101)
+  return ph; // null = przed Fazą 0 (fazy z `phases.json`; obecnie Faza 0 od 18.10.2026, Faza 1 od 12.11, Faza 2 od 11.12 — D-103, D-103c)
 }
 
 // Dzień z blokiem J (plan CFA v14, D-099: 21:00–21:53 w dni poza pt i sob) — wieczór układany inaczej (kolacja przed blokiem).
@@ -61,12 +62,13 @@ export function dosesFor(date) {
     d.weekdays.includes(wd) && inValidity(d, date));
   return doses.map(d => ({ ...d, time: doseTime(d.time, date) }));   // D-099, D-103, D-103b
 }
-// Okres przyjmowania preparatów czasowych (D-015; 12.10.2026–28.03.2027 — D-101). `from` opcjonalne.
+// Okres przyjmowania preparatów czasowych (D-015; `validity` w `supplements.json`, obecnie 18.10.2026–28.03.2027 — D-103c). `from` opcjonalne.
 export function inValidity(d, date) {
   return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
 }
 
-// Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (D-087, D-096, D-100: start treningów 12.10, 07–11.11) — trening, sauna, dieta, recall.
+// Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (`week.json` → `exceptions`; D-087, D-096, D-103, D-103b: np. 01–02.11 i 03–11.11 bez treningu,
+// święta, czwartki od 07.01) — trening, sauna, dieta, recall.
 export function dayPlan(date) {
   const w = SRC.week.days[String(weekday(date))];
   // D-102, D-103b: plan CFA ma własny zakres (`nightRecall`) — recall CFA także w ewentualnych dniach sprzed startu planu, które są historią
@@ -175,6 +177,16 @@ function jEvening(list) {
   });
 }
 
+// U1 (audyt 23.10.2026): slot nauki bez bloku poza okresem planu CFA (od 12.11 przez 4,5 miesiąca — 9 slotów dziennie z tekstem „Brak bloku CFA —
+// Poza okresem planu nauki”) to „Czas własny” (`own` — „Dziś” pokazuje go lżej). Slot, w którego czasie wypadają bloki MPW A–C (plan MPW ma osobną
+// kartę „Nauka MPW”, a szablon godzin dnia się nie zmienia — D-095), nazywa je wprost z godzinami bloków. Godziny slotów bez zmian.
+const overlaps = (godz, from, to) => { const [f, t] = godz.split('–'); return f < to && t > from; };
+function ownTime(s, mpw) {
+  const list = mpw.filter(b => !b.blok.startsWith('P') && overlaps(b.godz, s.from, s.to));
+  if (!list.length) return { title: 'Czas własny', desc: '', cfa: [], own: true };
+  return { title: 'Nauka MPW', desc: `${list.length === 1 ? 'Blok' : 'Bloki'} ${list.map(b => `${b.blok} ${b.godz}`).join(', ')} — w karcie „Nauka MPW”`, cfa: [] };
+}
+
 export function mealsFor(variant, phase) {
   const p = plan(variant, phase);
   return p.meals.map(m => ({
@@ -219,9 +231,9 @@ export function resolveDay(date) {
       const bl = blocks.filter(b => b.blok === letter);
       const pb = !inCfa && (s.mpwSlot ? mpwAll : mpwP).find(b => b.godz.startsWith(s.from));
       if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G; D-097: czwartek
-      else if (s.mpwSlot) Object.assign(out, { title: 'Wolne', desc: 'Brak bloku MPW', cfa: [] });
+      else if (s.mpwSlot) Object.assign(out, ownTime(s, mpwAll));
       else if (!inCfa && wb && (wb.kind === 'wolne' || s.to <= BLOCKS_END)) Object.assign(out, { title: wb.title, desc: wb.desc, cfa: [], block: wb.kind });
-      else if (!inCfa) Object.assign(out, { title: 'Brak bloku CFA', desc: 'Poza okresem planu nauki', cfa: [] });
+      else if (!inCfa) Object.assign(out, ownTime(s, mpwAll));
       else if (!bl.length) Object.assign(out, { title: 'Wolne', desc: isMock ? 'Dzień mocka — brak bloku w planie (D-036)' : 'Brak bloku w planie CFA tego dnia', cfa: [] });
       else if (isMock && letter.startsWith('S')) {
         // Bloki sesji przypisane tylko do pierwszego slotu sesji (A lub C); drugi slot = kontynuacja.
@@ -240,8 +252,8 @@ export function resolveDay(date) {
       Object.assign(out, { title: 'Wolne', items: [] });
     } else if (s.role === 'recall') {
       const on = inCfa && w.recall;
-      Object.assign(out, { recall: on, title: on ? 'CFA Active Recall' : 'Wieczór wolny',
-        desc: on ? 'Sesja active recall (53 min)' : (inCfa ? 'Brak sesji recall tego dnia (wg harmonogramu CFA)' : 'Poza okresem planu nauki') });
+      Object.assign(out, { recall: on, title: on ? 'CFA Active Recall' : 'Wieczór wolny', own: !inCfa,   // U1: poza planem CFA — bez opisu „Poza okresem planu nauki”
+        desc: on ? 'Sesja active recall (53 min)' : (inCfa ? 'Brak sesji recall tego dnia (wg harmonogramu CFA)' : '') });
     }
     return out;
   });

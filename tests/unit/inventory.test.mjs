@@ -5,7 +5,8 @@ import path from 'node:path';
 import { Store } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
 import { preview, apply } from '../../src/core/sync/bundle.js';
-import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, setCustomItems, lastOperation, undoOperation } from '../../src/core/calc/inventory.js';
+import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, setCustomItems, lastOperation, undoOperation, restoreRows } from '../../src/core/calc/inventory.js';
+import { reduce } from '../../src/core/storage/store.js';
 import { consumptionForDay } from '../../src/core/calc/consumption.js';
 import { catalogById } from '../../src/core/data.js';
 
@@ -227,4 +228,28 @@ test('B1: stos cofnięć — zakup cofany po cofnięciu późniejszej pomyłki (
   await s.recordMany(undoOperation(s.state.inv, lastOperation(s.allEvents()), '2026-10-29').list);
   assert.equal(stockAt(s.state.inv, 'banan', '2026-10-29'), base, 'trzecie „Cofnij” — pierwsza inwentaryzacja: bez wcześniejszego stanu, stan bez zmian');
   assert.equal(lastOperation(s.allEvents()), null);
+});
+
+test('U8 (audyt 23.10.2026): przywrócenie stanów Zapasów z kopii automatycznej — stan z kopii z odliczeniem zużycia do dziś, jedna operacja do cofnięcia', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  const use = (p, d) => consumptionForDay(d)[p] || 0;
+  await s.recordMany([['inv.count', { prod: 'banan', qty: 1000, date: '2026-10-26' }], ['inv.count', { prod: 'kefir', qty: 2000, date: '2026-10-26' }]]);
+  await s.backup('przed importem (sync)');
+  const [bk] = await s.adapter.getBackups();
+  // po kopii: import nadpisał banana, dodał stan pozycji nieobecnej w kopii; kefir bez zmian
+  await s.recordMany([['inv.count', { prod: 'banan', qty: 5, date: '2026-10-28' }], ['inv.count', { prod: 'skyr', qty: 900, date: '2026-10-28' }]]);
+  const items = allItems(), today = '2026-10-29';
+  const rows = restoreRows(reduce(bk.events).inv, s.state.inv, items, today);
+  const want = 1000 - use('banan', '2026-10-27') - use('banan', '2026-10-28') - use('banan', '2026-10-29');
+  assert.deepEqual(rows.map(r => [r.it.id, r.from, r.to]), [['banan', 5 - use('banan', '2026-10-29'), want]], 'tylko banan: kefir bez zmian, skyr bez stanu w kopii');
+  const op = 'op:test-u8';
+  await s.recordMany(rows.map(r => ['inv.count', { prod: r.it.id, qty: r.to, date: today, op }]));
+  assert.equal(stockAt(s.state.inv, 'banan', today), want);
+  assert.equal(stockAt(s.state.inv, 'skyr', today), 900 - use('skyr', '2026-10-29'), 'pozycja bez stanu w kopii — bez zmian');
+  assert.deepEqual(restoreRows(reduce(bk.events).inv, s.state.inv, items, today), [], 'po przywróceniu nic do zmiany');
+  // „Cofnij” w Zapasach cofa przywrócenie jako całość
+  const last = lastOperation(s.allEvents());
+  assert.equal(last.key, op);
+  await s.recordMany(undoOperation(s.state.inv, last, today).list);
+  assert.equal(stockAt(s.state.inv, 'banan', today), 5 - use('banan', '2026-10-29'));
 });

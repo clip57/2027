@@ -28,6 +28,9 @@ export function resolveText(text, phase, variant, pack) {
 // Produkty katalogu użyte w karcie (znaczniki {produkt} w krokach i notatkach)
 const cardProds = c => [...new Set([...JSON.stringify(c.blocks).matchAll(/\{(\w+)\}/g)].map(m => m[1]).filter(k => catalogById[k]))];
 
+// Klucz kroku karty w zdarzeniu `prep.step` (bez zmian od Etapu 4): numer bloku karty × 100 + numer kroku w bloku. R3: każda karta musi mieścić się
+// w limicie walidacji (`PREP_IDX_LIMIT`, 100 bloków × 100 kroków) — test w mealprep.test.mjs sprawdza wszystkie karty planu.
+export const PREP_IDX = (block, item) => block * 100 + item;
 const timerMin = text => { const m = text.match(/(\d+)(?:–(\d+))?\s*min/); return m ? Number(m[2] || m[1]) : null; };
 
 function timer(minutes, label) {
@@ -46,7 +49,7 @@ function timer(minutes, label) {
 }
 
 // Fazy w kolejności dnia: „Wieczór poprzedniego dnia” (karty 21:45–21:55) wykonuje się wieczorem tego dnia na jutro,
-// więc jest po „Wieczorze”, a jej ilości pochodzą z planu jutra (B1: na granicy faz, np. 18.10 → 19.10, płatki 85 g).
+// więc jest po „Wieczorze”, a jej ilości pochodzą z planu jutra (B1: na granicy faz, np. 11.11 → 12.11 — Faza 0 → Faza 1, płatki 85 g).
 // Identyfikatory sekcji (`mp-ph-<nr>`) = numer fazy w MEAL_PREP.
 const EVE = 0;
 const ORDER = [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && SRC.mealprep.phases[i].cards.some(Boolean))
@@ -71,7 +74,7 @@ export function renderMealPrep(root, ctx) {
   const byId = Object.fromEntries(SRC.mealprep.cards.map(c => [c.id, c]));
   const eveIds = new Set(SRC.mealprep.phases[EVE].cards);
   const textOf = (c, t) => (eveIds.has(c.id) ? TN(t) : T(t));
-  const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${date}|${c.id}|${bi * 100 + i}`, text: it, card: c })));
+  const stepsOf = c => c.blocks.flatMap((b, bi) => (b.items || []).map((it, i) => ({ key: `${date}|${c.id}|${PREP_IDX(bi, i)}`, text: it, card: c })));
   // D-100: w dniu bez diety (08–11.10) tylko wieczorne przygotowanie na jutro (11.10 → 12.10) — a gdy i jutro bez diety (08–10.10), brak kart
   const order = r.noDiet ? (rt.noDiet ? [] : [EVE]) : ORDER;
   const allSteps = order.flatMap(i => SRC.mealprep.phases[i].cards.map(id => byId[id]).filter(Boolean).flatMap(stepsOf));
@@ -151,11 +154,11 @@ export function renderMealPrep(root, ctx) {
         c.blocks.map((b, bi) => {
           if (b.items) {
             return h('ul', { class: `prep-list ${b.type}` }, b.items.map((it, i) => {
-              const key = `${date}|${c.id}|${bi * 100 + i}`;
+              const key = `${date}|${c.id}|${PREP_IDX(bi, i)}`;
               const mins = timerMin(it);
               return h('li', {},
                 h('label', {}, h('input', { type: 'checkbox', checked: !!state[key], disabled: !store,
-                  onchange: e => toggle(c.id, bi * 100 + i, e.target.checked) }), h('span', {}, textOf(c, it))),
+                  onchange: e => toggle(c.id, PREP_IDX(bi, i), e.target.checked) }), h('span', {}, textOf(c, it))),
                 mins ? timer(mins, c.title) : null);
             }));
           }

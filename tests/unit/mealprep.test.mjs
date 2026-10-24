@@ -57,3 +57,19 @@ test('{private:N} zastępowane treścią z pakietu, bez pakietu — komunikat', 
   const pack = { sections: [{ id: 'mp-why', blocks: [{ marker: 1, text: 'TREŚĆ' }] }] };
   assert.equal(resolveText(t, 0, 'T', pack), 'Uzasadnienie TREŚĆ dalej.');
 });
+
+test('R3 (audyt 23.10.2026): klucze kroków wszystkich kart Meal Prep są unikalne i mieszczą się w walidacji prep.step', async () => {
+  const { PREP_IDX } = await import('../../src/modules/mealprep.js');
+  const { PREP_IDX_LIMIT, validateEvent } = await import('../../src/core/storage/validate.js');
+  for (const c of SRC.mealprep.cards.filter(x => x.id)) {
+    assert.ok(c.blocks.length <= 100, `${c.id}: najwyżej 100 bloków`);
+    const keys = c.blocks.flatMap((b, bi) => (b.items || []).map((_, i) => { assert.ok(i < 100, `${c.id}: najwyżej 100 kroków w bloku`); return PREP_IDX(bi, i); }));
+    assert.equal(new Set(keys).size, keys.length, `${c.id}: klucze kroków bez powtórzeń`);
+    assert.ok(keys.every(k => k < PREP_IDX_LIMIT), c.id);
+  }
+  const ev = idx => ({ id: `prep.step:t${idx}`, hlc: '1790000000000:0000:dtest', dev: 'dtest', t: 'prep.step', d: { date: '2026-11-02', card: 'k4', idx, done: true }, at: '2026-11-02T10:00:00Z', v: 1 });
+  assert.equal(validateEvent(ev(PREP_IDX(2, 5))), null, 'trzeci blok kroków karty — zapisywalny (wcześniej idx < 200)');
+  assert.equal(validateEvent(ev(PREP_IDX(99, 99))), null);
+  assert.match(validateEvent(ev(PREP_IDX_LIMIT)), /prep\.step/);
+  assert.match(validateEvent(ev(-1)), /prep\.step/);
+});
