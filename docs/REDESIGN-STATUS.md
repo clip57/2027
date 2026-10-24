@@ -1,5 +1,6 @@
 # REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0, Fazie 5 (wszystkie moduły) i Etapach 0–3 audytu — 25.09.2026
 
+> **System 2.0 (D-110, 24.10.2026):** nowy wygląd całej aplikacji — `docs/RAPORT_D110.md`, specyfikacja `REDESIGN-SPEC.md` (§1, §2, §4, §5).
 > **Stan bieżący (29.09.2026):** `main` = `redesign-faza4` = `b3b4edc` (D-097). Aktualny stan, zasady i niedokończone zadania: `docs/PRZEKAZANIE.md`.
 > Poniższe zapisy o commitach (`69d5d94`, `b65b9fa`, `4e68589`) są historyczne.
 
@@ -35,6 +36,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 | Moduł Pielęgnacja D-094 (28.09.2026) | Nowy moduł (plan tylko w danych użytkownika, typy `care.def`/`care.done`), integracje, niedziela z basenem w planie dnia | `docs/RAPORT_PIELEGNACJA_D094.md` |
 | Plan MPW D-095 (29.09.2026) | Moduł MPW (wspólny kod z CFA), typy `mpw.done`/`mpw.err.*`, zakładka od 12.11, karta w „Dziś”, integracje | `docs/RAPORT_MPW_D095.md` |
 | MPW v8, weekendy, tydzień 28.09 — D-096 (29.09.2026) | Plan MPW v8, bloki weekendowe (studia, rozmowa, praca magisterska), święta, przesunięte treningi 28.09–04.10 | `docs/RAPORT_D096.md` |
+| **System 2.0 — D-110 (24.10.2026)** | Audyt designu całej aplikacji (112 zrzutów „przed”, 20 problemów) i nowy wygląd: „głębia przez światło” (tło „aurora” w kolorze modułu, krawędź światła kart), szkło tylko na elementach pływających (pływający pasek dolny, panel boczny, pasek tytułu, okna), „Teraz” z odliczaniem, plan dnia jako oś czasu, przewinięcie przy zmianie modułu i „Wstecz”, wejście ekranu, arkusze przeciągane, odsłonięcie motywu, nowa ikona; preferencje ruchu, przezroczystości, kontrastu i wymuszonych kolorów | `docs/RAPORT_D110.md` |
 
 ## 2. Wykonane
 

@@ -15,7 +15,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 input, select { font: inherit; font-size: 16px; min-height: 44px; }
 
 .app { min-height: 100%; display: grid; grid-template-columns: minmax(0, 1fr); }
-.main { min-width: 0; padding: 1rem 1rem calc(var(--tab-h) + 1.5rem + env(safe-area-inset-bottom, 0px)); max-width: 980px; width: 100%; margin: 0 auto; }
+.main { min-width: 0; padding: 1rem 1rem calc(var(--nav-space) + 1.5rem); max-width: 980px; width: 100%; margin: 0 auto; }
 .topline { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .75rem; margin-bottom: 1rem; }
 .topline .date { font-family: var(--font-round); font-weight: 650; font-size: 1.05rem; }
 .chip { display: inline-flex; align-items: center; gap: .35rem; font-size: .85rem; font-weight: 600; padding: .15rem .6rem;
@@ -321,10 +321,13 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .hero-tr-main .row { margin-top: var(--s-2); gap: var(--s-2); }
 .hero-tr-side { display: grid; justify-items: center; gap: var(--s-1); }
 .hero-tr-map { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: var(--s-3); align-items: center; border-top: 1px solid var(--line); padding-top: var(--s-3); }
-.ring { width: 72px; height: 72px; }
-.ring-bg { fill: none; stroke: color-mix(in srgb, var(--ink-2) 16%, transparent); stroke-width: 7; }
-.ring-fg { fill: none; stroke: var(--train); stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray .3s; }
-.ring-t { font-family: var(--font-round); font-weight: 800; font-size: 14px; fill: var(--ink); }
+/* Pierścień postępu (D-110): kolor z --ring (domena modułu), gradient wzdłuż łuku (components.js → <linearGradient>), poświata */
+.ring { --ring: var(--train); width: 72px; height: 72px; overflow: visible; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--ring) var(--glow-a), transparent)); }
+.ring-bg { fill: none; stroke: color-mix(in srgb, var(--text) 10%, transparent); stroke-width: 7; }
+.ring-fg { fill: none; stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray var(--dur-3) var(--ease-out); }
+.ring .rg-a { stop-color: color-mix(in oklab, var(--ring) 60%, var(--text)); }
+.ring .rg-b { stop-color: var(--ring); }
+.ring-t { font-family: var(--font); font-weight: 750; font-size: 14px; letter-spacing: -.02em; fill: var(--text); }
 
 /* Mapa mięśni */
 .bodymap { display: block; width: 100%; height: auto; }
@@ -372,7 +375,7 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 
 /* Meal Prep — odsłona 2 */
 .mp-ring { display: grid; justify-items: center; gap: var(--s-1); }
-.mp-ring .ring-fg { stroke: var(--prep); }
+.mp-ring .ring { --ring: var(--prep); }
 .mp-next { grid-column: 1 / -1; }
 .hero-tr-map:has(.mp-next) { grid-template-columns: 1fr; }
 .mp-next .btn { margin-top: var(--s-2); display: inline-flex; align-items: center; text-decoration: none; }
@@ -389,7 +392,7 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 @media (min-width: 900px) { .hero-tr-map { grid-template-columns: 220px minmax(0, 1fr); } }
 
 /* --- Etap 5: CFA --- */
-.hero-cfa .ring-fg, .cfa-dayhead .ring-fg { stroke: var(--cfa); }
+.hero-cfa .ring, .cfa-dayhead .ring { --ring: var(--cfa); }
 .cfa-dayhead { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-2); }
 .cfa-dayhead h2 { margin: 0; }
 .cfa-list { display: grid; gap: var(--s-2); margin-bottom: var(--s-3); }
@@ -493,7 +496,7 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .tr-done-ic { color: var(--success); display: grid; }
 .ex { scroll-margin-top: var(--s-4); }
 .ex.is-next { border-color: color-mix(in srgb, var(--train) 60%, var(--border)); }
-.tr-rest { position: fixed; z-index: 9; left: var(--s-3); right: var(--s-3); bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + var(--s-2));
+.tr-rest { position: fixed; z-index: 9; left: var(--s-3); right: var(--s-3); bottom: calc(var(--nav-space) + var(--s-2));
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--s-4);
   background: var(--surface-2); color: var(--text); border: 1px solid var(--border-strong); border-radius: var(--r-lg); box-shadow: var(--e2); }
 .tr-rest-ic { color: var(--train); display: grid; }
@@ -509,7 +512,7 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .tr-rest.is-ready .tr-rest-ic, .tr-rest.is-ready .tr-rest-t { color: var(--success); }
 .tr-rest.is-ready .tr-rest-fill { background: var(--success); }
 body.kbd .tr-rest { display: none; }                            /* klawiatura ekranowa — licznik działa dalej, pasek wraca po jej zamknięciu */
-.main:has(.tr-rest) { padding-bottom: calc(var(--tab-h) + 120px + env(safe-area-inset-bottom, 0px)); }
+.main:has(.tr-rest) { padding-bottom: calc(var(--nav-space) + 120px); }
 @media (max-width: 420px) { .tr-rest-act button span { display: none; } .tr-rest { gap: var(--s-2); padding: var(--s-2) var(--s-3); } }
 @media (min-width: 900px) { .tr-rest { left: auto; right: var(--s-6); bottom: var(--s-6); width: 460px; } .main:has(.tr-rest) { padding-bottom: 140px; } }
 

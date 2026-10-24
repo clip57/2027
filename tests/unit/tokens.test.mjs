@@ -38,6 +38,9 @@ const PAIRS = [
   ['--p-col', '--surface', 4.5], ['--c-col', '--surface', 4.5], ['--f-col', '--surface', 4.5], ['--org', '--surface', 4.5],
   ['--warn-ink', '--warn-bg', 4.5], ['--ok-ink', '--surface', 4.5],
   ['--border-strong', '--surface', 3],
+  // System 2.0 (D-110): przycisk domyślny (--btn), górny kraniec gradientu przycisku głównego (--accent-hi), aktywna zakładka (--accent-soft)
+  ['--text', '--btn', 4.5], ['--text-2', '--btn', 4.5], ['--muted', '--btn', 4.5], ['--danger', '--btn', 4.5],
+  ['--accent-ink', '--accent-hi', 4.5], ['--accent', '--accent-soft', 4.5], ['--text-2', '--bg', 4.5],
 ];
 for (const [name, theme] of [['jasny', light], ['ciemny', { ...light, ...dark }]]) {
   test(`kontrast par tokenów — motyw ${name}`, () => {

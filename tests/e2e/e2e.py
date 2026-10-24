@@ -164,7 +164,10 @@ async def run_variant(pw, name, url, mobile):
         await pg.get_by_role('button', name='Motyw: Jasny').click(); await pg.wait_for_timeout(200)
         await pg.reload(); await pg.wait_for_selector('.more-list')
         ok(await pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'light', f'{tag} Motyw: wybór jasnego zapamiętany po przeładowaniu')
-        await pg.get_by_role('button', name='Motyw: Systemowy').click(); await pg.wait_for_timeout(200)
+        await pg.get_by_role('button', name='Motyw: Systemowy').click()
+        # D-110: wygląd zmienia się w przejściu (odsłonięcie od przycisku) — czekamy na zastosowanie, nie stały czas
+        try: await wait_js(pg, "() => !document.documentElement.hasAttribute('data-theme')", timeout=3000)
+        except TimeoutError: pass
         ok(await pg.evaluate("document.documentElement.hasAttribute('data-theme')") is False, f'{tag} Motyw: systemowy (bez wymuszenia)')
         await pg.get_by_role('button', name='Motyw: Ciemny').click(); await pg.wait_for_timeout(200)
     else:
@@ -381,7 +384,7 @@ async def run_variant(pw, name, url, mobile):
     ok(await pg.evaluate('location.hash') == '#/dzis?d=2026-10-18', f'{tag} Kalendarz: klik dnia otwiera plan od startu (D-103c)')
     if mobile:
         await pg.goto(url + '#/dane'); await pg.wait_for_selector('h1')
-        small = await pg.evaluate('''[...document.querySelectorAll('button, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length''')
+        small = await pg.evaluate('''[...document.querySelectorAll('button, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 43.5 || r.width < 43.5).length''')
         ok(small == 0, f'{tag} elementy dotykowe ≥ 44 px (za małych: {small})')
     # --- import kopii ZAPASY przez interfejs
     tag0, tag = tag, tag + DATA['label']
@@ -659,10 +662,10 @@ async def run_features(pw, name, url, mobile):
     await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
     order = await pg.evaluate("[...document.querySelectorAll('main section.panel h2')].map(x => x.textContent)")
     ok(order and 'Synchronizacja' in order[0], f'{tag} Dane: synchronizacja jako pierwsza sekcja ({order[:2]})')
-    if mobile:   # cele dotykowe w rozbudowanych modułach
+    if mobile:   # cele dotykowe w rozbudowanych modułach (tolerancja 0,5 px: w trakcie wejścia ekranu — transform — wymiar 43,9999 px, D-110)
         for r in ('#/trening', '#/cfa?v=dzien', '#/cfa?v=log', '#/dieta', '#/zapasy', '#/mealprep', '#/suplementy', '#/bezpieczenstwo', '#/rekompozycja', '#/dane'):
             await pg.goto(url + r); await pg.wait_for_timeout(300)
-            small = await pg.evaluate('''[...document.querySelectorAll('main button, main a.btn, main a.chip, main summary, .dt-nav-a, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length''')
+            small = await pg.evaluate('''[...document.querySelectorAll('main button, main a.btn, main a.chip, main summary, .dt-nav-a, .tabs a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 43.5 || r.width < 43.5).length''')
             ok(small == 0, f'{tag} {r}: elementy dotykowe ≥ 44 px (za małych: {small})')
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await b.close()
@@ -1323,8 +1326,9 @@ async def run_d107(pw, name, url, mobile):
 AXE_SRC = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
 async def axe_audit(pg):
     """axe-core WCAG 2.1 A/AA (wstrzyknięcie przez CDP — CSP wariantu web blokuje skrypty inline) i przewijanie w poziomie.
-    Najpierw koniec animacji (okno na telefonie wjeżdża 200 ms od przezroczystości 0 — kontrast w trakcie byłby fałszywie za niski)."""
-    await wait_js(pg, "() => document.getAnimations().every(a => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity)")
+    Najpierw koniec animacji czasowych (wejście okna, przejście między ekranami — D-110); pomijane animacje nieskończone (pulsowanie „teraz”)
+    i sterowane przewijaniem (zanikanie krawędzi pasków — oś przewijania, nie czas)."""
+    await wait_js(pg, "() => document.getAnimations().every(a => a.playState !== 'running' || a.timeline !== document.timeline || a.effect?.getComputedTiming().iterations === Infinity)")
     cdp = await pg.context.new_cdp_session(pg); await cdp.send('Runtime.evaluate', {'expression': AXE_SRC}); await cdp.detach()
     res = await pg.evaluate("axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a','wcag2aa','wcag21a','wcag21aa']}, resultTypes: ['violations']})")
     sw, w = await pg.evaluate('[document.documentElement.scrollWidth, innerWidth]')
@@ -1442,6 +1446,93 @@ async def run_d108(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await ctx.close(); await b.close()
 
+async def run_d110(pw, name, url, mobile):
+    """D-110 (System 2.0): „Teraz” z upływem czasu i odliczaniem, oś czasu planu dnia, kolejność kart, poświata w kolorze punktu,
+    przewinięcie przy zmianie modułu i „Wstecz”, wejście ekranu, segmenty w jednym wierszu, pasek tytułu i arkusz przeciągany (telefon),
+    zmiana motywu z odsłonięciem i poświata kursora (komputer), pierścień z gradientem, dostępność."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-110]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 10, 19, 10, 40))
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    # „Teraz”: CFA blok C 10:10–11:03 o 10:40 — 23 min do końca, linia osi czasu wypełniona w 30/53, poświata tła w kolorze CFA
+    left = await pg.inner_text('.dz-now-left')
+    el = await pg.evaluate("parseFloat(document.querySelector('.dz-plan .slot.is-now').style.getPropertyValue('--el'))")
+    ok(left == 'zostało 23 min' and abs(el - 30 / 53) < 0.01 and await pg.evaluate("document.documentElement.dataset.domain") == 'cfa',
+       f'{tag} Teraz: odliczanie ({left}), upływ punktu --el={el:.3f}, poświata „cfa”')
+    order = await pg.evaluate("[...document.querySelector('.dz-grid').children].map(e => e.className.split(' ').find(c => c.startsWith('dz-')) || e.className)")
+    ok(order[:2] == ['dz-now', 'dz-attn'], f'{tag} Dziś: „Teraz” przed „Wymaga uwagi” ({order[:3]})')
+    ok(await pg.locator('.dz-kpi .unit').count() >= 2 and 'bloków' in await pg.inner_text('.dz-kpis'), f'{tag} Kafle KPI: jednostka pomniejszona, tekst bez zmian')
+    grad = await pg.evaluate("(() => { const fg = document.querySelector('.dz-now .ring-fg'); const id = (fg.getAttribute('stroke') || '').match(/#([^)]+)/); return !!(id && document.getElementById(id[1])?.querySelectorAll('stop').length === 2); })()")
+    ok(grad, f'{tag} Pierścień „Teraz”: gradient w dokumencie (unikalny identyfikator)')
+    await pg.evaluate("document.querySelector('main').dataset.mark = '1'")
+    await pg.clock.fast_forward(65_000); await pg.wait_for_timeout(300)
+    left2 = await pg.inner_text('.dz-now-left')
+    ok(left2 == 'zostało 22 min' and await pg.evaluate("document.querySelector('main').dataset.mark") == '1', f'{tag} Teraz: odliczanie w miejscu ({left2}), bez przerysowania strony')
+    v = await axe_audit(pg); ok(not v, f'{tag} Dziś (oś czasu): dostępność {v[:2]}')
+    # Przewinięcie: nowy moduł od góry, „Wstecz” wraca do miejsca; wejście ekranu tylko przy zmianie trasy
+    await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
+    await pg.evaluate('scrollTo(0, 1200)'); await pg.wait_for_timeout(300)
+    y0 = await pg.evaluate('scrollY')
+    await pg.locator(('.tabs' if mobile else '.side') + ' a[href="#/trening"]').click(); await pg.wait_for_selector('.ex'); await pg.wait_for_timeout(200)
+    y1, enter = await pg.evaluate("[scrollY, document.querySelector('main').dataset.enter]")
+    await pg.go_back(); await pg.wait_for_selector('.meal'); await pg.wait_for_timeout(300)
+    y2 = await pg.evaluate('scrollY')
+    ok(y0 > 1000 and y1 == 0 and enter == 'module' and abs(y2 - y0) < 5, f'{tag} Przewinięcie: nowy moduł od góry ({y0} → {y1}), „Wstecz” wraca ({y2}); wejście „{enter}”')
+    # pełne przerysowanie po zapisie (blok MPW w „Dziś” → ctx.rerender) — bez ponownej animacji wejścia
+    await pg.goto(url + '#/dzis?d=2026-11-17'); await pg.wait_for_selector('.dz-mpw .set-toggle')
+    e1 = await pg.evaluate("document.querySelector('main').dataset.enter")
+    await pg.locator('.dz-mpw .set-toggle').first.click(); await pg.wait_for_selector('.dz-mpw .set-toggle[aria-pressed="true"]')
+    e2 = await pg.evaluate("document.querySelector('main').dataset.enter")
+    ok(e1 == 'module' and e2 is None, f'{tag} Wejście ekranu tylko przy zmianie trasy (nowy moduł: {e1}; po zapisie: {e2})')
+    await pg.locator('.dz-mpw .set-toggle').first.click(); await pg.wait_for_selector('.dz-mpw .set-toggle[aria-pressed="false"]')
+    # Segmenty nie łamią się w dwa wiersze (CFA „Widok” — 5 pozycji)
+    await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.cfa-row')
+    h = await pg.evaluate("document.querySelector('.controls .seg').getBoundingClientRect().height")
+    ok(h < 60, f'{tag} CFA: przełącznik „Widok” w jednym wierszu ({h:.0f} px)')
+    if mobile:
+        tb = await pg.evaluate("(() => { const r = document.querySelector('.tabs').getBoundingClientRect(); return [r.left, r.right, r.bottom, innerWidth, innerHeight]; })()")
+        ok(tb[0] >= 12 and tb[3] - tb[1] >= 12 and tb[4] - tb[2] >= 8, f'{tag} Pasek dolny pływa nad krawędzią ({tb})')
+        await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+        top = await pg.evaluate("document.getElementById('app').classList.contains('is-scrolled')")
+        await pg.evaluate('scrollTo(0, 700)'); await pg.wait_for_timeout(400)
+        bar = await pg.evaluate("[document.getElementById('app').classList.contains('is-scrolled'), document.querySelector('.appbar-t').textContent, getComputedStyle(document.querySelector('.appbar')).visibility]")
+        ok(top is False and bar == [True, 'Dziś', 'visible'], f'{tag} Pasek tytułu po przewinięciu ({bar})')
+        await pg.goto(url + '#/trening?d=2026-10-19'); await pg.wait_for_selector('.ex-tech')
+        await pg.locator('.ex-tech').first.click(); await pg.wait_for_selector('dialog.sheet[open]'); await pg.wait_for_timeout(500)
+        box = await pg.locator('dialog.sheet .sheet-head h2').bounding_box()
+        x, y = box['x'] + 10, box['y'] + 5
+        cdp = await ctx.new_cdp_session(pg)
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': x, 'y': y}]})
+        for i in range(1, 6):
+            await cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': x, 'y': y + i * 12}]}); await pg.wait_for_timeout(30)
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []}); await pg.wait_for_timeout(500)
+        ok(await pg.locator('dialog.sheet[open]').count() == 1, f'{tag} Arkusz: krótkie przeciągnięcie — wraca na miejsce')
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': x, 'y': y}]})
+        for i in range(1, 11):
+            await cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': x, 'y': y + i * 30}]}); await pg.wait_for_timeout(16)
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []}); await pg.wait_for_timeout(600)
+        await cdp.detach()
+        ok(await pg.locator('dialog.sheet[open]').count() == 0, f'{tag} Arkusz: przeciągnięcie w dół zamyka okno')
+    else:
+        await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-card')
+        await pg.locator('.dz-card').first.hover(position={'x': 40, 'y': 30}); await pg.wait_for_timeout(200)
+        mx = await pg.evaluate("parseFloat(document.querySelector('.dz-card').style.getPropertyValue('--mx'))")
+        ok(mx == mx and abs(mx - 40) <= 2, f'{tag} Poświata kursora na karcie (--mx = {mx})')
+        await pg.get_by_role('button', name='Motyw: Jasny').click()
+        ok(await pg.evaluate("localStorage.getItem('p2027.theme')") == 'light', f'{tag} Motyw: wybór zapisany od razu')
+        await wait_js(pg, "() => document.documentElement.getAttribute('data-theme') === 'light' && !document.documentElement.classList.contains('vt-theme')", timeout=5000)
+        ok(await pg.evaluate("getComputedStyle(document.body).backgroundColor") == 'rgb(243, 244, 247)', f'{tag} Motyw jasny po odsłonięciu (tło #f3f4f7)')
+        v = await axe_audit(pg); ok(not v, f'{tag} Dziś jasny: dostępność {v[:2]}')
+        await pg.get_by_role('button', name='Motyw: Ciemny').click()
+        await wait_js(pg, "() => document.documentElement.getAttribute('data-theme') === 'dark' && !document.documentElement.classList.contains('vt-theme')", timeout=5000)
+    ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
+    await ctx.close(); await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -1466,6 +1557,8 @@ async def main():
         await run_d107(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d108(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d108(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d110(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d110(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

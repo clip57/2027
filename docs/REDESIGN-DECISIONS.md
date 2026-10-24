@@ -119,6 +119,25 @@ nieistotnym wzroście paczki — spełnione przez podzbiór.
 - Podgląd importu postępu CFA mówi, z którego planu jest plik i które bloki zostaną oznaczone; plik z innego planu — „Nie można zaimportować”.
 - Zadania bloków MPW poza pakietem aplikacji (wczytywane w module); gdy się nie wczytają — baner, reszta planu działa.
 
+## C10. System 2.0 — nowocześniejszy wygląd całej aplikacji (D-110, 24.10.2026)
+
+Polecenie użytkownika (24.10.2026): szeroki audyt designu i wygląd „bardziej nowoczesny, futurystyczny, a jednocześnie praktyczny”.
+Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w granicach poniżej; układ informacji, klasy, dane i logika bez zmian.
+- **Głębia przez światło:** tło „aurora” (poświata w kolorze modułu; w „Dziś” — bieżącego punktu planu), krawędź światła kart (`--rim`)
+  i miękki cień także w motywie ciemnym, chłodniejsza paleta (jasny `#f3f4f7`, ciemny `#090a0f`), większe promienie (10/14/20/28).
+- **Szkło tylko na elementach pływających:** pływający pasek dolny („soczewka” aktywnej sekcji), pływający panel boczny, pasek tytułu
+  po przewinięciu (telefon), nagłówek arkusza, liczniki przerwy, przyklejone skróty; krycie dobrane pod kontrast ≥ 4,5:1.
+- **Dziś:** najpierw „Teraz” (pasek upływu czasu punktu i „zostało N min”), potem „Wymaga uwagi” jako zwarta lista, kafle KPI
+  w kolorach domen z jednostką pomniejszoną, podsumowania jako przewijany pas na telefonie (plan dnia bliżej góry ekranu),
+  **plan dnia jako oś czasu** (linia wypełniana upływem czasu w bieżącym punkcie).
+- **Nawigacja praktyczniej:** nowy moduł / widok otwiera się od góry, „Wstecz” wraca do miejsca; przełączniki segmentowe nie łamią się
+  w dwa wiersze; strzałki dni na telefonie bez etykiet (nazwa w `aria-label`); tydzień w 7 kolumnach dopiero od 1500 px.
+- **Ruch z funkcją:** wejście ekranu (CSS, bez opóźnienia renderu), sprężysty nacisk, arkusz zamykany przeciągnięciem, pulsujący
+  znacznik „teraz”, odsłonięcie nowego motywu kołem (View Transitions — tylko tu; przy zmianie trasy opóźniały przerysowanie).
+- **Preferencje systemu przed efektami:** mniej ruchu, mniej przezroczystości, więcej kontrastu, wymuszone kolory.
+- Pierścienie postępu z gradientem i poświatą, wykresy z ograniczoną wysokością, kreślone strzałki rozwijania, nowa ikona aplikacji
+  (znak „27” w pierścieniu — `tools/app_icons.py`).
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.

@@ -10,8 +10,9 @@ export function applyTheme(pref = themePref()) {
   const root = document.documentElement;
   if (pref === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', pref === 'light' ? 'light' : 'dark');
   const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { m.setAttribute('content', dark ? '#0d0f13' : '#f6f5f2'); m.removeAttribute('media'); });
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { m.setAttribute('content', dark ? '#090a0f' : '#f3f4f7'); m.removeAttribute('media'); });
 }
-export function setTheme(pref) { set('theme', pref); applyTheme(pref); }
+export const saveTheme = pref => set('theme', pref);
+export function setTheme(pref) { saveTheme(pref); applyTheme(pref); }
 export const sideCollapsed = () => get('side', 'expanded') === 'collapsed';
 export const setSideCollapsed = v => set('side', v ? 'collapsed' : 'expanded');

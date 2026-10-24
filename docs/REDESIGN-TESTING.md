@@ -3,22 +3,34 @@
 ## 1. Zestawy testów
 | Zestaw | Komenda | Co sprawdza | Wymaga |
 |---|---|---|---|
-| Jednostkowe | `npm test` | rdzeń: daty, resolver, zużycie, zapasy, dieta, suplementy, trening, Meal Prep, mięśnie, zapis, synchronizacja, zgodność w przód; tokeny wyglądu (identyczne bloki motywu ciemnego, kontrast 23 par w obu motywach) | Node 22 |
+| Jednostkowe | `npm test` | rdzeń: daty, resolver, zużycie, zapasy, dieta, suplementy, trening, Meal Prep, mięśnie, zapis, synchronizacja, zgodność w przód; tokeny wyglądu (identyczne bloki motywu ciemnego, kontrast 30 par w obu motywach — D-110: +7 par przycisku `--btn`, gradientu `--accent-hi`, aktywnej zakładki); upływ czasu punktu planu (`day-clock.test.mjs`, D-110) | Node 22 |
 | Weryfikacja danych | `npm run verify` | zgodność `src/data/*.json` z plikami źródłowymi (407 kontroli) | **`SOURCES_DIR`** (pliki użytkownika — brak w repo) |
 | E2E | `npm run build && npm run e2e` | wszystkie moduły w 2 wariantach buildu (web przez http://localhost:8765, jeden plik przez file://) × 390 px (mobile, dotyk) / 1280 px; brak przewijania w poziomie, brak artefaktów „null/false/undefined/NaN”, cele dotykowe ≥ 44 px (widok Dane na 390 px), funkcje modułów, trwałość zapisu, eksport/import, offline (SW), kontrast odhaczonych elementów, linki w obrębie strony, sygnatury modułów | Python 3, Playwright ≥ 1.56, Chromium; `SOURCES_DIR`, `PRIVATE_PACK` opcjonalnie — bez nich dane syntetyczne (D-065) |
 | Synchronizacja i aktualizacja | `npm run e2e:sync` | 2 oddzielne profile (osobne bazy): sync w obu kierunkach, niezależne zmiany, brak duplikatów, ostrzeżenie o starszym pliku, zdarzenia z nowszej wersji (baner, brak utraty), aktualizacja kodu tylko za zgodą, offline po aktualizacji, przejście ze starego SW | jw.; **przebudowuje `dist/` kilka razy** (na końcu przywraca zwykły build); porty 8791 |
 | Synchronizacja w chmurze | `npm run e2e:cloud` (sam buduje wariant z CSP dla lokalnego serwera — D-108/U7 — i przywraca zwykły build) | lokalny fałszywy serwer Supabase (`tests/e2e/fake_supabase.py`, CORS, RLS, rotacja tokenów, indeks numerów) + 2 profile Chromium (390 ciemny / 1280 jasny z zegarem Playwright) + druga karta + plik `2027.html`: konfiguracja (odrzucenie klucza sekretnego), logowanie, hasło szyfrowania, przełącznik automatu (wyłączony: zero zapytań bez kliknięcia), automatyczna wysyłka i grupowanie serii zmian, pierwsza synchronizacja po haśle, powrót do aplikacji, powrót sieci, konflikt, dwie karty (A4), brak przerysowania w trakcie wpisywania, transfer pustej rundy, baner wstrzymania, brak treści jawnej na serwerze, wygasły token, wylogowanie, odłączenie; automatyczne pobieranie zmian D-085 (30 s komputer / 60 s telefon, bezczynność 5 min, powrót do okna ≤ 1/10 s, offline, przełącznik, wstrzymanie, sprawdzenie bez zmian ≤ 4 B); axe, przewijanie i cele dotykowe w każdym kroku (100 kontroli) | jw.; porty 8793 i 54329 |
 | Poprawki audytu (D-107) | w `npm run e2e` — `run_d107` | B1 „Cofnij” (760 g po pomyłce, drugie „Cofnij” bez przywracania błędu, zerowanie jako jedna operacja), B2 puste pole „Stan”, B3 „Teraz” o 10:03 w miejscu i zmiana dnia (zegar i powrót do aplikacji), B4 stoper po 25 h, B5 `.ics`, B6 MPW w czwartki 16:00, B7 ikona „monitor”, B8 seria tygodni, B9 sloty Pielęgnacji, B10 dwie karty bez nowych połączeń IndexedDB (web) | — |
 | Ryzyka i ulepszenia audytu (D-108) | w `npm run e2e` — `run_d108` | U7 CSP bez `localhost`, U6 zadania MPW wczytane dopiero w module (web: 1 zapytanie, `2027.html`: 0), U4 tygodnie w Treningu (← → na komputerze, „Ten tydzień”, pierwszy tydzień planu), U3 skróty `g k / p / e / n` (przed i po 12.11), U1 „Czas własny” i slot „Nauka MPW”, R2 blokada pliku postępu z innego planu i opis bloków, U8 przywrócenie stanów Zapasów z kopii i „Cofnij”; D-109: 31.12 bez zakupów, 01.01 bez treningu z blokami MPW; axe na nowych widokach i oknach — oba warianty buildu | — |
+| System 2.0 (D-110) | w `npm run e2e` — `run_d110` | „Teraz”: „zostało N min” i upływ punktu `--el` (zegar 19.10 10:40), odliczanie w miejscu po 65 s (bez przerysowania), poświata `data-domain`; kolejność „Teraz” → „Wymaga uwagi”; jednostka KPI; gradient pierścienia; przewinięcie: nowy moduł od góry, „Wstecz” przywraca; wejście ekranu tylko przy zmianie trasy (nie po zapisie); „Widok” CFA w jednym wierszu; telefon: pływający pasek dolny, pasek tytułu po przewinięciu, arkusz — krótkie przeciągnięcie wraca, długie zamyka; komputer: poświata kursora, zmiana motywu z odsłonięciem (wybór zapisany od razu, tło `#f3f4f7`), axe w obu motywach | — |
 | CI — „Testy 2027” | `.github/workflows/testy.yml` (push poza `main`, PR, wywołanie z `pages.yml`) | jednostkowe, `plan_check`, `verify_all --data-only`, budowa, `cfa_smoke`, E2E, a11y, Trening, `e2e:sync`, `e2e:cloud` — przed każdą publikacją na `main` (błąd zatrzymuje wdrożenie) | Python 3.12 + Playwright 1.56 (instalowane w CI) |
 | Trening: arkusze i dziennik sesji | `npm run build && npm run e2e:trening` | arkusze System kolana i Sauna (D-105); dziennik sesji (D-106): zapis pól, zakres, przeładowanie, cofnięcie, sekcje wg dnia, Historia, axe — 390 ciemny / 1100 jasny | — |
-| Dostępność | `npm run build && npm run a11y` | axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
+| Dostępność | `npm run build && npm run a11y` | (D-110: przed axe oczekiwanie na koniec animacji czasowych — wejście ekranu, okna; pomijane nieskończone i sterowane przewijaniem) axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
 
 Kolejność po każdej zmianie w Fazie 5: `npm run build && npm test && npm run e2e && npm run a11y`;
 dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, `tools/build.mjs`, `src/modules/dane.js`;
 `npm run e2e:cloud`, jeśli dotyka `src/core/sync/**`, `src/core/storage/**`, `src/modules/dane*.js` albo `src/app.js`.
 
 ## 2. Wyniki regresji
+
+### System 2.0 — audyt designu (D-110; 24.10.2026, konfiguracja B)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 247 testów: 246 zaliczonych, 1 pominięty (migracja ZAPASY — `SOURCES_DIR`) |
+| `plan_check.mjs` / `verify_all.py --data-only` / `cfa_smoke.py` | 0 błędów (3 znane ostrzeżenia D-101) / OK / 0 błędów |
+| `npm run e2e` | 1517/1517 (w tym 28 kontroli `[D-110]`) |
+| `npm run e2e:trening` | 0 błędów |
+| `npm run e2e:sync` | 23/23 |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń w obu motywach, brak przewijania w poziomie |
 
 ### Plan CFA v7 i start 27.09.2026 (D-090; 26–27.09.2026, konfiguracja B)
 | Zestaw | Wynik |
@@ -211,6 +223,7 @@ liczba fragmentów) liczone z tych samych danych. Pliki powstają w katalogu tym
 .pg-empty .pg-hero .pg-pora .pg-count .pg-check .pg-step .is-done .is-opt .pg-wait .pg-timer .pg-timer-t .pg-wday .pg-prod-card .pg-plan-i .pg-edit .slot-care
 .hero-mpw .dz-mpw .cf-task .topic .tech-list .cal-d .c-mock .c-exam .log-item .wk-blocks
 .dn .dn-phases .ks-actions .ks-alert .ks-crit .ks-row .is-alert .ph-list .sa-card .sa-steps .sa-timeline .sheet-text .tlog .tl-sec .tl-st .tl-derived .hist-d`
+`.dz-now .dz-now-left .dz-now-prog .dz-now-bar .dz-kpi .unit .appbar .appbar-t #app.is-scrolled main[data-enter] html.vt-theme .ring-fg[stroke] .controls .seg` i atrybut `data-domain` na `<html>` (D-110; testy czekają na koniec animacji czasowych: `a.timeline !== document.timeline` pomijane)
 `.day-strip .ds .ds.is-on .ds.is-today .tr-weeknav .slot.is-own .dz-plan .nowcard-t .dn-bk .dn-bk-list .dn-bk-rows .cf-task .cf-task-na` (D-108; przyciski „Przywróć stany Zapasów”, „Przywróć (N)”, linki „Poprzedni tydzień”, „Następny tydzień”, „Ten tydzień”, teksty „Czas własny”, „Nauka MPW”, „Bloki do oznaczenia”, „import zablokowany”)
 (dziennik sesji, D-106: `aria-label` pól „Basen: Dystans, m”, „Kolano: Ból w trakcie (najwyższy), /10”, „Sauna: Koniec sauny (godzina)”, „Notatka do sesji” itd. — wzór „<Sekcja>: <etykieta>, <jednostka>”; nazwy przycisków wyboru = opisy opcji, np. „Kraul”, „25 m”, „minimalny”)
 (MPW, D-095: `aria-label` „Blok MPW N do wykonania” (Dziś) i „Blok N do wykonania” (moduł), placeholder „np. KSH…”, przycisk „Eksport CSV”
@@ -264,7 +277,15 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
    CFA — odhaczenie recall; Dane — Diagnostyka, ostrzeżenia, plik `.ics` → Kalendarz („Dodaj wszystkie”, alarmy). MacBook:
    ⌘K, „/”, ← →, g + litera, „?”. Safari (karta i PWA) — brak błędów CSP, chmura działa. **Do wykonania przez użytkownika.**
 
+13. **System 2.0 (D-110)** — na iPhonie (Safari i PWA osobno): pływający pasek dolny nad wskaźnikiem Home (nie zasłania ostatniej
+   treści, chowa się przy klawiaturze i wraca), pasek tytułu po przewinięciu (tytuł modułu, w „Dziś” — dnia), arkusze: uchwyt, zamknięcie
+   przeciągnięciem w dół, krótkie przeciągnięcie wraca; szkło (rozmycie) paska dolnego, paska tytułu i liczników; „Dziś”: „Teraz” z „zostało
+   N min”, oś czasu, pas podsumowań przewijany w poziomie; zmiana modułu otwiera go od góry, „Wstecz” wraca do miejsca; nowa ikona po
+   ponownym dodaniu do ekranu początkowego; Ustawienia → Dostępność: „Ogranicz ruch” (bez animacji), „Ogranicz przezroczystość”
+   i „Zwiększ kontrast” (bez szkła i poświat). **Do wykonania przez użytkownika.**
+
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
+D-110: pływający panel boczny, poświata pod kursorem na kartach, zmiana motywu z odsłonięciem kołem (Safari 18+, Chrome), ⌘K u góry ekranu.
 
 Stan: **wszystkie punkty tej sekcji (iPhone Safari i PWA, MacBook, synchronizacja wg `TEST_IPHONE_SYNC.md`) sprawdzone ręcznie
 przez użytkownika na wersji opublikowanej `4e68589` (Faza 5 zakończona) — działa (potwierdzenie 24.09.2026).**

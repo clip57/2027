@@ -30,6 +30,16 @@ function cfaBlock(b, slot) {
     h('p', { class: 'cfa-meta' }, h('span', { class: 'chip' }, b.tryb), b.godz !== `${slot.from}–${slot.to}` && h('span', { class: 'muted' }, b.godz)));
 }
 
+// Upływ czasu w punkcie planu (D-110): ułamek od–do (także przez północ, np. sen 23:00–07:00) i minuty do końca
+const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+export function slotClock(s, hhmm) {
+  const f = toMin(s.from); let t = toMin(s.to), c = toMin(hhmm);
+  if (t <= f) t += 1440;
+  if (c < f) c += 1440;
+  return { frac: Math.min(1, Math.max(0, (c - f) / (t - f))), left: Math.max(0, t - c) };
+}
+const minLabel = m => (m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`);
+
 // Bieżący slot wyznaczany z zegara (tylko dla dzisiejszego dnia).
 export function currentSlot(slots, hhmm) {
   let cur = null;
@@ -45,8 +55,9 @@ function slotView(s, now, care) {
   const title = s.title, titleKcal = lead?.kcal ?? null;
   const items = s.items.filter(i => i !== lead);
   const isNow = now && now.current === s;
-  // U1: „Czas własny” (slot nauki bez bloku poza planem CFA) — lżej, bez koloru domeny
-  return h('article', { class: `slot${isNow ? ' is-now' : ''}${s.own ? ' is-own' : ''}`, 'data-domain': s.domain, 'aria-labelledby': `t-${s.id}`, id: s.id },
+  // U1: „Czas własny” (slot nauki bez bloku poza planem CFA) — lżej, bez koloru domeny. D-110: bieżący punkt — linia osi czasu wypełniona do upływu czasu (--el)
+  return h('article', { class: `slot${isNow ? ' is-now' : ''}${s.own ? ' is-own' : ''}`, 'data-domain': s.domain, 'aria-labelledby': `t-${s.id}`, id: s.id,
+    style: isNow && now.hhmm ? { '--el': slotClock(s, now.hhmm).frac.toFixed(3) } : null },
     h('div', { class: 'slot-time' }, h('time', {}, s.from), h('span', { class: 'to' }, `–${s.to}`)),
     h('div', { class: 'slot-body' },
       h('h3', { class: 'slot-title', id: `t-${s.id}` }, title, titleKcal != null && h('span', { class: 'kcal' }, `${titleKcal} kcal`),
@@ -237,7 +248,10 @@ export function renderDzis(root, ctx) {
   // bez przerysowania strony, przewinięcie i rozwinięte sekcje zostają); podział na „Minione punkty” — z chwili wyświetlenia
   const hm = () => { const x = new Date(); return `${String(x.getHours()).padStart(2, '0')}:${String(x.getMinutes()).padStart(2, '0')}`; };
   let hhmm = hm();
-  let now = date === ctx.today ? currentSlot(r.slots, hhmm) : null;
+  let now = date === ctx.today ? { ...currentSlot(r.slots, hhmm), hhmm } : null;
+  // D-110: poświata tła w kolorze bieżącego punktu planu (tylko dzień bieżący)
+  const ambient = () => { if (now?.current?.domain) document.documentElement.dataset.domain = now.current.domain; };
+  ambient();
   const t = plan(r.dietVariant, r.phase ?? 0).total;
   const D = dayData(r, date, ctx.store, ctx.today);
   const cfaMin = r.cfa.blocks.length * 53;
@@ -246,8 +260,10 @@ export function renderDzis(root, ctx) {
   const slotIdx = now?.current ? r.slots.indexOf(now.current) : -1;
   const allDoses = r.slots.flatMap(s => s.doses);
   const nextDose = () => allDoses.find(x => x.time >= hhmm);
-  const kpi = (label, value, hint, extra, cls = '') => h('div', { class: `stat dz-kpi ${cls}` },
-    h('span', { class: 'stat-l' }, label), h('strong', { class: 'stat-v' }, value), hint && h('span', { class: 'stat-h' }, hint), extra);
+  // Kafel KPI (D-110): ikona i pasek w kolorze domeny, liczba z jednostką pomniejszoną (tekst kafla bez zmian — „0 / 11 bloków”)
+  const kpi = (label, ic, dom, value, unit, hint, extra, cls = '') => h('div', { class: `stat dz-kpi ${cls}`, style: { '--dc': `var(--${dom})` } },
+    h('span', { class: 'stat-l' }, icon(ic, { size: 14 }), label), h('strong', { class: 'stat-v' }, value, unit && h('span', { class: 'unit' }, ` ${unit}`)),
+    hint && h('span', { class: 'stat-h' }, hint), extra);
   const bar = (v, max, dom) => h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%`, background: `var(--${dom})` } }));
   // Pielęgnacja (D-094): plan z danych użytkownika; bez planu — bez karty i bez znaczników w slotach
   const cm = careModel(ctx.store?.state?.careDefs || []), cDone = ctx.store?.state?.careDone || {};
@@ -256,11 +272,17 @@ export function renderDzis(root, ctx) {
   const nowBox = region(() => {
     if (!now || !(now.current || now.next)) return null;
     const idx = now.current ? r.slots.indexOf(now.current) : -1;
-    return h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz' },
+    // D-110: postęp bieżącego punktu w czasie (od–do) i czas do końca; przed pierwszym punktem — czas do rozpoczęcia
+    const clk = now.current ? slotClock(now.current, hhmm) : null;
+    const wait = !now.current ? (toMin(now.next.from) - toMin(hhmm) + 1440) % 1440 : 0;
+    return h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz', style: { '--dc': `var(--${(now.current || now.next).domain || 'accent'})` } },
       h('div', { class: 'dz-now-main' },
         h('p', { class: 'nowcard-l' }, now.current ? `Teraz · ${now.current.from}–${now.current.to}` : 'Za chwilę'),
         h('p', { class: 'nowcard-t' }, (now.current || now.next).title),
-        now.next && h('p', { class: 'muted' }, `Następnie ${now.next.from} · ${now.next.title}`),
+        clk ? h('div', { class: 'dz-now-prog' }, h('span', { class: 'dz-now-bar', 'aria-hidden': 'true' }, h('span', { style: { width: `${(clk.frac * 100).toFixed(1)}%` } })),
+          h('span', { class: 'dz-now-left' }, `zostało ${minLabel(clk.left)}`))
+          : h('p', { class: 'dz-now-left' }, `za ${minLabel(wait)} · ${now.next.from}`),
+        now.current && now.next && h('p', { class: 'muted' }, `Następnie ${now.next.from} · ${now.next.title}`),
         now.current && h('a', { class: 'btn', href: `#${now.current.id}` }, 'Pokaż w planie')),
       idx >= 0 && h('div', { class: 'dz-now-side' }, progressRing(idx + 1, r.slots.length, 'Postęp dnia'), h('span', { class: 'muted' }, `punkt ${idx + 1} z ${r.slots.length}`)));
   });
@@ -292,21 +314,21 @@ export function renderDzis(root, ctx) {
       r.mpw.inPlan && h('a', { class: 'btn ql', href: `#/mpw?v=dzien&d=${date}` }, icon('landmark', { size: 18 }), h('span', {}, 'Bloki MPW')),
       careP && h('a', { class: 'btn ql', href: `#/pielegnacja?d=${date}` }, icon('sparkles', { size: 18 }), h('span', {}, 'Pielęgnacja'))),
     h('div', { class: 'dz-grid' },
+      nowBox.el,   // D-110: najpierw „Teraz” (co robię), potem „Wymaga uwagi” — ta sama kolejność na telefonie i komputerze
       date === ctx.today && attentionCard(ctx),
-      nowBox.el,
       h('div', { class: 'stats dz-kpis' },
-        r.noDiet ? kpi('Dieta', 'Bez diety', `dieta od ${longDate(DIET_START)}`)
-          : kpi('Dieta', `${r.kcal} kcal`, `${r.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · B ${fmt(t.p)} / W ${fmt(t.c)} / T ${fmt(t.f)} g`,
+        r.noDiet ? kpi('Dieta', 'utensils', 'diet', 'Bez diety', null, `dieta od ${longDate(DIET_START)}`)
+          : kpi('Dieta', 'utensils', 'diet', String(r.kcal), 'kcal', `${r.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · B ${fmt(t.p)} / W ${fmt(t.c)} / T ${fmt(t.f)} g`,
           h('span', { class: 'dz-macro' }, bar(t.p * 4, t.p * 4 + t.c * 4 + t.f * 9, 'p-col'), bar(t.c * 4, t.p * 4 + t.c * 4 + t.f * 9, 'c-col'), bar(t.f * 9, t.p * 4 + t.c * 4 + t.f * 9, 'f-col'))),
-        kpi('Trening', D.planned ? `${D.done} / ${D.planned}` : (r.training?.length ? r.sessionLabel : 'Bez treningu'),
+        kpi('Trening', 'dumbbell', 'train', D.planned ? `${D.done} / ${D.planned}` : (r.training?.length ? r.sessionLabel : 'Bez treningu'), null,
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
           D.planned ? bar(D.done, D.planned, 'train') : null),
-        mpwNow ? kpi('MPW', r.mpw.blocks.length ? `${D.mpwToday} / ${r.mpw.blocks.length} bloków` : r.mpw.inPlan ? 'dzień wolny' : date < MD.stat.start ? `od ${shortDate(MD.stat.start)}` : 'po planie',
-          r.mpw.blocks.length ? mpwHint(r.mpw.blocks) : null,
+        mpwNow ? kpi('MPW', 'landmark', 'cfa', r.mpw.blocks.length ? `${D.mpwToday} / ${r.mpw.blocks.length}` : r.mpw.inPlan ? 'dzień wolny' : date < MD.stat.start ? `od ${shortDate(MD.stat.start)}` : 'po planie',
+          r.mpw.blocks.length ? 'bloków' : null, r.mpw.blocks.length ? mpwHint(r.mpw.blocks) : null,
           r.mpw.blocks.length ? bar(D.mpwToday, r.mpw.blocks.length, 'cfa') : null) :
-        kpi('CFA', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length} bloków` : 'poza planem',
+        kpi('CFA', 'graduation-cap', 'cfa', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length}` : 'poza planem', r.cfa.inPlan ? 'bloków' : null,
           r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null, r.cfa.inPlan ? bar(D.cfaToday, r.cfa.blocks.length, 'cfa') : null),
-        kpi('Zapasy', D.inv ? (D.inv.known ? `${D.inv.critical.length} ${plural(D.inv.critical.length, 'pilna', 'pilne', 'pilnych')}` : 'brak stanów') : '—',
+        kpi('Zapasy', 'package', 'prep', D.inv ? (D.inv.known ? String(D.inv.critical.length) : 'brak stanów') : '—', D.inv?.known ? plural(D.inv.critical.length, 'pilna', 'pilne', 'pilnych') : null,
           D.inv ? `zakupy ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)} · ${D.inv.toBuy} ${plural(D.inv.toBuy, 'pozycja', 'pozycje', 'pozycji')}` : null, null,
           D.inv?.critical.length ? 'is-alert' : '')),
       h('aside', { class: 'dz-aside', 'aria-label': 'Podsumowanie dnia' },
@@ -346,10 +368,14 @@ export function renderDzis(root, ctx) {
     if (D.inv && nextShopping(ctx.today, x.getHours(), x.getMinutes()).date !== shopDay) { ctx.soft?.(); return; }
     const prev = now, dose = nextDose()?.time;
     hhmm = t;
-    const n = currentSlot(r.slots, t);
+    const n = { ...currentSlot(r.slots, t), hhmm: t };
     if (n.current !== prev.current || n.next !== prev.next) {
-      now = n; nowBox.refresh();
+      now = n; nowBox.refresh(); ambient();
       for (const s of new Set([prev.current, n.current].filter(Boolean))) { const el = document.getElementById(s.id); if (el) swap(el, slotView(s, now, care)); }
+    } else if (t !== prev.hhmm) {
+      // ta sama pora: odliczanie w karcie „Teraz” i wypełnienie linii osi czasu (bez przebudowy punktów planu)
+      now = n; nowBox.refresh();
+      if (n.current) document.getElementById(n.current.id)?.style.setProperty('--el', slotClock(n.current, t).frac.toFixed(3));
     }
     if (nextDose()?.time !== dose) suppFoot.refresh();
   });

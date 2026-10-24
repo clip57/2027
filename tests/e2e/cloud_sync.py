@@ -69,7 +69,7 @@ async def audit(pg, label):
     ok(not v, f'{label}: axe bez naruszeń {v[:2]}')
     sw, w = await pg.evaluate('[document.documentElement.scrollWidth, innerWidth]')
     ok(sw <= w, f'{label}: bez przewijania w poziomie ({sw}/{w})')
-    small = await pg.evaluate("[...document.querySelectorAll('.dn-cloud button, .dn-cloud summary, .dn-cloud input')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 44).length")
+    small = await pg.evaluate("[...document.querySelectorAll('.dn-cloud button, .dn-cloud summary, .dn-cloud input')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 43.5).length")
     ok(small == 0, f'{label}: elementy dotykowe ≥ 44 px (za małych: {small})')
 
 async def configure(pg, url, srv):

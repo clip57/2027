@@ -93,9 +93,9 @@ export function renderPielegnacja(root, ctx) {
   // ---------------- Dzień: lista kontrolna wg pór dnia
   function dayView() {
     const nav = h('div', { class: 'row daynav' },
-      date > PLAN_START && h('a', { class: 'btn dz-nav', href: `#/pielegnacja?d=${addDays(date, -1)}` }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
+      date > PLAN_START && h('a', { class: 'btn dz-nav', href: `#/pielegnacja?d=${addDays(date, -1)}`, 'aria-label': 'Poprzedni dzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
       date !== today && h('a', { class: 'btn dz-nav', href: '#/pielegnacja' }, 'Dziś'),
-      h('a', { class: 'btn dz-nav', href: `#/pielegnacja?d=${addDays(date, 1)}` }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 })));
+      h('a', { class: 'btn dz-nav', href: `#/pielegnacja?d=${addDays(date, 1)}`, 'aria-label': 'Następny dzień' }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 })));
     if (!inPlan(date)) { add(root, nav, h('p', { class: 'panel pg-outside' }, date > PLAN_END ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.` : `Poza planem — plan zaczyna się ${longDate(PLAN_START)}.`)); return; }
     const list = stepsFor(model, date);
     const poras = byPora(list);

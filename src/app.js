@@ -8,7 +8,7 @@ import { autoRound, autoCheck, describeError, cloudStatus } from './core/sync/cl
 import { setCustomItems } from './core/calc/inventory.js';
 import { GROUPS, byId, modulesOn } from './modules/registry.js';
 import { icon } from './ui/icons.js';
-import { THEMES, themePref, applyTheme, setTheme, sideCollapsed, setSideCollapsed } from './ui/prefs.js';
+import { THEMES, themePref, applyTheme, saveTheme, sideCollapsed, setSideCollapsed } from './ui/prefs.js';
 import { setupShortcuts, searchButton } from './ui/search.js';
 import { renderDzis } from './modules/dzis.js';
 import { renderDane } from './modules/dane.js';
@@ -63,6 +63,7 @@ function restoreFocus(k) {
   }
 }
 const chan = 'BroadcastChannel' in globalThis ? new BroadcastChannel('p2027') : null;
+const SPOT = '.dz-card, .dz-kpi, .wk-day, .kl-day, .more-list a, .sf-card, .hist-item, .ex, .prep-card, .meal, .tl-card, .pg-prod-card, .dz-attn';   // karty z poświatą kursora
 const cloudUi = { dismissed: false, stale: false, shown: '' };   // baner synchronizacji: zamknięty w tej sesji / zaległość > 24 h
 
 // Każda instancja magazynu (także po przeładowaniu z powodu zmiany w innej karcie — poprawka A4): powiadom inne karty
@@ -112,7 +113,21 @@ function themeSwitch(compact = false) {
   const cur = themePref();
   return h('div', { class: `theme-switch${compact ? ' is-compact' : ''}`, role: 'group', 'aria-label': 'Motyw' },
     THEMES.map(([v, label, ic]) => h('button', { class: 'ts-b', 'aria-pressed': String(cur === v), 'aria-label': `Motyw: ${label}`, title: label,
-      onclick: () => { setTheme(v); render(true); } }, icon(ic, { size: 18 }), !compact && h('span', {}, label))));
+      onclick: e => switchTheme(v, e.currentTarget) }, icon(ic, { size: 18 }), !compact && h('span', {}, label))));
+}
+// D-110: zmiana motywu odsłaniana kołem od wybranego przycisku (View Transitions; bez obsługi lub przy ograniczeniu ruchu — natychmiast).
+// Wybór zapisany od razu (przeładowanie w trakcie przejścia go nie gubi); wygląd zmienia się w przejściu.
+function switchTheme(v, btn) {
+  saveTheme(v);
+  const apply = () => { applyTheme(v); return render(true); };
+  if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return; }
+  const r = btn.getBoundingClientRect(), root = document.documentElement;
+  root.style.setProperty('--vt-x', `${Math.round(r.left + r.width / 2)}px`);
+  root.style.setProperty('--vt-y', `${Math.round(r.top + r.height / 2)}px`);
+  root.classList.add('vt-theme');
+  const vt = document.startViewTransition(apply);
+  vt.ready.catch(() => {}); vt.updateCallbackDone.catch(e => console.error(e));
+  vt.finished.catch(() => {}).finally(() => root.classList.remove('vt-theme'));
 }
 
 function nav(current) {
@@ -123,6 +138,8 @@ function nav(current) {
   const collapsed = sideCollapsed();
   return [
     h('a', { class: 'skip-link', href: '#main' }, 'Przejdź do treści'),   // U-i: pominięcie panelu nawigacji
+    // D-110: pasek tytułu na telefonie — widoczny po przewinięciu poza nagłówek strony (duplikat h1, ukryty dla czytników ekranu)
+    h('div', { class: 'appbar', 'aria-hidden': 'true' }, h('span', { class: 'appbar-t' }, current === 'wiecej' ? 'Więcej' : byId[current]?.name || '')),
     h('nav', { class: `side${collapsed ? ' is-min' : ''}`, 'aria-label': 'Moduły' },
       h('div', { class: 'side-top' },
         h('a', { class: 'brand', href: '#/dzis', 'aria-label': '2027 — Dziś' }, h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, '27'), h('span', { class: 'brand-t' }, '2027')),
@@ -158,8 +175,11 @@ async function render(keepFocus = false) {
   const { id, params } = route();
   renderedDay = today(); tick = null;
   setCustomItems(ctx.store?.state?.catalogUser || []);
-  const main = h('main', { class: 'main', id: 'main', tabindex: '-1' });
+  const main = h('main', { class: 'main', id: 'main', tabindex: '-1', 'data-enter': keepFocus === true ? null : enterType });
+  enterType = null;
   clear(app).append(...nav(id), main);
+  // D-110: poświata tła w kolorze modułu (moduł może ją zmienić, np. „Dziś” — kolor bieżącego punktu planu)
+  document.documentElement.dataset.domain = byId[id]?.domain || 'regen';
   app.classList.toggle('side-min', sideCollapsed());
   const health = ctx.store?.health;
   if (!ctx.store || !health?.ok) main.append(h('div', { class: 'banner err', role: 'alert' },
@@ -196,7 +216,58 @@ async function render(keepFocus = false) {
     if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Obszar przewijany');
   });
   document.title = `${id === 'wiecej' ? 'Więcej' : byId[id].name} · 2027`;
+  // „Dziś”: w pasku tytułu nazwa wyświetlanego dnia (h1), nie modułu
+  if (id === 'dzis') { const t = main.querySelector('h1')?.textContent; const bar = app.querySelector('.appbar-t'); if (t && bar) bar.textContent = t; }
+  scrolled();
   restoreFocus(focus);
+}
+
+// ---- D-110: przewijanie i przejścia między ekranami ----
+// Pozycja przewinięcia per wpis historii: nowy moduł lub widok otwiera się od góry (wcześniej zostawało przewinięcie poprzedniego
+// modułu), „Wstecz/Dalej” wraca tam, gdzie użytkownik był; filtry i dni w obrębie widoku nie zmieniają przewinięcia. Wpis rozpoznawany
+// po znaczniku w history.state (Zapasy zachowują stan przy replaceState).
+const scrollMemo = new Map();
+let entrySeq = 0, scrollRaf = 0;
+const entryKey = () => history.state?.p2027 ?? null;
+function stampEntry() {
+  const k = `${Date.now().toString(36)}.${++entrySeq}`;
+  try { history.replaceState({ ...(history.state || {}), p2027: k }, ''); } catch { /* ograniczenie liczby wywołań — bez pamięci przewinięcia */ }
+  return k;
+}
+// Pasek tytułu (telefon): pokazany, gdy nagłówek strony schował się pod górną krawędzią
+function scrolled() {
+  const app = document.getElementById('app'), h1 = document.querySelector('#main h1');
+  app?.classList.toggle('is-scrolled', h1 ? h1.getBoundingClientRect().bottom < 44 : scrollY > 64);
+}
+function onScroll() {
+  if (scrollRaf) return;
+  scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; scrolled(); const k = entryKey(); if (k) scrollMemo.set(k, scrollY); });
+}
+// Rodzaj zmiany trasy: inny moduł / inny widok modułu (v; w Bezpieczeństwie m) — wejście od dołu; kolejny / poprzedni dzień (d) lub miesiąc (m) — przesunięcie
+// w poziomie; pozostałe (filtry, wyszukiwanie) — bez przejścia, jak dotąd.
+const DAY = /^\d{4}-\d{2}-\d{2}$/, MONTH = /^\d{4}-\d{2}$/;   // d — dzień, m — miesiąc (Kalendarz); `m` w innych modułach to tryb widoku
+const posOf = r => (DAY.test(r.params.get('d') || '') ? ['d', r.params.get('d')] : MONTH.test(r.params.get('m') || '') ? ['m', r.params.get('m')] : null);
+const viewOf = r => r.params.get('v') || (MONTH.test(r.params.get('m') || '') ? '' : r.params.get('m') || '');
+function transitionType(a, b) {
+  if (!a || a.id !== b.id) return 'module';
+  if (viewOf(a) !== viewOf(b)) return 'view';
+  const x = posOf(a), y = posOf(b), kind = x?.[0] || y?.[0];
+  if (!kind || (x && y && x[0] !== y[0])) return null;
+  const now = kind === 'm' ? today().slice(0, 7) : today(), from = x ? x[1] : now, to = y ? y[1] : now;
+  return from === to ? null : to > from ? 'forward' : 'back';
+}
+let shownRoute = null, enterType = null;
+// Zmiana trasy: przerysowanie od razu (bez opóźnienia — dane, fokus i testy jak dotąd), nowa treść wchodzi krótką animacją CSS
+// (main[data-enter]: moduł / widok — od dołu, kolejny / poprzedni dzień — z boku). Przy ograniczeniu ruchu — bez animacji.
+// (Pomiar: View Transitions opóźniały przerysowanie o 50–300 ms przy renderowaniu bez GPU — zostały tylko przy zmianie motywu.)
+function navigate() {
+  const k = entryKey(), back = k && scrollMemo.has(k) ? scrollMemo.get(k) : null;
+  if (!k) stampEntry();
+  const next = route(), type = transitionType(shownRoute, next);
+  shownRoute = next;
+  const top = back ?? (type === 'module' || type === 'view' ? 0 : null);
+  enterType = type && !matchMedia('(prefers-reduced-motion: reduce)').matches ? type : null;
+  render().then(() => { if (top != null) scrollTo(0, top); scrolled(); });
 }
 
 // Odnośniki w obrębie strony (#id, bez „/”): przewinięcie do elementu zamiast zmiany trasy. Router traktowałby
@@ -238,7 +309,25 @@ async function boot() {
     reloading = (async () => { do { again = false; if (await ctx.store.reload()) softRender(); } while (again); })()
       .catch(e => console.error(e)).finally(() => { reloading = null; });
   });
-  addEventListener('hashchange', () => render());
+  if (!entryKey()) stampEntry();
+  addEventListener('hashchange', navigate);
+  addEventListener('scroll', onScroll, { passive: true });
+  // D-110: komputer (mysz) — delikatna poświata pod kursorem na kartach (pozycja jako zmienne CSS karty; bez wpływu na treść)
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let spotRaf = 0, spotEv = null;
+    document.addEventListener('pointermove', e => {
+      spotEv = e;
+      if (spotRaf) return;
+      spotRaf = requestAnimationFrame(() => {
+        spotRaf = 0;
+        const el = spotEv.target.closest?.(SPOT);
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${Math.round(spotEv.clientX - r.left)}px`);
+        el.style.setProperty('--my', `${Math.round(spotEv.clientY - r.top)}px`);
+      });
+    }, { passive: true });
+  }
   // Synchronizacja automatyczna w chmurze (D-084) i automatyczne pobieranie zmian (D-085): działają tylko po skonfigurowaniu
   // chmury i przy włączonych przełącznikach. Telefon (wskaźnik dotykowy) sprawdza zmiany rzadziej (60 s) niż komputer (30 s).
   const coarse = matchMedia('(pointer: coarse)');
@@ -254,6 +343,7 @@ async function boot() {
   // Powrót do okna (MacBook: okno widoczne, praca na innym urządzeniu) i interakcja użytkownika (koniec bezczynności)
   addEventListener('focus', () => ctx.cloudAuto.focus());
   for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, () => ctx.cloudAuto.activity(), { capture: true, passive: true });
+  shownRoute = route();
   await render();
   setInterval(clockTick, 30000);
   document.addEventListener('visibilitychange', clockTick);

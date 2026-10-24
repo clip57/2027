@@ -63,6 +63,8 @@ async def main():
         for r, action, label in [(r, None, '') for r in ROUTES] + STATES:
           await pg.goto((ROOT / 'dist/single/2027.html').as_uri() + r); await pg.wait_for_timeout(350)
           if action: await pg.evaluate(action); await pg.wait_for_timeout(400)
+          # koniec animacji czasowych (przejście między ekranami, wejście okna — D-110); bez nieskończonych i sterowanych przewijaniem
+          await pg.wait_for_function("document.getAnimations().every(a => a.playState !== 'running' || a.timeline !== document.timeline || a.effect?.getComputedTiming().iterations === Infinity)", timeout=15000)
           if label: r = f'{r} [{label}]'
           sw = await pg.evaluate('document.documentElement.scrollWidth')
           if sw > w: overflow.append(f'{w}/{scheme} {r}: {sw}px')
