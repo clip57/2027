@@ -46,7 +46,18 @@ w przeglądarce z audytu (wczorajsza data po wznowieniu, „Odrzucono niepoprawn
 
 ## 3. Wyniki (24.10.2026, bez plików użytkownika — dane syntetyczne)
 
-WYNIKI_REGRESJI
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 234 / 235 (1 pominięty — wymaga kopii ZAPASY z `SOURCES_DIR`) |
+| `npm run e2e` | 1428 / 1428 (w tym 42 kontrole `run_d107`) |
+| `npm run a11y` | 0 naruszeń |
+| `npm run e2e:sync` | 23 / 23 |
+| `npm run e2e:cloud` | 100 / 100 |
+| `npm run e2e:trening` | 0 błędów |
+| `node tools/verify/plan_check.mjs`, `python3 tests/e2e/cfa_smoke.py` | 0 błędów (3 znane ostrzeżenia planu — D-101) |
+| `python3 tools/verify/verify_all.py --data-only` | 13 kontroli, 0 błędów, 1 pominięta (źródła) |
+| przegląd w przeglądarce 1065 tras (każdy dzień planu w Dziś, Treningu, Suplementacji, Meal Prep, Pielęgnacji, dni CFA i MPW, pozostałe widoki; 390 px) | 0 błędów JS, 0 „Błąd modułu”, 0 artefaktów „undefined/NaN/null”, 0 przewijania w poziomie |
+| kontrola planu dzień po dniu (14.10.2026–30.03.2027) | bez zmian względem audytu — plan dnia nietknięty |
 
 ## 4. Ograniczenia
 
