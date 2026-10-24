@@ -1322,7 +1322,9 @@ async def run_d107(pw, name, url, mobile):
 
 AXE_SRC = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
 async def axe_audit(pg):
-    """axe-core WCAG 2.1 A/AA (wstrzyknięcie przez CDP — CSP wariantu web blokuje skrypty inline) i przewijanie w poziomie"""
+    """axe-core WCAG 2.1 A/AA (wstrzyknięcie przez CDP — CSP wariantu web blokuje skrypty inline) i przewijanie w poziomie.
+    Najpierw koniec animacji (okno na telefonie wjeżdża 200 ms od przezroczystości 0 — kontrast w trakcie byłby fałszywie za niski)."""
+    await wait_js(pg, "() => document.getAnimations().every(a => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity)")
     cdp = await pg.context.new_cdp_session(pg); await cdp.send('Runtime.evaluate', {'expression': AXE_SRC}); await cdp.detach()
     res = await pg.evaluate("axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a','wcag2aa','wcag21a','wcag21aa']}, resultTypes: ['violations']})")
     sw, w = await pg.evaluate('[document.documentElement.scrollWidth, innerWidth]')
