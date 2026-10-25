@@ -39,6 +39,9 @@ obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte 
 znacznik pielęgnacji w niedziele świąteczne i akcje GitHub na Node 24 — wykonane; D2, I9, I12 — zamknięte bez wdrożenia; D-110 i D-111 —
 opublikowane na `main` (25.10.2026).
 
+**D-112 (25.10.2026):** zgłoszenie z iPhone'a (słabe przewijanie, skoki na początek strony, arkusz nie zamyka się przeciągnięciem) —
+poprawione na gałęzi (`docs/RAPORT_D112.md`); do kontroli na iPhonie po publikacji za zgodą użytkownika.
+
 **Do decyzji użytkownika:**
 1. **D1 — popołudnie od 16.11** (odłożone 25.10): bloki MPW 15:30 / 16:30 / 17:30 kolidują z planem dnia w 108 ze 119 dni
    (`RAPORT_AUDYT_2026-10-23.md` D1). Termin: przed 16.11.

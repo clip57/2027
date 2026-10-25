@@ -35,7 +35,9 @@ a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness:
 :root[data-domain="cfa"] { --amb: var(--cfa); }
 :root[data-domain="care"] { --amb: var(--care); }
 :root[data-domain="regen"] { --amb: var(--regen); }
-body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+/* D-112: wysokość „dużego” widoku (lvh) zamiast inset: 0 — chowanie paska Safari w trakcie przewijania nie zmienia rozmiaru warstwy
+   (bez przemalowywania gradientów w każdej klatce) */
+body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100lvh; z-index: -1; pointer-events: none;
   background:
     radial-gradient(56rem 30rem at 8% -12rem, color-mix(in oklab, var(--amb) var(--aur), transparent), transparent 70%),
     radial-gradient(44rem 26rem at 104% -10rem, color-mix(in oklab, var(--accent) calc(var(--aur) * .55), transparent), transparent 72%); }
@@ -197,12 +199,12 @@ body.kbd .tabs { transform: translateY(calc(100% + var(--dock-b) + var(--s-4)));
   box-shadow: var(--rim), 0 0 0 4px color-mix(in srgb, var(--hc, var(--accent)) 12%, transparent), 0 22px 48px -26px color-mix(in srgb, var(--hc, var(--accent)) 70%, transparent);
   border-radius: var(--r-lg); }
 .nowcard-l { color: var(--text-2); opacity: 1; display: flex; align-items: center; gap: var(--s-2); }
+/* kropka „na żywo” ze stałą poświatą — bez animacji nieskończonej (D-112: puls — także samym transform — wymuszał przeliczanie stylów
+   w każdej klatce przewijania; na iPhonie przewijanie „Dziś” szarpało) */
 .nowcard-l::before { content: ""; width: 8px; height: 8px; border-radius: var(--r-full); background: var(--hc, var(--accent)); flex: none;
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--hc, var(--accent)) 60%, transparent); animation: live-pulse 2.4s var(--ease) infinite; }
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hc, var(--accent)) 22%, transparent); }
 .nowcard .muted { color: var(--text-2); }
 .nowcard .btn { color: var(--text); border-color: var(--border-strong); background: var(--btn); }
-@keyframes live-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--hc, var(--accent)) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 8px transparent; } }
-@media (prefers-reduced-motion: reduce) { .nowcard-l::before { animation: none; } }
 
 /* ---------- Panel boczny (komputer, tablet poziomo): pływający, szklany ---------- */
 @media (min-width: 900px) {
@@ -368,16 +370,14 @@ body.kbd .tabs { transform: translateY(calc(100% + var(--dock-b) + var(--s-4)));
 .dz-plan .slot-body { min-width: 0; padding: var(--s-3) var(--s-4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md);
   box-shadow: var(--rim), var(--e1); background-image: linear-gradient(90deg, color-mix(in srgb, var(--dc, transparent) 9%, transparent), transparent 40%); }
 .dz-plan .slot-title { font-size: var(--fs-md); font-weight: 650; letter-spacing: -.012em; }
-/* bieżący punkt: węzeł z pulsującą obwódką, linia wypełniona do upływu czasu (--el, app/dzis.js), karta z poświatą */
+/* bieżący punkt: większy węzeł z obwódką i poświatą (bez pulsowania — D-112), linia wypełniona do upływu czasu (--el, app/dzis.js), karta z poświatą */
 .dz-plan .slot.is-now { border: 0; box-shadow: none; }
 .dz-plan .slot.is-now::before { background: linear-gradient(180deg, var(--dc, var(--accent)) calc(var(--el, 0) * 100%), var(--rail) calc(var(--el, 0) * 100%)); }
-.dz-plan .slot.is-now::after { width: 14px; height: 14px; margin-left: -7px; top: 17px; animation: node-pulse 2.4s var(--ease) infinite; }
+.dz-plan .slot.is-now::after { width: 14px; height: 14px; margin-left: -7px; top: 17px;
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px color-mix(in srgb, var(--dc, var(--accent)) 28%, transparent), 0 0 14px color-mix(in srgb, var(--dc, var(--accent)) 55%, transparent); }
 .dz-plan .slot.is-now .slot-body { border-color: color-mix(in srgb, var(--dc, var(--accent)) 55%, var(--border));
   box-shadow: var(--rim), 0 0 0 3px color-mix(in srgb, var(--dc, var(--accent)) 14%, transparent), 0 18px 40px -24px color-mix(in srgb, var(--dc, var(--accent)) 80%, transparent); }
 .dz-plan .slot.is-now .slot-time time { color: var(--text); }
-@keyframes node-pulse { 0% { box-shadow: 0 0 0 3px var(--bg), 0 0 0 3px color-mix(in srgb, var(--dc, var(--accent)) 60%, transparent); }
-  70%, 100% { box-shadow: 0 0 0 3px var(--bg), 0 0 0 12px transparent; } }
-@media (prefers-reduced-motion: reduce) { .dz-plan .slot.is-now::after { animation: none; } }
 /* „Czas własny” (U1): lżej — karta bez tła, przerywana krawędź */
 .dz-plan .slot.is-own .slot-body { background: transparent; box-shadow: none; border-style: dashed; padding-block: var(--s-2); }
 .dz-plan .slot.is-own::after { background: var(--bg); box-shadow: 0 0 0 2px var(--border-strong), 0 0 0 4px var(--bg); }

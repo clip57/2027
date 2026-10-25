@@ -1470,6 +1470,8 @@ async def run_d110(pw, name, url, mobile):
        f'{tag} Teraz: odliczanie ({left}), upływ punktu --el={el:.3f}, poświata „cfa”')
     order = await pg.evaluate("[...document.querySelector('.dz-grid').children].map(e => e.className.split(' ').find(c => c.startsWith('dz-')) || e.className)")
     ok(order[:2] == ['dz-now', 'dz-attn'], f'{tag} Dziś: „Teraz” przed „Wymaga uwagi” ({order[:3]})')
+    inf = await pg.evaluate("document.getAnimations().filter(a => a.effect?.getComputedTiming().iterations === Infinity).map(a => a.animationName || a.constructor.name)")
+    ok(inf == [], f'{tag} D-112: bez animacji nieskończonych w „Dziś” (praca w każdej klatce przewijania) {inf}')
     ok(await pg.locator('.dz-kpi .unit').count() >= 2 and 'bloków' in await pg.inner_text('.dz-kpis'), f'{tag} Kafle KPI: jednostka pomniejszona, tekst bez zmian')
     grad = await pg.evaluate("(() => { const fg = document.querySelector('.dz-now .ring-fg'); const id = (fg.getAttribute('stroke') || '').match(/#([^)]+)/); return !!(id && document.getElementById(id[1])?.querySelectorAll('stop').length === 2); })()")
     ok(grad, f'{tag} Pierścień „Teraz”: gradient w dokumencie (unikalny identyfikator)')
@@ -1522,6 +1524,29 @@ async def run_d110(pw, name, url, mobile):
         await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []}); await pg.wait_for_timeout(600)
         await cdp.detach()
         ok(await pg.locator('dialog.sheet[open]').count() == 0, f'{tag} Arkusz: przeciągnięcie w dół zamyka okno')
+        # D-112 (iPhone): przeciąganie za treść arkusza przewiniętą do góry zamyka okno; ruch w górę za treść — zwykłe przewijanie, okno zostaje
+        await pg.locator('.ex-tech').first.click(); await pg.wait_for_selector('dialog.sheet[open]'); await pg.wait_for_timeout(500)
+        pt = await pg.evaluate("""(() => { const d = document.querySelector('dialog.sheet[open]'); d.scrollTop = 0;
+          const el = [...d.querySelectorAll('.sheet-body p, .sheet-body li, .sheet-body h3')].find(e => e.offsetParent && !e.closest('button, a, input, .seg'));
+          const r = el.getBoundingClientRect(); return [r.left + 12, r.top + Math.min(10, r.height / 2)]; })()""")
+        cdp = await ctx.new_cdp_session(pg)
+        async def drag(x, y, step, n):
+            await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': x, 'y': y}]})
+            for i in range(1, n + 1):
+                await cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': x, 'y': y + i * step}]}); await pg.wait_for_timeout(16)
+            await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []}); await pg.wait_for_timeout(600)
+        await drag(pt[0], pt[1], -20, 6)
+        ok(await pg.locator('dialog.sheet[open]').count() == 1, f'{tag} D-112: ruch w górę za treść arkusza — okno zostaje')
+        await pg.evaluate("document.querySelector('dialog.sheet[open]').scrollTop = 0")
+        await drag(pt[0], pt[1], 30, 10)
+        ok(await pg.locator('dialog.sheet[open]').count() == 0, f'{tag} D-112: przeciągnięcie w dół za treść (arkusz u góry) zamyka okno')
+        await cdp.detach()
+        # D-112: ponowne dotknięcie zakładki bieżącego modułu przewija na górę (bez przerysowania); przywracanie przewinięcia — ręczne
+        await pg.goto(url + '#/trening'); await pg.wait_for_selector('.ex')
+        await pg.evaluate("scrollTo(0, 900); document.querySelector('main').dataset.mark = 't'"); await pg.wait_for_timeout(200)
+        await pg.locator('.tabs a[href="#/trening"]').click(); await pg.wait_for_timeout(1200)
+        st = await pg.evaluate("[scrollY, document.querySelector('main').dataset.mark, location.hash, history.scrollRestoration]")
+        ok(st == [0, 't', '#/trening', 'manual'], f'{tag} D-112: zakładka bieżącego modułu — na górę, bez przerysowania ({st})')
     else:
         await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-card')
         await pg.locator('.dz-card').first.hover(position={'x': 40, 'y': 30}); await pg.wait_for_timeout(200)

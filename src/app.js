@@ -172,6 +172,9 @@ function clockTick() {
 async function render(keepFocus = false) {
   const app = document.getElementById('app');
   const focus = keepFocus === true ? focusKey() : null;
+  // D-112: przerysowanie w miejscu (zapis, zmiana z chmury w tle) zachowuje przewinięcie — moduł rysowany asynchronicznie (Dane, MPW)
+  // na chwilę skraca stronę i przeglądarka przycinała przewinięcie do góry („skok na początek tej samej strony”)
+  const keepY = keepFocus === true ? scrollY : null, t0 = performance.now();
   const { id, params } = route();
   renderedDay = today(); tick = null;
   setCustomItems(ctx.store?.state?.catalogUser || []);
@@ -218,7 +221,8 @@ async function render(keepFocus = false) {
   document.title = `${id === 'wiecej' ? 'Więcej' : byId[id].name} · 2027`;
   // „Dziś”: w pasku tytułu nazwa wyświetlanego dnia (h1), nie modułu
   if (id === 'dzis') { const t = main.querySelector('h1')?.textContent; const bar = app.querySelector('.appbar-t'); if (t && bar) bar.textContent = t; }
-  scrolled();
+  watchTitle();
+  if (keepY != null && Math.abs(scrollY - keepY) > 1 && touchedAt < t0) scrollTo(0, keepY);
   restoreFocus(focus);
 }
 
@@ -226,22 +230,28 @@ async function render(keepFocus = false) {
 // Pozycja przewinięcia per wpis historii: nowy moduł lub widok otwiera się od góry (wcześniej zostawało przewinięcie poprzedniego
 // modułu), „Wstecz/Dalej” wraca tam, gdzie użytkownik był; filtry i dni w obrębie widoku nie zmieniają przewinięcia. Wpis rozpoznawany
 // po znaczniku w history.state (Zapasy zachowują stan przy replaceState).
+// D-112 (iPhone: słabe przewijanie, „skoki” strony): żadnego kodu w trakcie przewijania — pozycję opuszczanego widoku zapisuje zmiana trasy
+// (przeglądarka sama jej nie przywraca: scrollRestoration = 'manual', bez drugiego skoku), pasek tytułu przełącza IntersectionObserver
+// nagłówka strony (bez odczytu układu w każdej klatce); na górę — od razu przy zmianie modułu (nie po przerysowaniu, gdy można już
+// przewijać), powrót do zapamiętanej pozycji („Wstecz”) tylko wtedy, gdy użytkownik w międzyczasie nie dotknął ekranu.
 const scrollMemo = new Map();
-let entrySeq = 0, scrollRaf = 0;
+let entrySeq = 0, shownKey = null, navSeq = 0, touchedAt = -1, forceTop = false;
 const entryKey = () => history.state?.p2027 ?? null;
 function stampEntry() {
   const k = `${Date.now().toString(36)}.${++entrySeq}`;
   try { history.replaceState({ ...(history.state || {}), p2027: k }, ''); } catch { /* ograniczenie liczby wywołań — bez pamięci przewinięcia */ }
   return k;
 }
-// Pasek tytułu (telefon): pokazany, gdy nagłówek strony schował się pod górną krawędzią
-function scrolled() {
-  const app = document.getElementById('app'), h1 = document.querySelector('#main h1');
-  app?.classList.toggle('is-scrolled', h1 ? h1.getBoundingClientRect().bottom < 44 : scrollY > 64);
-}
-function onScroll() {
-  if (scrollRaf) return;
-  scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; scrolled(); const k = entryKey(); if (k) scrollMemo.set(k, scrollY); });
+// Pasek tytułu (telefon): pokazany, gdy nagłówek strony (h1) schował się pod górną krawędzią (pas 44 px)
+const titleIO = 'IntersectionObserver' in globalThis ? new IntersectionObserver(es => {
+  const e = es[es.length - 1];
+  document.getElementById('app')?.classList.toggle('is-scrolled', !e.isIntersecting && e.boundingClientRect.bottom < 44);
+}, { rootMargin: '-44px 0px 0px 0px' }) : null;
+function watchTitle() {
+  if (!titleIO) return;
+  titleIO.disconnect();
+  const h1 = document.querySelector('#main h1');
+  if (h1) titleIO.observe(h1); else document.getElementById('app')?.classList.remove('is-scrolled');
 }
 // Rodzaj zmiany trasy: inny moduł / inny widok modułu (v; w Bezpieczeństwie m) — wejście od dołu; kolejny / poprzedni dzień (d) lub miesiąc (m) — przesunięcie
 // w poziomie; pozostałe (filtry, wyszukiwanie) — bez przejścia, jak dotąd.
@@ -262,12 +272,17 @@ let shownRoute = null, enterType = null;
 // (Pomiar: View Transitions opóźniały przerysowanie o 50–300 ms przy renderowaniu bez GPU — zostały tylko przy zmianie motywu.)
 function navigate() {
   const k = entryKey(), back = k && scrollMemo.has(k) ? scrollMemo.get(k) : null;
+  if (shownKey) scrollMemo.set(shownKey, scrollY);   // opuszczany widok
   if (!k) stampEntry();
+  shownKey = entryKey();
   const next = route(), type = transitionType(shownRoute, next);
   shownRoute = next;
-  const top = back ?? (type === 'module' || type === 'view' ? 0 : null);
+  const top = back ?? (forceTop || type === 'module' || type === 'view' ? 0 : null);
+  forceTop = false;
   enterType = type && !matchMedia('(prefers-reduced-motion: reduce)').matches ? type : null;
-  render().then(() => { if (top != null) scrollTo(0, top); scrolled(); });
+  if (top === 0) scrollTo(0, 0);
+  const seq = ++navSeq, at = performance.now();
+  render().then(() => { if (top && seq === navSeq && touchedAt < at) scrollTo(0, top); });
 }
 
 // Odnośniki w obrębie strony (#id, bez „/”): przewinięcie do elementu zamiast zmiany trasy. Router traktowałby
@@ -309,9 +324,22 @@ async function boot() {
     reloading = (async () => { do { again = false; if (await ctx.store.reload()) softRender(); } while (again); })()
       .catch(e => console.error(e)).finally(() => { reloading = null; });
   });
+  try { history.scrollRestoration = 'manual'; } catch { /* starsza przeglądarka — jak dotąd */ }
   if (!entryKey()) stampEntry();
+  shownKey = entryKey();
   addEventListener('hashchange', navigate);
-  addEventListener('scroll', onScroll, { passive: true });
+  // dotyk / kółko / klawisz po rozpoczęciu zmiany trasy — bez przywracania pozycji po przerysowaniu (D-112)
+  for (const ev of ['touchstart', 'wheel', 'keydown']) addEventListener(ev, () => { touchedAt = performance.now(); }, { capture: true, passive: true });
+  // Zakładka bieżącego modułu (pasek dolny, panel boczny): ponowne dotknięcie przewija na górę, jak w aplikacjach systemowych;
+  // przejście z widoku dnia / filtra do modułu przez zakładkę — od góry (D-112)
+  document.addEventListener('click', e => {
+    const a = e.target.closest?.('.tabs a, .side a[href^="#/"]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (a.getAttribute('href') === (location.hash || '#/dzis')) {
+      e.preventDefault();
+      scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    } else forceTop = true;
+  });
   // D-110: komputer (mysz) — delikatna poświata pod kursorem na kartach (pozycja jako zmienne CSS karty; bez wpływu na treść)
   if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     let spotRaf = 0, spotEv = null;

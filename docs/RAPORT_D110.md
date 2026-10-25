@@ -1,5 +1,7 @@
 # Raport D-110 — audyt designu i System 2.0 (24.10.2026)
 
+> **D-112 (25.10.2026):** pulsowanie znacznika „teraz” usunięte, przewijanie i przeciąganie arkusza poprawione po kontroli na iPhonie — `docs/RAPORT_D112.md`.
+
 Polecenie użytkownika (24.10.2026): „Zrób bardzo szeroko zakrojony audyt w całej aplikacji do poprawy jej designu żeby był bardziej
 nowoczesny, futurystyczny, a jednocześnie praktyczny. Chcę żebyś użył maksimum możliwości swoich do tego i wprowadził jak najbardziej
 zaawansowane możliwie rozwiązania.”

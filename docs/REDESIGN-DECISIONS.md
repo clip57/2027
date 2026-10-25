@@ -132,8 +132,8 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
   **plan dnia jako oś czasu** (linia wypełniana upływem czasu w bieżącym punkcie).
 - **Nawigacja praktyczniej:** nowy moduł / widok otwiera się od góry, „Wstecz” wraca do miejsca; przełączniki segmentowe nie łamią się
   w dwa wiersze; strzałki dni na telefonie bez etykiet (nazwa w `aria-label`); tydzień w 7 kolumnach dopiero od 1500 px.
-- **Ruch z funkcją:** wejście ekranu (CSS, bez opóźnienia renderu), sprężysty nacisk, arkusz zamykany przeciągnięciem, pulsujący
-  znacznik „teraz”, odsłonięcie nowego motywu kołem (View Transitions — tylko tu; przy zmianie trasy opóźniały przerysowanie).
+- **Ruch z funkcją:** wejście ekranu (CSS, bez opóźnienia renderu), sprężysty nacisk, arkusz zamykany przeciągnięciem (D-112: także za treść), znacznik „teraz”
+  (pulsujący do D-112, potem ze stałą poświatą), odsłonięcie nowego motywu kołem (View Transitions — tylko tu; przy zmianie trasy opóźniały przerysowanie).
 - **Preferencje systemu przed efektami:** mniej ruchu, mniej przezroczystości, więcej kontrastu, wymuszone kolory.
 - Pierścienie postępu z gradientem i poświatą, wykresy z ograniczoną wysokością, kreślone strzałki rozwijania, nowa ikona aplikacji
   (znak „27” w pierścieniu — `tools/app_icons.py`).
@@ -144,6 +144,14 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
   i interpunkcji (’ “ € … w tekstach wpisywanych przez użytkownika), Latin Extended-A, ș ț, znaki łączące (tekst NFD) i symboli interfejsu
   (← → ≤ ≥ ≈ ≠ ✓ ⌘); emoji i znaki z selektorem emoji — font systemowy. Pliki 32 → 61 KB.
 - **Pielęgnacja w „Dziś”:** znacznik kroku przypiętego do slotu innego wariantu dnia — w slocie tego dnia o tej porze.
+
+## C12. iPhone: przewijanie i arkusze (D-112, 25.10.2026)
+- **Bez animacji nieskończonych** w widokach przewijanych (także samym `transform`): przeliczanie stylów w każdej klatce przewijania;
+  wskaźniki „teraz” — stała poświata zamiast pulsu. Strażnik w `run_d110`: brak animacji nieskończonych w „Dziś”.
+- **Bez kodu w czasie przewijania:** pasek tytułu przez `IntersectionObserver`, pozycje widoków zapisywane przy zmianie trasy, przywracanie ręczne.
+- **Przewinięcie nie „szarpie”:** na górę od razu przy zmianie modułu; przywracanie („Wstecz”, przerysowanie w miejscu) tylko bez dotyku w międzyczasie.
+- **Arkusz:** przeciąganie w dół za nagłówek albo za treść u góry (zdarzenia dotyku — na iOS zdarzenia wskaźnika przegrywały z przewijaniem).
+- **Zakładka bieżącego modułu** — ponowne dotknięcie przewija na górę (konwencja iOS).
 
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.

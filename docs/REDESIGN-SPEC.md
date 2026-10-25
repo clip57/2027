@@ -20,7 +20,7 @@ Tło „aurora” — stała poświata u góry ekranu w kolorze bieżącego modu
 światła (`--rim`) i miękkim cieniem także w motywie ciemnym, **szkło wyłącznie na elementach pływających** (pasek dolny, panel boczny,
 pasek tytułu, okna, liczniki przerwy, przyklejone skróty), duże liczby z ciasnym odstępem liter i pomniejszoną jednostką, pierścienie
 i paski z gradientem w kolorze domeny, ruch krótki i sprężysty (`--ease-spring`) z funkcją: wejście ekranu, nacisk, uchwyt arkusza,
-pulsujący znacznik „teraz”. Plan dnia jako oś czasu z linią wypełnianą upływem czasu. Wszystkie efekty ustępują preferencjom
+znacznik „teraz” (od D-112 bez pulsowania). Plan dnia jako oś czasu z linią wypełnianą upływem czasu. Wszystkie efekty ustępują preferencjom
 systemu: mniej ruchu (bez animacji), mniej przezroczystości i więcej kontrastu (bez szkła i poświat), wymuszone kolory.
 
 **Unikaj:** szkła na kartach z treścią (tylko elementy pływające), neumorfizmu, gradientów, które nie niosą głębi ani stanu,
@@ -186,11 +186,11 @@ usunięciem własnej pozycji), zwinięte `.zp-bulk`. Rozwinięcie sekcji przetrw
 
 ### Dashboard „Dziś” (Faza 4, klasy `dz-*`; System 2.0 — D-110)
 **D-110:** kolejność: nagłówek (telefon: tytuł i strzałki dni w jednym wierszu, etykiety strzałek tylko w `aria-label`) → skróty (jeden
-przewijany wiersz) → **„Teraz”** (kolor bieżącego punktu `--dc`/`--hc`, pulsująca kropka, pasek upływu czasu punktu `.dz-now-prog` /
+przewijany wiersz) → **„Teraz”** (kolor bieżącego punktu `--dc`/`--hc`, kropka ze stałą poświatą (D-112 — bez pulsowania), pasek upływu czasu punktu `.dz-now-prog` /
 `.dz-now-bar` i „zostało N min” `.dz-now-left`; przed pierwszym punktem „za N min · HH:MM”; odliczanie co 30 s przez `ctx.tick`, w miejscu)
 → „Wymaga uwagi” (zwarta lista: ikona poziomu, tekst najwyżej w 2 wierszach, pilne ze znacznikiem `--warning`) → kafle KPI (ikona
 i pasek w kolorze domeny, liczba + jednostka `.unit`) → podsumowania (telefon: przewijany poziomo pas kart) → **plan dnia jako oś czasu**
-(godzina | linia `--rail` z węzłem w kolorze domeny | karta `.slot-body`; bieżący punkt: większy pulsujący węzeł, linia wypełniona
+(godzina | linia `--rail` z węzłem w kolorze domeny | karta `.slot-body`; bieżący punkt: większy węzeł z obwódką (D-112 — bez pulsowania), linia wypełniona
 do upływu czasu `--el`, karta z poświatą; „Czas własny” — przerywana ramka; minione punkty — tło jak strona). Poświata tła strony
 (`data-domain` na `<html>`) — kolor bieżącego punktu planu.
 
@@ -220,6 +220,6 @@ okno techniki) — obecnie 0 naruszeń; kontrast par tokenów liczy `tests/unit/
 nawigacja klawiaturą (przewijane obszary fokusowalne), `aria-current`, `aria-pressed`, etykiety ikon-przycisków,
 stan nigdy tylko kolorem (tekst/ikona obok), `prefers-reduced-motion`. **D-110:** także `prefers-reduced-transparency` i
 `prefers-contrast: more` (bez szkła i poświat, mocniejsze ramki) oraz `forced-colors` (obramowania `CanvasText`, wskaźnik `Highlight`).
-Testy axe czekają na koniec animacji czasowych (wejście ekranu i okna); animacje nieskończone (pulsowanie „teraz”) i sterowane
+Testy axe czekają na koniec animacji czasowych (wejście ekranu i okna); animacje nieskończone (od D-112 żadnych w „Dziś”) i sterowane
 przewijaniem (zanikanie krawędzi pasków — oś przewijania) są pomijane w tym oczekiwaniu.
 Zmierzone kontrasty: tekst/tło 16,4 (jasny) i 16,5 (ciemny); akcent na karcie 6,9 / 8,2; `--muted` 4,8 / 6,0; ramka pola 3,4 (jasny) / 3,5 (ciemny) na `--surface`, 3,2 na `--surface-2`.
