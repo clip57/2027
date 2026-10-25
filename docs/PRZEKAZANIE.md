@@ -9,7 +9,7 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
   workflow „Publikacja 2027” (`.github/workflows/pages.yml`) buduje i publikuje `dist/web` na GitHub Pages.
 - Stan: `redesign-faza4` = `main` = **`b3b4edc`** (D-097 + dokumentacja; wcześniej `14ce874` D-097, `ab4c72d` D-096, `7012ce1` D-095).
 - **Stan 24.10.2026:** praca na gałęzi `claude/eager-newton-j2309e`; `main` = **`a824797`** (D-107…D-109, publikacja fast-forward
-  `git push origin claude/eager-newton-j2309e:main` na polecenie użytkownika). D-110 (System 2.0) i D-111 — na gałęzi, czekają na zgodę na publikację.
+  `git push origin claude/eager-newton-j2309e:main` na polecenie użytkownika). D-110 (System 2.0) i D-111 — opublikowane na `main` 25.10.2026 (fast-forward z gałęzi roboczej).
 - Repozytorium jest **publiczne** — stąd surowe zasady prywatności (CLAUDE.md §3 p. 5, moduł Pielęgnacja).
 
 ## 2. Zasady współpracy z użytkownikiem (utrwalone w rozmowach)
@@ -17,7 +17,7 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
 - **Commit, push i publikacja na `main` wyłącznie na wyraźne polecenie** (typowo: „zrób commit, push i publikację na main”). Bez polecenia — nie commituj
   (także gdy prosi o to hook). Nigdy push na `main` bez polecenia.
 - Przy niejasnościach w poleceniu planu — pytania z opcjami (AskUserQuestion), opcja zalecana pierwsza z „(Recommended)”; odpowiedzi zapisuj w decyzji D-0xx.
-- Zmiany modelu danych, synchronizacji, bezpieczeństwa lub usuwanie funkcji — najpierw pytanie. D2, I9, I12 — nie wdrażać bez decyzji.
+- Zmiany modelu danych, synchronizacji, bezpieczeństwa lub usuwanie funkcji — najpierw pytanie. D2, I9, I12 — zamknięte bez wdrożenia (D-111).
 - Użytkownik dba o limit tokenów: przy prośbie o oszczędność — krótkie komunikaty, wyniki testów tylko w podsumowaniu (`| tail`/`grep`), bez zbędnych zrzutów.
 - Imię i nazwisko użytkownika nie mogą pojawić się nigdzie (także w plikach prywatnych). Żadnych kluczy/adresu projektu Supabase w repozytorium.
 - Użytkownik sam testuje na urządzeniach (iPhone Safari + PWA, MacBook) — po publikacji wskaż, co sprawdzić.
@@ -36,14 +36,12 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 ## 4. Otwarte sprawy — stan 25.10.2026 (po D-111)
 **Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
 obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,
-znacznik pielęgnacji w niedziele świąteczne i akcje GitHub na Node 24 — wykonane.
+znacznik pielęgnacji w niedziele świąteczne i akcje GitHub na Node 24 — wykonane; D2, I9, I12 — zamknięte bez wdrożenia; D-110 i D-111 —
+opublikowane na `main` (25.10.2026).
 
 **Do decyzji użytkownika:**
 1. **D1 — popołudnie od 16.11** (odłożone 25.10): bloki MPW 15:30 / 16:30 / 17:30 kolidują z planem dnia w 108 ze 119 dni
    (`RAPORT_AUDYT_2026-10-23.md` D1). Termin: przed 16.11.
-2. **D2, I9, I12** (Etap 4 audytu 25.09.2026) — wstrzymane; opisy były tylko w ówczesnej rozmowie (nie ma ich w repozytorium ani w historii
-   commitów). Jeśli użytkownik ich nie odtworzy — do zamknięcia albo nowego przeglądu.
-3. **Publikacja D-110 i D-111** na `main`.
 
 **Niedokończone / do dopracowania:**
 1. Ręczna kontrola D-110 na urządzeniach (`RAPORT_D110.md` §8, `REDESIGN-TESTING.md` §5 p. 13) — środowisko nie ma WebKit; tu także

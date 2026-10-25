@@ -13,7 +13,7 @@ wersje akcji z ostatniego punktu.”
 | D-099 §4 — 10 min „powrotu” w dni z blokiem J | bez zmian |
 | G-20 — monitoring (kolano, waga, sen, obwody) | zamknięte: kolano usunięte, reszta poza aplikacją |
 | D-031 — pliki postępu i error logu CFA v3 | zamknięte (nieaktualne po planie V44) |
-| D2, I9, I12 (Etap 4 audytu 25.09.2026) | opisy nie zachowały się (repozytorium, historia commitów, zapis tej rozmowy) — nadal niewdrożone |
+| D2, I9, I12 (Etap 4 audytu 25.09.2026) | zamknięte bez wdrożenia (decyzja użytkownika 25.10.2026; opisy nie zachowały się w repozytorium) |
 
 ## 2. Zmiany
 ### Dziennik sesji bez kolana (`src/core/trainlog.js`, `src/modules/trening_log.js`)

@@ -157,5 +157,6 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 ## E. Punkty otwarte (nierozstrzygnięte)
 - ~~G-20~~ — **zamknięte (D-111, 25.10.2026):** kolano usunięte z dziennika sesji; waga, sen, obwody — nie w aplikacji.
 - ~~D-031~~ — **zamknięte (D-111):** pliki CFA v3 nieaktualne po planie V44.
+- ~~D2, I9, I12~~ (Etap 4 audytu 25.09.2026) — **zamknięte bez wdrożenia (D-111, decyzja użytkownika 25.10.2026).**
 - ~~Potwierdzenie wyglądu na iPhonie (Safari i PWA)~~ — **potwierdzone przez użytkownika 24.09.2026** dla wersji `4e68589` (wszystkie punkty `REDESIGN-TESTING.md` §5).
   naprawy synchronizacji, wersji sprzed redesignu).
