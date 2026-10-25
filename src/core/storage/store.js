@@ -17,7 +17,7 @@ export function lwwKey(e) {
     case 'train.set': return `train:${e.d.date}|${e.d.ex}|${e.d.set}`;
     case 'setting': return `setting:${e.d.key}`;
     case 'train.session': return `trainsess:${e.d.date}`;
-    case 'train.detail': return `traindet:${e.d.date}`;   // D-106: szczegóły sesji (basen, rower, kolano, sauna) — jeden dokument na dzień
+    case 'train.detail': return `traindet:${e.d.date}`;   // D-106: szczegóły sesji (basen, rower, sauna) — jeden dokument na dzień
     case 'prep.step': return `prep:${e.d.date}|${e.d.card}|${e.d.idx}`;
     case 'prep.test': return `preptest:${e.d.id}`;
     case 'private.pack': return 'private.pack';

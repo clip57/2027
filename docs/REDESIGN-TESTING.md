@@ -12,7 +12,7 @@
 | Ryzyka i ulepszenia audytu (D-108) | w `npm run e2e` — `run_d108` | U7 CSP bez `localhost`, U6 zadania MPW wczytane dopiero w module (web: 1 zapytanie, `2027.html`: 0), U4 tygodnie w Treningu (← → na komputerze, „Ten tydzień”, pierwszy tydzień planu), U3 skróty `g k / p / e / n` (przed i po 12.11), U1 „Czas własny” i slot „Nauka MPW”, R2 blokada pliku postępu z innego planu i opis bloków, U8 przywrócenie stanów Zapasów z kopii i „Cofnij”; D-109: 31.12 bez zakupów, 01.01 bez treningu z blokami MPW; axe na nowych widokach i oknach — oba warianty buildu | — |
 | System 2.0 (D-110) | w `npm run e2e` — `run_d110` | „Teraz”: „zostało N min” i upływ punktu `--el` (zegar 19.10 10:40), odliczanie w miejscu po 65 s (bez przerysowania), poświata `data-domain`; kolejność „Teraz” → „Wymaga uwagi”; jednostka KPI; gradient pierścienia; przewinięcie: nowy moduł od góry, „Wstecz” przywraca; wejście ekranu tylko przy zmianie trasy (nie po zapisie); „Widok” CFA w jednym wierszu; telefon: pływający pasek dolny, pasek tytułu po przewinięciu, arkusz — krótkie przeciągnięcie wraca, długie zamyka; komputer: poświata kursora, zmiana motywu z odsłonięciem (wybór zapisany od razu, tło `#f3f4f7`), axe w obu motywach | — |
 | CI — „Testy 2027” | `.github/workflows/testy.yml` (push poza `main`, PR, wywołanie z `pages.yml`) | jednostkowe, `plan_check`, `verify_all --data-only`, budowa, `cfa_smoke`, E2E, a11y, Trening, `e2e:sync`, `e2e:cloud` — przed każdą publikacją na `main` (błąd zatrzymuje wdrożenie) | Python 3.12 + Playwright 1.56 (instalowane w CI) |
-| Trening: arkusze i dziennik sesji | `npm run build && npm run e2e:trening` | arkusze System kolana i Sauna (D-105); dziennik sesji (D-106): zapis pól, zakres, przeładowanie, cofnięcie, sekcje wg dnia, Historia, axe — 390 ciemny / 1100 jasny | — |
+| Trening: arkusze i dziennik sesji | `npm run build && npm run e2e:trening` | arkusze System kolana i Sauna (D-105); dziennik sesji (D-106; bez sekcji Kolano — D-111): zapis pól, zakres, przeładowanie, cofnięcie, sekcje wg dnia, Historia, axe — 390 ciemny / 1100 jasny | — |
 | Dostępność | `npm run build && npm run a11y` | (D-110: przed axe oczekiwanie na koniec animacji czasowych — wejście ekranu, okna; pomijane nieskończone i sterowane przewijaniem) axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
 
 Kolejność po każdej zmianie w Fazie 5: `npm run build && npm test && npm run e2e && npm run a11y`;
@@ -20,6 +20,17 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 `npm run e2e:cloud`, jeśli dotyka `src/core/sync/**`, `src/core/storage/**`, `src/modules/dane*.js` albo `src/app.js`.
 
 ## 2. Wyniki regresji
+
+### D-111 — dziennik sesji bez kolana, font skryptem, znacznik pielęgnacji, akcje na Node 24 (25.10.2026, konfiguracja B)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 253 testy: 252 zaliczone, 1 pominięty (migracja ZAPASY — `SOURCES_DIR`); nowe: `fonts.test.mjs` (4), D-111 w `trainlog.test.mjs` i `care.test.mjs` |
+| `plan_check.mjs` / `verify_all.py --data-only` / `cfa_smoke.py` | 0 błędów (3 znane ostrzeżenia) / 13 kontroli, 0 błędów, 1 pominięta / 0 błędów |
+| `npm run e2e` | 1519/1519 (w tym 27.12 — znacznik pielęgnacji w slocie 20:15) |
+| `npm run e2e:trening` | 0 błędów (dziennik sesji bez kolana) |
+| `npm run e2e:sync` | 23/23 |
+| `npm run e2e:cloud` | 100/100 |
+| `npm run a11y` | 0 naruszeń, brak przewijania w poziomie |
 
 ### System 2.0 — audyt designu (D-110; 24.10.2026, konfiguracja B)
 | Zestaw | Wynik |

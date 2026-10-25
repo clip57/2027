@@ -9,15 +9,14 @@ import { region } from '../ui/patch.js';
 import { SRC } from '../core/data.js';
 import { inPlan, PLAN_START, PLAN_END, templateFor } from '../core/resolver.js';
 import { addDays, longDate, shortDate, dayShort, weekday, range } from '../core/dates.js';
-import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, weekGrid, slotOptions, PORY, AREAS, STATUS, DAY_SHORT } from '../core/calc/care.js';
+import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, weekGrid, slotOptions, slotDefs, PORY, AREAS, STATUS, DAY_SHORT } from '../core/calc/care.js';
 
 const VIEWS = [{ value: 'dzien', label: 'Dzień' }, { value: 'tydzien', label: 'Tydzień' }, { value: 'produkty', label: 'Produkty' }, { value: 'plan', label: 'Plan' }];
 const STATUS_LABEL = Object.fromEntries(STATUS);
 const AREA_LABEL = Object.fromEntries(AREAS);
 // Sloty planu dnia, do których można przypiąć krok (postęp widoczny w „Dziś”): szablon, warianty dnia i układ dni z blokiem M — każdy raz,
 // z dniami wyliczonymi z kalendarza planu (B9); lista liczona przy pierwszym użyciu
-const SLOT_DEFS = [...SRC.dayTemplate.slots, ...Object.values(SRC.dayTemplate.variants || {}).flatMap(v => v.slots),
-  ...['home', 'wash'].map(k => SRC.dayTemplate.mTraining?.[k]).filter(Boolean)];
+const SLOT_DEFS = slotDefs(SRC.dayTemplate);
 let slotList = null;
 const SLOTS = () => (slotList ||= slotOptions([...range(PLAN_START, PLAN_END)], templateFor, SLOT_DEFS));
 const slotLabel = id => SLOTS().find(x => x[0] === id)?.[1] || (d => (d ? `${d.from} · ${d.title_src} (nie występuje w planie)` : id))(SLOT_DEFS.find(x => x.id === id));

@@ -1,4 +1,4 @@
-"""Test w przeglądarce: dziennik szczegółów sesji (D-106) — pola basenu, roweru, kolana i sauny zapisują się od razu (zdarzenie train.detail), wracają po przeładowaniu,
+"""Test w przeglądarce: dziennik szczegółów sesji (D-106; bez kolana — D-111) — pola basenu, roweru i sauny zapisują się od razu (zdarzenie train.detail), wracają po przeładowaniu,
 walidują zakres, są widoczne zależnie od dnia, trafiają do Historii i są dostępne (axe WCAG 2.1 A/AA). Uruchomienie: npm run build && python3 tests/e2e/trening_log.py"""
 import asyncio, datetime as dt, pathlib, sys
 from zoneinfo import ZoneInfo
@@ -33,7 +33,8 @@ async def main():
             pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL + '#/trening?d=2026-10-25'); await pg.wait_for_selector('.tlog', timeout=15000)       # niedziela: basen
             ok(await pg.locator('.tl-st', has_text='Basen').count() == 1 and await pg.locator('.tl-st', has_text='Rower').count() == 0, f'{tag} niedziela: sekcja Basen, bez sekcji Rower')
-            ok(await pg.locator('details.tl-sec[open]').count() == 1, f'{tag} niedziela: otwarta tylko sekcja Basen (kolano i sauna zwinięte)')
+            ok(await pg.locator('details.tl-sec[open]').count() == 1, f'{tag} niedziela: otwarta tylko sekcja Basen (sauna zwinięta)')
+            ok(await pg.locator('.tl-st', has_text='Kolano').count() == 0 and await pg.get_by_label('Kolano: Ból wyjściowy przed 1. serią, /10', exact=True).count() == 0, f'{tag} D-111: bez sekcji Kolano w dzienniku sesji')
             # --- wypełnienie basenu
             await fill(pg, 'Basen: Część właściwa, min', 45); await fill(pg, 'Basen: Dystans, m', 1500); await fill(pg, 'Basen: RPE części właściwej', 3.5)
             await fill(pg, 'Basen: Tętno średnie, bpm', 118)
@@ -48,10 +49,7 @@ async def main():
             await fill(pg, 'Basen: Dystans, m', 99999)
             ok(await pg.get_by_label('Basen: Dystans, m', exact=True).get_attribute('aria-invalid') == 'true' and await pg.locator('.banner.err').count() >= 1, f'{tag} basen: dystans spoza zakresu — komunikat i oznaczenie błędu')
             await fill(pg, 'Basen: Dystans, m', 1500)
-            # --- kolano i sauna (rozwinięcie), notatka
-            await pg.locator('.tl-sec > summary', has_text='Kolano').click()
-            await fill(pg, 'Kolano: Ból wyjściowy przed 1. serią, /10', 1); await fill(pg, 'Kolano: Ból w trakcie (najwyższy), /10', 2.5)
-            await pg.get_by_role('radio', name='minimalny').click()
+            # --- sauna (rozwinięcie), notatka
             await pg.locator('.tl-sec > summary', has_text='Sauna').click()
             await fill(pg, 'Sauna: Liczba rund', 1); await fill(pg, 'Sauna: Temperatura, °C', 90); await fill(pg, 'Sauna: Woda po prysznicu, ml', 600)
             await pg.get_by_label('Sauna: Koniec sauny (godzina)').fill('20:35'); await pg.get_by_label('Sauna: Koniec sauny (godzina)').dispatch_event('change')
@@ -61,22 +59,22 @@ async def main():
             # --- po przeładowaniu wartości wracają (IndexedDB)
             await pg.reload(); await pg.wait_for_selector('.tlog')
             ok(await pg.get_by_label('Basen: Dystans, m', exact=True).input_value() == '1500' and await pg.get_by_label('Basen: RPE części właściwej', exact=True).input_value() == '3.5', f'{tag} po przeładowaniu: dystans i RPE zapisane')
-            ok(await pg.get_by_role('button', name='Grzbiet').get_attribute('aria-pressed') == 'true' and await pg.get_by_role('radio', name='minimalny').get_attribute('aria-checked') == 'true', f'{tag} po przeładowaniu: styl i obrzęk zapisane')
+            ok(await pg.get_by_role('button', name='Grzbiet').get_attribute('aria-pressed') == 'true' and await pg.get_by_role('radio', name='25 m').get_attribute('aria-checked') == 'true', f'{tag} po przeładowaniu: styl i długość basenu zapisane')
             ok(await pg.get_by_label('Sauna: Koniec sauny (godzina)').input_value() == '20:35' and await pg.get_by_label('Notatka do sesji').input_value() == 'Lekko, bez problemów.', f'{tag} po przeładowaniu: godzina sauny i notatka zapisane')
-            ok(await pg.locator('details.tl-sec[open]').count() == 3, f'{tag} po przeładowaniu: sekcje z wpisami otwarte')
+            ok(await pg.locator('details.tl-sec[open]').count() == 2, f'{tag} po przeładowaniu: sekcje z wpisami otwarte (basen, sauna)')
             # --- cofnięcie: odznaczenie chipu usuwa wpis; wyczyszczenie pola usuwa wartość
             await pg.get_by_role('button', name='Grzbiet').click(); await fill(pg, 'Basen: Tętno średnie, bpm', ''); await pg.wait_for_timeout(150)
             ok(await pg.get_by_role('button', name='Grzbiet').get_attribute('aria-pressed') == 'false' and await pg.get_by_label('Basen: Tętno średnie, bpm', exact=True).input_value() == '', f'{tag} cofnięcie wpisów działa')
             # --- Historia pokazuje podsumowanie wpisów
             await pg.goto(URL + '#/trening?v=historia'); await pg.wait_for_selector('.hist-item', timeout=10000)
             hist = ' '.join((await pg.inner_text('main')).split())
-            ok('Basen 1500 m · 45 min · RPE 3,5 · 3:00 /100 m' in hist and 'kolano 1 / 2,5 / –' in hist, f'{tag} Historia: podsumowanie wpisów dnia')
+            ok('Basen 1500 m · 45 min · RPE 3,5 · 3:00 /100 m' in hist and 'Sauna 1 runda · 90°C' in hist, f'{tag} Historia: podsumowanie wpisów dnia')
             # --- dostępność z otwartymi sekcjami
             await pg.goto(URL + '#/trening?d=2026-10-25'); await pg.wait_for_selector('.tlog')
             v = await axe(pg); ok(not v, f'{tag} niedziela (dziennik): dostępność {v[:2]}')
-            # --- widoczność zależnie od dnia: wtorek (LOWER — kolano otwarte), środa (rower), czwartek (sauna otwarta)
+            # --- widoczność zależnie od dnia: wtorek (LOWER — bez kolana, D-111), środa (rower), czwartek (sauna otwarta)
             await pg.goto(URL + '#/trening?d=2026-10-20'); await pg.wait_for_selector('.tlog')
-            ok(await pg.locator('details.tl-sec[open] .tl-st', has_text='Kolano').count() == 1 and await pg.locator('.tl-st', has_text='Basen').count() == 0 and await pg.locator('.tl-st', has_text='Rower').count() == 0, f'{tag} wtorek (LOWER 1): kolano rozwinięte, bez basenu i roweru')
+            ok(await pg.locator('.tl-st', has_text='Kolano').count() == 0 and await pg.locator('.tl-st', has_text='Basen').count() == 0 and await pg.locator('.tl-st', has_text='Rower').count() == 0 and await pg.locator('.tl-st', has_text='Sauna').count() == 1, f'{tag} wtorek (LOWER 1): tylko sekcja Sauna — bez kolana, basenu i roweru')
             await pg.goto(URL + '#/trening?d=2026-10-21'); await pg.wait_for_selector('.tlog')
             ok(await pg.locator('details.tl-sec[open] .tl-st', has_text='Rower').count() == 1 and await pg.locator('.tl-st', has_text='Basen').count() == 0, f'{tag} środa (rower + ABS): sekcja Rower')
             await fill(pg, 'Rower: Tętno średnie, bpm', 128); await pg.get_by_role('radio', name='Niski').click()

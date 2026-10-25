@@ -1,5 +1,7 @@
 # Raport D-106 — dziennik szczegółów sesji treningowej (23.10.2026)
 
+> **D-111 (25.10.2026):** sekcja „Kolano” usunięta z dziennika sesji na życzenie użytkownika (`docs/RAPORT_D111.md`); opis kolana poniżej — historyczny.
+
 ## 1. Zlecenie
 Patch `d106.patch` (dziennik szczegółów sesji: basen, rower, kolano, sauna, notatka) — ocena, poprawki i publikacja
 na polecenie użytkownika z 23.10.2026. Zmiana opisu basenu („Basen 55 min (5 rozgrzewka + 45 właściwa część + 5 schłodzenie)”)

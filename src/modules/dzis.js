@@ -13,7 +13,7 @@ import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.j
 import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
 import { sessions, weekStart } from '../core/calc/training.js';
-import { careModel, stepsFor, progress, slotProgress } from '../core/calc/care.js';
+import { careModel, stepsFor, progress, slotProgress, placeSlotProgress, slotDefs } from '../core/calc/care.js';
 import { mpwDaySpan } from '../core/calc/mpw.js';
 import { byId, isTab } from './registry.js';
 
@@ -267,7 +267,8 @@ export function renderDzis(root, ctx) {
   const bar = (v, max, dom) => h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%`, background: `var(--${dom})` } }));
   // Pielęgnacja (D-094): plan z danych użytkownika; bez planu — bez karty i bez znaczników w slotach
   const cm = careModel(ctx.store?.state?.careDefs || []), cDone = ctx.store?.state?.careDone || {};
-  const care = cm.empty ? null : { date, ...slotProgress(cm, cDone, date) };
+  // D-111: krok przypięty do slotu innego wariantu dnia — znacznik w slocie tego dnia o tej porze (np. niedziela świąteczna bez basenu)
+  const care = cm.empty ? null : { date, ...placeSlotProgress(slotProgress(cm, cDone, date), r.slots, slotDefs(SRC.dayTemplate)) };
   const careP = cm.empty ? null : progress(stepsFor(cm, date), cDone, date);
   const nowBox = region(() => {
     if (!now || !(now.current || now.next)) return null;

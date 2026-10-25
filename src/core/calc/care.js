@@ -73,6 +73,30 @@ export function slotProgress(model, done, date) {
   return out;
 }
 
+// Definicje slotów planu dnia, do których można przypiąć krok: szablon, warianty dnia (czwartek, niedziela z basenem…) i układ dni
+// z blokiem M — każdy identyfikator z godziną (`from`) i nazwą (`title_src`); `dayTemplate` = SRC.dayTemplate
+export const slotDefs = dayTemplate => [...dayTemplate.slots, ...Object.values(dayTemplate.variants || {}).flatMap(v => v.slots),
+  ...['home', 'wash'].map(k => dayTemplate.mTraining?.[k]).filter(Boolean)];
+
+// Postęp kroków na slotach konkretnego dnia (D-111): krok przypięty do slotu, którego tego dnia nie ma (inny wariant dnia — np. niedziela
+// świąteczna bez „basenu”: slot.2015n → zwykły slot 20:15), trafia do slotu dnia obejmującego godzinę przypiętego slotu, a gdy żaden jej
+// nie obejmuje — do ostatniego wcześniejszego. Slot spoza definicji (usunięty z planu) — bez znacznika, jak dotąd.
+const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+const covers = (s, m) => { const f = toMin(s.from), t = toMin(s.to); return t > f ? m >= f && m < t : t < f && (m >= f || m < t); };
+export function placeSlotProgress(prog, daySlots, defs) {
+  const ids = new Set(daySlots.map(s => s.id)), at = new Map(), out = {};
+  for (const d of defs) if (!at.has(d.id)) at.set(d.id, d.from);
+  const put = (id, p) => { const o = (out[id] ||= { done: 0, total: 0 }); o.done += p.done; o.total += p.total; };
+  for (const [id, p] of Object.entries(prog)) {
+    if (ids.has(id)) { put(id, p); continue; }
+    if (!at.has(id)) continue;
+    const m = toMin(at.get(id));
+    const host = daySlots.find(s => covers(s, m)) || daySlots.filter(s => toMin(s.from) <= m).at(-1);
+    if (host) put(host.id, p);
+  }
+  return out;
+}
+
 // Opis reguły kroku: „codziennie”, „PN, ŚR”, „doraźnie”, z okresem („do 11.10”, „od 12.10”)
 const cycleText = c => `cykl: ${c.on} ${c.on === 1 ? 'dzień' : 'dni'} tak, ${c.off} ${c.off === 1 ? 'dzień' : 'dni'} przerwy`;
 export function ruleText(s) {

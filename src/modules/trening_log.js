@@ -1,4 +1,4 @@
-// Dziennik szczegółów sesji (D-106): panel z sekcjami Basen / Rower / Kolano / Sauna / Notatka wg protokołów z Rekompozycji i arkusza „System kolana”.
+// Dziennik szczegółów sesji (D-106): panel z sekcjami Basen / Rower / Sauna / Notatka wg protokołów z Rekompozycji (bez kolana — D-111).
 // Zapis po każdej zmianie pola (zdarzenie `train.detail`, jeden dokument na dzień); bez przerysowywania strony, żeby nie gubić fokusu. Definicja pól: core/trainlog.js.
 import { h, clear } from '../ui/dom.js';
 import { LOG, NOTE_MAX, mainKind, withValue, fieldOk, swimPace, paceText } from '../core/trainlog.js';
@@ -10,7 +10,6 @@ export function sessionLog(store, date, r, ctx, msg) {
   if (!store || r.outside) return null;
   const kind = mainKind(r.dayType);
   const main = kind === 'swim' ? 'swim' : kind === 'bike' ? 'bike' : null;
-  const lower = /LOWER/.test(r.sessionLabel || '');
   const doc = () => store.state.trainDetails?.[date] || { date };
   let queue = Promise.resolve();
   const refreshers = [];
@@ -81,7 +80,6 @@ export function sessionLog(store, date, r, ctx, msg) {
     h('h2', { id: `tl-h-${date}` }, 'Dziennik sesji'),
     h('p', { class: 'muted' }, 'Wpisy są dobrowolne i zapisują się od razu. Czas treningu — u góry; serie i ciężary — przy ćwiczeniach.'),
     main && section(main, true),
-    section('knee', lower),
     section('sauna', planned),
     h('div', { class: 'tl-f tl-note' }, h('label', { class: 'tl-l', for: `tl-note-${date}` }, 'Notatka'), Object.assign(note, { id: `tl-note-${date}` })));
   return root;

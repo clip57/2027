@@ -1,7 +1,9 @@
-// Dziennik szczegółów sesji treningowej (D-106): basen, rower, kolano i sauna wg protokołów z Rekompozycji (sekcje Basen, Cardio, Sauna) i arkusza „System kolana”.
+// Dziennik szczegółów sesji treningowej (D-106): basen, rower i sauna wg protokołów z Rekompozycji (sekcje Basen, Cardio, Sauna).
+// D-111: sekcja „Kolano” usunięta (decyzja użytkownika 25.10.2026) — dawne wpisy `knee` zostają w dzienniku zdarzeń, nie są pokazywane
+// ani liczone, a przy kolejnym zapisie dnia przechodzą dalej jak sekcja nieznana (withValue nie usuwa sekcji spoza definicji).
 // Jedna definicja pól dla widoku i walidacji zdarzenia `train.detail` (jeden dokument na dzień, „ostatni zapis wygrywa”):
-//   { date, swim?: {…}, bike?: {…}, knee?: {…}, sauna?: {…}, note? }
-// Wszystkie pola są opcjonalne. Nic tu nie jest oceną ani metryką — tylko zapis wpisów (bez podpowiedzi koloru kolana, decyzja użytkownika).
+//   { date, swim?: {…}, bike?: {…}, sauna?: {…}, note? }
+// Wszystkie pola są opcjonalne. Nic tu nie jest oceną ani metryką — tylko zapis wpisów.
 
 const num = (label, min, max, step, extra = {}) => ({ type: 'num', label, min, max, step, ...extra });
 const opts = (label, options, extra = {}) => ({ type: 'enum', label, options, ...extra });
@@ -38,16 +40,6 @@ export const LOG = {
       saddle_high: bool('Siodełko wyżej niż intuicyjnie'),
     },
   },
-  knee: {
-    title: 'Kolano', icon: '🦵',
-    fields: {
-      before: num('Ból wyjściowy przed 1. serią', 0, 10, 0.5, { unit: '/10', hint: 'punkt odniesienia na dziś' }),
-      during: num('Ból w trakcie (najwyższy)', 0, 10, 0.5, { unit: '/10' }),
-      next_morning: num('Ból nazajutrz rano', 0, 10, 0.5, { unit: '/10', hint: 'uzupełnij następnego dnia' }),
-      swelling: opts('Obrzęk', [['none', 'brak'], ['minimal', 'minimalny'], ['clear', 'wyraźny / nawrotowy']]),
-      instability: opts('„Luz” / niestabilność', [['none', 'brak'], ['rare', 'rzadkie, bez uginania'], ['episode', 'epizod uginania']]),
-    },
-  },
   sauna: {
     title: 'Sauna', icon: '♨️',
     fields: {
@@ -66,7 +58,7 @@ export const LOG = {
 export const NOTE_MAX = 600;
 export const SECTIONS = Object.keys(LOG);
 
-// Rodzaj głównej sesji dnia wg typu dnia z planu (pozostałe dni — tylko kolano i sauna dobrowolnie).
+// Rodzaj głównej sesji dnia wg typu dnia z planu (pozostałe dni — tylko sauna dobrowolnie).
 export const mainKind = dayType => (dayType === 'swim' ? 'swim' : dayType === 'cardio_sauna' ? 'bike' : /^strength/.test(dayType || '') ? 'strength' : null);
 
 const isDay = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(`${v}T00:00:00Z`));
@@ -127,15 +119,14 @@ export const swimPace = doc => (pos(doc?.swim?.main_min) && pos(doc?.swim?.dist)
 export const paceText = s => (s == null ? null : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} /100 m`);
 
 const n1 = v => String(v).replace('.', ',');
-// Krótki opis wpisów dnia (Historia): „Basen 1250 m · 45 min · RPE 3,5 · 3:36 /100 m — kolano 1 / 2 / 1”.
+// Krótki opis wpisów dnia (Historia): „Basen 1250 m · 45 min · RPE 3,5 · 3:36 /100 m — Sauna 2 rundy · 90°C”.
 export function summarize(doc) {
   if (!doc) return '';
   const p = [];
-  const s = doc.swim, b = doc.bike, k = doc.knee, u = doc.sauna;
+  const s = doc.swim, b = doc.bike, u = doc.sauna;
   const lab = (name, items) => [name, items.filter(Boolean).join(' · ')].filter(Boolean).join(' ');
   if (s) p.push(lab('Basen', [s.dist && `${s.dist} m`, s.main_min && `${s.main_min} min`, s.rpe != null && `RPE ${n1(s.rpe)}`, paceText(swimPace(doc)), s.hr_avg && `${s.hr_avg} bpm`]));
   if (b) p.push(lab('Rower', [b.main_min && `${b.main_min} min`, b.hr_avg && `${b.hr_avg} bpm`, b.dist_km && `${n1(b.dist_km)} km`, b.cadence && `${b.cadence} obr./min`]));
-  if (k) p.push(`kolano ${[k.before, k.during, k.next_morning].map(x => (x == null ? '–' : n1(x))).join(' / ')}${k.swelling && k.swelling !== 'none' ? ` · obrzęk: ${LOG.knee.fields.swelling.options.find(([c]) => c === k.swelling)?.[1] ?? k.swelling}` : ''}`);
   if (u) p.push(lab('Sauna', [u.rounds != null && `${u.rounds} ${u.rounds === 1 ? 'runda' : u.rounds >= 2 && u.rounds <= 4 ? 'rundy' : 'rund'}`, u.temp_c && `${u.temp_c}°C`, Array.isArray(u.symptoms) && u.symptoms.length && `objawy: ${u.symptoms.length}`]));
   if (doc.note) p.push('notatka');
   return p.join(' — ');

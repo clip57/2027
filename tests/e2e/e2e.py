@@ -1066,6 +1066,10 @@ async def run_care(pw, name, url, mobile):
     await pg.goto(url + '#/dzis?d=2026-10-25'); await pg.wait_for_selector('.dz-plan-h')
     ok('Prysznic całego ciała' in await pg.inner_text('#slot\\.2015n') and 'Pielęgnacja 0 / 1' in await pg.inner_text('#slot\\.2015n')
        and await pg.locator('#slot\\.2035').count() == 0, f'{tag} niedziela: prysznic 20:15–20:45 z postępem pielęgnacji, bez mycia głowy (D-094)')
+    # D-111: niedziela świąteczna (27.12) bez wariantu „basen” — krok przypięty do slot.2015n w zwykłym slocie 20:15
+    await pg.goto(url + '#/dzis?d=2026-12-27'); await pg.wait_for_selector('.dz-plan-h')
+    ok(await pg.locator('#slot\\.2015n').count() == 0 and 'Pielęgnacja 0 / 1' in await pg.inner_text('#slot\\.2015'),
+       f'{tag} niedziela świąteczna 27.12: znacznik pielęgnacji w slocie 20:15 (krok z wariantu „basen”)')
     if not mobile:
         await pg.keyboard.press('Control+k'); await pg.wait_for_selector('dialog.gs-dialog')
         await pg.keyboard.type('Produkt C'); await pg.wait_for_timeout(300)

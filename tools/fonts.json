@@ -1,0 +1,39 @@
+{
+  "source": {
+    "package": "inter-ui@4.1.1",
+    "sha256": "e392e4d71f18a7c1f23dfecd833d68fa05eeab41862686584e80fd2b5d87e9c0",
+    "file": "package/variable/InterVariable.woff2",
+    "version": "Version 4.001;git-9221beed3"
+  },
+  "axes": {
+    "opsz": 14,
+    "wght": "100–900"
+  },
+  "features": [
+    "kern",
+    "liga",
+    "calt",
+    "tnum",
+    "case",
+    "ccmp",
+    "locl",
+    "mark",
+    "mkmk"
+  ],
+  "files": {
+    "inter-latin.woff2": {
+      "sha256": "b2ba2967a40aad1886cb94b0d7b2c368cc1b6099a9968fa06e432623ceaa26c1",
+      "bytes": 40996,
+      "chars": 282,
+      "ranges": "U+0000, U+0020-007E, U+00A0-00AC, U+00AE-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-200B, U+2010-2027, U+202F-2055, U+2057, U+205F, U+20AC, U+2122, U+2191-2193, U+2212"
+    },
+    "inter-latin-ext.woff2": {
+      "sha256": "4f4cf61a03debd10e9e96c7da1b05d6cf837bd671b6b46317cffe3461f02935b",
+      "bytes": 20144,
+      "chars": 155,
+      "ranges": "U+0100-0130, U+0132-0148, U+014A-0151, U+0154-017F, U+0218-021B, U+0300-0304, U+0306-0308, U+030A, U+030C, U+0326-0328, U+036F, U+2074, U+2077, U+2079, U+2190, U+2194, U+21A9, U+2248, U+2260, U+2264-2265, U+2318, U+25B6, U+2713"
+    }
+  },
+  "fallback": "ℹ∈⏱⏸▾☕♨⚠⚡⛔✅✍✔✕✘❄❌ﬁﬂﬃ🌙🌡🌿🍗🍚🍝🍵🏊👉📌📍🔒🔥🔴🗄🗓😌🚨🚴🟡🟢🤖🥗🥡🥣🥤🦵🧊🧘🧰🧺",
+  "fallbackNote": "znaki ze źródeł aplikacji wyświetlane fontem systemowym: emoji (także z U+FE0F) i znaki bez glifu w Inter"
+}

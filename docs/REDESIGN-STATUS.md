@@ -1,7 +1,7 @@
 # REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0, Fazie 5 (wszystkie moduły) i Etapach 0–3 audytu — 25.09.2026
 
 > **System 2.0 (D-110, 24.10.2026):** nowy wygląd całej aplikacji — `docs/RAPORT_D110.md`, specyfikacja `REDESIGN-SPEC.md` (§1, §2, §4, §5).
-> **Stan bieżący (24.10.2026):** `main` = `a824797` (D-109); D-110 na gałęzi `claude/eager-newton-j2309e`. Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
+> **Stan bieżący (25.10.2026):** `main` = `a824797` (D-109); D-110 i D-111 na gałęzi `claude/eager-newton-j2309e`. Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
 > Poniższe zapisy o commitach (`69d5d94`, `b65b9fa`, `4e68589`) są historyczne.
 
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).
@@ -141,12 +141,11 @@ Scalenie `redesign-faza4` → `main` wdroży naraz naprawę synchronizacji, Fazy
 najpierw aktualizacja kodu w każdym miejscu (K, S, P — ta sama „Wersja aplikacji”), potem dopiero import plików (`TEST_IPHONE_SYNC.md`).
 
 ## 5. Znane ograniczenia
-- **Brak skryptu podzbioru fontu w repozytorium.** Pliki woff2 wygenerowano poza repo (`pyftsubset` z fonttools z plików
-  `@fontsource-variable/inter` 5.3.0, znaki z `src/**/*.js` i `src/data/*.json` + polskie litery, cechy `kern,liga,calt,tnum,case`).
-  Nowe znaki poza podzbiorem wyświetlą się fontem systemowym. Odtworzenie wymaga dopisania skryptu **[do zrobienia]**.
+- ~~Brak skryptu podzbioru fontu~~ — **wykonane (D-111, 25.10.2026):** `python3 tools/fonts.py` (źródło `inter-ui@4.1.1` z npm, suma SHA-256,
+  opis i lista znaków przy foncie systemowym w `tools/fonts.json`, strażnik `tests/unit/fonts.test.mjs` — nowy znak w tekstach = uruchom skrypt).
 - Brak testów w WebKit/Safari (środowisko bez WebKit) — wszystkie testy automatyczne w Chromium.
 - Motyw domyślnie ciemny — **potwierdzone przez użytkownika 24.09.2026**.
-- 79 znaków używanych w aplikacji (strzałki, ≤ ≥ ≈ ≠, ✓, emoji) jest poza podzbiorem Inter i wyświetla się fontem systemowym.
+- Fontem systemowym wyświetlają się tylko emoji i znaki, których Inter nie ma (51 znaków — lista w `tools/fonts.json`); strzałki, ≤ ≥ ≈ ≠, ✓, ⌘ — Inter (D-111).
 - Pasek statusu PWA (`status-bar-style: default`) — zachowanie w motywie ciemnym do sprawdzenia na iPhonie (D-067).
 - Konfiguracja testów z plikami użytkownika (A) nie była uruchamiana w Fazie 5.0.
 - Referencje Figma (Nucleus OS, OneDay) nie były otwarte — kierunek oparty na zrzutach użytkownika.

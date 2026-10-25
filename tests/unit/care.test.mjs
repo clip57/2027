@@ -114,3 +114,25 @@ test('B9 (audyt 23.10.2026): sloty do przypięcia kroku — każdy raz, dni z ka
   assert.equal(label('slot.1940c'), undefined, 'slot nieużywany w planie (wariant czwartek_k) — poza listą wyboru');
   assert.ok(!o.some(x => /\.\d+$/.test(x[0].split('.').slice(2).join('.'))), 'części przyciętych slotów („slot.1745.1”) jako ten sam slot');
 });
+
+test('D-111: krok przypięty do slotu innego wariantu dnia — znacznik w slocie tego dnia o tej porze (niedziele świąteczne bez basenu)', async () => {
+  const { SRC } = await import('../../src/core/data.js');
+  const { resolveDay } = await import('../../src/core/resolver.js');
+  const { placeSlotProgress, slotDefs } = await import('../../src/core/calc/care.js');
+  const defs = slotDefs(SRC.dayTemplate);
+  const ids = d => resolveDay(d).slots.map(s => s.id);
+  // niedziela z basenem: slot wariantu jest w planie — bez zmian
+  assert.ok(ids('2026-10-25').includes('slot.2015n'));
+  assert.deepEqual(placeSlotProgress({ 'slot.2015n': { done: 1, total: 2 } }, resolveDay('2026-10-25').slots, defs), { 'slot.2015n': { done: 1, total: 2 } });
+  // 27.12 i 28.03 (święta, D-096): bez wariantu „basen” — krok trafia do zwykłego slotu 20:15 i sumuje się z jego krokami
+  for (const d of ['2026-12-27', '2027-03-28']) {
+    assert.ok(!ids(d).includes('slot.2015n') && ids(d).includes('slot.2015'), `${d}: zwykły slot 20:15`);
+    assert.deepEqual(placeSlotProgress({ 'slot.2015n': { done: 0, total: 1 }, 'slot.2015': { done: 1, total: 1 } }, resolveDay(d).slots, defs), { 'slot.2015': { done: 1, total: 2 } });
+  }
+  // godzina bez slotu, który ją obejmuje — ostatni wcześniejszy; slot spoza definicji — bez znacznika
+  const day = [{ id: 'a', from: '07:00', to: '08:00' }, { id: 'b', from: '09:00', to: '10:00' }, { id: 'sen', from: '23:00', to: '07:00' }];
+  const own = [{ id: 'x', from: '08:30' }, { id: 'y', from: '06:00' }, { id: 'z', from: '23:30' }];
+  assert.deepEqual(placeSlotProgress({ x: { done: 0, total: 1 }, y: { done: 1, total: 1 }, z: { done: 0, total: 1 }, nieznany: { done: 0, total: 3 } }, day, own),
+    { a: { done: 0, total: 1 }, sen: { done: 1, total: 2 } });
+  assert.deepEqual(placeSlotProgress({ x: { done: 0, total: 1 } }, [], own), {}, 'dzień bez planu — bez znaczników');
+});

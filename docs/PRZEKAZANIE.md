@@ -9,7 +9,7 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
   workflow „Publikacja 2027” (`.github/workflows/pages.yml`) buduje i publikuje `dist/web` na GitHub Pages.
 - Stan: `redesign-faza4` = `main` = **`b3b4edc`** (D-097 + dokumentacja; wcześniej `14ce874` D-097, `ab4c72d` D-096, `7012ce1` D-095).
 - **Stan 24.10.2026:** praca na gałęzi `claude/eager-newton-j2309e`; `main` = **`a824797`** (D-107…D-109, publikacja fast-forward
-  `git push origin claude/eager-newton-j2309e:main` na polecenie użytkownika). D-110 (System 2.0) — na gałęzi, czeka na zgodę na publikację.
+  `git push origin claude/eager-newton-j2309e:main` na polecenie użytkownika). D-110 (System 2.0) i D-111 — na gałęzi, czekają na zgodę na publikację.
 - Repozytorium jest **publiczne** — stąd surowe zasady prywatności (CLAUDE.md §3 p. 5, moduł Pielęgnacja).
 
 ## 2. Zasady współpracy z użytkownikiem (utrwalone w rozmowach)
@@ -33,27 +33,23 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
 
 Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 
-## 4. Otwarte sprawy — stan 24.10.2026 (po D-110)
+## 4. Otwarte sprawy — stan 25.10.2026 (po D-111)
+**Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
+obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,
+znacznik pielęgnacji w niedziele świąteczne i akcje GitHub na Node 24 — wykonane.
+
 **Do decyzji użytkownika:**
-1. **D1 — popołudnie od 16.11:** bloki MPW 15:30 / 16:30 / 17:30 kolidują z planem dnia w 108 ze 119 dni (przerwa, zmywanie, dojazd,
-   rozgrzewka, trening 18:15, sauna) — potrzebny nowy rozkład popołudnia (`RAPORT_AUDYT_2026-10-23.md` D1). Termin: przed 16.11.
-2. **Założenia D-103 (`RAPORT_D103.md` §5), w mocy na pozostałe dni:** brak sauny w dni treningowe z blokiem M (26.10, 28.10, 31.10);
-   czwartek 29.10 — „Posiłek po saunie” 20:15 bez sauny; 03–11.11 — posiłek 20:15 w trakcie bloku M; dawki 17:15 w dni bez treningu;
-   tekst Rekompozycji „kreatyna o 20:15” (w dni z M aplikacja pokazuje 19:15).
-3. **D-099 §4:** w niedziele i czwartki z blokiem J 10 min „powrotu” zabrane z posiłku potreningowego — czy z innego punktu.
-4. **G-20:** monitoring wagi, snu i obwodów (kolano jest w dzienniku sesji, D-106) — czy ma być w aplikacji.
-5. **Etap 4 audytu 25.09 — D2, I9, I12:** wstrzymane decyzją użytkownika (D-092); opisy tylko w ówczesnej rozmowie.
-6. **D-031:** pliki postępu i error logu CFA v3 nie zostały dostarczone — po zmianie planu na V44 prawdopodobnie nieaktualne (do zamknięcia).
-7. **Publikacja D-110** na `main`.
+1. **D1 — popołudnie od 16.11** (odłożone 25.10): bloki MPW 15:30 / 16:30 / 17:30 kolidują z planem dnia w 108 ze 119 dni
+   (`RAPORT_AUDYT_2026-10-23.md` D1). Termin: przed 16.11.
+2. **D2, I9, I12** (Etap 4 audytu 25.09.2026) — wstrzymane; opisy były tylko w ówczesnej rozmowie (nie ma ich w repozytorium ani w historii
+   commitów). Jeśli użytkownik ich nie odtworzy — do zamknięcia albo nowego przeglądu.
+3. **Publikacja D-110 i D-111** na `main`.
 
 **Niedokończone / do dopracowania:**
 1. Ręczna kontrola D-110 na urządzeniach (`RAPORT_D110.md` §8, `REDESIGN-TESTING.md` §5 p. 13) — środowisko nie ma WebKit; tu także
    pasek statusu PWA w motywie ciemnym (D-067) i `CryptoKey` w IndexedDB w Safari (`SYNC_CHMURA.md`).
 2. Fazy 6–7 redesignu formalnie otwarte (urządzenia, regresja końcowa) — testy automatyczne obejmują 320–1920 px (D-110), brak potwierdzenia na sprzęcie.
-3. Skrypt podzbioru fontu Inter (`REDESIGN-STATUS.md` §5) — brak w repozytorium; 79 znaków poza podzbiorem (font systemowy).
-4. `npm run verify` i test migracji kopii ZAPASY wymagają plików użytkownika (`SOURCES_DIR`) — w tym środowisku zawsze pominięte.
-5. Pielęgnacja: niedziele świąteczne bez wariantu „basen” — kroki przypięte do `slot.2015n` bez znacznika w slocie (`RAPORT_D097.md` §4).
-6. GitHub Actions: `actions/checkout@v4`, `setup-node@v4`, `setup-python@v5` na wycofywanym Node 20 (ostrzeżenie w CI) — podnieść wersje.
+3. `npm run verify` i test migracji kopii ZAPASY wymagają plików użytkownika (`SOURCES_DIR`) — w tym środowisku zawsze pominięte.
 
 ## 4a. Niedokończone po D-097 (historyczne — kolejność zalecana)
 > **Stan 24.10.2026:** punkty 1–4 wykonane — E2E i `verify_all.py` na kalendarzu V44 (wyniki w `RAPORT_D103.md` §6); punkt 2 (`UPGRADE` w `private_pack_lib.py`) — reguły do D-103c i D-104 (potwierdzone w audycie 23.10.2026, U5). Przy następnej zmianie planu dopisz nowe reguły.

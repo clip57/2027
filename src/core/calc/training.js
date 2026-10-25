@@ -20,7 +20,7 @@ export function sets(train) {
   });
 }
 
-// `details` (D-106): dokumenty szczegółów sesji — dzień z wpisem basenu lub roweru liczy się jako sesja także bez serii i czasu (kolano i sauna same nie czynią dnia treningowym).
+// `details` (D-106): dokumenty szczegółów sesji — dzień z wpisem basenu lub roweru liczy się jako sesja także bez serii i czasu (sauna — i dawne wpisy kolana — same nie czynią dnia treningowym).
 export function sessions(train, sess = {}, details = {}) {
   const byDate = {};
   for (const s of sets(train)) (byDate[s.date] ||= []).push(s);

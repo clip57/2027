@@ -8,15 +8,16 @@ on:
   workflow_call:
   workflow_dispatch:
 permissions: { contents: read }
+# Akcje w wersjach na Node 24 (D-111, 25.10.2026 — Node 20 wycofany z runnerów GitHub).
 jobs:
   testy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.12' }
       - run: npm ci
       - name: Testy jednostkowe

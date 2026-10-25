@@ -138,6 +138,13 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 - Pierścienie postępu z gradientem i poświatą, wykresy z ograniczoną wysokością, kreślone strzałki rozwijania, nowa ikona aplikacji
   (znak „27” w pierścieniu — `tools/app_icons.py`).
 
+## C11. Dopracowanie po liście otwartych spraw (D-111, 25.10.2026)
+- **Dziennik sesji bez kolana** (decyzja użytkownika): sekcje Basen / Rower / Sauna / Notatka; dawne wpisy kolana niewidoczne, nieusuwane.
+- **Font:** podzbiór Inter odtwarzalny skryptem (`tools/fonts.py`), ten sam wygląd (porównanie pikseli: 0 różnic), pokrycie całego Latin-1
+  i interpunkcji (’ “ € … w tekstach wpisywanych przez użytkownika), Latin Extended-A, ș ț, znaki łączące (tekst NFD) i symboli interfejsu
+  (← → ≤ ≥ ≈ ≠ ✓ ⌘); emoji i znaki z selektorem emoji — font systemowy. Pliki 32 → 61 KB.
+- **Pielęgnacja w „Dziś”:** znacznik kroku przypiętego do slotu innego wariantu dnia — w slocie tego dnia o tej porze.
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.
@@ -148,7 +155,7 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 7. Zmiana wymagająca naruszenia powyższych → zatrzymaj się i zapytaj użytkownika.
 
 ## E. Punkty otwarte (nierozstrzygnięte)
-- G-20: dziennik kolana i monitoring (waga, sen, obwody) — kolano w dzienniku sesji (D-106); waga, sen, obwody — brak decyzji.
-- D-031: import postępu i error logu CFA v3 od użytkownika — funkcje gotowe, pliki nie zostały dostarczone.
+- ~~G-20~~ — **zamknięte (D-111, 25.10.2026):** kolano usunięte z dziennika sesji; waga, sen, obwody — nie w aplikacji.
+- ~~D-031~~ — **zamknięte (D-111):** pliki CFA v3 nieaktualne po planie V44.
 - ~~Potwierdzenie wyglądu na iPhonie (Safari i PWA)~~ — **potwierdzone przez użytkownika 24.09.2026** dla wersji `4e68589` (wszystkie punkty `REDESIGN-TESTING.md` §5).
   naprawy synchronizacji, wersji sprzed redesignu).
