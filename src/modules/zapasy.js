@@ -2,7 +2,9 @@
 // na nowej architekturze — stan liczony z inwentaryzacji i planu (D-003, D-027), zapis zdarzeniami,
 // bez dat zakodowanych na sztywno i bez wstawiania danych do innerHTML.
 import { h, clear, fmt, plural, add, numberOf } from '../ui/dom.js';
-import { stockAt, stockInfo, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation } from '../core/calc/inventory.js';
+import { stockAt, stockInfo, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation, stockSeries, usedBetween } from '../core/calc/inventory.js';
+import { shopKey, shopChecked, settingEvents } from '../core/calc/checks.js';
+import { areaChart } from '../ui/charts.js';
 import { randomId } from '../core/ids.js';
 import { icon } from '../ui/icons.js';
 import { sheet as dialog, statusBadge } from '../ui/components.js';
@@ -257,7 +259,29 @@ export function renderZapasy(root, ctx) {
             moreBox()),
         it.tracked === false && moreBox());
       // Szczegóły i rzadsze korekty — zwinięte (w wierszu czynności; po rozwinięciu zajmują całą szerokość)
-      function moreBox() { return h('details', { class: 'zp-more', ...keepOpen(`more:${it.id}`) }, h('summary', { 'aria-label': `Szczegóły i korekty: ${it.name}` }, icon('ellipsis', { size: 18 }), h('span', {}, 'Więcej')),
+      // F-Z4 (D-113): historia stanu (14 dni) i prognoza (14 dni) na wykresie + zużycie wg planu — liczone dopiero po rozwinięciu
+      function histBox() {
+        const box = h('div', { class: 'zp-hist' });
+        const fill = () => {
+          if (box.firstChild || r.st == null || it.tracked === false) return;
+          const from = addDays(today, -13), to = addDays(today, 14), ser = stockSeries(store.state.inv, it.id, from, to);
+          const past = ser.map((p, i) => (i <= 13 ? p.qty : null)), fut = ser.map((p, i) => (i >= 13 ? p.qty : null));
+          const back = ser.find(p => p.qty != null);
+          add(box, h('p', { class: 'zp-hist-h' }, h('strong', {}, 'Stan w czasie'), h('span', { class: 'muted' }, ' · 14 dni wstecz i prognoza wg planu')),
+            h('div', { class: 'zp-hist-c', style: { '--ch': `var(--${r.status === 'CRITICAL' ? 'danger' : r.status === 'WARNING' ? 'warning' : 'success'})` } },
+              areaChart(ser.map(p => `${dayShort(p.date)} ${shortDate(p.date)}`), [{ values: past }, { values: fut, cls: 'is-plan', fill: false }],
+                { title: `${it.name}: stan ${back ? `${shortDate(back.date)} ${fmt(back.qty, 1)} ${it.unit}, ` : ''}dziś ${fmt(r.st, 1)} ${it.unit}, prognoza ${shortDate(to)} ${fmt(ser[ser.length - 1].qty ?? 0, 1)} ${it.unit}`,
+                  height: 96, mark: 13, fmt: v => `${fmt(v, 0)} ${it.unit}` })),
+            h('p', { class: 'muted small' }, `Zużycie wg planu: ostatnie 14 dni ${fmt(usedBetween(it.id, addDays(today, -13), today), 1)} ${it.unit} · następne 14 dni ${fmt(usedBetween(it.id, addDays(today, 1), to), 1)} ${it.unit}`,
+              r.si?.shortSince ? ` · brak od ${dayShort(r.si.shortSince)} ${shortDate(r.si.shortSince)}` : r.fc?.runOut ? ` · skończy się ${dayShort(r.fc.runOut)} ${shortDate(r.fc.runOut)}` : ''));
+        };
+        return { box, fill };
+      }
+      function moreBox() {
+        const ko = keepOpen(`more:${it.id}`), hb = histBox();
+        if (ko.open) hb.fill();
+        return h('details', { class: 'zp-more', open: ko.open, ontoggle: e => { ko.ontoggle(e); if (e.target.open) hb.fill(); } }, h('summary', { 'aria-label': `Szczegóły i korekty: ${it.name}` }, icon('ellipsis', { size: 18 }), h('span', {}, 'Więcej')),
+          hb.box,
           h('p', { class: 'inv-tags' },
             it.packSize && h('span', { class: 'tag' }, `Opakowanie ${fmt(it.packSize)} ${it.unit}`),
             it.maxLimit && h('span', { class: 'tag' }, `Limit: ${fmt(it.maxLimit)} ${it.unit}`),
@@ -374,33 +398,53 @@ export function renderZapasy(root, ctx) {
       } }, edit ? 'Zapisz zmiany' : 'Zapisz pozycję'));
   }
 
+  // Tryb zakupów (D-113, F-Z2/F-Z3/F-Z5): lista na najbliższe zakupy pogrupowana wg kategorii; odhaczenia zapisywane jako `setting`
+  // `zapasy.shop:<data zakupów>|<pozycja>` — wspólne dla urządzeń (iPhone w sklepie, MacBook) i zachowane po zamknięciu okna;
+  // ilość do kupienia można zmienić (domyślnie wyliczona); „Kupione” dodaje zaznaczone pozycje jedną operacją (jedno „Cofnij”) i czyści odhaczenia.
   function shopDialog() {
-    const checked = new Set();
+    const settings = () => store.state.settings || {};
+    const isOn = id => shopChecked(settings(), shop.date, id);
+    const qty = new Map(list.map(x => [x.id, x.toBuy]));
     const bar = h('span', { class: 'prog-fill' });
     const txt = h('span', { class: 'prog-t' });
+    const buyBtn = h('button', { class: 'primary' });
+    const rowsEl = new Map();
     const upd = () => {
-      const pct = list.length ? Math.round((checked.size / list.length) * 100) : 100;
-      txt.textContent = `${checked.size} / ${list.length} (${pct}%)`; bar.style.width = `${pct}%`;
+      const n = list.filter(x => isOn(x.id)).length;
+      const pct = list.length ? Math.round((n / list.length) * 100) : 100;
+      txt.textContent = `${n} / ${list.length} (${pct}%)`; bar.style.width = `${pct}%`;
+      clear(buyBtn).append(icon('check', { size: 18 }), h('span', {}, n ? `Kupione — dodaj do stanu (${n})` : 'Dodaj wszystkie do stanu'));
+      for (const [id, li] of rowsEl) { const on = isOn(id); li.classList.toggle('is-done', on); li.querySelector('input[type=checkbox]').checked = on; }
     };
-    const listText = () => (checked.size ? list.filter(x => checked.has(x.id)) : list).map(x => `${x.name}: ${fmt(x.toBuy)} ${x.unit}`).join('\n');
+    const toggle = async (x, on) => {
+      try { await store.record('setting', { key: shopKey(shop.date, x.id), value: on }); upd(); } catch (e) { dlg.error(e); }
+    };
+    const chosen = () => list.filter(x => isOn(x.id));
+    const listText = () => (chosen().length ? chosen() : list).map(x => `${x.name}: ${fmt(qty.get(x.id))} ${x.unit}`).join('\n');
     const remindersHref = text => `shortcuts://run-shortcut?name=DodajZakupySpozywcze&input=text&text=${encodeURIComponent(text)}`;
-    const dlg = dialog(`Plan zakupów — ${dayShort(shop.date)} ${shortDate(shop.date)}`,
+    const groups = [...new Set(byNeed.map(x => x.category || 'Inne'))].sort((a, b) => CATS.indexOf(a) - CATS.indexOf(b));
+    const row = x => {
+      const q = h('input', { type: 'number', inputmode: 'decimal', step: 'any', min: '0', value: String(x.toBuy), class: 'shop-q', 'aria-label': `Ilość do kupienia: ${x.name} (${x.unit})`,
+        onchange: e => { const v = numberOf(e.target); if (Number.isFinite(v) && v > 0) qty.set(x.id, v); else { e.target.value = String(qty.get(x.id)); ctx.flash(`${x.name}: niepoprawna ilość — bez zmian.`, 'info'); } } });
+      const li = h('li', {},
+        h('label', {}, h('input', { type: 'checkbox', checked: isOn(x.id), onchange: e => toggle(x, e.target.checked) }), h('span', { class: 'f-n' }, x.name)),
+        h('span', { class: 'f-q shop-qw' }, q, h('span', { class: 'muted' }, x.unit)),
+        h('span', { class: 'muted block' }, `${x.packs} × ${fmt(x.packSize)} ${x.unit} · na ${x.targetDays} dni · masz ${fmt(x.current, 1)} ${x.unit}${x.overLimit ? ' · przekracza limit' : ''}`));
+      rowsEl.set(x.id, li);
+      return li;
+    };
+    const dlg = dialog(`Zakupy — ${dayShort(shop.date)} ${shortDate(shop.date)}`,
       h('div', { class: 'prog' }, h('span', { class: 'prog-bar' }, bar), txt),
+      list.length > 0 && h('p', { class: 'muted shop-note' }, 'Odhaczenia widać na wszystkich urządzeniach (synchronizacja). Ilość możesz zmienić przed „Kupione”.'),
       list.length === 0 ? h('p', {}, 'Nic nie trzeba kupować — zapasy wystarczą.') :
-        h('ul', { class: 'shop-list' }, list.map(x => h('li', {},
-          h('label', {}, h('input', { type: 'checkbox', onchange: e => { e.target.checked ? checked.add(x.id) : checked.delete(x.id); upd(); } }),
-            h('span', { class: 'f-n' }, x.name)),
-          h('span', { class: 'f-q' }, `${fmt(x.toBuy)} ${x.unit}`),
-          h('span', { class: 'muted block' }, `${x.packs} × ${fmt(x.packSize)} ${x.unit} · na ${x.targetDays} dni · masz ${fmt(x.current, 1)} ${x.unit}${x.overLimit ? ' · przekracza limit' : ''}`)))),
-      list.length > 0 && h('div', { class: 'row' },
-        h('button', { class: 'primary', onclick: async () => {
-          const chosen = checked.size ? list.filter(x => checked.has(x.id)) : list;
-          if (!confirm(checked.size ? `Dodać ${chosen.length} zaznaczonych pozycji do stanu magazynu?` : `Dodać wszystkie ${chosen.length} wyliczone zakupy do stanu magazynu?`)) return;
-          try {
-            await manyOp(chosen.map(x => ['inv.move', { prod: x.id, qty: x.toBuy, date: today, kind: 'purchase' }]));
-            dlg.close(); ctx.flash(`Zaktualizowano stany dla ${chosen.length} pozycji.`, 'info'); ctx.rerender();
-          } catch (e) { dlg.error(e); }
-        } }, icon('check', { size: 18 }), 'Zaktualizuj stan'),
+        groups.map(g => h('section', { class: 'shop-group' }, h('h3', {}, g, h('span', { class: 'muted' }, ` · ${byNeed.filter(x => (x.category || 'Inne') === g).length}`)),
+          h('ul', { class: 'shop-list' }, byNeed.filter(x => (x.category || 'Inne') === g).map(row)))),
+      list.length > 0 && h('div', { class: 'row shop-acts' },
+        buyBtn,
+        h('button', { onclick: async () => {
+          const on = chosen(); if (!on.length) return;
+          try { await many(settingEvents(on.map(x => shopKey(shop.date, x.id)), false)); upd(); } catch (e) { dlg.error(e); }
+        } }, icon('x', { size: 18 }), 'Odznacz wszystko'),
         h('button', { onclick: async () => {
           try { await navigator.clipboard.writeText(listText()); ctx.flash('Lista skopiowana do schowka.'); } catch { ctx.flash('Nie udało się skopiować listy.'); }
           dlg.close();
@@ -408,6 +452,17 @@ export function renderZapasy(root, ctx) {
         // D8: Reminders — zaznaczone pozycje w chwili dotknięcia (jak „Kopiuj listę”)
         h('a', { class: 'btn', href: remindersHref(listText()), onclick: e => { e.currentTarget.href = remindersHref(listText()); } },
           icon('smartphone', { size: 18 }), 'Do Reminders')));
+    buyBtn.onclick = async () => {
+      const on = chosen(), pick = on.length ? on : list;
+      if (!confirm(on.length ? `Dodać ${pick.length} zaznaczonych pozycji do stanu magazynu?` : `Dodać wszystkie ${pick.length} wyliczone zakupy do stanu magazynu?`)) return;
+      try {
+        await manyOp([...pick.map(x => ['inv.move', { prod: x.id, qty: qty.get(x.id), date: today, kind: 'purchase' }]),
+          ...settingEvents(on.map(x => shopKey(shop.date, x.id)), false)]);
+        const op = lastOperation(store.allEvents());
+        dlg.close(); ctx.flash(`Zaktualizowano stany dla ${pick.length} pozycji.`, 'info', op ? { action: { label: 'Cofnij', aria: 'Cofnij tę zmianę', icon: 'undo-2', run: () => undo(op) } } : undefined); ctx.rerender();
+      } catch (e) { dlg.error(e); }
+    };
+    dlg.el.classList.add('shop-dialog');
     upd();
   }
 

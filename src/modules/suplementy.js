@@ -8,6 +8,7 @@ import { scheduleFor, supplementOverview } from '../core/calc/supplements.js';
 import { addDays, longDate, weekday, dayShort, shortDate } from '../core/dates.js';
 import { stockAt, forecast, statusInfo, runway, nextShopping } from '../core/calc/inventory.js';
 import { catalogById } from '../core/data.js';
+import { doseKey, doseDone, settingEvents } from '../core/calc/checks.js';
 import { dayPlan, inPlan, PLAN_START, PLAN_END, DAY_ZERO } from '../core/resolver.js';
 
 const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
@@ -53,9 +54,23 @@ export function renderSuplementy(root, ctx) {
     catch (e) { clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
   };
 
+  // F-D4 (D-113): odhaczanie przyjętych dawek — `setting` `supp.dose:<data>|<godz>|<preparat>` (wspólne dla urządzeń); tylko do dziś włącznie
+  const settings = store?.state?.settings || {};
+  const allDoses = groups.flatMap(g => g.doses);
+  const canCheck = !!store && date <= ctx.today && allDoses.length > 0;
+  const taken = allDoses.filter(d => doseDone(settings, date, d)).length;
+  const mark = async (doses, value) => {
+    try { await store.recordMany(settingEvents(doses.map(d => doseKey(date, d)), value)); ctx.rerender(); }
+    catch (e) { clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
+  };
+  const doseBtn = d => { const on = doseDone(settings, date, d);
+    return h('button', { class: 'set-toggle dose-ck', 'aria-pressed': String(on), 'aria-label': `${d.name}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
+      onclick: () => mark([d], !on) }, on ? '✓' : ''); };
+
   add(root, h('header', { class: 'sp-head' }, h('h1', {}, 'Suplementacja'),
     h('div', { class: 'topline' }, h('span', { class: 'date' }, longDate(date)),
       h('span', { class: 'chip' }, `${groups.reduce((n, g) => n + g.doses.length, 0)} dawek w ${groups.length} porach`),
+      canCheck && h('span', { class: 'chip sp-taken' }, `przyjęte ${taken} / ${allDoses.length}`),
       nextTime && h('span', { class: 'chip sp-now' }, icon('clock', { size: 14 }), `następna pora: ${nextTime}`),
       low.length > 0 && h('a', { class: 'chip sp-low-link', href: '#sp-stock-h' }, icon('package', { size: 14 }), `do uzupełnienia: ${low.length}`))),
     msg,
@@ -71,8 +86,10 @@ export function renderSuplementy(root, ctx) {
       h('div', { class: 'tl-mark' }, h('time', {}, g.time)),
       h('div', { class: 'tl-card' },
         h('h3', { class: 'tl-title' }, g.situation, next && h('span', { class: 'now-tag' }, 'następna'), past && h('span', { class: 'sr-only' }, ' (minęła)')),
-        h('ul', { class: 'dose-list' }, g.doses.map(d => h('li', {},
-          h('div', { class: 'dose-head' }, h('span', { class: 'sn' }, d.name), h('span', { class: 'dose-badge' }, d.label)),
+        canCheck && g.doses.length > 1 && h('button', { class: 'sp-all', onclick: () => mark(g.doses, !g.doses.every(d => doseDone(settings, date, d))) },
+          icon('check', { size: 16 }), h('span', {}, g.doses.every(d => doseDone(settings, date, d)) ? `Odznacz porę ${g.time}` : `Przyjęte wszystkie o ${g.time}`)),
+        h('ul', { class: 'dose-list' }, g.doses.map(d => h('li', { class: canCheck && doseDone(settings, date, d) ? 'is-taken' : null },
+          h('div', { class: 'dose-head' }, canCheck && doseBtn(d), h('span', { class: 'sn' }, d.name), h('span', { class: 'dose-badge' }, d.label)),
           h('p', { class: 'dose-form' }, d.form),
           (d.note || (d.thursday && nt)) && h('p', { class: 'dose-note' },
             [d.note, d.thursday && nt ? ntNote(d.thursday.note) : null].filter(Boolean).join(' · '))))))));

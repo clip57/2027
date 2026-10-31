@@ -36,7 +36,9 @@ button:active:not(:disabled), .btn:active { transform: scale(.98); }
 /* ---------- Plakietki w nagłówkach stron: zamiast „chipów” jedna linia metadanych rozdzielona kropkami (V2) ---------- */
 .topline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 0; }
 .topline .chip { background: none; border: 0; padding: 0; border-radius: 0; color: var(--text-2); font-weight: 550; font-size: var(--fs-sm); min-height: 0; }
-.topline > * + .chip::before, .topline .chip + .chip::before { content: "·"; margin: 0 .55em; color: var(--muted); font-weight: 400; }
+/* separator po elemencie (nie przed) — przy zawijaniu kropka zostaje na końcu wiersza, nie na początku następnego */
+.topline > :not(:last-child)::after { content: "·"; margin: 0 .55em; color: var(--muted); font-weight: 400; }
+.topline > a.chip:not(:last-child)::after { color: var(--muted); }
 .topline .date { margin-right: 0; }
 .topline a.chip { color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
 
@@ -174,7 +176,7 @@ button:active:not(:disabled), .btn:active { transform: scale(.98); }
 /* ---------- Nagłówek strony: data w osobnym wierszu na telefonie (bez kropki na początku wiersza) ---------- */
 @media (max-width: 599px) {
   .topline .date { flex-basis: 100%; }
-  .topline .date + .chip::before { content: none; margin: 0; }
+  .topline .date::after { content: none !important; }
 }
 
 /* ==========================================================================
@@ -249,10 +251,11 @@ button:active:not(:disabled), .btn:active { transform: scale(.98); }
 
 @media (min-width: 1100px) {
   /* liczby dnia zaraz pod „Teraz” (kolejność w DOM bez zmian: Teraz → Wymaga uwagi — czytniki ekranu, test kolejności) */
-  .dz-grid, .dz-grid:has(> .dz-attn) { grid-template-columns: minmax(0, 1fr) 340px; grid-template-areas: "now aside" "kpis aside" "attn aside" "plan aside"; gap: var(--s-4) var(--s-6); }
-  .dz-grid:has(> .dz-mpw), .dz-grid:has(> .dz-attn):has(> .dz-mpw) { grid-template-areas: "now aside" "kpis aside" "attn aside" "mpw aside" "plan aside"; }
-  .dz-grid:not(:has(> .dz-attn)) { grid-template-areas: "now aside" "kpis aside" "plan aside"; }
-  .dz-grid:not(:has(> .dz-attn)):has(> .dz-mpw) { grid-template-areas: "now aside" "kpis aside" "mpw aside" "plan aside"; }
+  /* jeden szablon dla wszystkich wariantów (bez „Wymaga uwagi”, z MPW, z podsumowaniem) — puste wiersze mają 0 px (odstęp marginesem) */
+  .app .main .dz-grid.dz-grid { grid-template-columns: minmax(0, 1fr) 340px; gap: 0 var(--s-6);
+    grid-template-areas: "now aside" "kpis aside" "sum aside" "attn aside" "mpw aside" "plan aside"; }
+  .dz-grid > :not(.dz-aside) { margin-bottom: var(--s-4); }
+  .dz-summary { grid-area: sum; } .dz-mpw { grid-area: mpw; }
   .dz-attn { grid-area: attn; }
   .dz-aside { grid-row: 1 / -1; }
   .dz-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -324,3 +327,122 @@ button:active:not(:disabled), .btn:active { transform: scale(.98); }
 .gs-hit-cmd .gs-kind { display: inline-flex; align-items: center; gap: 4px; color: var(--accent); }
 .gs-cmd + li:not(.gs-cmd) { border-top: 1px solid var(--border); margin-top: var(--s-2); padding-top: var(--s-2); }
 .set-c .theme-switch .ts-b { flex: 1 0 auto; padding: 0 var(--s-3); }
+
+/* ---------- Tryb zakupów (D-113, F-Z2/F-Z3/F-Z5) ---------- */
+.shop-dialog .shop-note { font-size: var(--fs-sm); margin: var(--s-2) 0; }
+.shop-group { margin-top: var(--s-4); }
+.shop-group h3 { font-size: var(--fs-sm); font-weight: 650; color: var(--text-2); margin: 0 0 var(--s-1); }
+.shop-dialog .shop-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px var(--s-3); padding: var(--s-2) 0; border-top: 1px solid var(--border); }
+.shop-dialog .shop-list li .block { grid-column: 1 / -1; font-size: var(--fs-xs); }
+.shop-dialog .shop-list label { display: flex; align-items: center; gap: var(--s-3); min-height: 44px; cursor: pointer; }
+.shop-dialog .shop-list input[type="checkbox"] { width: 22px; height: 22px; flex: none; }
+.shop-dialog .shop-list li.is-done .f-n { text-decoration: line-through; color: var(--muted); }
+.shop-qw { display: inline-flex; align-items: center; gap: 6px; }
+.shop-q { width: 5.5rem; min-height: 44px; padding: 0 var(--s-2); text-align: right; font-variant-numeric: tabular-nums; }
+.shop-acts { position: sticky; bottom: 0; padding: var(--s-3) 0; background: var(--surface-2); flex-wrap: wrap; gap: var(--s-2); }
+
+/* ---------- Szczegóły pozycji: stan w czasie (F-Z4) ---------- */
+.zp-hist { grid-column: 1 / -1; margin-bottom: var(--s-2); }
+.zp-hist-h { margin: 0 0 var(--s-1); font-size: var(--fs-sm); }
+.zp-hist-c .chart { width: 100%; height: auto; max-height: 140px; }
+.zp-hist-c { --ch: var(--success); }
+.ch-lab { fill: var(--muted); font-size: 10px; }
+
+/* ---------- Odhaczanie dawek (D-113, F-D4): Suplementacja i plan dnia ---------- */
+.dose-ck { width: 44px; min-width: 44px; height: 44px; flex: none; font-size: var(--fs-sm); border-radius: var(--r-full); background: transparent; border: 1.5px solid var(--border-strong); box-shadow: none; }
+.dose-ck[aria-pressed="true"] { background-color: var(--success); color: var(--on-success); border-color: transparent; box-shadow: none; }
+.dose-head { display: flex; align-items: center; gap: var(--s-3); }
+.dose-list li.is-taken .sn, .slot-supps li.is-taken .sn { color: var(--text-2); }
+.slot-supps li { align-items: center; }
+.slot-supps .dose-ck { width: 44px; height: 44px; margin-right: var(--s-1); }
+.sp-all { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--s-3); margin: var(--s-1) 0 var(--s-2); font-size: var(--fs-sm); }
+
+/* ---------- Trening: postęp ćwiczenia w sesji (F-T2) ---------- */
+.ex-prog { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-1) 0 var(--s-2); font-size: var(--fs-xs); color: var(--text-2); }
+.ex-prog .spark { width: 96px; height: 28px; flex: none; }
+.ex-prog-t { display: inline-flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+.ex-prog.is-pr .ex-prog-t { color: var(--train); font-weight: 650; }
+
+/* ---------- Dieta (F-DI2) ---------- */
+.dt-kcal-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); }
+.hero-kcal strong { font-family: var(--font-display); letter-spacing: -.035em; }
+.dt-head .topline .dt-today { color: var(--accent); }
+.meal summary .meal-k { font-variant-numeric: tabular-nums; }
+
+/* ---------- Dziś: akcje w „Wymaga uwagi” (F-D2) i podsumowanie dnia (F-D3) ---------- */
+.dz-attn-list li.has-act { display: flex; align-items: center; gap: var(--s-2); }
+.dz-attn-list li.has-act .dz-at-item { flex: 1 1 auto; min-width: 0; }
+.dz-at-act { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--s-3); border-radius: var(--r-full); font-size: var(--fs-sm); white-space: nowrap; }
+@media (max-width: 599px) { .dz-at-act span { display: none; } .dz-at-act { width: 44px; padding: 0; justify-content: center; } }
+.dz-summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--s-4) var(--s-5); }
+.dz-sum-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); margin-bottom: var(--s-3); }
+.dz-sum-head h2 { margin: 0; font-size: var(--fs-lg); }
+.dz-sum-pct { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+.dz-sum-pct .muted { font-family: var(--font); font-size: var(--fs-sm); font-weight: 500; }
+.dz-sum-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.dz-sum-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px var(--s-2); align-items: baseline; }
+.dz-sum-list .dz-bar { grid-column: 1 / -1; }
+.dz-sum-l { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--text-2); }
+.dz-sum-l .ico { color: var(--dc); }
+.dz-sum-list strong { font-variant-numeric: tabular-nums; }
+
+/* wartość tekstowa zamiast liczby („brak stanów”, „Bez treningu”, „poza planem”) — mniejszy krój, bez ucinania */
+.mt.is-text .stat-v { font-size: var(--fs-xl); white-space: normal; letter-spacing: -.02em; }
+.spark .sp-0 { fill: color-mix(in srgb, var(--text) 9%, transparent); }
+.dz-sum-head { flex-wrap: wrap; }
+.dz-sum-pct { white-space: nowrap; }
+
+/* ---------- Nauka: postęp względem planu (F-N1), mapa wykonania (F-N3), licznik bloku (F-N2) ---------- */
+.cf-progress { --ch: var(--cfa); }
+.cf-prog-head h2 { margin: 0 0 2px; }
+.cf-prog-grid { display: grid; gap: var(--s-5); margin-top: var(--s-3); }
+@media (min-width: 900px) { .cf-prog-grid { grid-template-columns: minmax(0, 1fr) auto; align-items: start; } }
+.cf-prog-chart .chart { width: 100%; height: auto; }
+.cf-heat .heat { max-width: 100%; height: auto; }
+.cf-legend { display: flex; gap: var(--s-4); margin: var(--s-2) 0 0; font-size: var(--fs-xs); color: var(--text-2); }
+.cf-legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: middle; border-radius: 2px; background: var(--ch); }
+.cf-legend .lg-plan::before { background: var(--muted); }
+.cf-legend .lg-today::before { width: 2px; height: 10px; background: var(--text-2); }
+.cf-legend .lg-h0::before { width: 10px; height: 10px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.cf-legend .lg-h4::before { width: 10px; height: 10px; background: var(--ch); }
+.cf-timer { margin: var(--s-2) 0 0; }
+
+/* ---------- Kalendarz: wybrany dzień i podgląd (F-K1) ---------- */
+.kl-day.is-sel { outline: 2px solid var(--accent); outline-offset: -2px; }
+.kl-preview { margin-top: var(--s-4); }
+.kl-p-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
+.kl-p-head h2 { margin: 0; }
+.kl-p-head p { margin: 2px 0 0; }
+.kl-open { display: inline-flex; align-items: center; gap: var(--s-2); }
+.kl-p-facts { list-style: none; margin: var(--s-3) 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); font-size: var(--fs-sm); color: var(--text-2); }
+.kl-p-facts li { display: inline-flex; align-items: center; gap: 6px; }
+.kl-p-facts .ico { color: var(--muted); }
+.kl-p-slots { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; border-top: 1px solid var(--border); padding-top: var(--s-2); }
+.kl-p-slots li { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); gap: var(--s-3); padding: 4px 0; font-size: var(--fs-sm); }
+.kl-p-slots time { color: var(--text-2); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---------- Tydzień: wykonanie planu z dziennika (F-G3) ---------- */
+.wk-exec { display: grid; gap: 4px; margin-top: var(--s-2); padding-top: var(--s-2); border-top: 1px solid var(--border); }
+.wk-exec-t { font-size: var(--fs-xs); color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* ---------- Bezpieczeństwo (V4: ikony zamiast emoji) ---------- */
+.rule-i { color: var(--accent); display: grid; place-items: center; }
+.sf-place { display: inline-flex; align-items: center; gap: 5px; }
+.sf-place .ico, .sf-chip .ico { color: var(--text-2); }
+.sf-chip { display: inline-flex; align-items: center; gap: 4px; }
+.sf-risk { display: flex; align-items: baseline; gap: 6px; }
+.sf-risk .ico { color: var(--warning); flex: none; align-self: center; }
+
+/* pasek górny na węższym komputerze / tablecie poziomo — bez przewijania w poziomie (przegląd 7 szerokości, 1024 px) */
+@media (min-width: 900px) {
+  .topbar > * { flex-shrink: 0; }
+  .topbar .tb-crumb { flex-shrink: 1; min-width: 0; overflow: hidden; }
+}
+@media (min-width: 900px) and (max-width: 1279px) {
+  .topbar { padding-inline: var(--s-6); gap: var(--s-2); }
+  .tb-day span { display: none; }
+  .topbar .gs-open { width: auto; }
+  .topbar .gs-open .gs-kbd { display: none; }
+  .sync-chip { width: 38px; padding: 0; justify-content: center; }
+  .sync-chip span { display: none; }
+}

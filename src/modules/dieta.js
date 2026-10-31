@@ -2,6 +2,7 @@
 // Faza 5 (D-071): następny posiłek z godzin planu dnia, nawigacja po posiłkach, stan składników z modułu Zapasy.
 import { h, add, fmt } from '../ui/dom.js';
 import { segmented } from '../ui/components.js';
+import { donut } from '../ui/charts.js';
 import { icon } from '../ui/icons.js';
 import { dietSummary, phaseDiff, mealTimes, nextMeal } from '../core/calc/diet.js';
 import { stockAt, forecast, statusInfo } from '../core/calc/inventory.js';
@@ -85,7 +86,10 @@ export function renderDieta(root, ctx) {
 
   const aside = h('aside', { class: 'dt-aside', 'aria-label': 'Podsumowanie planu' },
     h('div', { class: 'hero' },
-      h('div', { class: 'hero-kcal' }, h('strong', {}, String(s.total.kcal)), h('span', {}, 'kcal')),
+      h('div', { class: 'dt-kcal-row' }, h('div', { class: 'hero-kcal' }, h('strong', {}, String(s.total.kcal)), h('span', {}, 'kcal')),
+        // F-DI2 (D-113): udział energii z makroskładników (B/W/T, %) — z planu (te same wartości co paski obok)
+        donut([{ value: s.pct.p, cls: 'dn-p' }, { value: s.pct.c, cls: 'dn-c' }, { value: s.pct.f, cls: 'dn-f' }],
+          { label: `Udział energii: białko ${s.pct.p} %, węglowodany ${s.pct.c} %, tłuszcz ${s.pct.f} %`, size: 72, stroke: 9 })),
       h('div', { class: 'hero-macros' }, [
         ['p', 'Białko', s.total.p, s.pct.p], ['c', 'Węglowodany', s.total.c, s.pct.c], ['f', 'Tłuszcz', s.total.f, s.pct.f],
       ].map(([k, label, g, pct]) => h('div', { class: `hm hm--${k}` },

@@ -11,7 +11,8 @@ const SECTIONS = [...new Set(S.rows.map(r => r.section))];
 const SHORT = s => s.split(' — ')[0];
 const EVID = { WYS: ['wysokie', 'ev-hi'], UMI: ['umiarkowane', 'ev-mid'], NIS: ['niskie', 'ev-lo'], PRX: ['przybliżenie', 'ev-px'] };
 const PREP = { '✔': ['nadaje się do meal prepu', 'ok'], '~': ['meal prep z zastrzeżeniami', 'mid'], '✘': ['nie do meal prepu', 'no'] };
-const place = g => /zamraż/.test(g) && !/lodówka/.test(g) ? ['❄️', 'zamrażarka'] : /lodówk/.test(g) ? ['🧊', 'lodówka'] : /szafk|ciemn|chlebak/.test(g) ? ['🗄️', 'szafka'] : /blat/.test(g) ? ['🧺', 'blat'] : /termos/.test(g) ? ['♨️', 'termos'] : ['📍', g];
+// D-113 (V4): ikony Lucide zamiast emoji (miejsce przechowywania i reguły ogólne)
+const place = g => /zamraż/.test(g) && !/lodówka/.test(g) ? ['snowflake', 'zamrażarka'] : /lodówk/.test(g) ? ['refrigerator', 'lodówka'] : /szafk|ciemn|chlebak/.test(g) ? ['archive', 'szafka'] : /blat/.test(g) ? ['package', 'blat'] : /termos/.test(g) ? ['soup', 'termos'] : ['map-pin', g];
 
 // „12 h WYS porcjowany: 2 dni” -> { main: '12 h', ev: 'WYS', rest: 'porcjowany: 2 dni' }
 function splitLimit(txt) {
@@ -33,9 +34,9 @@ export function renderBezpieczenstwo(root, ctx) {
   add(root, h('header', { class: 'sf-head' }, h('h1', {}, 'Bezpieczeństwo żywności'),
     h('div', { class: 'topline' }, h('span', { class: 'date' }, 'Limity przechowywania z poziomem dowodów'))),
     h('div', { class: 'rules' },
-      [['🧊', 'Lodówka', '≤ 4 °C'], ['❄️', 'Zamrażarka', '−18 °C'], ['⏱', 'Poza chłodzeniem', 'maks. 2 h'],
-        ['♨️', 'Odgrzewanie', '70 °C / 2 min lub 75 °C / 30 s'], ['🥡', 'Lunch w termosie', 'prosto z patelni, > 63 °C przy jedzeniu']]
-        .map(([i, t, v]) => h('div', { class: 'rule' }, h('span', { class: 'rule-i', 'aria-hidden': 'true' }, i), h('span', { class: 'rule-t' }, t), h('strong', {}, v)))),
+      [['refrigerator', 'Lodówka', '≤ 4 °C'], ['snowflake', 'Zamrażarka', '−18 °C'], ['alarm-clock', 'Poza chłodzeniem', 'maks. 2 h'],
+        ['flame', 'Odgrzewanie', '70 °C / 2 min lub 75 °C / 30 s'], ['soup', 'Lunch w termosie', 'prosto z patelni, > 63 °C przy jedzeniu']]
+        .map(([i, t, v]) => h('div', { class: 'rule' }, h('span', { class: 'rule-i', 'aria-hidden': 'true' }, icon(i, { size: 18 })), h('span', { class: 'rule-t' }, t), h('strong', {}, v)))),
     h('div', { class: 'sf-search' },
       h('input', { type: 'search', value: ctx.params.get('q') || '', placeholder: 'Szukaj produktu, miejsca lub ryzyka', 'aria-label': 'Szukaj',
         onchange: e => go({ q: e.target.value, p: '' }) }),
@@ -68,18 +69,18 @@ export function renderBezpieczenstwo(root, ctx) {
         return h('article', { class: `sf-card${r.user_decision ? ' is-decision' : ''}` },
           h('div', { class: 'sf-top' },
             h('div', {}, h('h3', {}, r.Produkt), val(r.Forma) && h('p', { class: 'muted small' }, r.Forma)),
-            h('span', { class: 'sf-place', title: r.Gdzie }, h('span', { 'aria-hidden': 'true' }, pi), pl)),
+            h('span', { class: 'sf-place', title: r.Gdzie }, icon(pi, { size: 14 }), pl)),
           h('div', { class: 'sf-limit' },
             h('span', { class: 'eyebrow' }, 'Limit'),
             h('strong', { class: 'sf-limit-v' }, lim.main),
             lim.ev && h('span', { class: `ev ${EVID[lim.ev][1]}` }, `dowody: ${EVID[lim.ev][0]}`),
             lim.rest && h('span', { class: 'sf-limit-r' }, lim.rest)),
           h('div', { class: 'sf-meta' },
-            val(r['Temp.']) && h('span', { class: 'sf-chip' }, `🌡 ${r['Temp.']}`),
+            val(r['Temp.']) && h('span', { class: 'sf-chip' }, icon('thermometer', { size: 13 }), r['Temp.']),
             prep && h('span', { class: `sf-chip prep-${prep[1]}` }, prep[0]),
             val(r['Próżnia']) && h('span', { class: 'sf-chip' }, `próżnia: ${r['Próżnia']}`)),
           facts.length > 0 && h('dl', { class: 'sf-facts' }, facts.map(([k, v]) => h('div', {}, h('dt', {}, k), h('dd', {}, v)))),
-          val(r['Najważniejsze ryzyko']) && h('p', { class: 'sf-risk' }, h('span', { 'aria-hidden': 'true' }, '⚠️ '), h('strong', {}, 'Ryzyko: '), r['Najważniejsze ryzyko']),
+          val(r['Najważniejsze ryzyko']) && h('p', { class: 'sf-risk' }, icon('triangle-alert', { size: 14 }), h('strong', {}, 'Ryzyko: '), r['Najważniejsze ryzyko']),
           (val(r.Opakowanie) || val(r.Gdzie)) && h('details', { class: 'sf-more' }, h('summary', {}, 'Przechowywanie i opakowanie'),
             val(r.Gdzie) && h('p', {}, h('strong', {}, 'Gdzie: '), r.Gdzie),
             val(r.Opakowanie) && h('p', {}, h('strong', {}, 'Opakowanie: '), r.Opakowanie)),

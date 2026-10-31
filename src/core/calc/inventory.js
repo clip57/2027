@@ -9,7 +9,14 @@ const round = x => Math.round(x * 1e6) / 1e6;
 
 // Pozycje dodane przez użytkownika (zdarzenia cat.upsert) mają własne zużycie dzienne (jak w v31).
 let customDaily = {};
-export function setCustomItems(items = []) { customDaily = Object.fromEntries(items.map(i => [i.id, Number(i.daily_v31) || 0])); }
+export function setCustomItems(items = []) {
+  const next = Object.fromEntries(items.map(i => [i.id, Number(i.daily_v31) || 0]));
+  if (JSON.stringify(next) !== JSON.stringify(customDaily)) { customDaily = next; customVer++; }
+}
+// F-G6 (D-113): pamięć wyników stockInfo — klucz: obiekt `inv` (magazyn tworzy nowy przy każdej zmianie zapasów, P1), wersja
+// pozycji własnych (ich dzienne zużycie), pozycja i data. „Dziś”, „Wymaga uwagi”, Zapasy i Dieta liczyły te same stany kilka razy.
+let customVer = 0;
+const memo = new WeakMap();
 const useFor = (prod, date) => consumptionForDay(date)[prod] ?? customDaily[prod] ?? 0;
 const after = (a, b) => a.date > b.date || (a.date === b.date && a.hlc > b.hlc);
 
@@ -25,6 +32,14 @@ export function baseCount(inv, prod, date) {
 // Wynik: { qty, shortSince (pierwszy dzień obecnego braku albo null), deficit (zużycie wg planu niepokryte od tego dnia) }.
 // Dziennik zdarzeń bez zmian — zmienia się wyłącznie obliczenie.
 export function stockInfo(inv, prod, date) {
+  if (!inv || typeof inv !== 'object') return computeStockInfo(inv, prod, date);
+  let m = memo.get(inv);
+  if (!m) { m = new Map(); memo.set(inv, m); }
+  const k = `${customVer}|${prod}|${date}`;
+  if (!m.has(k)) m.set(k, computeStockInfo(inv, prod, date));
+  return m.get(k);
+}
+function computeStockInfo(inv, prod, date) {
   const base = baseCount(inv, prod, date);
   if (!base) return null; // brak inwentaryzacji = stan nieznany
   const byDay = new Map();
@@ -202,4 +217,18 @@ export function coverage(inv, prods, asOf, forDate) {
     const stock = stockAt(inv, p, asOf);
     return { prod: p, need: round(use[p]), stock, short: stock == null ? null : stock < use[p] - 1e-9 };
   });
+}
+
+// D-113 (F-Z4): historia i prognoza stanu pozycji — ten sam rachunek co stan bieżący (stockInfo, K1: bez wartości ujemnych);
+// daty przyszłe = prognoza wg planu (bez zakupów, których jeszcze nie ma). null dla dni przed pierwszą inwentaryzacją.
+export function stockSeries(inv, prod, from, to) {
+  const out = [];
+  for (let d = from; d <= to; d = addDays(d, 1)) { const s = stockInfo(inv, prod, d); out.push({ date: d, qty: s ? s.qty : null }); }
+  return out;
+}
+// Zużycie wg planu w przedziale dni (włącznie) — np. „ostatnie 14 dni”
+export function usedBetween(prod, from, to) {
+  let n = 0;
+  for (let d = from; d <= to; d = addDays(d, 1)) n += useFor(prod, d);
+  return round(n);
 }

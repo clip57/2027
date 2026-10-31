@@ -1,13 +1,14 @@
-# Przekazanie projektu — stan na 29.09.2026 (po D-097)
+# Przekazanie projektu — stan na 31.10.2026 (po D-113)
 
 Dokument dla kolejnej instancji Claude Code. Zawiera to, czego nie da się wywnioskować z kodu: sposób pracy z użytkownikiem,
 stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność czytania: `CLAUDE.md` → ten plik → `docs/RAPORT_D097.md`
 → `docs/DECYZJE_2027.md` (D-086…D-097) → `docs/REDESIGN-STATUS.md` / `REDESIGN-SPEC.md` / `REDESIGN-DECISIONS.md` / `REDESIGN-TESTING.md`.
 
 ## 1. Gałęzie i publikacja
-- Praca na gałęzi **`redesign-faza4`**. Publikacja = **`git push origin redesign-faza4:main`** (fast-forward; `main` nie ma własnych commitów),
-  workflow „Publikacja 2027” (`.github/workflows/pages.yml`) buduje i publikuje `dist/web` na GitHub Pages.
-- Stan: `redesign-faza4` = `main` = **`b3b4edc`** (D-097 + dokumentacja; wcześniej `14ce874` D-097, `ab4c72d` D-096, `7012ce1` D-095).
+- Historycznie praca na gałęzi `redesign-faza4` (do D-097). Publikacja = fast-forward gałęzi roboczej na `main`
+  (`git push origin <gałąź>:main`), workflow „Publikacja 2027” (`.github/workflows/pages.yml`) buduje i publikuje `dist/web` na GitHub Pages.
+- **Stan 31.10.2026:** praca na gałęzi `claude/eager-newton-j2309e` — D-113 (audyt i System 3.0 „Precision”); publikacja na `main`
+  jednorazowo po całości (decyzja użytkownika).
 - **Stan 24.10.2026:** praca na gałęzi `claude/eager-newton-j2309e`; `main` = **`a824797`** (D-107…D-109, publikacja fast-forward
   `git push origin claude/eager-newton-j2309e:main` na polecenie użytkownika). D-110 (System 2.0) i D-111 — opublikowane na `main` 25.10.2026 (fast-forward z gałęzi roboczej).
 - Repozytorium jest **publiczne** — stąd surowe zasady prywatności (CLAUDE.md §3 p. 5, moduł Pielęgnacja).

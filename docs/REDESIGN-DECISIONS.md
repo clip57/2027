@@ -153,6 +153,17 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 - **Arkusz:** przeciąganie w dół za nagłówek albo za treść u góry (zdarzenia dotyku — na iOS zdarzenia wskaźnika przegrywały z przewijaniem).
 - **Zakładka bieżącego modułu** — ponowne dotknięcie przewija na górę (konwencja iOS).
 
+## C13. System 3.0 „Precision” (D-113, 31.10.2026)
+- **Warstwa** `src/ui/precision.css` doklejana po `system.css` (build: tokens → styles → system → precision; CSS minifikowany).
+- **Kolor:** grafitowa paleta zaprojektowana w OKLCH, zapisana w hex (test kontrastu `tokens.test.mjs`); akcent do wyboru w Ustawieniach
+  (indygo domyślnie, turkus, bursztyn — `data-accent` na `<html>`, kontrast każdego wariantu w teście); bez poświaty „aurora” i kart z gradientem.
+- **Typografia:** Inter Display (opsz 32, grubości 500–800, podzbiór `tools/fonts.py` → `inter-display.woff2`) — nagłówki i duże liczby (`--font-display`).
+- **Mniej ramek i plakietek:** metadane nagłówków jako jedna linia z kropkami; plakietki stanu = ikona + słowo (`statusBadge`, `statusInfo.label`), bez emoji.
+- **Liczby z wykresami z prawdziwych danych** (`metric`, `charts.js`: mini-wykres, obszar, pierścień udziałów, mapa ciepła, oś zapasu).
+- **Powłoka:** pasek górny na komputerze (poza `<main>`), strona Ustawienia (`#/ustawienia`, preferencje urządzenia), paleta ⌘K z poleceniami,
+  komunikat z akcją („Cofnij”, 10 s), stan synchronizacji w pasku górnym.
+- **Nowe zapisy tylko przez `setting`** (bez nowych typów zdarzeń): dawki `supp.dose:*`, lista zakupów `zapasy.shop:*` — jeden klucz na pozycję.
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.

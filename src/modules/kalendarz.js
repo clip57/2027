@@ -39,6 +39,8 @@ export function renderKalendarz(root, ctx) {
   const first = `${ym}-01`, days = new Date(Number(ym.slice(0, 4)), Number(ym.slice(5, 7)), 0).getDate();
   const inPlanDays = [...Array(days)].map((_, i) => addDays(first, i)).filter(d => d >= PLAN_START && d <= PLAN_END).length;
   const link = m => `#/kalendarz?m=${m}`;
+  // F-K1 (D-113): wybrany dzień (d) — podgląd pod siatką; domyślnie dziś, gdy jest w wyświetlanym miesiącu
+  const dRaw = ctx.params.get('d'), sel = /^\d{4}-\d{2}-\d{2}$/.test(dRaw || '') && dRaw.startsWith(ym) ? dRaw : today.startsWith(ym) ? today : null;
 
   add(root,
     h('header', { class: 'dz-head kl-head' },
@@ -55,8 +57,8 @@ export function renderKalendarz(root, ctx) {
     const d = addDays(first, i), { r, marks } = dayMarks(d);
     const label = `${r.dayName}, ${longDate(d)}${d === today ? ' (dziś)' : ''}: ${r.outside && !r.zero ? 'poza planem' : marks.map(m => m[1]).join(', ') || 'bez zajęć'}`;
     cells.push(h('li', {}, h('a', {
-      class: `kl-day${d === today ? ' is-today' : ''}${r.outside && !r.zero ? ' is-out' : ''}${marks.some(m => m[0] === 'holiday') ? ' is-holiday' : ''}${marks.some(m => m[0] === 'exam') ? ' is-exam' : ''}${r.zero ? ' is-zero' : ''}`,
-      href: `#/dzis?d=${d}`, 'aria-label': label },
+      class: `kl-day${d === sel ? ' is-sel' : ''}${d === today ? ' is-today' : ''}${r.outside && !r.zero ? ' is-out' : ''}${marks.some(m => m[0] === 'holiday') ? ' is-holiday' : ''}${marks.some(m => m[0] === 'exam') ? ' is-exam' : ''}${r.zero ? ' is-zero' : ''}`,
+      href: `#/kalendarz?m=${ym}&d=${d}`, 'aria-label': label, 'aria-current': d === sel ? 'date' : null },
       h('span', { class: 'kl-n' }, String(i + 1)),
       marks.length > 0 && h('span', { class: 'kl-dots', 'aria-hidden': 'true' }, marks.slice(0, 5).map(([k]) => h('span', { class: `kl-dot k-${k}` }))),
       marks.length > 0 && h('span', { class: 'kl-lines', 'aria-hidden': 'true' }, marks.slice(0, 4).map(([k, t]) => h('span', { class: `kl-l k-${k}` }, t))))));
@@ -66,6 +68,25 @@ export function renderKalendarz(root, ctx) {
       h('h2', { id: 'kl-m-h' }, MONTH(ym)),
       h('ol', { class: 'kl-grid kl-wd', 'aria-hidden': 'true' }, ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'].map(x => h('li', {}, x))),
       h('ol', { class: 'kl-grid', 'aria-label': `Dni: ${MONTH(ym)}` }, cells)),
+    sel && preview(sel, today),
     h('ul', { class: 'kl-legend', 'aria-label': 'Legenda' }, LEGEND.map(([k, t]) => h('li', {}, h('span', { class: `kl-dot k-${k}`, 'aria-hidden': 'true' }), t))),
-    h('p', { class: 'muted kl-hint' }, 'Wybierz dzień, aby otworzyć jego plan w „Dziś”.'));
+    h('p', { class: 'muted kl-hint' }, 'Wybierz dzień, aby zobaczyć podgląd; „Otwórz w Dziś” pokazuje pełny plan dnia.'));
+}
+
+// Podgląd dnia (F-K1): znaczniki, trening, dieta, nauka i punkty planu — z resolvera, bez zapisu
+function preview(d, today) {
+  const { r, marks } = dayMarks(d);
+  const slots = r.outside ? [] : r.slots.filter(x => !x.own);
+  return h('section', { class: 'panel kl-preview', 'aria-labelledby': 'kl-p-h', 'aria-live': 'polite' },
+    h('div', { class: 'kl-p-head' },
+      h('div', {}, h('h2', { id: 'kl-p-h' }, `${r.dayName[0].toUpperCase()}${r.dayName.slice(1)}, ${longDate(d)}`),
+        h('p', { class: 'muted' }, r.outside && !r.zero ? 'Poza planem' : d === today ? 'Dziś' : marks.map(m => m[1]).join(' · ') || 'Bez zajęć')),
+      h('a', { class: 'btn primary kl-open', href: `#/dzis?d=${d}` }, h('span', {}, 'Otwórz w Dziś'), icon('arrow-right', { size: 18 }))),
+    !r.outside && h('ul', { class: 'kl-p-facts' },
+      h('li', {}, icon('dumbbell', { size: 16 }), r.sessionLabel),
+      h('li', {}, icon('utensils', { size: 16 }), r.noDiet ? 'bez diety' : `${r.kcal} kcal (${r.dietVariant})`),
+      r.cfa.blocks.length > 0 && h('li', {}, icon('graduation-cap', { size: 16 }), `CFA: ${r.cfa.blocks.length} ${plural(r.cfa.blocks.length, 'blok', 'bloki', 'bloków')}`),
+      r.mpw.blocks.length > 0 && h('li', {}, icon('landmark', { size: 16 }), `MPW: ${r.mpw.blocks.length} ${plural(r.mpw.blocks.length, 'blok', 'bloki', 'bloków')}`)),
+    slots.length > 0 && h('ol', { class: 'kl-p-slots' }, slots.slice(0, 10).map(x => h('li', {}, h('time', {}, x.from), h('span', {}, x.title)))),
+    slots.length > 10 && h('p', { class: 'muted small' }, `i ${slots.length - 10} innych punktów planu`));
 }

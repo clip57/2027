@@ -2,7 +2,8 @@
 // Jeden kod dla obu planów — różnice (dane, typy zdarzeń, recall, widok „Plan”) opisuje konfiguracja `P` w cfa.js / mpw.js.
 // Daty lokalne (naprawa błędu UTC z v1/v2).
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
-import { segmented, progressRing, section } from '../ui/components.js';
+import { segmented, progressRing, section, timerChip } from '../ui/components.js';
+import { areaChart, heatmap } from '../ui/charts.js';
 import { cfaSourceLine } from '../core/resolver.js';
 import { addDays, diffDays, longDate, shortDate, dayShort, weekday, parse } from '../core/dates.js';
 import { previewEvents, apply } from '../core/sync/bundle.js';
@@ -87,6 +88,8 @@ export function renderStudy(root, ctx, P) {
       h('p', { class: 'cfa-topic' }, b.temat),
       h('p', { class: 'cfa-meta' }, h('span', { class: `mode ${P.modeClass[b.tryb] || ''}` }, b.tryb), h('span', { class: 'muted' }, `${b.godz} · nr ${b.nr}`),
         P.meta?.(b)),
+      // F-N2 (D-113): licznik bloku 53 min przy następnym bloku dnia (stan interfejsu, sygnał na koniec — bez zapisu w dzienniku)
+      next && b.data === today && !done.has(b.nr) && h('p', { class: 'cf-timer' }, timerChip(`study|${P.id}|${b.nr}`, 53, `Blok ${b.blok}: ${b.temat}`, ctx.flash, { startLabel: 'Start 53 min' })),
       // Zadania bloku (MPW: instrukcja wykonania z planu) — zwinięte, bez przerysowania przy odhaczaniu innych bloków; U6: tekst spoza pakietu (`taskOf`)
       P.tasks && P.taskOf(b) && h('details', { class: 'cf-task' }, h('summary', {}, 'Zadania bloku'), h('p', {}, P.taskOf(b)))));
 
@@ -282,7 +285,34 @@ export function renderStudy(root, ctx, P) {
   }
 
   // ---------------- Plan (działy / obszary, mocki / symulacje, statystyki) — zależny od planu
-  if (view === 'plan') P.plan(root, { done, pace, late, rs });
+  if (view === 'plan') { add(root, progressPanel()); P.plan(root, { done, pace, late, rs }); }
+
+  // F-N1 / F-N3 (D-113): postęp względem planu — bloki wykonane (wg dnia bloku w planie) narastająco na tle planu, z kreską „dziś”,
+  // i mapa wykonania dni (tygodnie × dni). Wyłącznie z planu i dziennika postępu.
+  function progressPanel() {
+    const days = [...new Set(D.bloki.map(b => b.data))].sort(), by = new Map(days.map(d => [d, D.bloki.filter(b => b.data === d)]));
+    let cp = 0, cd = 0, mark = null;
+    const planCum = [], doneCum = [];
+    days.forEach((d, i) => { const l = by.get(d); cp += l.length; cd += l.filter(b => done.has(b.nr)).length;
+      planCum.push(cp); doneCum.push(d <= today ? cd : null); if (d <= today) mark = i; });
+    const dueNow = mark == null ? 0 : planCum[mark], doneNow = mark == null ? 0 : doneCum[mark];
+    const mon = d => addDays(d, 1 - weekday(d)), first = mon(days[0]), last = days[days.length - 1];
+    const weeks = [];
+    for (let w = first; w <= last; w = addDays(w, 7)) weeks.push([...Array(7)].map((_, i) => { const d = addDays(w, i), l = by.get(d);
+      if (d < days[0] || d > last) return null;
+      return { date: d, today: d === today, v: !l ? null : d > today ? null : l.filter(b => done.has(b.nr)).length / l.length,
+        title: `${dayShort(d)} ${shortDate(d)}: ${l ? `${l.filter(b => done.has(b.nr)).length} / ${l.length} bloków` : 'bez bloków'}` }; }));
+    return h('section', { class: 'panel cf-progress', 'aria-labelledby': 'cf-prog-h', style: { '--ch': 'var(--cfa)' } },
+      h('div', { class: 'cf-prog-head' }, h('h2', { id: 'cf-prog-h' }, 'Postęp względem planu'),
+        h('p', { class: 'muted' }, mark == null ? `Plan zaczyna się ${dayShort(days[0])} ${shortDate(days[0])}.` : `Do dziś wg planu: ${dueNow} ${plural(dueNow, 'blok', 'bloki', 'bloków')} · wykonane z nich: ${doneNow} (${dueNow ? Math.round((doneNow / dueNow) * 100) : 0}%)`)),
+      h('div', { class: 'cf-prog-grid' },
+        h('div', { class: 'cf-prog-chart' }, areaChart(days.map(d => `${dayShort(d)} ${shortDate(d)}`), [{ values: planCum, cls: 'is-plan', fill: false }, { values: doneCum }],
+          { title: `Bloki narastająco: plan ${D.bloki.length}, do dziś wg planu ${dueNow}, wykonane z nich ${doneNow}`, height: 150, max: D.bloki.length, mark: mark ?? -1 }),
+          h('p', { class: 'cf-legend' }, h('span', { class: 'lg-done' }, 'wykonane'), h('span', { class: 'lg-plan' }, 'plan'), mark != null && h('span', { class: 'lg-today' }, 'dziś'))),
+        h('div', { class: 'cf-heat' }, h('p', { class: 'muted small' }, 'Wykonanie dni'),
+          heatmap(weeks, { label: `Wykonanie bloków w dniach planu: ${weeks.flat().filter(c => c?.v === 1).length} dni w całości` }),
+          h('p', { class: 'cf-legend' }, h('span', { class: 'lg-h0' }, '0%'), h('span', { class: 'lg-h4' }, '100%')))));
+  }
 }
 
 // Wiersz statystyk trybów — wspólny dla obu planów

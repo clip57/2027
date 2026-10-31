@@ -1,6 +1,7 @@
 // Wspólne komponenty interfejsu. Bez innerHTML, z obsługą klawiatury i czytników ekranu.
 import { h, clear } from './dom.js';
 import { icon } from './icons.js';
+import { startCountdown, stopCountdown, countdown } from './signal.js';
 
 // Przełącznik segmentowy (faza, wariant, dzień). options: [{value, label, hint}]
 export function segmented(label, options, value, onChange) {
@@ -112,10 +113,39 @@ export function metric({ label, ic, value, unit, hint, chart, href, tone, cls = 
   const body = [h('span', { class: 'stat-l' }, ic && icon(ic, { size: 14 }), label),
     h('strong', { class: 'stat-v' }, value, unit && h('span', { class: 'unit' }, ` ${unit}`)),
     hint && h('span', { class: 'stat-h' }, hint), chart && h('span', { class: 'mt-chart' }, chart)];
-  const attrs = { class: `stat mt ${tone ? `is-${tone}` : ''} ${cls}`.trim(), style: dom ? { '--dc': `var(--${dom})` } : null };
+  const isText = typeof value === 'string' && !/^[\d−-]/.test(value.trim());   // słowo zamiast liczby — mniejszy krój (bez ucinania)
+  const attrs = { class: `stat mt${isText ? ' is-text' : ''} ${tone ? `is-${tone}` : ''} ${cls}`.replace(/\s+/g, ' ').trim(), style: dom ? { '--dc': `var(--${dom})` } : null };
   return href ? h('a', { ...attrs, href, class: `${attrs.class} mt-link` }, ...body) : h('div', attrs, ...body);
 }
 
 // Plakietka statusu: ikona + słowo (bez emoji). code: CRITICAL / WARNING / OK / UNKNOWN / UNTRACKED (jak statusInfo w Zapasach)
 const STATUS_IC = { CRITICAL: 'triangle-alert', WARNING: 'clock', OK: 'circle-check', UNKNOWN: 'info', UNTRACKED: 'minus' };
 export const statusBadge = (code, text, extra = {}) => h('span', { class: `sb sb-${code}`, ...extra }, icon(STATUS_IC[code] || 'info', { size: 13 }), h('span', {}, text));
+
+// Minutnik (D5 / F-N2, D-113): odliczanie globalne (`startCountdown`) — działa i daje sygnał także po zmianie widoku; widżet tylko
+// pokazuje stan i przestaje się odświeżać, gdy zniknie z DOM. Czas od znacznika końca (poprawny po wygaszeniu ekranu).
+const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+export function timerChip(key, minutes, label, flash, { startLabel = 'Start' } = {}) {
+  const out = h('span', { class: 'timer-v' });
+  const btn = h('button', { class: 'timer-b', 'aria-label': `Minutnik ${minutes} min: ${label}` });
+  const wrap = h('span', { class: 'timer', title: label }, out, btn);
+  let id = null;
+  const show = () => {
+    const c = countdown(key);
+    out.textContent = !c ? mmss(minutes * 60) : c.done ? 'gotowe' : mmss(c.left);
+    btn.textContent = c && !c.done ? 'Stop' : startLabel;
+    wrap.classList.toggle('is-run', !!c && !c.done);
+    wrap.classList.toggle('is-done', !!c?.done);
+    if ((!c || c.done) && id) { clearInterval(id); id = null; }
+  };
+  const loop = () => { if (!id) id = setInterval(() => (wrap.isConnected ? show() : (clearInterval(id), id = null)), 1000); };
+  btn.onclick = () => {
+    const c = countdown(key);
+    if (c && !c.done) stopCountdown(key);
+    else { startCountdown(key, minutes * 60, label, l => flash?.(`Minutnik: ${l} — czas minął.`, 'info')); loop(); }
+    show();
+  };
+  show();
+  if (countdown(key) && !countdown(key).done) loop();
+  return wrap;
+}

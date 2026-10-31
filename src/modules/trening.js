@@ -6,7 +6,7 @@ import { progressRing, segmented, section, statGrid, stat, sheet } from '../ui/c
 import { signal, unlockAudio } from '../ui/signal.js';
 import { icon } from '../ui/icons.js';
 import { movementPlayer } from '../ui/movement.js';
-import { barChart, lineChart } from '../ui/charts.js';
+import { barChart, lineChart, sparkline } from '../ui/charts.js';
 import { sessions, weekly, muscleSets, exerciseHistory, records, streakWeeks, weekStart, restSeconds, nextSet, TRAIN_FROM } from '../core/calc/training.js';
 import { bodyMap, MUSCLE_PL } from '../ui/bodymap.js';
 import { SRC } from '../core/data.js';
@@ -177,6 +177,7 @@ function renderSession(root, ctx) {
     try {
       await store.record('train.set', { date, ex, set, done: cur.done, kg: cur.kg ?? null, reps: cur.reps ?? null, rir: cur.rir ?? null, ...patch });
       if (rerender === 'point') refresh(ex); else if (rerender) ctx.rerender();
+      else if ('kg' in patch || 'reps' in patch) progressOnly(ex);   // F-T2: tylko linia postępu (fokus w polu zostaje)
     } catch (e) { clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
   };
   const exercises = T.days[key] || [];
@@ -319,11 +320,31 @@ function renderSession(root, ctx) {
           e.note_html && h('p', { class: 'ex-note' }, strip(e.note_html)),
           last && h('p', { class: 'ex-last' }, `Ostatnio (${last.date.slice(8)}.${last.date.slice(5, 7)}): `,
             last.sets.map(x => `${x.kg ?? '–'} kg × ${x.reps ?? '–'}`).join(' · ')),
+          exProgress(e.name),
           h('button', { class: 'ex-tech', onclick: () => techniqueDialog(e.name) }, 'Technika i mięśnie')),
         M[e.name] && h('button', { class: 'ex-map', onclick: () => techniqueDialog(e.name), 'aria-label': `Mapa mięśni: ${e.name}` }, bodyMap(M[e.name], { size: 'sm' }))),
       n === 0 ? optionalSets(e) :
         h('div', { class: 'sets' }, h('div', { class: 'set set-h' }, h('span', {}, 'Seria'), h('span', {}, 'kg'), h('span', {}, 'powt.'), h('span', {}, 'RIR'), h('span', {})), sets));
   };
+  // F-T2 (D-113): postęp ćwiczenia w sesji — szacowany 1RM (Epley) z ostatnich 8 sesji do tego dnia i wyróżnienie rekordu po zapisie serii
+  function exProgress(name) {
+    const hist = exerciseHistory(store?.state?.train || {}, name).filter(x => x.date <= date && x.bestE1rm > 0).slice(-8);
+    if (!hist.length) return null;
+    const today = hist.find(x => x.date === date), prev = hist.filter(x => x.date < date);
+    const prevBest = prev.length ? Math.max(...prev.map(x => x.bestE1rm)) : 0;
+    const pr = today && prevBest > 0 && today.bestE1rm > prevBest;
+    const best = hist.reduce((a, x) => (x.bestE1rm > a.bestE1rm ? x : a), hist[0]);
+    return h('div', { class: `ex-prog${pr ? ' is-pr' : ''}`, style: { '--dc': 'var(--train)' } },
+      hist.length > 1 && sparkline(hist.map(x => x.bestE1rm), { kind: 'line', w: 96, h: 28,
+        label: `Szacowany 1RM w ostatnich ${hist.length} sesjach: ${hist.map(x => `${x.date.slice(8)}.${x.date.slice(5, 7)} ${fmt(x.bestE1rm, 1)} kg`).join(', ')}` }),
+      h('span', { class: 'ex-prog-t' }, pr ? [icon('sparkles', { size: 14 }), `Rekord: szac. 1RM ${fmt(today.bestE1rm, 1)} kg (było ${fmt(prevBest, 1)} kg)`]
+        : `Szac. 1RM: ${today ? `dziś ${fmt(today.bestE1rm, 1)} kg · ` : ''}najlepszy ${fmt(best.bestE1rm, 1)} kg (${best.date.slice(8)}.${best.date.slice(5, 7)})`));
+  }
+  function progressOnly(exId) {
+    const a = arts.get(exId); if (!a) return;
+    const old = a.el.querySelector('.ex-prog'), nw = exProgress(a.x.e.name);
+    if (old && nw) old.replaceWith(nw); else if (old) old.remove(); else if (nw) a.el.querySelector('.ex-tech')?.before(nw);
+  }
   const arts = new Map();
   add(root, h('div', { class: 'ex-list' }, plan.map((x, idx) => { const el = article(x, idx); arts.set(x.e.id, { el, x, idx }); return el; })));
   const restBox = region(() => (rest?.date === date ? restBar() : null));

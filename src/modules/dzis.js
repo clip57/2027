@@ -16,6 +16,7 @@ import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } f
 import { sessions, weekStart } from '../core/calc/training.js';
 import { careModel, stepsFor, progress, slotProgress, placeSlotProgress, slotDefs } from '../core/calc/care.js';
 import { mpwDaySpan } from '../core/calc/mpw.js';
+import { doseKey, doseDone } from '../core/calc/checks.js';
 import { byId, isTab } from './registry.js';
 
 const suppName = id => SRC.supplements.supplements[id]?.name || id;
@@ -72,9 +73,14 @@ function slotView(s, now, care) {
         icon('sparkles', { size: 14 }), h('span', {}, `Pielęgnacja ${care[s.id].done} / ${care[s.id].total}`)),
       s.doses.length > 0 && h('div', { class: 'slot-supps' },
         h('p', { class: 'supps-h' }, 'Suplementy'),
-        h('ul', {}, s.doses.map(d => h('li', {}, h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp)), h('span', { class: 'sd' }, d.label),
+        h('ul', {}, s.doses.map(d => h('li', { class: doseCtx?.done(d) ? 'is-taken' : null }, doseCtx && doseBtn(d), h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp)), h('span', { class: 'sd' }, d.label),
           d.note && h('span', { class: 'muted' }, ` · ${d.note}`)))))));
 }
+// F-D4 (D-113): odhaczanie dawek w planie dnia (ten sam zapis `setting` co w Suplementacji); kontekst ustawiany przy renderze „Dziś”
+let doseCtx = null;
+const doseBtn = d => { const on = doseCtx.done(d);
+  return h('button', { class: 'set-toggle dose-ck', 'aria-pressed': String(on), 'aria-label': `${suppName(d.supp)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
+    onclick: () => doseCtx.mark(d, !on) }, on ? '✓' : ''); };
 
 // ---- Dane dashboardu — wyłącznie z resolvera i dziennika zdarzeń (bez metryk fikcyjnych) ----
 function dayData(r, date, store, today) {
@@ -173,10 +179,12 @@ function attentionCard(ctx) {
     list, empty);
   // Każdy sygnał jako kafelek-odnośnik: ikona w kolorze poziomu, tekst, strzałka; nagłówek z licznikiem (I2, nowy wygląd — D-097)
   const put = items => {
-    for (const x of items) list.append(h('li', { class: `at-${x.level}` },
-      h('a', { class: 'dz-at-item', href: x.href },
-        h('span', { class: 'dz-at-ic' }, icon(x.level === 'warn' ? 'triangle-alert' : 'info', { size: 16 })),
-        h('span', { class: 'dz-at-t' }, x.text), icon('chevron-right', { size: 16, cls: 'dz-at-go' }))));
+    for (const x of items) { const act = ATTN_ACT[x.id?.startsWith('end-') ? 'end' : x.id]?.(ctx);
+      list.append(h('li', { class: `at-${x.level}${act ? ' has-act' : ''}` },
+        h('a', { class: 'dz-at-item', href: x.href },
+          h('span', { class: 'dz-at-ic' }, icon(x.level === 'warn' ? 'triangle-alert' : 'info', { size: 16 })),
+          h('span', { class: 'dz-at-t' }, x.text), icon('chevron-right', { size: 16, cls: 'dz-at-go' })),
+        act && h('a', { class: 'btn dz-at-act', href: act.href, 'aria-label': act.label, title: act.label }, icon(act.ic, { size: 16 }), h('span', {}, act.label)))); }
     const n = list.childElementCount, w = list.querySelectorAll('.at-warn').length;
     empty.hidden = n > 0; count.hidden = n === 0; count.textContent = String(n);
     sub.textContent = n ? (w ? `${w} ${plural(w, 'pilna sprawa', 'pilne sprawy', 'pilnych spraw')}${n > w ? ` · ${n - w} ${plural(n - w, 'informacja', 'informacje', 'informacji')}` : ''}` : `${n} ${plural(n, 'informacja', 'informacje', 'informacji')}`) : 'Przegląd sygnałów z modułów';
@@ -198,13 +206,51 @@ function attentionCard(ctx) {
   return box;
 }
 
+// F-D2 (D-113): akcja w miejscu dla sygnału — od razu do czynności (tryb zakupów, dzisiejsze bloki), obok przejścia do modułu
+const ATTN_ACT = {
+  shop: () => ({ label: 'Tryb zakupów', ic: 'shopping-cart', href: '#/zapasy?a=zakupy' }),
+  cfa: ctx => ({ label: 'Bloki dziś', ic: 'graduation-cap', href: `#/cfa?v=dzien&d=${ctx.today}` }),
+  mpw: ctx => ({ label: 'Bloki dziś', ic: 'landmark', href: `#/mpw?v=dzien&d=${ctx.today}` }),
+  recall: ctx => ({ label: 'Recall dziś', ic: 'check', href: `#/cfa?v=dzien&d=${ctx.today}` }),
+};
+
+// F-D3 (D-113): podsumowanie dnia — wieczorem (od 20:00) i dla dni minionych; wyłącznie z dziennika i planu dnia
+function daySummary(rows) {
+  const list = rows.filter(r => r && r.total > 0);
+  if (!list.length) return null;
+  const all = list.reduce((a, r) => a + r.done, 0), tot = list.reduce((a, r) => a + r.total, 0);
+  return h('section', { class: 'dz-summary', 'aria-labelledby': 'dz-sum-h' },
+    h('div', { class: 'dz-sum-head' }, h('h2', { id: 'dz-sum-h' }, 'Podsumowanie dnia'),
+      h('span', { class: 'dz-sum-pct' }, `${Math.round((all / tot) * 100)}%`, h('span', { class: 'muted' }, ` planu (${all} / ${tot})`))),
+    h('ul', { class: 'dz-sum-list' }, list.map(r => h('li', { style: { '--dc': `var(--${r.dom})` } },
+      h('span', { class: 'dz-sum-l' }, icon(r.ic, { size: 14 }), r.label),
+      h('strong', {}, `${r.done} / ${r.total}`),
+      h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${Math.min(100, (r.done / r.total) * 100)}%`, background: `var(--${r.dom})` } }))))));
+}
+
 // Tydzień (I3): 7 dni z resolvera — trening, sauna, dieta, bloki CFA, recall, zakupy, wyjątki. Komputer: 7 kolumn; telefon: lista.
+// F-G3 (D-113): wykonanie planu dnia z dziennika — serie, bloki CFA / MPW, dawki (tylko dni do dziś)
+function dayExec(st, d) {
+  const r = resolveDay(d);
+  if (r.outside) return null;
+  const sets = (r.training || []).reduce((a, e) => a + e.seriesToday, 0);
+  const setsDone = (r.training || []).reduce((a, e) => a + [...Array(e.seriesToday)].filter((_, i) => st?.train?.[`${d}|${e.id}|${i + 1}`]?.done).length, 0);
+  const doses = r.slots.flatMap(x => x.doses);
+  const rows = [['Serie', setsDone, sets], ['CFA', r.cfa.blocks.filter(b => st?.cfaDone?.has(b.nr)).length, r.cfa.blocks.length],
+    ['MPW', r.mpw.blocks.filter(b => st?.mpwDone?.has(b.nr)).length, r.mpw.blocks.length],
+    ['Dawki', doses.filter(x => doseDone(st?.settings, d, x)).length, doses.length]].filter(x => x[2] > 0);
+  return { rows, done: rows.reduce((a, x) => a + x[1], 0), total: rows.reduce((a, x) => a + x[2], 0) };
+}
+
 function renderWeek(root, ctx, date) {
   const week = weekSummary(date), mon = mondayOf(date), sun = addDays(mon, 6);
+  const st = ctx.store?.state, ex = Object.fromEntries(week.filter(x => x.date <= ctx.today).map(x => [x.date, dayExec(st, x.date)]));
+  const exAll = Object.values(ex).filter(Boolean), wDone = exAll.reduce((a, x) => a + x.done, 0), wTot = exAll.reduce((a, x) => a + x.total, 0);
   const wlink = d => `#/dzis?v=tydzien&d=${d}`;
   add(root, h('header', { class: 'dz-head' },
     h('div', {}, h('h1', {}, 'Tydzień'),
-      h('div', { class: 'topline' }, h('span', { class: 'date' }, `${shortDate(mon)} – ${longDate(sun)}`))),
+      h('div', { class: 'topline' }, h('span', { class: 'date' }, `${shortDate(mon)} – ${longDate(sun)}`),
+        wTot > 0 && h('span', { class: 'chip wk-exec-sum' }, `wykonanie planu do dziś: ${Math.round((wDone / wTot) * 100)}% (${wDone} / ${wTot})`))),
     h('div', { class: 'row daynav' },
       mondayOf(PLAN_START) < mon && h('a', { class: 'btn dz-nav', href: wlink(addDays(mon, -7)), 'aria-label': 'Poprzedni tydzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni tydzień')),
       h('a', { class: 'btn dz-nav', href: `#/dzis${date === ctx.today ? '' : `?d=${date < PLAN_START ? PLAN_START : date}`}` }, 'Dzień'),
@@ -223,7 +269,10 @@ function renderWeek(root, ctx, date) {
             : `MPW: ${x.mpw} ${plural(x.mpw, 'blok', 'bloki', 'bloków')} · ${x.mpwSpan.all.from}`),
           x.shopping && h('span', { class: 'wk-l' }, icon('shopping-cart', { size: 14 }), `Zakupy ${x.shopping}`),
           x.phase != null && x.date === mon && h('span', { class: 'wk-l muted' }, `Faza ${x.phase}`),
-          x.note && h('span', { class: 'wk-note' }, x.note)])))));
+          x.note && h('span', { class: 'wk-note' }, x.note),
+          ex[x.date]?.total > 0 && h('span', { class: 'wk-exec', role: 'img', 'aria-label': `Wykonanie: ${ex[x.date].rows.map(([l, a2, t]) => `${l} ${a2} z ${t}`).join(', ')}` },
+            h('span', { class: 'dz-bar' }, h('span', { style: { width: `${Math.round((ex[x.date].done / ex[x.date].total) * 100)}%`, background: 'var(--success)' } })),
+            h('span', { class: 'wk-exec-t' }, ex[x.date].rows.map(([l, a2, t]) => `${l} ${a2}/${t}`).join(' · ')))])))));
 }
 
 export function renderDzis(root, ctx) {
@@ -261,6 +310,10 @@ export function renderDzis(root, ctx) {
   const mpwNow = isTab(byId.mpw, date), MD = SRC.mpw.D;
   const slotIdx = now?.current ? r.slots.indexOf(now.current) : -1;
   const allDoses = r.slots.flatMap(s => s.doses);
+  const dset = ctx.store?.state?.settings || {};
+  doseCtx = ctx.store && date <= ctx.today && allDoses.length ? { done: d => doseDone(dset, date, d),
+    mark: async (d, v) => { try { await ctx.store.record('setting', { key: doseKey(date, d), value: v }); ctx.rerender(); } catch (e) { ctx.flash(e.message || String(e)); } } } : null;
+  const taken = doseCtx ? allDoses.filter(d => doseCtx.done(d)).length : 0;
   const nextDose = () => allDoses.find(x => x.time >= hhmm);
   // Kafel KPI (D-110): ikona i pasek w kolorze domeny, liczba z jednostką pomniejszoną (tekst kafla bez zmian — „0 / 11 bloków”)
   // D-113: kafel KPI = metric() — liczba krojem Display, jednostka pomniejszona, podpis i mini-wykres z prawdziwych danych (klasy kafli bez zmian)
@@ -339,7 +392,9 @@ export function renderDzis(root, ctx) {
       h('aside', { class: 'dz-aside', 'aria-label': 'Podsumowanie dnia' },
         // Tylko podsumowanie (liczba dawek, następna pora) — nazwy dawek są w planie dnia; bez dublowania (D-041)
         card('Suplementy', 'pill', `#/suplementy?d=${date}`,
-          h('div', { class: 'dz-prog' }, h('strong', {}, String(allDoses.length)), h('span', { class: 'muted' }, `${plural(allDoses.length, 'dawka', 'dawki', 'dawek')} w ${new Set(allDoses.map(x => x.time)).size} porach`)),
+          doseCtx ? [h('div', { class: 'dz-prog' }, h('strong', {}, `${taken} / ${allDoses.length}`), h('span', { class: 'muted' }, `${plural(allDoses.length, 'dawka', 'dawki', 'dawek')} przyjęte · ${new Set(allDoses.map(x => x.time)).size} pór`)),
+            bar(taken, allDoses.length, 'diet')]
+            : h('div', { class: 'dz-prog' }, h('strong', {}, String(allDoses.length)), h('span', { class: 'muted' }, `${plural(allDoses.length, 'dawka', 'dawki', 'dawek')} w ${new Set(allDoses.map(x => x.time)).size} porach`)),
           suppFoot.el),
         careP && card('Pielęgnacja', 'sparkles', `#/pielegnacja?d=${date}`,
           h('div', { class: 'dz-prog' }, h('strong', {}, `${careP.done} / ${careP.total}`), h('span', { class: 'muted' }, 'kroków dziś')), bar(careP.done, careP.total, 'care')),
@@ -357,6 +412,13 @@ export function renderDzis(root, ctx) {
           bar(D.cfaAll, SRC.cfa.D.bloki.length, 'cfa')),
         card('Aktywność treningowa', 'dumbbell', '#/trening?v=stat', activityGrid(ctx.store, ctx.today))),
       r.mpw.blocks.length > 0 && mpwCard(r, ctx),
+      (date < ctx.today || (date === ctx.today && new Date().getHours() >= 20)) && daySummary([
+        { label: 'Serie', ic: 'dumbbell', dom: 'train', done: D.done, total: D.planned },
+        { label: 'Bloki CFA', ic: 'graduation-cap', dom: 'cfa', done: D.cfaToday, total: r.cfa.blocks.length },
+        { label: 'Bloki MPW', ic: 'landmark', dom: 'cfa', done: D.mpwToday, total: r.mpw.blocks.length },
+        doseCtx && { label: 'Dawki', ic: 'pill', dom: 'diet', done: taken, total: allDoses.length },
+        careP && { label: 'Pielęgnacja', ic: 'sparkles', dom: 'care', done: careP.done, total: careP.total },
+        { label: 'Meal prep', ic: 'chef-hat', dom: 'prep', done: D.prepDone, total: D.prepTotal }]),
       h('section', { class: 'dz-plan', 'aria-labelledby': 'dz-plan-h' },
         h('h2', { id: 'dz-plan-h', class: 'dz-plan-h' }, 'Plan dnia'),
         // U-a: w dniu bieżącym minione punkty planu zwinięte (plan zaczyna się od „teraz”); rozwinięcie pamiętane do przeładowania

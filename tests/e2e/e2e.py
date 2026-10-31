@@ -1,6 +1,6 @@
 """Testy E2E (Chromium, Playwright): oba warianty budowy, iPhone 390×844 i komputer 1280×800.
 Uruchomienie: python3 tests/e2e/e2e.py  (wymaga dist/ oraz opcjonalnie SOURCES_DIR z kopią ZAPASY)."""
-import asyncio, json, os, sys, time, threading, http.server, functools, tempfile, pathlib
+import asyncio, re, json, os, sys, time, threading, http.server, functools, tempfile, pathlib
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures
@@ -380,7 +380,11 @@ async def run_variant(pw, name, url, mobile):
     ok(await pg.locator('.dose-list').count() == 0, f'{tag} Suplementacja: dni przed startem planu bez dawek (D-103c)')
     await pg.goto(url + '#/kalendarz?m=2026-10'); await pg.wait_for_selector('.kl-day')
     ok(await pg.locator('.kl-day').count() == 31 and await pg.locator('.kl-day.is-today').count() == (1 if TODAY().strftime('%Y-%m') == '2026-10' else 0), f'{tag} Kalendarz: październik — 31 dni')
-    await pg.locator('a.kl-day[href="#/dzis?d=2026-10-18"]').click(); await pg.wait_for_selector('.dz-plan-h')
+    # F-K1 (D-113): klik dnia — podgląd pod siatką (bez przechodzenia); „Otwórz w Dziś” — pełny plan dnia
+    await pg.locator('a.kl-day[href="#/kalendarz?m=2026-10&d=2026-10-18"]').click(); await pg.wait_for_selector('.kl-preview')
+    pv = await pg.inner_text('.kl-preview')
+    ok('18 października 2026' in pv and await pg.locator('.kl-p-slots li').count() > 0 and await pg.locator('a.kl-day.is-sel').count() == 1, f'{tag} Kalendarz: podgląd wybranego dnia pod siatką')
+    await pg.locator('.kl-open').click(); await pg.wait_for_selector('.dz-plan-h')
     ok(await pg.evaluate('location.hash') == '#/dzis?d=2026-10-18', f'{tag} Kalendarz: klik dnia otwiera plan od startu (D-103c)')
     if mobile:
         await pg.goto(url + '#/dane'); await pg.wait_for_selector('h1')
@@ -434,6 +438,9 @@ async def run_variant(pw, name, url, mobile):
     await pg.get_by_role('button', name='Zakupy', exact=True).click(); await pg.wait_for_selector('dialog.sheet')
     ok(await pg.locator('dialog .shop-list li').count() > 0, f'{tag} Zapasy: okno planu zakupów z listą')
     await pg.locator('dialog .shop-list input[type=checkbox]').first.check()
+    # D-113: odhaczenie zapisywane w dzienniku (`setting`) — licznik po zapisie, nie natychmiast
+    try: await wait_js(pg, "() => document.querySelector('dialog .prog').textContent.includes('1 / ')", timeout=5000)
+    except TimeoutError: pass
     ok('1 / ' in await pg.inner_text('dialog .prog'), f'{tag} Zapasy: pasek postępu zakupów')
     await pg.locator('dialog .sheet-head button').click()
     await pg.get_by_role('button', name='Kopia', exact=True).click(); await pg.wait_for_selector('dialog.sheet')
@@ -1462,6 +1469,80 @@ async def run_d108(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await ctx.close(); await b.close()
 
+async def run_d113(pw, name, url, mobile):
+    """D-113 (audyt 31.10.2026, System 3.0 „Precision”): Ustawienia i akcent, paleta ⌘K z poleceniami, tryb zakupów z odhaczeniami
+    zapisanymi w dzienniku (`setting`, wspólne dla urządzeń), „Cofnij” w komunikacie, odhaczanie dawek (Suplementacja ↔ Dziś),
+    podgląd dnia w Kalendarzu, postęp nauki względem planu, stan nigdy < 0 w widokach, dostępność nowych widoków."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-113]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 10, 31, 10, 40))
+    syn = fixtures.write(fixtures.synthetic_zapasy(_dt.date(2026, 10, 25))[0], 'zapasy_d113.json')
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('text=Stan zapisu')
+    await pg.set_input_files('input[type=file]', str(syn)); await pg.wait_for_selector('dialog[open]')
+    await pg.click('dialog >> text=Scal dane'); await pg.wait_for_selector('text=Zaimportowano')
+    # Ustawienia: akcent zapisany per urządzenie i stosowany przed pierwszym renderem
+    await pg.goto(url + '#/ustawienia'); await pg.wait_for_selector('.set-sec')
+    await pg.get_by_role('button', name='Bursztyn').click(); await pg.wait_for_timeout(200)
+    await pg.reload(); await pg.wait_for_selector('.set-sec')
+    ok(await pg.evaluate("document.documentElement.dataset.accent") == 'amber' and await pg.evaluate("localStorage.getItem('p2027.accent')") == 'amber',
+       f'{tag} Ustawienia: akcent zapamiętany i stosowany od startu')
+    v = await axe_audit(pg); ok(not v, f'{tag} Ustawienia: dostępność {v[:2]}')
+    await pg.get_by_role('button', name='Indygo').click(); await pg.wait_for_timeout(200)
+    ok(await pg.evaluate("document.documentElement.hasAttribute('data-accent')") is False, f'{tag} Ustawienia: akcent domyślny bez atrybutu')
+    # Zapasy: żadna ilość < 0 (K1), plakietki bez emoji, tryb zakupów
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
+    vals = await pg.eval_on_selector_all('.inv-item input[type=number]', 'e => e.map(x => x.value).filter(v => v !== "")')
+    ok(vals and all(float(v) >= 0 for v in vals), f'{tag} Zapasy: brak stanów ujemnych ({len(vals)} pozycji)')
+    await pg.get_by_role('button', name='Zakupy', exact=True).click(); await pg.wait_for_selector('dialog.shop-dialog')
+    ok(await pg.locator('dialog .shop-group').count() >= 2, f'{tag} Tryb zakupów: lista pogrupowana wg kategorii')
+    cb = pg.locator('dialog .shop-list input[type=checkbox]')
+    await cb.nth(0).check(); await pg.wait_for_timeout(300)
+    await pg.locator('dialog .sheet-head button').click(); await pg.reload(); await pg.wait_for_selector('.inv-item')
+    await pg.get_by_role('button', name='Zakupy', exact=True).click(); await pg.wait_for_selector('dialog.shop-dialog')
+    ok('1 / ' in await pg.inner_text('dialog .prog') and await pg.locator('dialog .shop-list li.is-done').count() == 1, f'{tag} Tryb zakupów: odhaczenie zapisane (po przeładowaniu)')
+    first = (await pg.locator('dialog .shop-list li.is-done .f-n').inner_text()).strip()
+    had = float(re.search(r'masz ([\d,.]+)', await pg.locator('dialog .shop-list li.is-done').inner_text()).group(1).replace(',', '.'))
+    await pg.locator('dialog .shop-list li.is-done .shop-q').fill('7'); await pg.locator('dialog .shop-list li.is-done .shop-q').dispatch_event('change')
+    pg.once('dialog', lambda d: asyncio.ensure_future(d.accept()))
+    await pg.locator('dialog').get_by_role('button', name='Kupione — dodaj do stanu', exact=False).click(); await pg.wait_for_selector('#toast .toast-act')
+    ok('Zaktualizowano stany dla 1 pozycji' in await pg.inner_text('#toast'), f'{tag} Tryb zakupów: „Kupione” dodaje zaznaczone ({first}, 7)')
+    await pg.goto(url + f'#/zapasy?q={first}'); await pg.wait_for_selector('.inv-item')
+    st_after = float(await pg.locator('.inv-item').first.locator('input[type=number]').input_value())
+    # K1: zakup z dzisiejszego dnia pokrywa dzisiejsze zużycie — stan na koniec dnia rośnie, ale o ≤ 7
+    ok(had < st_after <= had + 7, f'{tag} Tryb zakupów: stan po zakupie {had} → {st_after}')
+    await pg.locator('.inv-item .zp-more > summary').first.click(); await pg.wait_for_selector('.zp-hist .chart')
+    ok('Zużycie wg planu' in await pg.inner_text('.zp-hist'), f'{tag} Zapasy: szczegóły — stan w czasie i zużycie')
+    # Suplementacja ↔ Dziś: te same odhaczenia dawek
+    await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list')
+    await pg.locator('.dose-ck').first.click(); await pg.wait_for_selector('.dose-ck[aria-pressed=true]')
+    ok('przyjęte 1 / ' in await pg.inner_text('.sp-taken'), f'{tag} Suplementacja: odhaczenie dawki')
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok(await pg.locator('.slot-supps .dose-ck[aria-pressed=true]').count() == 1 and '1 / ' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: dawka odhaczona w Suplementacji')
+    ok((await pg.inner_text('main')).lower().count('chondroityn') == 2, f'{tag} Dziś: nazwy dawek bez dublowania (D-041)')
+    v = await axe_audit(pg); ok(not v, f'{tag} Dziś: dostępność {v[:2]}')
+    # Kalendarz: podgląd dnia
+    await pg.goto(url + '#/kalendarz'); await pg.wait_for_selector('.kl-preview')
+    ok('Dziś' in await pg.inner_text('.kl-preview') and await pg.locator('.kl-day.is-sel').count() == 1, f'{tag} Kalendarz: podgląd bieżącego dnia')
+    # Nauka: postęp względem planu i mapa wykonania
+    await pg.goto(url + '#/cfa?v=plan'); await pg.wait_for_selector('.cf-progress')
+    ok(await pg.locator('.cf-progress .chart').count() == 1 and await pg.locator('.cf-progress .heat').count() == 1, f'{tag} CFA: wykres postępu i mapa wykonania')
+    await pg.goto(url + '#/cfa?v=dzien'); await pg.wait_for_selector('.cfa-dayhead')
+    ok(await pg.locator('.cf-timer .timer').count() == 1, f'{tag} CFA: licznik 53 min przy następnym bloku')
+    if not mobile:
+        await pg.keyboard.press('Control+k'); await pg.wait_for_selector('dialog.gs-dialog')
+        ok(await pg.locator('.gs-cmd').count() >= 10, f'{tag} ⌘K: lista poleceń przy pustej frazie')
+        await pg.keyboard.type('24.12'); await pg.wait_for_timeout(200); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(400)
+        ok(await pg.evaluate('location.hash') == '#/dzis?d=2026-12-24', f'{tag} ⌘K: data → przejście do dnia')
+        ok(await pg.locator('.topbar .sync-chip').count() == 1 and await pg.locator('.topbar .tb-search').count() == 1, f'{tag} Pasek górny: wyszukiwanie i stan synchronizacji')
+    ok(errs == [], f'{tag} brak błędów JS {errs[:2]}')
+    await b.close()
+
+
 async def run_d110(pw, name, url, mobile):
     """D-110 (System 2.0): „Teraz” z upływem czasu i odliczaniem, oś czasu planu dnia, kolejność kart, poświata w kolorze punktu,
     przewinięcie przy zmianie modułu i „Wstecz”, wejście ekranu, segmenty w jednym wierszu, pasek tytułu i arkusz przeciągany (telefon),
@@ -1600,6 +1681,8 @@ async def main():
         await run_d108(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d110(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d110(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d113(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d113(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')
