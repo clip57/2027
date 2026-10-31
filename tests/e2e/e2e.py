@@ -173,7 +173,7 @@ async def run_variant(pw, name, url, mobile):
     else:
         groups = await pg.eval_on_selector_all('.side .side-gl', 'e => e.map(x => x.textContent.trim())')
         ok(groups == ['Dzień', 'Trening', 'Dieta', 'Nauka', 'System'], f'{tag} Panel: grupy {groups}')
-        ok(await pg.locator('.side .side-a').count() == 13, f'{tag} Panel: 13 modułów (z Kalendarzem D-097)')
+        ok(await pg.locator('.side .side-groups .side-a').count() == 13 and await pg.locator('.side .side-set').count() == 1, f'{tag} Panel: 13 modułów (z Kalendarzem D-097) + Ustawienia (D-113)')
         await pg.get_by_role('button', name='Zwiń panel').click(); await pg.wait_for_timeout(200)
         await pg.reload(); await pg.wait_for_selector('.side')
         ok(await pg.locator('.side.is-min').count() == 1, f'{tag} Panel: zwinięcie zapamiętane')
@@ -426,7 +426,10 @@ async def run_variant(pw, name, url, mobile):
     ok(await pg.locator('.counters .counter').count() == 4 and await pg.locator('.counters .c-shop').count() == 1, f'{tag} Zapasy: liczniki statusów + „Do zakupów” (U-c)')
     tags = await pg.inner_text('.inv')
     ok('ŚWIEŻE (≤7D)' in tags and 'TRWAŁE (>7D)' in tags and 'SUPLEMENT' in tags, f'{tag} Zapasy: klasyfikacja wg terminu przydatności')
-    ok(any(b in tags for b in ['🚨 < 2 dni', '⚠️ Niski (2-3.9d)', '🟢 OK (≥4d)', '⛔ BRAK (0)']), f'{tag} Zapasy: statusy świeżych wg progów 2/4 dni')
+    ok(any(b in tags for b in ['Pilne · < 2 dni', 'Niski · 2–4 dni', 'OK · ≥ 4 dni', 'Brak']), f'{tag} Zapasy: statusy świeżych wg progów 2/4 dni')
+    # D-113: plakietki stanu bez emoji (ikona + słowo); format v31 zostaje w podpowiedzi (title) i w raporcie tekstowym
+    ok(not any(e in tags for e in ['🚨', '⛔', '🟢']) and await pg.locator('.inv-item .sb[title]').count() == await pg.locator('.inv-item').count(),
+       f'{tag} Zapasy: plakietki stanu bez emoji, format v31 w podpowiedzi')
     ok('Wystarczy do:' in tags and ('✓ Wystarczy do zakupów' in tags or 'przed zakupami' in tags), f'{tag} Zapasy: prognoza w formacie v31')
     await pg.get_by_role('button', name='Zakupy', exact=True).click(); await pg.wait_for_selector('dialog.sheet')
     ok(await pg.locator('dialog .shop-list li').count() > 0, f'{tag} Zapasy: okno planu zakupów z listą')
@@ -721,8 +724,12 @@ async def run_audit_fixes(pw, name, url, mobile):
     ok(r and r[0] >= 0 and r[1] <= r[2] and ':' in r[3], f'{tag} Zapasy: potwierdzenie w obszarze komunikatów, w widoku ({r})')
     ok(await pg.evaluate("document.querySelector('main').textContent.includes(document.querySelector('#toast').textContent)") is False,
        f'{tag} komunikat poza przerysowywaną treścią')
+    # D-113 (F-G5): komunikat po zapisie pozycji ma „Cofnij” — zostaje 10 s (bez akcji 6 s)
+    ok(await pg.locator('#toast .toast-act').count() == 1, f'{tag} komunikat z „Cofnij” po zapisie pozycji')
     await pg.clock.fast_forward(7000); await pg.wait_for_timeout(300)
-    ok(await pg.locator('#toast .banner').count() == 0, f'{tag} komunikat znika po 6 s')
+    ok(await pg.locator('#toast .banner').count() == 1, f'{tag} komunikat z akcją widoczny po 7 s')
+    await pg.clock.fast_forward(4000); await pg.wait_for_timeout(300)
+    ok(await pg.locator('#toast .banner').count() == 0, f'{tag} komunikat znika po 10 s')
     await pg.goto(url + '#/trening?d=2026-10-19'); await pg.wait_for_selector('.ex')
     t = pg.locator('.set:not(.set-h) .set-toggle').nth(2)
     host = await t.evaluate("e => e.closest('.ex').id")
@@ -1560,7 +1567,7 @@ async def run_d110(pw, name, url, mobile):
         await pg.get_by_role('button', name='Motyw: Jasny').click()
         ok(await pg.evaluate("localStorage.getItem('p2027.theme')") == 'light', f'{tag} Motyw: wybór zapisany od razu')
         await wait_js(pg, "() => document.documentElement.getAttribute('data-theme') === 'light' && !document.documentElement.classList.contains('vt-theme')", timeout=5000)
-        ok(await pg.evaluate("getComputedStyle(document.body).backgroundColor") == 'rgb(243, 244, 247)', f'{tag} Motyw jasny po odsłonięciu (tło #f3f4f7)')
+        ok(await pg.evaluate("getComputedStyle(document.body).backgroundColor") == 'rgb(245, 247, 250)', f'{tag} Motyw jasny po odsłonięciu (tło #f5f7fa)')
         v = await axe_audit(pg); ok(not v, f'{tag} Dziś jasny: dostępność {v[:2]}')
         await pg.get_by_role('button', name='Motyw: Ciemny').click()
         await wait_js(pg, "() => document.documentElement.getAttribute('data-theme') === 'dark' && !document.documentElement.classList.contains('vt-theme')", timeout=5000)

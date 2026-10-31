@@ -1,7 +1,8 @@
 // Widok „Dziś” (Etap 2+): wynik resolvera czytelnie podzielony na sloty i podpunkty.
 // Suplementy pochodzą wyłącznie z SUPLEMENTACJI (D-001) — tekst źródłowy PLAN_DNIA ich nie powtarza.
 import { h, add, fmt, plural } from '../ui/dom.js';
-import { progressRing } from '../ui/components.js';
+import { progressRing, metric, statusBadge } from '../ui/components.js';
+import { sparkline, donut } from '../ui/charts.js';
 import { region, swap } from '../ui/patch.js';
 import { icon } from '../ui/icons.js';
 import { recallDone } from '../core/calc/recall.js';
@@ -90,11 +91,32 @@ function dayData(r, date, store, today) {
   if (st) {
     const items = [...allItems(), ...(st.catalogUser || [])];
     const rows = items.map(it => { const s = stockAt(st.inv, it.id, today); return { it, st: s, info: statusInfo(it, s, forecast(it.id, s, today)) }; });
-    inv = { critical: rows.filter(x => x.info.code === 'CRITICAL'), known: rows.filter(x => x.st != null).length,
+    inv = { critical: rows.filter(x => x.info.code === 'CRITICAL'), warning: rows.filter(x => x.info.code === 'WARNING').length, ok: rows.filter(x => x.info.code === 'OK').length,
+      known: rows.filter(x => x.st != null).length,
       shop: nextShopping(today, new Date().getHours(), new Date().getMinutes()), toBuy: shoppingList(st.inv, today, items).length };
   }
-  return { planned, done, cfaToday, cfaAll, mpwToday, mpwAll, prepTotal, prepDone, inv };
+  // D-113: mini-wykresy z dziennika — serie wykonane w 14 dniach do `date`; bloki nauki wykonane w 10 ostatnich dniach planu (≤ `date`)
+  const setsByDay = {};
+  for (const [k, v] of Object.entries(st?.train || {})) if (v?.done) { const d = k.slice(0, 10); setsByDay[d] = (setsByDay[d] || 0) + 1; }
+  const trainSpark = [...Array(14)].map((_, i) => { const d = addDays(date, i - 13); return d < PLAN_START ? null : setsByDay[d] || 0; });
+  const studySpark = (D, doneSet) => {
+    const days = [...new Set(D.bloki.map(b => b.data))].filter(d => d <= date).sort().slice(-10);
+    return { days, done: days.map(d => D.bloki.filter(b => b.data === d && doneSet?.has(b.nr)).length), max: Math.max(1, ...days.map(d => D.bloki.filter(b => b.data === d).length)) };
+  };
+  return { planned, done, cfaToday, cfaAll, mpwToday, mpwAll, prepTotal, prepDone, inv, trainSpark,
+    cfaSpark: studySpark(SRC.cfa.D, st?.cfaDone), mpwSpark: studySpark(SRC.mpw.D, st?.mpwDone) };
 }
+
+// D-113: podział stanów Zapasów (pilne / średnie / OK) jako pasek proporcji — z tych samych obliczeń co moduł Zapasy
+const statusStrip = inv => { const c = inv.critical.length, n = Math.max(1, c + inv.warning + inv.ok);
+  return h('span', { class: 'mt-strip', role: 'img', 'aria-label': `Pilne ${c}, średnie ${inv.warning}, OK ${inv.ok}` },
+    [['CRITICAL', c], ['WARNING', inv.warning], ['OK', inv.ok]].filter(([, v]) => v).map(([k, v]) => h('span', { class: `s-${k}`, style: { flexGrow: String(v / n) } }))); };
+
+// D-113: udział energii z makroskładników (4/4/9 kcal) — pierścień i legenda; wartości z planu diety dnia
+const macroMix = t => { const k = [t.p * 4, t.c * 4, t.f * 9], sum = k.reduce((a, b) => a + b, 0) || 1, pc = k.map(v => Math.round((v / sum) * 100));
+  return h('span', { class: 'dz-mix' }, donut([{ value: k[0], cls: 'dn-p' }, { value: k[1], cls: 'dn-c' }, { value: k[2], cls: 'dn-f' }],
+    { label: `Udział energii: białko ${pc[0]} %, węglowodany ${pc[1]} %, tłuszcz ${pc[2]} %`, size: 34, stroke: 6 }),
+    h('span', { class: 'dz-mix-l', 'aria-hidden': 'true' }, [['m-p', 'B', pc[0]], ['m-c', 'W', pc[1]], ['m-f', 'T', pc[2]]].map(([c, l, v]) => h('span', { class: c }, `${l} ${v}%`)))); };
 
 const card = (title, ic, href, ...body) => h('section', { class: 'dz-card' },
   h('div', { class: 'dz-card-h' }, h('span', { class: 'dz-ic' }, icon(ic, { size: 18 })), h('h2', {}, title),
@@ -241,9 +263,9 @@ export function renderDzis(root, ctx) {
   const allDoses = r.slots.flatMap(s => s.doses);
   const nextDose = () => allDoses.find(x => x.time >= hhmm);
   // Kafel KPI (D-110): ikona i pasek w kolorze domeny, liczba z jednostką pomniejszoną (tekst kafla bez zmian — „0 / 11 bloków”)
-  const kpi = (label, ic, dom, value, unit, hint, extra, cls = '') => h('div', { class: `stat dz-kpi ${cls}`, style: { '--dc': `var(--${dom})` } },
-    h('span', { class: 'stat-l' }, icon(ic, { size: 14 }), label), h('strong', { class: 'stat-v' }, value, unit && h('span', { class: 'unit' }, ` ${unit}`)),
-    hint && h('span', { class: 'stat-h' }, hint), extra);
+  // D-113: kafel KPI = metric() — liczba krojem Display, jednostka pomniejszona, podpis i mini-wykres z prawdziwych danych (klasy kafli bez zmian)
+  const kpi = (label, ic, dom, value, unit, hint, extra, cls = '', chart = null, href = null) =>
+    metric({ label, ic, value, unit, hint, chart: chart || extra, dom, cls: `dz-kpi ${cls}`.trim(), href });
   const bar = (v, max, dom) => h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%`, background: `var(--${dom})` } }));
   // Pielęgnacja (D-094): plan z danych użytkownika; bez planu — bez karty i bez znaczników w slotach
   const cm = careModel(ctx.store?.state?.careDefs || []), cDone = ctx.store?.state?.careDone || {};
@@ -300,18 +322,20 @@ export function renderDzis(root, ctx) {
       h('div', { class: 'stats dz-kpis' },
         r.noDiet ? kpi('Dieta', 'utensils', 'diet', 'Bez diety', null, `dieta od ${longDate(DIET_START)}`)
           : kpi('Dieta', 'utensils', 'diet', String(r.kcal), 'kcal', `${r.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'} · B ${fmt(t.p)} / W ${fmt(t.c)} / T ${fmt(t.f)} g`,
-          h('span', { class: 'dz-macro' }, bar(t.p * 4, t.p * 4 + t.c * 4 + t.f * 9, 'p-col'), bar(t.c * 4, t.p * 4 + t.c * 4 + t.f * 9, 'c-col'), bar(t.f * 9, t.p * 4 + t.c * 4 + t.f * 9, 'f-col'))),
+            null, '', macroMix(t),
+            `#/dieta?d=${r.date}`),
         kpi('Trening', 'dumbbell', 'train', D.planned ? `${D.done} / ${D.planned}` : (r.training?.length ? r.sessionLabel : 'Bez treningu'), null,
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
-          D.planned ? bar(D.done, D.planned, 'train') : null),
+          null, '', sparkline(D.trainSpark, { label: `Serie wykonane w ostatnich 14 dniach: ${D.trainSpark.map(v => v ?? 0).reduce((a, b) => a + b, 0)}` }), `#/trening?d=${date}`),
         mpwNow ? kpi('MPW', 'landmark', 'cfa', r.mpw.blocks.length ? `${D.mpwToday} / ${r.mpw.blocks.length}` : r.mpw.inPlan ? 'dzień wolny' : date < MD.stat.start ? `od ${shortDate(MD.stat.start)}` : 'po planie',
           r.mpw.blocks.length ? 'bloków' : null, r.mpw.blocks.length ? mpwHint(r.mpw.blocks) : null,
-          r.mpw.blocks.length ? bar(D.mpwToday, r.mpw.blocks.length, 'cfa') : null) :
+          null, '', D.mpwSpark.days.length ? sparkline(D.mpwSpark.done, { max: D.mpwSpark.max, label: `Bloki MPW wykonane w ostatnich ${D.mpwSpark.days.length} dniach planu` }) : null, `#/mpw?v=dzien&d=${date}`) :
         kpi('CFA', 'graduation-cap', 'cfa', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length}` : 'poza planem', r.cfa.inPlan ? 'bloków' : null,
-          r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null, r.cfa.inPlan ? bar(D.cfaToday, r.cfa.blocks.length, 'cfa') : null),
+          r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null,
+          null, '', D.cfaSpark.days.length ? sparkline(D.cfaSpark.done, { max: D.cfaSpark.max, label: `Bloki CFA wykonane w ostatnich ${D.cfaSpark.days.length} dniach planu` }) : null, `#/cfa?v=dzien&d=${date}`),
         kpi('Zapasy', 'package', 'prep', D.inv ? (D.inv.known ? String(D.inv.critical.length) : 'brak stanów') : '—', D.inv?.known ? plural(D.inv.critical.length, 'pilna', 'pilne', 'pilnych') : null,
           D.inv ? `zakupy ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)} · ${D.inv.toBuy} ${plural(D.inv.toBuy, 'pozycja', 'pozycje', 'pozycji')}` : null, null,
-          D.inv?.critical.length ? 'is-alert' : '')),
+          D.inv?.critical.length ? 'is-alert' : '', D.inv?.known ? statusStrip(D.inv) : null, '#/zapasy')),
       h('aside', { class: 'dz-aside', 'aria-label': 'Podsumowanie dnia' },
         // Tylko podsumowanie (liczba dawek, następna pora) — nazwy dawek są w planie dnia; bez dublowania (D-041)
         card('Suplementy', 'pill', `#/suplementy?d=${date}`,
@@ -322,7 +346,7 @@ export function renderDzis(root, ctx) {
         card('Meal prep', 'chef-hat', '#/mealprep',
           h('div', { class: 'dz-prog' }, h('strong', {}, `${D.prepDone} / ${D.prepTotal}`), h('span', { class: 'muted' }, 'kroków dziś')), bar(D.prepDone, D.prepTotal, 'prep')),
         D.inv && card('Zapasy', 'package', '#/zapasy',
-          D.inv.critical.length ? h('ul', { class: 'dz-list' }, D.inv.critical.slice(0, 4).map(x => h('li', {}, h('span', { class: 'dz-flag' }, icon('triangle-alert', { size: 14 })), h('span', {}, x.it.name), h('span', { class: 'muted' }, x.info.badge))))
+          D.inv.critical.length ? h('ul', { class: 'dz-list' }, D.inv.critical.slice(0, 4).map(x => h('li', {}, h('span', { class: 'dz-flag' }, icon('triangle-alert', { size: 14 })), h('span', {}, x.it.name), statusBadge(x.info.code, x.info.label, { title: x.info.badge }))))
             : h('p', { class: 'muted' }, D.inv.known ? 'Brak pilnych braków.' : 'Wczytaj kopię zapasów w module Dane albo ustaw stany w Zapasach.'),
           h('p', { class: 'dz-foot' }, `Najbliższe zakupy: ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)}`)),
         mpwNow ? card('Plan MPW', 'landmark', '#/mpw?v=plan',

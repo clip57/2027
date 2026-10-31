@@ -5,7 +5,7 @@ import { h, clear, fmt, plural, add, numberOf } from '../ui/dom.js';
 import { stockAt, stockInfo, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation } from '../core/calc/inventory.js';
 import { randomId } from '../core/ids.js';
 import { icon } from '../ui/icons.js';
-import { sheet as dialog } from '../ui/components.js';
+import { sheet as dialog, statusBadge } from '../ui/components.js';
 import { parseReceipt } from '../core/receipt.js';
 import { reduce } from '../core/storage/store.js';
 import { exportBundle, preview, apply } from '../core/sync/bundle.js';
@@ -51,7 +51,10 @@ export function renderZapasy(root, ctx) {
   // Zmiana stanu jednej pozycji (stan, zakup, korekta) — punktowe odświeżanie (P2); pozostałe zapisy — pełne przerysowanie
   const save = async (type, data, text) => {
     try {
-      await store.record(type, data); if (text) ctx.flash(text);
+      await store.record(type, data);
+      // D-113 (F-G5): komunikat z „Cofnij” — cofa dokładnie tę operację (stos operacji B1), także po kolejnych zmianach innych pozycji
+      if (text) { const op = INV_TYPES.includes(type) ? lastOperation(store.allEvents()) : null;
+        ctx.flash(text, 'info', op ? { action: { label: 'Cofnij', aria: 'Cofnij tę zmianę', icon: 'undo-2', run: () => undo(op) } } : undefined); }
       if ((type === 'inv.count' || type === 'inv.move') && data.prod) refresh([data.prod]); else ctx.rerender();
     } catch (e) { err(e); }
   };
@@ -78,7 +81,7 @@ export function renderZapasy(root, ctx) {
     name: (a, b) => a.it.name.localeCompare(b.it.name, 'pl'),
     cat: (a, b) => (a.it.category || '').localeCompare(b.it.category || '', 'pl') || a.it.name.localeCompare(b.it.name, 'pl') };
   // Stan pochodny — zmienne (nie stałe): po punktowym odświeżeniu (P2) przyciski i okna czytają bieżące wartości
-  let rows, list, shopIds, counts, soonest, last, packs, known, byNeed, visible;
+  let rows, list, shopIds, counts, soonest, last, packs, known, byNeed, visible, outNow, oldest;
   const compute = () => {
     rows = items.map(it => {
       const si = stockInfo(store.state.inv, it.id, today), st = si ? si.qty : null;
@@ -90,10 +93,12 @@ export function renderZapasy(root, ctx) {
     list = shoppingList(store.state.inv, today, items);
     shopIds = new Set(list.map(x => x.id));
     counts = rows.reduce((m, r) => ((m[r.status] = (m[r.status] || 0) + 1), m), {});
-    soonest = rows.filter(r => r.fc?.runOut).sort((a, b) => (a.fc.runOut < b.fc.runOut ? -1 : 1))[0];
+    soonest = rows.filter(r => r.fc?.runOut && r.st > 0).sort((a, b) => (a.fc.runOut < b.fc.runOut ? -1 : 1))[0];
     // Ostatnia operacja na zapasach do „Cofnij” (B1): najnowsza niecofnięta; zapis zbiorczy = jedna operacja, same cofnięcia pomijane
     last = lastOperation(store.allEvents());
     packs = list.reduce((n, x) => n + x.packs, 0);
+    const out = rows.filter(r => r.st != null && r.st <= 0 && r.it.tracked !== false);
+    outNow = out.length; oldest = out.filter(r => r.si?.shortSince).sort((a, b) => (a.si.shortSince < b.si.shortSince ? -1 : 1))[0] || out[0];
     known = rows.filter(r => r.st != null && r.it.tracked !== false).length;
     // Kolejność listy zakupów wg pilności (najwcześniejszy brak najpierw) — ta sama lista co w oknie planu zakupów
     const runOut = id => rows.find(r => r.it.id === id)?.fc?.runOut || '9999-12-31';
@@ -120,7 +125,14 @@ export function renderZapasy(root, ctx) {
       h('p', { class: 'zp-legend' },
         [['CRITICAL', 'pilne'], ['WARNING', 'średnie'], ['OK', 'OK'], ['UNKNOWN', 'bez stanu']].filter(([k]) => counts[k]).map(([k, l]) =>
           h('span', {}, h('span', { class: `dot-s s-${k}`, 'aria-hidden': 'true' }), `${counts[k]} ${l}`))),
-      soonest && h('p', { class: 'muted' }, `Najbliższy brak: ${soonest.it.name} (${dayShort(soonest.fc.runOut)} ${shortDate(soonest.fc.runOut)})`))));
+      soonest && h('p', { class: 'muted' }, `Najbliższy brak: ${soonest.it.name} (${dayShort(soonest.fc.runOut)} ${shortDate(soonest.fc.runOut)})`)),
+    // D-113: liczby przeglądu — najbliższe zakupy i braki teraz (stan 0, K1) — z tych samych obliczeń co lista
+    h('div', { class: 'dash-box zp-next' }, h('p', { class: 'dash-l' }, 'Najbliższe zakupy'),
+      h('p', { class: 'dash-v zp-big' }, `${dayShort(shop.date)} ${shortDate(shop.date)}`),
+      h('p', { class: 'muted' }, `${shop.inDays === 0 ? 'dzisiaj' : `za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}`} · ${list.length} ${plural(list.length, 'pozycja', 'pozycje', 'pozycji')} · ${packs} ${plural(packs, 'opakowanie', 'opakowania', 'opakowań')}`)),
+    h('div', { class: `dash-box zp-out${outNow ? ' is-alert' : ''}` }, h('p', { class: 'dash-l' }, 'Brak teraz'),
+      h('p', { class: 'dash-v zp-big' }, String(outNow), h('span', { class: 'unit' }, ` ${plural(outNow, 'pozycja', 'pozycje', 'pozycji')}`)),
+      h('p', { class: 'muted' }, outNow ? (oldest.si?.shortSince ? `najdłużej: ${oldest.it.name} (od ${dayShort(oldest.si.shortSince)} ${shortDate(oldest.si.shortSince)})` : `m.in. ${oldest.it.name}`) : 'wszystkie śledzone pozycje są na stanie'))));
   add(root, dash.el);
 
   // ---------- akcje: zwarta siatka ikon (wszystkie funkcje D-046 bez zmian)
@@ -206,7 +218,7 @@ export function renderZapasy(root, ctx) {
       return h('article', { class: `inv-item st-${r.status}`, id: `zp-${it.id}` },
         h('div', { class: 'inv-head' },
           h('h3', {}, it.name),
-          h('span', { class: `pill pill-${r.status}` }, r.info.badge)),
+          statusBadge(r.status, r.info.label, { class: `pill pill-${r.status} sb sb-${r.status}`, title: r.info.badge })),
         h('p', { class: 'inv-sum' },
           h('span', { class: 'tag' }, it.category === 'Suplementy' ? 'SUPLEMENT' : it.shelfLife === 'short' ? 'ŚWIEŻE (≤7D)' : 'TRWAŁE (>7D)'),
           h('span', { class: 'inv-meta' },
@@ -215,12 +227,12 @@ export function renderZapasy(root, ctx) {
             r.fc?.lastCovered ? `Wystarczy do: ${v31Date(r.fc.lastCovered)}` : r.daily ? 'Wystarczy do: dziś' : 'Nie jest zużywana'),
           r.st != null && it.tracked !== false && r.daily > 0 && h('span', { class: runsOutBeforeShopping || r.st <= 0 ? 'inv-warn' : lowAfter ? 'inv-ok inv-low' : 'inv-ok' },
             (() => {
-              if (r.st <= 0) return `⚠️ Brak na ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')} przed zakupami`;
+              if (r.st <= 0) return [icon('triangle-alert', { size: 14 }), `Brak na ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')} przed zakupami`];
               // B7: status v31 (pilne / średnie) liczony od dziś zostaje (D-046); komunikat mówi wprost, że do zakupów wystarczy,
               // ale zapas jest krótki — zamiast sprzecznego zestawienia „pilne” + „✓ wystarczy”
               if (!runsOutBeforeShopping) return lowAfter ? `✓ Wystarczy do zakupów (${dayShort(shop.date)} ${shortDate(shop.date)}) · zapas ${r.status === 'CRITICAL' ? 'pilny' : 'średni'}${shopIds.has(it.id) ? ' — na liście zakupów' : ''}` : '✓ Wystarczy do zakupów';
               const d = Math.max(1, diffDays(r.fc.runOut, shop.date));
-              return `⚠️ Skończy się ${d}d przed zakupami`;
+              return [icon('triangle-alert', { size: 14 }), `Skończy się ${d} ${plural(d, 'dzień', 'dni', 'dni')} przed zakupami`];
             })())),
         // Pasek zapasu: dni pokrycia na tle 14 dni (suplementy 30) z kreską dnia zakupów
         rw && h('span', { class: 'zp-run', role: 'img', 'aria-label': `Zapas na ${fmt(rw.days, 1)} dnia, zakupy za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}` },
@@ -283,6 +295,14 @@ export function renderZapasy(root, ctx) {
     for (let i = visible.length - 1; i >= 0; i--) { const el = artOf.get(visible[i].it.id); if (el.parentNode !== invList) invList.insertBefore(el, next); next = el; }
     for (const [id, restore] of back) restore(artOf.get(id));
     narrow((document.getElementById('zp-q')?.value || '').trim().toLowerCase());
+  }
+
+  // D-113 (F-G1): polecenie z palety ⌘K — `a=zakupy` otwiera plan zakupów, `a=dodaj` okno nowej pozycji; parametr zdejmowany z adresu
+  const act0 = ctx.params.get('a');
+  if (act0 === 'zakupy' || act0 === 'dodaj') {
+    const p = new URLSearchParams(location.hash.split('?')[1] || ''); p.delete('a');
+    history.replaceState(history.state, '', `#/zapasy${p.toString() ? `?${p}` : ''}`);
+    setTimeout(() => (act0 === 'zakupy' ? shopDialog() : addDialog()), 0);
   }
 
   // ---------- operacje zbiorcze (rzadkie, nieodwracalne bez historii) — zwinięte

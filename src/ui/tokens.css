@@ -11,11 +11,17 @@
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap;
   src: url("fonts/inter-latin-ext.woff2") format("woff2");
   unicode-range: U+0100-0130, U+0132-0148, U+014A-0151, U+0154-017F, U+0218-021B, U+0300-0304, U+0306-0308, U+030A, U+030C, U+0326-0328, U+036F, U+2074, U+2077, U+2079, U+2190, U+2194, U+21A9, U+2248, U+2260, U+2264-2265, U+2318, U+25B6, U+2713; }
+/* Inter Display (opsz 32, D-113): nagłówki i duże liczby; znaki spoza podzbioru — z rodziny „Inter” (stos --font-display) */
+@font-face { font-family: "Inter Display"; font-style: normal; font-weight: 500 800; font-display: swap;
+  src: url("fonts/inter-display.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0-00AC, U+00AE-00FF, U+0104-0107, U+0118-0119, U+0141-0144, U+015A-015B, U+0179-017C, U+2013-2014, U+2018-2019, U+201C-201E, U+2022, U+2026, U+2191-2193, U+2212; }
 
 :root {
   /* Typografia (Inter lokalnie, podzbiór znaków aplikacji; awaryjnie font systemowy) */
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-round: var(--font);
+  --font-display: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI", Roboto, sans-serif;   /* D-113: nagłówki i duże liczby */
+  --fs-num: 2.25rem; --fs-hero: 3rem;   /* D-113: liczba w kafelku / liczba-bohater */
   --fs-2xs: .75rem;   /* U-e: min. 12 px (było 11 px) */ --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.75rem; --fs-stat: 1.5rem;
   --fs-display: clamp(1.875rem, 1.35rem + 1.5vw, 2.375rem);   /* tytuł strony (h1) */
   --track-tight: -.025em; --track-num: -.035em; --track-caps: .08em;   /* nagłówki / duże liczby / etykiety wersalikami */
@@ -35,69 +41,78 @@
 
   /* ---- Motyw jasny ---- */
   color-scheme: light;
-  --bg: #f3f4f7; --surface: #ffffff; --surface-2: #ffffff; --sunken: #eceef3;
-  --text: #12141a; --text-2: #454b57; --muted: #626977;
-  --border: #e2e5eb; --border-strong: #8a909c;
-  --accent: #4845d2; --accent-ink: #ffffff; --accent-soft: #ebebfb; --accent-hi: #5d5ae6;
-  --success: #11632f; --warning: #8a4204; --danger: #9b1c16; --info: #4845d2;
+  --bg: #f5f7fa; --surface: #ffffff; --surface-2: #ffffff; --sunken: #eff1f5;
+  --text: #14171d; --text-2: #4c5058; --muted: #656971;
+  --border: #e2e4e8; --border-strong: #888c94;
+  --accent: #484dd2; --accent-ink: #ffffff; --accent-soft: #eaefff; --accent-hi: #5760e7;
+  --success: #0f6a31; --warning: #834600; --danger: #b02a2d; --info: #484dd2;
   --on-success: #ffffff;                                   /* tekst/ikona na wypełnieniu --success (≥ 4,5:1) */
-  --btn: #ffffff; --btn-hover: #f6f7fa; --rail: #dde1e8;   /* przycisk domyślny; linia osi czasu */
+  --btn: #ffffff; --btn-hover: #f4f6f8; --rail: #dcdee3;   /* przycisk domyślny; linia osi czasu */
   --brand-1: #23245a; --brand-2: #07080c; --brand-arc: #a5a8ff; --brand-arc-2: #c9a0ff; --brand-ink: #ffffff;   /* znak „27” (jak ikona aplikacji, w obu motywach ciemny) */
   --e1: 0 1px 2px rgb(16 18 27 / .04), 0 2px 10px -4px rgb(16 18 27 / .07);
   --e2: 0 28px 56px -16px rgb(16 18 27 / .22), 0 4px 14px rgb(16 18 27 / .06);
   --e3: 0 14px 34px -10px rgb(16 18 27 / .22), 0 2px 6px rgb(16 18 27 / .06);   /* elementy pływające */
   --e-raise: 0 1px 3px rgb(20 20 30 / .14), 0 0 0 .5px rgb(20 20 30 / .04);   /* aktywny element toru (segment, motyw) */
-  --rim: inset 0 1px 0 rgb(255 255 255 / .9);              /* krawędź światła na górze powierzchni */
+  --rim: 0 0 #0000;              /* krawędź światła na górze powierzchni */
   --scrim: rgb(10 12 20 / .38);                            /* tło pod oknem */
   /* Materiał szklany (tylko elementy pływające). Krycie dobrane tak, by tekst --text-2 i --accent miały ≥ 4,5:1 nad dowolną treścią */
   --glass: rgb(255 255 255 / .86); --glass-border: rgb(16 18 27 / .08); --glass-blur: blur(22px) saturate(1.8);
-  --aur: 7%; --tint: 6%; --glow-a: 18%;                               /* natężenie poświaty tła („aurora”) i zabarwienia kart nagłówkowych */
+  --aur: 0%; --tint: 0%; --glow-a: 0%;                               /* natężenie poświaty tła („aurora”) i zabarwienia kart nagłówkowych */
   /* domeny (sygnatura modułu — ikona, pasek, kropka) */
-  --cfa: #1e40af; --train: #8a3324; --regen: #6b21a8; --care: #0e6660;
-  --p-col: #1d4ed8; --c-col: #92400e; --f-col: #5b21b6; --org: #0b5f75;
-  --warn-bg: #fff4d6; --warn-ink: #6b4a00; --err-bg: #fde4e4; --ok-ink: #15603a;
+  --cfa: #3054ae; --train: #a33e25; --regen: #7238a5; --care: #006b61;
+  --p-col: #0e5caf; --c-col: #915200; --f-col: #6a3ea5; --org: #00667e;
+  --warn-bg: #fef0d4; --warn-ink: #694500; --err-bg: #ffe7e4; --ok-ink: #196632;
 }
 /* ---- Motyw ciemny (ręcznie wybrany albo systemowy). Oba bloki niżej MUSZĄ być identyczne
    (pilnuje tego tests/unit/tokens.test.mjs, który sprawdza też kontrast par tokenów) ---- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #090a0f; --surface: #12151c; --surface-2: #1a1e27; --sunken: #0c0e14;
-  --text: #eef0f6; --text-2: #b6bccb; --muted: #9198a8;
-  --border: #232834; --border-strong: #687083;
-  --accent: #a5a8ff; --accent-ink: #090a0f; --accent-soft: #252856; --accent-hi: #c0c2ff;
-  --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
-  --on-success: #090a0f; --btn: #1b1f29; --btn-hover: #222733; --rail: #262b37;
+  --bg: #090a0d; --surface: #111316; --surface-2: #17191e; --sunken: #060609;
+  --text: #f2f3f6; --text-2: #babec4; --muted: #989ba3;
+  --border: #212327; --border-strong: #60636a;
+  --accent: #9eaeff; --accent-ink: #090a0d; --accent-soft: #232849; --accent-hi: #b4c2ff;
+  --success: #72d699; --warning: #f2b966; --danger: #f98f87; --info: #9eaeff;
+  --on-success: #090a0d; --btn: #1a1c20; --btn-hover: #202328; --rail: #24262b;
   --brand-1: #23245a; --brand-2: #07080c; --brand-arc: #a5a8ff; --brand-arc-2: #c9a0ff; --brand-ink: #ffffff;
   --e1: 0 1px 0 rgb(0 0 0 / .35), 0 10px 28px -18px rgb(0 0 0 / .9);
   --e2: 0 32px 72px -18px rgb(0 0 0 / .8), 0 6px 18px rgb(0 0 0 / .45);
   --e3: 0 18px 42px -12px rgb(0 0 0 / .75), 0 2px 8px rgb(0 0 0 / .4);
   --e-raise: 0 1px 3px rgb(0 0 0 / .5), inset 0 1px 0 rgb(255 255 255 / .06);
-  --rim: inset 0 1px 0 rgb(255 255 255 / .055); --scrim: rgb(3 4 8 / .62);
+  --rim: inset 0 1px 0 rgb(255 255 255 / .035); --scrim: rgb(3 4 8 / .62);
   --glass: rgb(20 23 31 / .82); --glass-border: rgb(255 255 255 / .08); --glass-blur: blur(22px) saturate(1.6);
-  --aur: 16%; --tint: 12%; --glow-a: 42%;
-  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff; --care: #6fd6c9;
-  --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
-  --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --ok-ink: #8fe0b0;
+  --aur: 0%; --tint: 0%; --glow-a: 0%;
+  --cfa: #96aef7; --train: #f29676; --regen: #c6a0f2; --care: #69d3c6;
+  --p-col: #8cbaf7; --c-col: #edbb64; --f-col: #cba9f3; --org: #77cce6;
+  --warn-bg: #332305; --warn-ink: #f3d392; --err-bg: #3c1715; --ok-ink: #80dba2;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme]) {
   color-scheme: dark;
-  --bg: #090a0f; --surface: #12151c; --surface-2: #1a1e27; --sunken: #0c0e14;
-  --text: #eef0f6; --text-2: #b6bccb; --muted: #9198a8;
-  --border: #232834; --border-strong: #687083;
-  --accent: #a5a8ff; --accent-ink: #090a0f; --accent-soft: #252856; --accent-hi: #c0c2ff;
-  --success: #7fe0a6; --warning: #f5bd6b; --danger: #ff9f97; --info: #a5a8ff;
-  --on-success: #090a0f; --btn: #1b1f29; --btn-hover: #222733; --rail: #262b37;
+  --bg: #090a0d; --surface: #111316; --surface-2: #17191e; --sunken: #060609;
+  --text: #f2f3f6; --text-2: #babec4; --muted: #989ba3;
+  --border: #212327; --border-strong: #60636a;
+  --accent: #9eaeff; --accent-ink: #090a0d; --accent-soft: #232849; --accent-hi: #b4c2ff;
+  --success: #72d699; --warning: #f2b966; --danger: #f98f87; --info: #9eaeff;
+  --on-success: #090a0d; --btn: #1a1c20; --btn-hover: #202328; --rail: #24262b;
   --brand-1: #23245a; --brand-2: #07080c; --brand-arc: #a5a8ff; --brand-arc-2: #c9a0ff; --brand-ink: #ffffff;
   --e1: 0 1px 0 rgb(0 0 0 / .35), 0 10px 28px -18px rgb(0 0 0 / .9);
   --e2: 0 32px 72px -18px rgb(0 0 0 / .8), 0 6px 18px rgb(0 0 0 / .45);
   --e3: 0 18px 42px -12px rgb(0 0 0 / .75), 0 2px 8px rgb(0 0 0 / .4);
   --e-raise: 0 1px 3px rgb(0 0 0 / .5), inset 0 1px 0 rgb(255 255 255 / .06);
-  --rim: inset 0 1px 0 rgb(255 255 255 / .055); --scrim: rgb(3 4 8 / .62);
+  --rim: inset 0 1px 0 rgb(255 255 255 / .035); --scrim: rgb(3 4 8 / .62);
   --glass: rgb(20 23 31 / .82); --glass-border: rgb(255 255 255 / .08); --glass-blur: blur(22px) saturate(1.6);
-  --aur: 16%; --tint: 12%; --glow-a: 42%;
-  --cfa: #8ea2ff; --train: #f08c78; --regen: #c9a0ff; --care: #6fd6c9;
-  --p-col: #9dbbff; --c-col: #f3c06a; --f-col: #d4b3ff; --org: #7fd6ea;
-  --warn-bg: #3a2e0b; --warn-ink: #f5d98a; --err-bg: #3d1717; --ok-ink: #8fe0b0; } }
+  --aur: 0%; --tint: 0%; --glow-a: 0%;
+  --cfa: #96aef7; --train: #f29676; --regen: #c6a0f2; --care: #69d3c6;
+  --p-col: #8cbaf7; --c-col: #edbb64; --f-col: #cba9f3; --org: #77cce6;
+  --warn-bg: #332305; --warn-ink: #f3d392; --err-bg: #3c1715; --ok-ink: #80dba2; } }
+
+/* Akcent (D-113, Ustawienia): indygo w blokach motywów wyżej; turkus i bursztyn — atrybut data-accent na <html>. Kontrast par akcentu
+   sprawdzany w tests/unit/tokens.test.mjs dla każdego wariantu i motywu. Selektor z motywem ma wyższą specyficzność niż sam akcent. */
+:root[data-accent="teal"] { --accent: #006b6c; --accent-ink: #ffffff; --accent-soft: #def6f5; --accent-hi: #007d7e; --info: #006b6c; }
+:root[data-theme="dark"][data-accent="teal"] { --accent: #57d4d4; --accent-ink: #090a0d; --accent-soft: #073232; --accent-hi: #81e5e4; --info: #57d4d4; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme])[data-accent="teal"] { --accent: #57d4d4; --accent-ink: #090a0d; --accent-soft: #073232; --accent-hi: #81e5e4; --info: #57d4d4; } }
+:root[data-accent="amber"] { --accent: #915200; --accent-ink: #ffffff; --accent-soft: #feeddb; --accent-hi: #a46400; --info: #915200; }
+:root[data-theme="dark"][data-accent="amber"] { --accent: #fdb862; --accent-ink: #090a0d; --accent-soft: #3e2503; --accent-hi: #ffce88; --info: #fdb862; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme])[data-accent="amber"] { --accent: #fdb862; --accent-ink: #090a0d; --accent-soft: #3e2503; --accent-hi: #ffce88; --info: #fdb862; } }
 
 /* Aliasy dotychczasowych nazw (istniejące reguły korzystają z nowej palety bez zmian w kodzie modułów) */
 :root, :root[data-theme] {

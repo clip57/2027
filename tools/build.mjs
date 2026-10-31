@@ -1,7 +1,7 @@
 // Budowa obu wariantów z jednego źródła (D-026). Nie edytuj plików w dist/ ręcznie.
 //  dist/web/     — GitHub Pages: index.html + app.<hash>.js + app.<hash>.css + sw.js + manifest + ikony (offline, instalacja)
 //  dist/single/  — 2027.html: jeden plik, wszystko wbudowane, bez service workera (Documents by Readdle, plik lokalny)
-import { build } from 'esbuild';
+import { build, transform } from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -30,7 +30,12 @@ const js = res.outputFiles[0].text;
 for (const id of PLAN_IDS) if (!js.includes(PLAN_SRC[id].D.bloki[0].temat)) throw new Error(`Plan ${id} nie trafił do pakietu`);
 for (const [id, t] of Object.entries(LAZY)) if (js.includes(JSON.parse(t).values[Object.keys(JSON.parse(t).values)[0]].slice(0, 60))) throw new Error(`Zadania planu ${id} trafiły do pakietu`);
 // Arkusz = tokeny (jedyne źródło wartości) + style modułów + warstwa komponentów systemu projektowego
-const css = ['src/ui/tokens.css', 'src/ui/styles.css', 'src/ui/system.css'].map(f => fs.readFileSync(P(f), 'utf8')).join('\n');
+// D-113: warstwa System 3.0 „Precision” (precision.css) na końcu; arkusz minifikowany (F-G6) — fonty wariantu jednoplikowego osadzane
+// PRZED minifikacją (esbuild może zdjąć cudzysłowy z url(), a podstawienie szuka dokładnego tekstu `url("fonts/…")`)
+const CSS_TARGET = ['safari16', 'chrome110', 'firefox115'];
+const cssRaw = ['src/ui/tokens.css', 'src/ui/styles.css', 'src/ui/system.css', 'src/ui/precision.css'].map(f => fs.readFileSync(P(f), 'utf8')).join('\n');
+const minCss = async t => (await transform(t, { loader: 'css', minify: true, target: CSS_TARGET, legalComments: 'none', charset: 'utf8' })).code.trim();
+const css = await minCss(cssRaw);
 const FONTS = fs.readdirSync(P('public/fonts')).filter(f => f.endsWith('.woff2'));
 const tpl = fs.readFileSync(P('src/index.html'), 'utf8');
 const version = `${pkg.version}+${hash(js + css + Object.values(LAZY).join(''))}${process.env.BUILD_TAG ? `-${process.env.BUILD_TAG}` : ''}`;
@@ -93,7 +98,9 @@ fs.writeFileSync(P('dist/web/.nojekyll'), '');
 const icon = 'data:image/png;base64,' + fs.readFileSync(P('public/icons/apple-touch-icon.png')).toString('base64');
 const inlineJs = js.replace(/<\/script/gi, () => '<\\/script');
 // Wariant jednoplikowy: fonty wbudowane jako data URI (bez zewnętrznych plików)
-const cssSingle = FONTS.reduce((c, f) => c.split(`url("fonts/${f}")`).join(`url("data:font/woff2;base64,${fs.readFileSync(P('public/fonts', f)).toString('base64')}")`), css);
+for (const f of FONTS) if (!cssRaw.includes(`url("fonts/${f}")`)) throw new Error(`Brak reguły @font-face dla ${f} w tokens.css`);
+const cssSingle = await minCss(FONTS.reduce((c, f) => c.split(`url("fonts/${f}")`).join(`url("data:font/woff2;base64,${fs.readFileSync(P('public/fonts', f)).toString('base64')}")`), cssRaw));
+if (/url\(["']?fonts\//.test(cssSingle)) throw new Error('Wariant jednoplikowy: font nieosadzony');
 // U6: zadania bloków MPW wbudowane jako dane (bez wykonywania); „<” jako \u003c — tekst nie może zamknąć elementu <script>
 const inlinePlans = Object.entries(LAZY).map(([id, t]) => `<script type="application/json" id="plan-${id}">${t.replace(/</g, '\\u003c')}</script>`).join('\n');
 const single = put(put(tpl, '<!--HEAD-->', `${stamp}\n<link rel="apple-touch-icon" href="${icon}">\n<style>${cssSingle}</style>`),

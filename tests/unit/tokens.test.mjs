@@ -49,3 +49,17 @@ for (const [name, theme] of [['jasny', light], ['ciemny', { ...light, ...dark }]
     assert.deepEqual(bad, []);
   });
 }
+
+// D-113: akcenty z Ustawień (data-accent) — kontrast par akcentu w obu motywach; blok systemowy ciemny = ręczny ciemny
+const ACCENT_PAIRS = [['--accent', '--surface', 4.5], ['--accent', '--bg', 4.5], ['--accent-ink', '--accent', 4.5], ['--accent-ink', '--accent-hi', 4.5], ['--accent', '--accent-soft', 4.5]];
+for (const name of ['teal', 'amber']) {
+  const l = vars(block(`:root[data-accent="${name}"] {`)), d = vars(block(`:root[data-theme="dark"][data-accent="${name}"] {`));
+  const ds = vars(block(`:root:not([data-theme])[data-accent="${name}"] {`));
+  test(`akcent ${name}: blok systemowy ciemny = ręczny ciemny`, () => assert.deepEqual(ds, d));
+  for (const [tn, theme] of [['jasny', { ...light, ...l }], ['ciemny', { ...light, ...dark, ...d }]]) {
+    test(`akcent ${name} — kontrast par (${tn})`, () => {
+      const bad = ACCENT_PAIRS.map(([f, b, min]) => [f, b, min, ratio(theme[f], theme[b])]).filter(([, , min, r]) => r < min).map(([f, b, min, r]) => `${f} na ${b}: ${r.toFixed(2)} < ${min}`);
+      assert.deepEqual(bad, []);
+    });
+  }
+}

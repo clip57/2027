@@ -291,3 +291,15 @@ test('K1: korekta dnia i ruch ujemny przy zerze nie dają wartości ujemnych; �
     if (q != null) assert.ok(q >= 0, `${it.id}: ${q}`);
   }
 });
+
+test('D-113: statusInfo — etykieta bez emoji (ikona + słowo w interfejsie), format v31 bez zmian', () => {
+  const fresh = { category: 'Lunch', shelfLife: 'short' }, dry = { category: 'Obiad' }, sup = { category: 'Suplementy' };
+  assert.equal(statusInfo(fresh, 0, { days: 0 }).label, 'Brak');
+  assert.equal(statusInfo(fresh, 10, { days: 1 }).label, 'Pilne · < 2 dni');
+  assert.equal(statusInfo(fresh, 50, { days: 3 }).label, 'Niski · 2–4 dni');
+  assert.equal(statusInfo(dry, 50, { days: 10 }).label, 'Średni · 7–14 dni');
+  assert.equal(statusInfo(sup, 50, { days: 30 }).label, 'OK · ≥ 20 dni');
+  assert.equal(statusInfo(fresh, null, null).label, 'Brak stanu');
+  for (const [it, st, fc] of [[fresh, 0, { days: 0 }], [fresh, 10, { days: 1 }], [dry, 50, { days: 10 }], [sup, 50, { days: 30 }]])
+    assert.doesNotMatch(statusInfo(it, st, fc).label, /\p{Extended_Pictographic}/u);
+});

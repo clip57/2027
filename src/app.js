@@ -8,8 +8,11 @@ import { autoRound, autoCheck, describeError, cloudStatus } from './core/sync/cl
 import { setCustomItems } from './core/calc/inventory.js';
 import { GROUPS, byId, modulesOn } from './modules/registry.js';
 import { icon } from './ui/icons.js';
-import { THEMES, themePref, applyTheme, saveTheme, sideCollapsed, setSideCollapsed } from './ui/prefs.js';
-import { setupShortcuts, searchButton } from './ui/search.js';
+import { THEMES, themePref, applyTheme, saveTheme, sideCollapsed, setSideCollapsed, startPref } from './ui/prefs.js';
+import { renderSettings } from './ui/settings.js';
+import { PLAN_START, PLAN_END } from './core/resolver.js';
+import { diffDays, dayShort, shortDate } from './core/dates.js';
+import { setupShortcuts, searchButton, setCommandExtras } from './ui/search.js';
 import { renderDzis } from './modules/dzis.js';
 import { renderDane } from './modules/dane.js';
 import { renderDieta } from './modules/dieta.js';
@@ -35,11 +38,16 @@ function toastBox() {
   if (!box) { box = h('div', { id: 'toast', class: 'toast', role: 'status', 'aria-live': 'polite' }); document.body.append(box); }
   return box;
 }
-function toast(text, cls = 'warn') {
+// D-113 (F-G5): komunikat z akcją — np. „Cofnij” po zapisie; z akcją zostaje dłużej (10 s), akcja wykonywana raz i zamyka komunikat
+function toast(text, cls = 'warn', opts = {}) {
   const box = toastBox();
   clearTimeout(toastTimer);
-  clear(box).append(h('div', { class: `banner ${cls}` }, text));
-  toastTimer = setTimeout(() => clear(box), 6000);
+  const act = opts.action && h('button', { class: 'toast-act', 'aria-label': opts.action.aria || null, onclick: async e => {
+    e.currentTarget.disabled = true; clearTimeout(toastTimer); clear(box);
+    try { await opts.action.run(); } catch (x) { toast(x.message || String(x), 'err'); }
+  } }, opts.action.icon && icon(opts.action.icon, { size: 16 }), h('span', {}, opts.action.label));
+  clear(box).append(h('div', { class: `banner ${cls}${act ? ' has-act' : ''}` }, h('span', { class: 'toast-t' }, text), act));
+  toastTimer = setTimeout(() => clear(box), act ? 10000 : 6000);
 }
 
 // Fokus po przerysowaniu (B5): zapis przerysowuje cały widok, więc element z fokusem jest zastępowany nowym. Klucz elementu:
@@ -95,6 +103,7 @@ function cloudBannerText(s) {
   return '';
 }
 async function onCloudState(s) {
+  syncPaint?.();
   if (s.phase === 'retry' && ctx.store) {
     const st = await cloudStatus(ctx.store).catch(() => null);
     cloudUi.stale = !!(st?.pending && st.lastSync && Date.now() - Date.parse(st.lastSync) > 24 * 3600e3);
@@ -103,9 +112,13 @@ async function onCloudState(s) {
   if (text !== cloudUi.shown) { cloudUi.shown = text; if (route().id !== 'dane') softRender(); }
 }
 
+const PAGES = { wiecej: 'Więcej', ustawienia: 'Ustawienia' };
 function route() {
   const [path, qs] = (location.hash.replace(/^#\/?/, '') || 'dzis').split('?');
-  return { id: byId[path] || path === 'wiecej' ? path : 'dzis', params: new URLSearchParams(qs || '') };
+  // D-113: ekran startowy z Ustawień (tylko przy pustym adresie); strona Ustawienia — jak „Więcej”, poza rejestrem modułów
+  const start = !location.hash.replace(/^#\/?/, '') && byId[startPref()] ? startPref() : null;
+  const id = start || path;
+  return { id: byId[id] || PAGES[id] ? id : 'dzis', params: new URLSearchParams(start ? '' : qs || '') };
 }
 
 // Przełącznik motywu (per urządzenie): ciemny / jasny / systemowy
@@ -130,6 +143,45 @@ function switchTheme(v, btn) {
   vt.finished.catch(() => {}).finally(() => root.classList.remove('vt-theme'));
 }
 
+// ---- D-113 (System 3.0): pasek górny na komputerze — ścieżka modułu, dzień planu, wyszukiwanie (⌘K), stan synchronizacji, motyw, Ustawienia.
+// Na telefonie ukryty (pasek tytułu D-110 i „Więcej”). Stan synchronizacji: jedna plakietka (F-G4) odświeżana przy zmianie fazy chmury.
+const SYNC_TXT = { running: ['refresh-cw', 'Synchronizacja…', 'run'], waiting: ['refresh-cw', 'Za chwilę synchronizacja', 'run'], retry: ['cloud-off', 'Brak połączenia — ponowię', 'warn'],
+  paused: ['cloud-off', 'Synchronizacja wstrzymana', 'err'] };
+const hhmmOf = ms => new Date(ms).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+function syncChip() {
+  const el = h('a', { class: 'sync-chip', href: '#/dane', 'aria-label': 'Stan synchronizacji — otwórz Dane' });
+  const paint = async () => {
+    const s = ctx.cloudAuto?.state?.() || { phase: 'idle' };
+    let ic, txt, tone;
+    if (SYNC_TXT[s.phase]) [ic, txt, tone] = SYNC_TXT[s.phase];
+    else {
+      const st = ctx.store ? await cloudStatus(ctx.store).catch(() => null) : null;
+      if (!st?.config) [ic, txt, tone] = ['smartphone', 'Dane na tym urządzeniu', 'off'];
+      else if (st.step !== 'ready') [ic, txt, tone] = ['cloud-off', 'Chmura: wymaga logowania', 'warn'];
+      else if (st.pending) [ic, txt, tone] = ['cloud-upload', `Do wysłania: ${st.pending}`, 'run'];
+      else [ic, txt, tone] = ['cloud-check', s.lastOk || st.lastSync ? `Zsynchronizowano ${hhmmOf(s.lastOk || Date.parse(st.lastSync))}` : 'Zsynchronizowano', 'ok'];
+    }
+    el.className = `sync-chip is-${tone}`; el.title = txt;
+    clear(el).append(icon(ic, { size: 16 }), h('span', {}, txt));
+  };
+  paint(); syncPaint = paint;
+  return el;
+}
+let syncPaint = null;
+function topbar(id) {
+  const mod = byId[id], t = today();
+  const dayNo = t >= PLAN_START && t <= PLAN_END ? diffDays(PLAN_START, t) + 1 : null, total = diffDays(PLAN_START, PLAN_END) + 1;
+  const cur = themePref(), nextTheme = { dark: 'light', light: 'system', system: 'dark' }[cur] || 'dark';
+  return h('div', { class: 'topbar', role: 'region', 'aria-label': 'Pasek narzędzi' },
+    h('p', { class: 'tb-crumb' }, mod ? [h('span', { class: 'tb-g' }, mod.group), icon('chevron-right', { size: 14 }), h('span', { class: 'tb-m' }, mod.name)] : h('span', { class: 'tb-m' }, PAGES[id] || '')),
+    h('p', { class: 'tb-day' }, h('strong', {}, `${dayShort(t)} ${shortDate(t)}`), dayNo && h('span', {}, ` · dzień ${dayNo} z ${total}`)),
+    searchButton(() => ctx.store?.state, 'tb-search'),
+    syncChip(),
+    h('button', { class: 'tb-icon', 'aria-label': `Zmień motyw (teraz: ${THEMES.find(x => x[0] === cur)?.[1] || cur})`, title: 'Zmień motyw',
+      onclick: e => switchTheme(nextTheme, e.currentTarget) }, icon(THEMES.find(x => x[0] === cur)?.[2] || 'moon', { size: 18 })),
+    h('a', { class: `tb-icon${id === 'ustawienia' ? ' is-on' : ''}`, href: '#/ustawienia', 'aria-label': 'Ustawienia', title: 'Ustawienia' }, icon('settings', { size: 18 })));
+}
+
 function nav(current) {
   // Zakładki i kolejność w grupach zależne od dnia (D-095: od 12.11.2026 MPW zamiast CFA)
   const MODULES = modulesOn(today());
@@ -139,7 +191,7 @@ function nav(current) {
   return [
     h('a', { class: 'skip-link', href: '#main' }, 'Przejdź do treści'),   // U-i: pominięcie panelu nawigacji
     // D-110: pasek tytułu na telefonie — widoczny po przewinięciu poza nagłówek strony (duplikat h1, ukryty dla czytników ekranu)
-    h('div', { class: 'appbar', 'aria-hidden': 'true' }, h('span', { class: 'appbar-t' }, current === 'wiecej' ? 'Więcej' : byId[current]?.name || '')),
+    h('div', { class: 'appbar', 'aria-hidden': 'true' }, h('span', { class: 'appbar-t' }, PAGES[current] || byId[current]?.name || '')),
     h('nav', { class: `side${collapsed ? ' is-min' : ''}`, 'aria-label': 'Moduły' },
       h('div', { class: 'side-top' },
         h('a', { class: 'brand', href: '#/dzis', 'aria-label': '2027 — Dziś' }, h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, '27'), h('span', { class: 'brand-t' }, '2027')),
@@ -151,7 +203,9 @@ function nav(current) {
         MODULES.filter(m => m.group === g).map(m => h('a', { href: `#/${m.id}`, class: 'side-a', 'aria-current': m.id === current ? 'page' : null,
           title: collapsed ? m.name : null, style: { '--dc': `var(--${m.domain})` } },
           icon(m.icon, { size: 20 }), h('span', { class: 'side-n' }, m.name)))))),
-      h('div', { class: 'side-foot' }, themeSwitch(true))),
+      h('div', { class: 'side-foot' }, themeSwitch(true),
+        h('a', { class: `side-a side-set${current === 'ustawienia' ? ' is-on' : ''}`, href: '#/ustawienia', 'aria-current': current === 'ustawienia' ? 'page' : null, title: collapsed ? 'Ustawienia' : null, style: { '--dc': 'var(--accent)' } },
+          icon('settings', { size: 20 }), h('span', { class: 'side-n' }, 'Ustawienia')))),
     h('nav', { class: 'tabs', 'aria-label': 'Główne sekcje' },
       tabs.map(m => h('a', { href: `#/${m.id}`, 'aria-current': m.id === current ? 'page' : null }, icon(m.icon, { size: 22 }), h('span', {}, m.name))),
       h('a', { href: '#/wiecej', 'aria-current': moreActive ? 'page' : null }, icon('ellipsis', { size: 22 }), h('span', {}, 'Więcej'))),
@@ -180,7 +234,7 @@ async function render(keepFocus = false) {
   setCustomItems(ctx.store?.state?.catalogUser || []);
   const main = h('main', { class: 'main', id: 'main', tabindex: '-1', 'data-enter': keepFocus === true ? null : enterType });
   enterType = null;
-  clear(app).append(...nav(id), main);
+  clear(app).append(...nav(id), topbar(id), main);   // D-113: pasek górny (komputer) — poza <main>, w kolumnie treści
   // D-110: poświata tła w kolorze modułu (moduł może ją zmienić, np. „Dziś” — kolor bieżącego punktu planu)
   document.documentElement.dataset.domain = byId[id]?.domain || 'regen';
   app.classList.toggle('side-min', sideCollapsed());
@@ -199,16 +253,19 @@ async function render(keepFocus = false) {
   if (cloudText) main.append(h('div', { class: 'banner warn cloud-banner', role: 'status' }, h('span', {}, cloudText),
     h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/dane' }, 'Przejdź do Dane'),
       h('button', { 'aria-label': 'Zamknij komunikat synchronizacji', onclick: () => { cloudUi.dismissed = true; render(true); } }, 'Zamknij'))));
-  if (id === 'wiecej') {
+  if (id === 'ustawienia') {
+    renderSettings(main, { ...ctx, rerender: () => render(true), flash: (text, cls = 'warn', o) => toast(text, cls, o), themeSwitch, modules: modulesOn(today()).filter(m => m.tab || m.id === 'zapasy' || m.id === 'kalendarz') });
+  } else if (id === 'wiecej') {
     add(main, h('h1', {}, 'Więcej'), searchButton(() => ctx.store?.state, 'more-search'),
       GROUPS.map(g => { const list = modulesOn(today()).filter(m => m.group === g && !m.tab); return list.length ? h('section', { class: 'more-sec' },
         h('p', { class: 'side-gl' }, g),
         h('div', { class: 'more-list' }, list.map(m => h('a', { href: `#/${m.id}`, style: { '--dc': `var(--${m.domain})` } },
           h('span', { class: 'more-ic' }, icon(m.icon, { size: 20 })), h('span', { class: 'more-n' }, m.name), icon('chevron-right', { size: 18 }))))) : null; }),
-      h('section', { class: 'more-sec' }, h('p', { class: 'side-gl' }, 'Wygląd'), themeSwitch(false)));
+      h('section', { class: 'more-sec' }, h('p', { class: 'side-gl' }, 'Wygląd'), themeSwitch(false),
+        h('a', { class: 'btn more-settings', href: '#/ustawienia' }, icon('settings', { size: 18 }), h('span', {}, 'Ustawienia — akcent, gęstość, tekst, dźwięki'), icon('chevron-right', { size: 18 }))));
   } else {
     const mod = byId[id];
-    const c = { ...ctx, params, today: renderedDay, rerender: () => render(true), flash: (text, cls = 'warn') => toast(text, cls),
+    const c = { ...ctx, params, today: renderedDay, rerender: () => render(true), flash: (text, cls = 'warn', o) => toast(text, cls, o),
       soft: softRender, tick: fn => { tick = fn; } };
     try { await (RENDER[id] || ((r) => renderPlaceholder(r, mod)))(main, c); }
     catch (e) { main.append(h('div', { class: 'banner err', role: 'alert' }, `Błąd modułu: ${e.message}`)); console.error(e); }
@@ -218,7 +275,7 @@ async function render(keepFocus = false) {
     if (!el.hasAttribute('tabindex')) el.tabIndex = 0;
     if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Obszar przewijany');
   });
-  document.title = `${id === 'wiecej' ? 'Więcej' : byId[id].name} · 2027`;
+  document.title = `${PAGES[id] || byId[id].name} · 2027`;
   // „Dziś”: w pasku tytułu nazwa wyświetlanego dnia (h1), nie modułu
   if (id === 'dzis') { const t = main.querySelector('h1')?.textContent; const bar = app.querySelector('.appbar-t'); if (t && bar) bar.textContent = t; }
   watchTitle();
@@ -304,7 +361,9 @@ function inPageLink(e) {
 async function boot() {
   applyTheme();
   toastBox();
-  setupShortcuts(() => ctx.store?.state);   // I5: skróty klawiaturowe (⌘K, /, ← →, g + litera, ?)
+  setupShortcuts(() => ctx.store?.state);
+  // D-113 (F-G1): polecenie „Zmień motyw” w palecie ⌘K — kolejny motyw jak przycisk w pasku górnym
+  setCommandExtras({ theme: () => { const nx = { dark: 'light', light: 'system', system: 'dark' }[themePref()] || 'dark'; saveTheme(nx); applyTheme(nx); render(true); } });   // I5: skróty klawiaturowe (⌘K, /, ← →, g + litera, ?)
   document.addEventListener('click', inPageLink);
   // Klawiatura ekranowa (pole w fokusie) — chowamy dolny pasek, żeby nie „pływał” nad klawiaturą na iOS
   const isField = el => el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'range', 'button', 'file'].includes(el.type)));

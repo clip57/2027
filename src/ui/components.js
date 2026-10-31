@@ -1,5 +1,6 @@
 // Wspólne komponenty interfejsu. Bez innerHTML, z obsługą klawiatury i czytników ekranu.
 import { h, clear } from './dom.js';
+import { icon } from './icons.js';
 
 // Przełącznik segmentowy (faza, wariant, dzień). options: [{value, label, hint}]
 export function segmented(label, options, value, onChange) {
@@ -100,3 +101,21 @@ function dragToClose(d, head, close) {
   d.addEventListener('touchend', end);
   d.addEventListener('touchcancel', end);
 }
+
+// ==========================================================================
+// System 3.0 „Precision” (D-113): komponenty wspólne
+// ==========================================================================
+
+// Liczba-bohater: etykieta (ikona + słowo), wartość krojem Display z jednostką pomniejszoną, podpis, opcjonalnie mini-wykres i odnośnik.
+// Klasy dotychczasowych kafli (`stat`, `stat-l`, `stat-v`, `unit`, `stat-h`) zostają — testy i style P2 je znają.
+export function metric({ label, ic, value, unit, hint, chart, href, tone, cls = '', dom }) {
+  const body = [h('span', { class: 'stat-l' }, ic && icon(ic, { size: 14 }), label),
+    h('strong', { class: 'stat-v' }, value, unit && h('span', { class: 'unit' }, ` ${unit}`)),
+    hint && h('span', { class: 'stat-h' }, hint), chart && h('span', { class: 'mt-chart' }, chart)];
+  const attrs = { class: `stat mt ${tone ? `is-${tone}` : ''} ${cls}`.trim(), style: dom ? { '--dc': `var(--${dom})` } : null };
+  return href ? h('a', { ...attrs, href, class: `${attrs.class} mt-link` }, ...body) : h('div', attrs, ...body);
+}
+
+// Plakietka statusu: ikona + słowo (bez emoji). code: CRITICAL / WARNING / OK / UNKNOWN / UNTRACKED (jak statusInfo w Zapasach)
+const STATUS_IC = { CRITICAL: 'triangle-alert', WARNING: 'clock', OK: 'circle-check', UNKNOWN: 'info', UNTRACKED: 'minus' };
+export const statusBadge = (code, text, extra = {}) => h('span', { class: `sb sb-${code}`, ...extra }, icon(STATUS_IC[code] || 'info', { size: 13 }), h('span', {}, text));

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#090a0f">
-<script>/* motyw przed pierwszym renderem (domyślnie ciemny, preferencja per urządzenie) + kolor paska przeglądarki (= --bg) */(function(){var t;try{t=localStorage.getItem("p2027.theme")}catch(e){}if(t!=="system")document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.querySelector('meta[name="theme-color"]').setAttribute("content","#f3f4f7")})()</script>
+<meta name="theme-color" content="#090a0d">
+<script>/* motyw i ustawienia wyglądu przed pierwszym renderem (domyślnie ciemny; preferencje per urządzenie: akcent, gęstość, rozmiar tekstu — D-113) + kolor paska przeglądarki (= --bg) */(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem("p2027."+k)}catch(e){return null}},t=g("theme");if(t!=="system")d.setAttribute("data-theme",t==="light"?"light":"dark");["accent","density","text"].forEach(function(k){var v=g(k);if(v&&/^[a-z]+$/.test(v))d.setAttribute("data-"+k,v)});if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.querySelector('meta[name="theme-color"]').setAttribute("content","#f5f7fa")})()</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="2027">

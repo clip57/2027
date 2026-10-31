@@ -28,7 +28,11 @@ OPSZ = 14
 FEATURES = ['kern', 'liga', 'calt', 'tnum', 'case', 'ccmp', 'locl', 'mark', 'mkmk']
 EXT_BASE = [(0x0100, 0x017F), (0x0218, 0x021B), (0x0300, 0x0308), (0x030A, 0x030C), (0x0326, 0x0328)]   # Extended-B i rzadkie znaki łączące: +30 KB — pominięte
 TOKENS = ROOT / 'src/ui/tokens.css'
-FACES = ('inter-latin.woff2', 'inter-latin-ext.woff2')
+FACES = ('inter-latin.woff2', 'inter-latin-ext.woff2', 'inter-display.woff2')
+# D-113 (System 3.0 „Precision”): Inter Display — ten sam font, oś opsz 32 (krój tytułowy: ciaśniejszy, do nagłówków i dużych liczb),
+# grubości 500–800; tylko znaki nagłówków i liczb (ASCII, Latin-1, polskie litery, typografia). Pozostałe znaki — z „Inter” (rodzina zapasowa).
+DISPLAY_OPSZ, DISPLAY_WGHT = 32, (500, 800)
+DISPLAY_CPS = set(range(0x20, 0x7F)) | set(range(0xA0, 0x100)) | {ord(c) for c in 'ĄąĆćĘęŁłŃńŚśŹźŻż–—‘’“”„…•·−→↑↓'}
 
 
 def used_text():
@@ -82,9 +86,17 @@ def source_font(arg):
     # usWin z granic pełnego fontu (jak w plikach Google Fonts) — bez przycinania wysokich znaków w Windows; przeglądarki używają
     # metryk typo (USE_TYPO_METRICS), identycznych z dotychczasowymi
     font['OS/2'].usWinAscent, font['OS/2'].usWinDescent = font['head'].yMax, -font['head'].yMin
-    font = instancer.instantiateVariableFont(font, {'opsz': OPSZ})
-    font.recalcTimestamp = False
     return font
+
+
+def instance(var, opsz, wght=None):
+    buf = io.BytesIO(); var.save(buf); buf.seek(0)
+    f = TTFont(buf, recalcTimestamp=False)
+    limits = {'opsz': opsz}
+    if wght: limits['wght'] = wght
+    f = instancer.instantiateVariableFont(f, limits)
+    f.recalcTimestamp = False
+    return f
 
 
 def write_subset(font, cps, path):
@@ -99,7 +111,9 @@ def write_subset(font, cps, path):
 
 
 def main():
-    font = source_font(sys.argv[1] if len(sys.argv) > 1 else None)
+    var = source_font(sys.argv[1] if len(sys.argv) > 1 else None)
+    font = instance(var, OPSZ)
+    display = instance(var, DISPLAY_OPSZ, DISPLAY_WGHT)
     have = set(font.getBestCmap())
     css = TOKENS.read_text(encoding='utf8')
     rules = face_rules(css)
@@ -113,17 +127,22 @@ def main():
     ext = (ext & have) - emoji - latin
     out = ROOT / 'public/fonts'
     got = {'inter-latin.woff2': write_subset(font, latin, out / 'inter-latin.woff2'),
-           'inter-latin-ext.woff2': write_subset(font, ext, out / 'inter-latin-ext.woff2')}
+           'inter-latin-ext.woff2': write_subset(font, ext, out / 'inter-latin-ext.woff2'),
+           'inter-display.woff2': write_subset(display, (DISPLAY_CPS & set(display.getBestCmap())) - emoji, out / 'inter-display.woff2')}
     # unicode-range reguły rozszerzonej = dokładnie zawartość pliku (bez spacji i U+0020 dokładanych przez fonttools)
     ext_range = fmt_ranges(got['inter-latin-ext.woff2'] - latin_range)
-    a, b = rules['inter-latin-ext.woff2'][1]
-    TOKENS.write_text(css[:a] + ext_range + css[b:], encoding='utf8')
+    disp_range = fmt_ranges(got['inter-display.woff2'] - {0x20} | {0x20})
+    # zakresy w kolejności od końca pliku (zmiana długości tekstu nie przesuwa wcześniejszych położeń)
+    for name, rng in sorted([('inter-latin-ext.woff2', ext_range), ('inter-display.woff2', disp_range)], key=lambda x: -rules[x[0]][1][0]):
+        a, b = rules[name][1]
+        css = css[:a] + rng + css[b:]
+    TOKENS.write_text(css, encoding='utf8')
     covered = got['inter-latin.woff2'] | got['inter-latin-ext.woff2']
     fallback = ''.join(chr(cp) for cp in sorted(used - covered))
     files = {n: {'sha256': hashlib.sha256((out / n).read_bytes()).hexdigest(), 'bytes': (out / n).stat().st_size,
                  'chars': len(got[n]), 'ranges': fmt_ranges(got[n])} for n in FACES}
     manifest = {'source': {'package': PKG, 'sha256': PKG_SHA, 'file': MEMBER, 'version': font['name'].getDebugName(5)},
-                'axes': {'opsz': OPSZ, 'wght': '100–900'}, 'features': FEATURES, 'files': files,
+                'axes': {'opsz': OPSZ, 'wght': '100–900', 'display': {'opsz': DISPLAY_OPSZ, 'wght': f'{DISPLAY_WGHT[0]}–{DISPLAY_WGHT[1]}'}}, 'features': FEATURES, 'files': files,
                 'fallback': fallback, 'fallbackNote': 'znaki ze źródeł aplikacji wyświetlane fontem systemowym: emoji (także z U+FE0F) i znaki bez glifu w Inter'}
     (ROOT / 'tools/fonts.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
     for n in FACES: print(f'{n}: {files[n]["chars"]} znaków, {files[n]["bytes"]} B')

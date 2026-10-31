@@ -130,17 +130,18 @@ export function forecast(prod, stock, fromDate, maxDays = 400) {
 // Klasyfikacja przeniesiona 1:1 z ZAPASY v31 (getProductStatus), z podziałem wg terminu przydatności:
 //   stan 0 -> ⛔ BRAK; suplementy: <10 / <20 dni; świeże (shelfLife 'short', ≤ 7 dni): <2 / <4 dni; trwałe: <7 / <14 dni.
 // Jedyna różnica: liczba dni pochodzi z symulacji (uwzględnia czwartki i fazy), a nie z ilorazu stan / porcja.
+// D-113 (System 3.0): `label` — ta sama klasyfikacja słowami, bez emoji (plakietki w interfejsie); `badge` (format v31) zostaje w raporcie tekstowym.
 export function statusInfo(item, stock, fc) {
-  if (item.tracked === false) return { code: 'UNTRACKED', badge: 'Nieśledzony', group: 'Suplementy' };
-  if (stock == null) return { code: 'UNKNOWN', badge: 'Brak stanu', group: null };
+  if (item.tracked === false) return { code: 'UNTRACKED', badge: 'Nieśledzony', label: 'Nieśledzony', group: 'Suplementy' };
+  if (stock == null) return { code: 'UNKNOWN', badge: 'Brak stanu', label: 'Brak stanu', group: null };
   const group = item.category === 'Suplementy' ? 'Suplementy' : item.shelfLife === 'short' ? 'Świeże ≤7d' : 'Trwałe >7d';
-  if (stock <= 0) return { code: 'CRITICAL', isZero: true, badge: '⛔ BRAK (0)', group, days: 0 };
+  if (stock <= 0) return { code: 'CRITICAL', isZero: true, badge: '⛔ BRAK (0)', label: 'Brak', group, days: 0 };
   const days = fc ? fc.days : 0;
   const [crit, warn] = group === 'Suplementy' ? [10, 20] : group === 'Świeże ≤7d' ? [2, 4] : [7, 14];
   const warnLabel = group === 'Suplementy' ? '⚠️ Średni (10-19d)' : group === 'Świeże ≤7d' ? '⚠️ Niski (2-3.9d)' : '⚠️ Średni (7-13.9d)';
-  if (days < crit) return { code: 'CRITICAL', badge: `🚨 < ${crit} dni`, group, days };
-  if (days < warn) return { code: 'WARNING', badge: warnLabel, group, days };
-  return { code: 'OK', badge: `🟢 OK (≥${warn}d)`, group, days };
+  if (days < crit) return { code: 'CRITICAL', badge: `🚨 < ${crit} dni`, label: `Pilne · < ${crit} dni`, group, days };
+  if (days < warn) return { code: 'WARNING', badge: warnLabel, label: `${group === 'Świeże ≤7d' ? 'Niski' : 'Średni'} · ${crit}–${warn} dni`, group, days };
+  return { code: 'OK', badge: `🟢 OK (≥${warn}d)`, label: `OK · ≥ ${warn} dni`, group, days };
 }
 export const status = (item, stock, fc) => statusInfo(item, stock, fc).code;
 
