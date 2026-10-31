@@ -630,6 +630,8 @@ body.kbd .toast { bottom: var(--s-3); }
 body.kbd .pg-timer { display: none; }
 @media (max-width: 420px) { .pg-timer button span { display: none; } .pg-timer { gap: var(--s-2); padding: var(--s-2) var(--s-3); } }
 @media (min-width: 760px) { .pg-prods { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* D17 (audyt 31.10): odstęp pod treścią na czas licznika — jak `.main:has(.tr-rest)` w Treningu */
+.main:has(.pg-timer) { padding-bottom: calc(var(--nav-space) + 120px); }
 @media (min-width: 900px) { .pg-timer { left: auto; right: var(--s-6); bottom: var(--s-6); width: 460px; } .main:has(.pg-timer) { padding-bottom: 140px; } }
 @media (min-width: 700px) { .pg-week { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); } }
 @media (min-width: 1500px) { .pg-week { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
@@ -654,6 +656,7 @@ body.kbd .pg-timer { display: none; }
 /* Nagłówek dnia CFA/MPW: długi „Następny: …” (tematy MPW) nie ściska pierścienia do zera (przewijanie w poziomie przy 320 px) */
 .cfa-dayhead > div { min-width: 0; }
 .cfa-dayhead .ring { flex: none; }
+.cf-free { flex: none; padding: var(--s-1) var(--s-3); border-radius: var(--r-full); background: var(--sunken); color: var(--text-2); font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; }
 /* Długie ciągi bez spacji w planie MPW (adresy stron w zadaniach, „a/b/c” w tematach) — łamanie zamiast przewijania w poziomie */
 .cfa-body { min-width: 0; }
 .cfa-body p, .cf-next { overflow-wrap: anywhere; }

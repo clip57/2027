@@ -34,7 +34,9 @@ const css = ['src/ui/tokens.css', 'src/ui/styles.css', 'src/ui/system.css'].map(
 const FONTS = fs.readdirSync(P('public/fonts')).filter(f => f.endsWith('.woff2'));
 const tpl = fs.readFileSync(P('src/index.html'), 'utf8');
 const version = `${pkg.version}+${hash(js + css + Object.values(LAZY).join(''))}${process.env.BUILD_TAG ? `-${process.env.BUILD_TAG}` : ''}`;
-const stamp = `<meta name="app-version" content="${version}">`;
+// D16 (audyt 31.10.2026): data budowy (strefa Europe/Warsaw) — czytelna wersja w „Dane” obok skrótu; `app-version` bez zmian (aktualizacja, SW)
+const built = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Warsaw' }).format(process.env.SOURCE_DATE_EPOCH ? new Date(Number(process.env.SOURCE_DATE_EPOCH) * 1000) : new Date());
+const stamp = `<meta name="app-version" content="${version}">\n<meta name="app-built" content="${built}">`;
 
 fs.rmSync(P('dist'), { recursive: true, force: true });
 fs.mkdirSync(P('dist/web/icons'), { recursive: true });

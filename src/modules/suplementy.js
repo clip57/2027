@@ -11,6 +11,8 @@ import { catalogById } from '../core/data.js';
 import { dayPlan, inPlan, PLAN_START, PLAN_END, DAY_ZERO } from '../core/resolver.js';
 
 const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
+// D2 (audyt 31.10.2026): daty jak w całej aplikacji („03.11.2026”, „pn 03.11”), nie ISO
+const dmy = d => `${shortDate(d)}.${d.slice(0, 4)}`;
 
 export function renderSuplementy(root, ctx) {
   const date = ctx.params.get('d') || ctx.today;
@@ -101,10 +103,10 @@ export function renderSuplementy(root, ctx) {
           return h('tr', { class: s.active ? null : 'is-off' },
             h('td', {}, h('strong', {}, s.name), h('span', { class: 'muted block' }, s.form)),
             h('td', {}, s.times.join(', '), !s.everyDay && h('span', { class: 'muted block' }, s.weekdays.map(w => DAYS[w - 1]).join(', ')),
-              s.validity && h('span', { class: 'muted block' }, `${s.validity.from ? `od ${s.validity.from} ` : ''}do ${s.validity.until}`)),
+              s.validity && h('span', { class: 'muted block' }, `${s.validity.from ? `od ${dmy(s.validity.from)} ` : ''}do ${dmy(s.validity.until)}`)),
             h('td', { class: 'num' }, s.daily ? `${fmt(s.daily, 2)} ${catalogById[s.id]?.unit || ''}` : '—'),
             h('td', {}, !s.tracked ? 'nieśledzony' : x?.st == null ? 'brak stanu' :
-              [`${fmt(x.st, 1)} ${catalogById[s.id]?.unit || ''}${x.fc?.lastCovered ? ` · do ${x.fc.lastCovered}` : ''}`,
+              [`${fmt(x.st, 1)} ${catalogById[s.id]?.unit || ''}${x.fc?.lastCovered ? ` · do ${dayShort(x.fc.lastCovered)} ${shortDate(x.fc.lastCovered)}` : x.st <= 0 ? ' · brak' : ''}`,
                 x.rw && h('span', { class: `zp-run st-${x.info.code}`, role: 'img', 'aria-label': `Zapas na ${fmt(x.rw.days, 1)} dnia` },
                   h('span', { class: 'zp-run-f', style: { width: `${x.rw.pct}%` } }))]));
         }))))));

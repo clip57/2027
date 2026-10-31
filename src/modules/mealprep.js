@@ -1,12 +1,13 @@
 // Moduł Meal Prep (Etap 4): procedury z MEAL_PREP z ilościami wyliczonymi dla aktywnej fazy i wariantu dnia (D-003),
 // progami z D-013, odhaczaniem kroków i zapisem testów kalibracyjnych. Fragmenty z wynikami badań: pakiet prywatny (D-035).
-import { h, clear, fmt, add } from '../ui/dom.js';
+import { h, clear, fmt, add, plural } from '../ui/dom.js';
 import { progressRing } from '../ui/components.js';
 import { SRC, plan, catalogById } from '../core/data.js';
 import { resolveDay, PLAN_START, DIET_START } from '../core/resolver.js';
 import { longDate, addDays, dayShort, shortDate } from '../core/dates.js';
 import { coverage } from '../core/calc/inventory.js';
 import { icon } from '../ui/icons.js';
+import { startCountdown, stopCountdown, countdown } from '../ui/signal.js';
 
 // {produkt} -> gramatura z planu diety na dany dzień; brak pozycji w planie = jawna informacja
 export function resolveText(text, phase, variant, pack) {
@@ -36,19 +37,32 @@ export const prepKey = (card, block, item) => (block < 2 ? { card, idx: block * 
 const prepKeyText = (date, k) => `${date}|${k.card}|${k.idx}`;
 const timerMin = text => { const m = text.match(/(\d+)(?:–(\d+))?\s*min/); return m ? Number(m[2] || m[1]) : null; };
 
-function timer(minutes, label) {
-  const out = h('span', { class: 'timer-v' }, `${minutes}:00`);
-  let left = minutes * 60, id = null;
-  const btn = h('button', { class: 'timer-b', 'aria-label': `Minutnik ${minutes} min: ${label}`, onclick: () => {
-    if (id) { clearInterval(id); id = null; btn.textContent = 'Start'; return; }
-    btn.textContent = 'Stop';
-    id = setInterval(() => {
-      left -= 1;
-      out.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-      if (left <= 0) { clearInterval(id); id = null; btn.textContent = 'Start'; out.textContent = 'gotowe'; }
-    }, 1000);
-  } }, 'Start');
-  return h('span', { class: 'timer', title: label }, out, btn);
+// Minutnik kroku (D5, audyt 31.10.2026): odliczanie globalne (`startCountdown`) — działa i daje sygnał także po zmianie widoku;
+// widżet tylko pokazuje stan i przestaje się odświeżać, gdy zniknie z DOM. Czas od znacznika końca (poprawny po wygaszeniu ekranu).
+const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function timer(key, minutes, label, flash) {
+  const out = h('span', { class: 'timer-v' });
+  const btn = h('button', { class: 'timer-b', 'aria-label': `Minutnik ${minutes} min: ${label}` });
+  const wrap = h('span', { class: 'timer', title: label }, out, btn);
+  let id = null;
+  const show = () => {
+    const c = countdown(key);
+    out.textContent = !c ? mmss(minutes * 60) : c.done ? 'gotowe' : mmss(c.left);
+    btn.textContent = c && !c.done ? 'Stop' : 'Start';
+    wrap.classList.toggle('is-run', !!c && !c.done);
+    wrap.classList.toggle('is-done', !!c?.done);
+    if ((!c || c.done) && id) { clearInterval(id); id = null; }
+  };
+  const loop = () => { if (!id) id = setInterval(() => (wrap.isConnected ? show() : (clearInterval(id), id = null)), 1000); };
+  btn.onclick = () => {
+    const c = countdown(key);
+    if (c && !c.done) stopCountdown(key);
+    else { startCountdown(key, minutes * 60, label, l => flash?.(`Minutnik: ${l} — czas minął.`, 'info')); loop(); }
+    show();
+  };
+  show();
+  if (countdown(key) && !countdown(key).done) loop();
+  return wrap;
 }
 
 // Fazy w kolejności dnia: „Wieczór poprzedniego dnia” (karty 21:45–21:55) wykonuje się wieczorem tego dnia na jutro,
@@ -132,7 +146,7 @@ export function renderMealPrep(root, ctx) {
       h('div', { class: 'mp-stock-h' }, h('h2', { id: 'mp-stock-h' }, icon('package-check', { size: 18 }), 'Składniki na jutro'),
         h('span', { class: 'muted' }, `${dayShort(tomorrow)} ${shortDate(tomorrow)} · Faza ${rt.phase ?? 0} · ${dietLabel(rt.dietVariant)}`)),
       !known.length ? h('p', { class: 'muted' }, 'Brak stanów składników — ustaw je w module Zapasy.')
-        : short.length === 0 ? h('p', { class: 'mp-ok' }, icon('circle-check', { size: 16 }), `Wszystkie ${known.length} składniki kart wystarczą na jutro.`)
+        : short.length === 0 ? h('p', { class: 'mp-ok' }, icon('circle-check', { size: 16 }), `Wszystkie ${known.length} ${plural(known.length, 'składnik karty wystarczy', 'składniki kart wystarczą', 'składników kart wystarczy')} na jutro.`)
         : [h('ul', { class: 'mp-short-list' }, short.map(x => h('li', {},
             h('span', {}, catalogById[x.prod].name),
             h('span', { class: 'muted' }, `potrzeba ${fmt(x.need, 1)} ${unitOf(x.prod)} · zostanie ${fmt(Math.max(0, x.stock), 1)} ${unitOf(x.prod)}`)))),
@@ -162,7 +176,7 @@ export function renderMealPrep(root, ctx) {
               return h('li', {},
                 h('label', {}, h('input', { type: 'checkbox', checked: !!state[key], disabled: !store,
                   onchange: e => toggle(pk.card, pk.idx, e.target.checked) }), h('span', {}, textOf(c, it))),
-                mins ? timer(mins, c.title) : null);
+                mins ? timer(`mp|${key}`, mins, c.title, ctx.flash) : null);
             }));
           }
           return h('p', { class: `prep-note n-${b.type}` }, textOf(c, b.text));
@@ -184,7 +198,7 @@ export function renderMealPrep(root, ctx) {
     return h('td', {}, h('span', { class: 'row' },
       h('button', { onclick: () => save(true) }, 'Zdany'),
       h('button', { onclick: () => save(false) }, 'Niezdany'),
-      rec && h('span', { class: 'muted' }, `${rec.pass ? 'zdany' : 'niezdany'} · ${rec.date}`)));
+      rec && h('span', { class: 'muted' }, `${rec.pass ? 'zdany' : 'niezdany'} · ${dayShort(rec.date)} ${shortDate(rec.date)}`)));
   };
   for (const t of SRC.mealprep.tables) {
     const isTest = t.head[0] === 'Test';

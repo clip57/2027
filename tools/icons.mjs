@@ -11,7 +11,7 @@ export const NAMES = ['sun', 'moon', 'monitor', 'utensils', 'dumbbell', 'graduat
   'chevron-right', 'chevron-down', 'check', 'x', 'triangle-alert', 'info', 'clock', 'calendar', 'flame', 'timer', 'play', 'pause',
   'plus', 'minus', 'search', 'list-checks', 'book-open', 'refresh-cw', 'circle-check', 'shopping-cart', 'heart-pulse', 'zap',
   'square', 'copy', 'skip-forward', 'calendar-clock', 'list-todo',
-  'undo-2', 'history', 'bot', 'save', 'receipt', 'sliders-horizontal', 'package-check', 'clock-3',
+  'undo-2', 'history', 'clipboard-list', 'save', 'receipt', 'sliders-horizontal', 'package-check', 'clock-3',
   'cloud', 'cloud-check', 'cloud-off', 'lock', 'log-in', 'log-out',
   'smartphone', 'trash-2', 'download', 'folder-open', 'pencil', 'calendar-plus', 'calendar-range', 'keyboard', 'activity', 'bell', 'arrow-right',
   'sparkles', 'sun-medium', 'droplets', 'landmark'];

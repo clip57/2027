@@ -81,7 +81,7 @@ osiągnięciu zera w zapasach, więc napraw to. Najpierw przedstaw bardzo szczeg
 | D4 | Meal Prep | Wynik testu kalibracyjnego z datą ISO („zdany · 2026-10-25”) | wspólny format |
 | D5 | Meal Prep | Minutnik kroku działa dalej po zmianie widoku (niewidoczny), bez sygnału końca | minutnik globalny z sygnałem dźwiękowym (patrz F-T1) |
 | D6 | CFA/MPW | Dzień bez bloków: pierścień „0 / 1” → 0 % zamiast stanu „dzień wolny” | stan „wolne” |
-| D7 | CFA | Panel dnia: „recall 22:00” zakodowane na sztywno — godzina recallu pochodzi z danych (`nightRecall`) | godzina z danych |
+| D7 | CFA | ~~Panel dnia: „recall 22:00” zakodowane na sztywno~~ — **zweryfikowane przy wdrożeniu: nie błąd** (wszystkie sesje recall planu V44 są o 22:00–22:53; dane i testy to potwierdzają) | bez zmian |
 | D8 | Zapasy | Plan zakupów: „Kopiuj listę” respektuje zaznaczenia, a „Do Reminders” zawsze wysyła całą listę | obie z zaznaczeń |
 | D9 | Zapasy | „Status AI” i „Kopiuj listę” przerysowują cały widok bez potrzeby | bez przerysowania |
 | D10 | Zapasy | Nazwa „Status AI” myląca — to raport tekstowy do schowka | „Raport do schowka” (lub „Raport dla asystenta”) |
@@ -91,7 +91,7 @@ osiągnięciu zera w zapasach, więc napraw to. Najpierw przedstaw bardzo szczeg
 | D14 | Dziś | Martwy kod „Dnia zero” („dzień 0 z 180”, „Wielkanoc”) — po D-100 nie występuje | usunąć |
 | D15 | Tydzień | „Następny tydzień” bez górnej granicy (po 28.03 — nieskończone tygodnie „poza planem”) | granica jak w Treningu |
 | D16 | Dane | „Wersja 0.2.0+…” — numer z `package.json` nie zmienia się od miesięcy | wersja = data budowy + skrót, np. „31.10.2026 · 4f1c…” |
-| D17 | Trening | Pasek przerwy (pływający) zasłania ostatnią sekcję na telefonie, bez odstępu pod treścią | odstęp na czas przerwy |
+| D17 | Trening / Pielęgnacja | Pasek przerwy w Treningu — **zweryfikowane pomiarem: odstęp jest** (`.main:has(.tr-rest)`, 25–30 px nad paskiem przy 375/390/1280 px); ten sam problem faktycznie występował w **Pielęgnacji** (licznik „Odczekaj” na telefonie — reguła tylko ≥ 900 px) | odstęp na czas licznika na każdej szerokości |
 
 **Dokumentacja (porządkowe):** `CLAUDE.md` i `docs/PRZEKAZANIE.md` §1 wciąż wspominają `main = redesign-faza4 = b3b4edc` i gałąź `redesign-faza4` — nieaktualne.
 

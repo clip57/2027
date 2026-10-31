@@ -14,7 +14,8 @@ const fromOf = p => SRC.phases.phases.find(x => x.phase === p).from;
 const PHASES = [0, 1, 2].map(value => ({ value, label: `Faza ${value}`, hint: `od ${shortDate(value === 0 ? TRAIN_START : fromOf(value))}` }));
 // Etykieta z PDF bywa samą liczbą (gramy) — dodajemy jednostkę, nie zmieniając wartości.
 const qty = label => (/^[\d,]+$/.test(label.trim()) ? `${label.trim()} g` : label);
-const VARIANTS = [{ value: 'T', label: 'Dzień treningowy', hint: 'pn–śr, pt–nd' }, { value: 'NT', label: 'Dzień nietreningowy', hint: 'czwartek' }];
+// D1 (audyt 31.10): podpowiedź bez dni tygodnia — dni treningowe wynikają z kalendarza planu (wyjątki, święta, przerwy), nie z weekday
+const VARIANTS = [{ value: 'T', label: 'Dzień treningowy', hint: 'dni z treningiem' }, { value: 'NT', label: 'Dzień nietreningowy', hint: 'dni bez treningu' }];
 
 // Makroskładniki jako jedna zwarta linia (zamiast czterech plakietek na każdą pozycję).
 const macroLine = (m, unit = 'g') => h('span', { class: 'dt-mac' },
@@ -30,11 +31,17 @@ function macroBar(t) {
 
 export function renderDieta(root, ctx) {
   const dayNow = resolveDay(ctx.today);
-  const phase = Number(ctx.params.get('f') ?? (phaseFor(ctx.today) ?? 0));
-  const variant = ctx.params.get('w') || dayNow.dietVariant;
+  // D1: `?d=` — jadłospis obowiązujący w wybranym dniu (faza z `phaseFor`, wariant z kalendarza planu przez `resolveDay`)
+  const dRaw = ctx.params.get('d');
+  const ref = dRaw && /^\d{4}-\d{2}-\d{2}$/.test(dRaw) ? dRaw : ctx.today;
+  const dayRef = ref === ctx.today ? dayNow : resolveDay(ref);
+  const refDiet = !dayRef.outside && !dayRef.noDiet && dayRef.dietVariant ? dayRef.dietVariant : null;
+  const phase = Number(ctx.params.get('f') ?? (phaseFor(ref) ?? 0));
+  const variant = ctx.params.get('w') || refDiet || dayNow.dietVariant || 'T';
   const go = (f, w) => { location.hash = `#/dieta?f=${f}&w=${w}`; };
   const s = dietSummary(phase, variant);
   const isToday = phase === (phaseFor(ctx.today) ?? 0) && variant === dayNow.dietVariant;
+  const forRef = ref !== ctx.today && refDiet && phase === (phaseFor(ref) ?? 0) && variant === refDiet;
   const times = mealTimes(dayNow.slots);
   const d = new Date();
   const hhmm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -67,7 +74,11 @@ export function renderDieta(root, ctx) {
       h('h1', {}, 'Dieta'),
       h('div', { class: 'topline' }, h('span', { class: 'date' }, s.header),
         isToday ? h('span', { class: 'chip' }, `obowiązuje dziś · ${longDate(ctx.today)}`)
-          : h('a', { class: 'chip dt-today', href: '#/dieta' }, icon('calendar', { size: 14 }), 'Pokaż plan na dziś'))),
+          : forRef ? h('span', { class: 'chip dt-ref' }, `obowiązuje ${dayShort(ref)} ${longDate(ref)}`) : null,
+        !isToday && h('a', { class: 'chip dt-today', href: '#/dieta' }, icon('calendar', { size: 14 }), 'Pokaż plan na dziś')),
+      dRaw && !refDiet && h('p', { class: 'muted dt-nodiet', role: 'note' }, ref === dRaw
+        ? `${dayShort(ref)} ${longDate(ref)} — ${dayRef.outside ? 'dzień poza planem' : 'dzień bez diety'}; poniżej plan wybrany przełącznikami.`
+        : 'Nieczytelna data w adresie — poniżej plan na dziś.')),
     h('div', { class: 'controls dt-controls' },
       segmented('Faza', PHASES, phase, v => go(v, variant)),
       segmented('Rodzaj dnia', VARIANTS, variant, v => go(phase, v))));

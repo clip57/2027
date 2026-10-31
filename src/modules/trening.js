@@ -1,8 +1,9 @@
 // Moduł Trening (Etap 5): plan z TRENING.html (= REKOMPOZYCJA s.9–17), faza z kalendarza (D-017),
 // dziennik serii (wykonana, ciężar, powtórzenia, RIR) zapisywany trwale zdarzeniami train.set (D-008),
 // mapa mięśni z free-exercise-db (domena publiczna).
-import { h, clear, add, fmt, plural } from '../ui/dom.js';
+import { h, clear, add, fmt, plural, numberOf } from '../ui/dom.js';
 import { progressRing, segmented, section, statGrid, stat, sheet } from '../ui/components.js';
+import { signal, unlockAudio } from '../ui/signal.js';
 import { icon } from '../ui/icons.js';
 import { movementPlayer } from '../ui/movement.js';
 import { barChart, lineChart } from '../ui/charts.js';
@@ -32,6 +33,7 @@ let rest = null; // { key, date, name, set, of, next, start, min, max, label }
 function startRest(e, set, of, date, next) {
   const r = restSeconds(spec(e).rest);
   rest = r && next ? { key: `${date}|${e.id}|${set}`, date, name: e.name, set, of, next, start: Date.now(), ...r, label: spec(e).rest } : null;
+  if (rest) unlockAudio();   // odhaczenie serii = gest użytkownika — Safari odblokowuje dźwięk sygnału końca przerwy (F-T1)
 }
 function restBar() {
   if (!rest) return null;
@@ -44,7 +46,7 @@ function restBar() {
     h('div', { class: 'tr-rest-main' }, note, time, h('span', { class: 'tr-rest-next' }, `Następnie: ${rest.next.e.name} · seria ${rest.next.set} z ${rest.next.of}`),
       h('span', { class: 'tr-rest-bar', role: 'presentation' }, fill)),
     h('div', { class: 'tr-rest-act' },
-      h('button', { onclick: () => { rest.min += 30; rest.max += 30; ready = false; tick(); } }, '+30 s'),
+      h('button', { onclick: () => { rest.min += 30; rest.max += 30; ready = false; rest.signaled = false; tick(); } }, '+30 s'),
       h('button', { 'aria-label': 'Pomiń przerwę', onclick: () => { rest = null; bar.remove(); } }, icon('skip-forward', { size: 18 }), h('span', {}, 'Pomiń'))),
     live);
   function tick() {
@@ -54,7 +56,10 @@ function restBar() {
     fill.style.width = `${Math.min(100, (el / rest.min) * 100)}%`;
     note.textContent = left > 0 ? `Przerwa · plan ${rest.label}` : el < rest.max ? `Możesz zaczynać · plan ${rest.label}` : 'Przerwa zakończona';
     bar.classList.toggle('is-ready', left <= 0);
-    if (left <= 0 && !ready) { ready = true; live.textContent = `Przerwa zakończona. Następnie: ${rest.next.e.name}, seria ${rest.next.set}.`; }
+    if (left <= 0 && !ready) {
+      ready = true; live.textContent = `Przerwa zakończona. Następnie: ${rest.next.e.name}, seria ${rest.next.set}.`;
+      if (!rest.signaled) { rest.signaled = true; if (left > -5) signal(); }   // raz na przerwę, tylko w chwili końca (nie po powrocie do widoku); „+30 s” — ponownie
+    }
     return true;
   }
   tick();
@@ -86,7 +91,7 @@ function sessionTimer(store, date, ctx, msg) {
   }
   const minutes = h('input', { type: 'number', min: '0', max: '600', step: '1', inputmode: 'numeric', value: cur.minutes ?? '', placeholder: 'min', 'aria-label': 'Czas treningu w minutach',
     // Wpis ręczny kończy też działający stoper (B4) — inaczej zostawał „start” bez „end” i stoper biegł dalej
-    onchange: e => { const v = e.target.value === '' ? null : Math.round(Number(e.target.value)); if (v === null || (v >= 0 && v < 1440)) saveSess({ minutes: v, ...(running && { end: new Date().toISOString() }) }); } });
+    onchange: e => { const n = numberOf(e.target), v = n == null ? null : Math.round(n); if (Number.isNaN(v)) return badNum(e.target, cur.minutes, msg); if (v === null || (v >= 0 && v < 1440)) saveSess({ minutes: v, ...(running && { end: new Date().toISOString() }) }); } });
   return h('div', { class: 'hero-tr-map tm' },
     h('div', {}, h('p', { class: 'eyebrow' }, 'Czas treningu'),
       running ? h('p', { class: 'tm-run' }, clock, h('span', { class: 'muted' }, ` od ${new Date(cur.start).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}`))
@@ -97,6 +102,12 @@ function sessionTimer(store, date, ctx, msg) {
       h('label', { class: 'tm-man' }, h('span', {}, 'lub wpisz:'), minutes, h('span', {}, 'min'))));
 }
 
+// W2: wpis nieodczytany przez przeglądarkę (np. „62,5”, gdy pole nie przyjmuje przecinka) — bez zapisu (wcześniej zapisywał się jako puste pole
+// i kasował wartość), komunikat i przywrócenie poprzedniej wartości
+function badNum(el, prev, msg) {
+  el.value = prev ?? '';
+  clear(msg).append(h('div', { class: 'banner err', role: 'alert' }, 'Nie odczytano liczby — wpisz ją z kropką albo przecinkiem jeszcze raz (np. 62.5). Poprzednia wartość bez zmian.'));
+}
 const sheetDialog = sheet;   // wspólny arkusz: nazwa dostępna, usunięcie po Esc (B3)
 
 const muscleLegend = m => h('div', { class: 'bm-legend' },
@@ -259,7 +270,7 @@ function renderSession(root, ctx) {
           h('button', { class: 'set-toggle', 'aria-pressed': String(!!v.done), onclick: () => save(e.id, v.set, { done: !v.done, opt: true }, true) }, v.done ? '✓' : String(v.set)),
           ...['kg', 'reps', 'rir'].map(field => h('input', { type: 'number', inputmode: 'decimal', step: field === 'kg' ? '0.5' : '1', min: '0',
             placeholder: field === 'kg' ? 'kg' : field === 'reps' ? 'powt.' : 'RIR', value: v[field] ?? '', 'aria-label': `${e.name}, seria opcjonalna ${v.set}: ${field}`,
-            onchange: ev => { const x = ev.target.value === '' ? null : Number(ev.target.value); if (x === null || Number.isFinite(x)) save(e.id, v.set, { [field]: x, opt: true }); } })),
+            onchange: ev => { const x = numberOf(ev.target); if (Number.isNaN(x)) return badNum(ev.target, v[field], msg); if (x === null || Number.isFinite(x)) save(e.id, v.set, { [field]: x, opt: true }); } })),
           h('span', { class: 'set-copy-sp' })))),
       rows.length < 10 && h('button', { class: 'opt-add', onclick: () => save(e.id, rows.length + 1, { done: false, opt: true }, true) }, '+ Dodaj serię (opcjonalnie)'));
   }
@@ -281,7 +292,7 @@ function renderSession(root, ctx) {
       const s = i + 1, v = log[`${date}|${e.id}|${s}`] || {}, prev = log[`${date}|${e.id}|${s - 1}`];
       const num = (field, ph, step) => h('input', { type: 'number', inputmode: 'decimal', step, min: '0', placeholder: ph, value: v[field] ?? '',
         'aria-label': `${e.name}, seria ${s}: ${ph}`,
-        onchange: ev => { const x = ev.target.value === '' ? null : Number(ev.target.value); if (x === null || Number.isFinite(x)) save(e.id, s, { [field]: x }); } });
+        onchange: ev => { const x = numberOf(ev.target); if (Number.isNaN(x)) return badNum(ev.target, v[field], msg); if (x === null || Number.isFinite(x)) save(e.id, s, { [field]: x }); } });
       return h('div', { class: `set${v.done ? ' is-done' : ''}` },
         h('button', { class: 'set-toggle', 'aria-pressed': String(!!v.done), 'aria-label': `Seria ${s} ${v.done ? 'wykonana' : 'do wykonania'}`,
           onclick: () => {

@@ -1,8 +1,8 @@
 // Moduł Zapasy (Etap 4, odsłona 2): odwzorowanie funkcji pierwotnego pliku ZAPASY_DIETA.html
 // na nowej architekturze — stan liczony z inwentaryzacji i planu (D-003, D-027), zapis zdarzeniami,
 // bez dat zakodowanych na sztywno i bez wstawiania danych do innerHTML.
-import { h, clear, fmt, plural, add } from '../ui/dom.js';
-import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation } from '../core/calc/inventory.js';
+import { h, clear, fmt, plural, add, numberOf } from '../ui/dom.js';
+import { stockAt, stockInfo, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation } from '../core/calc/inventory.js';
 import { randomId } from '../core/ids.js';
 import { icon } from '../ui/icons.js';
 import { sheet as dialog } from '../ui/components.js';
@@ -25,6 +25,8 @@ const DN = ['Nd', 'Pn', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob'], MN = ['sty', 'lut', 'm
 const v31Date = d => { const [y, m, dd] = d.split('-').map(Number); const x = new Date(y, m - 1, dd); return `${DN[x.getDay()]}, ${dd} ${MN[m - 1]}`; };
 const UNITS = ['g', 'kaps.', 'szt.', 'ml', 'tabl.'];
 const rank = { CRITICAL: 0, WARNING: 1, UNKNOWN: 2, OK: 3, UNTRACKED: 4 };
+// W1 (audyt 31.10.2026): pole „Stan” bez surowych ułamków („3.666667”) — wartość do 1 miejsca po przecinku (zapis bez zmian, dopiero wpis użytkownika)
+const inputQty = q => String(Math.round(q * 10) / 10);
 // Rozwinięte sekcje przetrwają przerysowanie widoku po zapisie (np. kilka korekt z rzędu) — stan wyłącznie interfejsu.
 const opened = new Set();
 const keepOpen = key => ({ open: opened.has(key) || null, ontoggle: e => { if (e.target.open) opened.add(key); else opened.delete(key); } });
@@ -79,11 +81,11 @@ export function renderZapasy(root, ctx) {
   let rows, list, shopIds, counts, soonest, last, packs, known, byNeed, visible;
   const compute = () => {
     rows = items.map(it => {
-      const st = stockAt(store.state.inv, it.id, today);
+      const si = stockInfo(store.state.inv, it.id, today), st = si ? si.qty : null;
       const fc = forecast(it.id, st, today);
       const daily = consumptionForDay(today)[it.id] ?? it.daily_v31 ?? 0;
       const info = statusInfo(it, st, fc);
-      return { it, st, fc, daily, info, status: info.code };
+      return { it, st, si, fc, daily, info, status: info.code };
     });
     list = shoppingList(store.state.inv, today, items);
     shopIds = new Set(list.map(x => x.id));
@@ -129,7 +131,7 @@ export function renderZapasy(root, ctx) {
     act('receipt', 'Paragon', () => receiptDialog()),
     act('undo-2', 'Cofnij', () => undo(last), { disabled: !last, title: last ? `Cofnij: ${opText(last)}` : 'Brak zmian do cofnięcia' }),
     act('history', 'Historia', () => historyDialog()),
-    act('bot', 'Status AI', () => aiStatus()),
+    act('clipboard-list', 'Raport', () => aiStatus(), { 'aria-label': 'Raport zapasów do schowka', title: 'Skopiuj raport zapasów (tekst dla asystenta) do schowka' }),
     act('save', 'Kopia', () => backupDialog())));
   add(root, actions.el);
 
@@ -209,7 +211,7 @@ export function renderZapasy(root, ctx) {
           h('span', { class: 'tag' }, it.category === 'Suplementy' ? 'SUPLEMENT' : it.shelfLife === 'short' ? 'ŚWIEŻE (≤7D)' : 'TRWAŁE (>7D)'),
           h('span', { class: 'inv-meta' },
             r.st == null ? 'Stan nieznany — ustaw stan poniżej.' :
-            r.st <= 0 ? 'Wystarczy do: DZIŚ (Brak)' :
+            r.st <= 0 ? (r.si?.shortSince ? `Brak od ${dayShort(r.si.shortSince)} ${shortDate(r.si.shortSince)} · wg planu zabrakło ${fmt(r.si.deficit, 1)} ${it.unit}` : 'Brak — stan 0') :
             r.fc?.lastCovered ? `Wystarczy do: ${v31Date(r.fc.lastCovered)}` : r.daily ? 'Wystarczy do: dziś' : 'Nie jest zużywana'),
           r.st != null && it.tracked !== false && r.daily > 0 && h('span', { class: runsOutBeforeShopping || r.st <= 0 ? 'inv-warn' : lowAfter ? 'inv-ok inv-low' : 'inv-ok' },
             (() => {
@@ -226,15 +228,15 @@ export function renderZapasy(root, ctx) {
         it.tracked === false ? h('p', { class: 'muted' }, 'Pozycja nieśledzona (zapas wieloletni).') :
           h('div', { class: 'inv-actions' },
             h('label', { class: 'inv-set' }, h('span', { class: 'sr-only' }, 'Stan'),
-              h('input', { type: 'number', inputmode: 'decimal', step: 'any', min: '0', value: r.st == null ? '' : String(r.st),
+              h('input', { type: 'number', inputmode: 'decimal', step: 'any', min: '0', value: r.st == null ? '' : inputQty(r.st),
                 'aria-label': `Stan: ${it.name}`, 'aria-describedby': 'zp-stan-hint', title: 'Stan na koniec dzisiejszego dnia',
                 // B2 (audyt 23.10.2026): puste albo nieczytelne pole (np. przecinek, którego przeglądarka nie przyjęła) NIE jest zerem —
                 // Number('') === 0 zapisywało „⛔ BRAK”; wtedy stan bez zmian, pole wraca do wartości z planu
                 onchange: e => {
-                  const raw = e.target.value.trim(), v = raw === '' ? NaN : Number(raw);
+                  const raw = e.target.value.trim(), n = numberOf(e.target), v = n == null ? NaN : n;   // W2: badInput = nieczytelne
                   if (Number.isFinite(v) && v >= 0) return save('inv.count', { prod: it.id, qty: v, date: today }, `${it.name}: stan ${fmt(v, 1)} ${it.unit}`);
-                  e.target.value = r.st == null ? '' : String(r.st);
-                  ctx.flash(raw === '' ? `${it.name}: puste pole „Stan” — stan bez zmian. Brak pozycji wpisz jako 0.` : `${it.name}: niepoprawna wartość — stan bez zmian.`, 'info');
+                  e.target.value = r.st == null ? '' : inputQty(r.st);
+                  ctx.flash(raw === '' && !e.target.validity?.badInput ? `${it.name}: puste pole „Stan” — stan bez zmian. Brak pozycji wpisz jako 0.` : `${it.name}: niepoprawna wartość — stan bez zmian.`, 'info');
                 } }),
               h('span', {}, it.unit)),
             h('button', { class: 'zp-pack', 'aria-label': `+ opakowanie (${fmt(it.packSize || 1)} ${it.unit}): ${it.name}`,
@@ -252,7 +254,8 @@ export function renderZapasy(root, ctx) {
             h('span', { class: 'tag' }, it.category),
             SAFE.has(it.name) && h('a', { class: 'btn zp-safe', href: `#/bezpieczenstwo?q=${encodeURIComponent(it.name)}` }, 'Przechowywanie →')),
           it.tracked !== false && h('div', { class: 'row' },
-            h('button', { onclick: () => save('inv.move', { prod: it.id, qty: -(r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: −1 porcja`) }, '− porcja'),
+            // K1: „− porcja” najwyżej do zera (stan nie bywa ujemny)
+            h('button', { disabled: !(r.st > 0) || null, onclick: () => save('inv.move', { prod: it.id, qty: -Math.min(r.daily || 1, r.st), date: today, kind: 'adjust' }, `${it.name}: −1 porcja`) }, '− porcja'),
             h('button', { onclick: () => save('inv.move', { prod: it.id, qty: (r.daily || 1), date: today, kind: 'adjust' }, `${it.name}: +1 porcja`) }, '+ porcja'),
             String(it.id).startsWith('custom_') && h('button', { 'aria-label': `Edytuj ${it.name}`, onclick: () => addDialog(it) }, icon('pencil', { size: 16 }), 'Edytuj'),
             String(it.id).startsWith('custom_') && h('button', { class: 'danger', 'aria-label': `Usuń ${it.name}`,
@@ -359,6 +362,8 @@ export function renderZapasy(root, ctx) {
       const pct = list.length ? Math.round((checked.size / list.length) * 100) : 100;
       txt.textContent = `${checked.size} / ${list.length} (${pct}%)`; bar.style.width = `${pct}%`;
     };
+    const listText = () => (checked.size ? list.filter(x => checked.has(x.id)) : list).map(x => `${x.name}: ${fmt(x.toBuy)} ${x.unit}`).join('\n');
+    const remindersHref = text => `shortcuts://run-shortcut?name=DodajZakupySpozywcze&input=text&text=${encodeURIComponent(text)}`;
     const dlg = dialog(`Plan zakupów — ${dayShort(shop.date)} ${shortDate(shop.date)}`,
       h('div', { class: 'prog' }, h('span', { class: 'prog-bar' }, bar), txt),
       list.length === 0 ? h('p', {}, 'Nic nie trzeba kupować — zapasy wystarczą.') :
@@ -377,11 +382,12 @@ export function renderZapasy(root, ctx) {
           } catch (e) { dlg.error(e); }
         } }, icon('check', { size: 18 }), 'Zaktualizuj stan'),
         h('button', { onclick: async () => {
-          const text = (checked.size ? list.filter(x => checked.has(x.id)) : list).map(x => `${x.name}: ${fmt(x.toBuy)} ${x.unit}`).join('\n');
-          try { await navigator.clipboard.writeText(text); ctx.flash('Lista skopiowana do schowka.'); } catch { ctx.flash('Nie udało się skopiować listy.'); }
-          dlg.close(); ctx.rerender();
+          try { await navigator.clipboard.writeText(listText()); ctx.flash('Lista skopiowana do schowka.'); } catch { ctx.flash('Nie udało się skopiować listy.'); }
+          dlg.close();
         } }, icon('copy', { size: 18 }), 'Kopiuj listę'),
-        h('a', { class: 'btn', href: `shortcuts://run-shortcut?name=DodajZakupySpozywcze&input=text&text=${encodeURIComponent(list.map(x => `${x.name}: ${fmt(x.toBuy)} ${x.unit}`).join('\n'))}` }, icon('smartphone', { size: 18 }), 'Do Reminders')));
+        // D8: Reminders — zaznaczone pozycje w chwili dotknięcia (jak „Kopiuj listę”)
+        h('a', { class: 'btn', href: remindersHref(listText()), onclick: e => { e.currentTarget.href = remindersHref(listText()); } },
+          icon('smartphone', { size: 18 }), 'Do Reminders')));
     upd();
   }
 
@@ -488,7 +494,7 @@ export function renderZapasy(root, ctx) {
   async function aiStatus() {
     const groups = { CRITICAL: [], WARNING: [], OK: [] };
     for (const r of rows) {
-      const line = `• ${r.it.name} [${r.it.category} | ${r.info.group || '—'}]: masz ${r.st == null ? '?' : fmt(r.st, 2)} ${r.it.unit} (starczy do: ${r.st != null && r.st <= 0 ? 'DZIŚ (Brak)' : r.fc?.lastCovered ? v31Date(r.fc.lastCovered) : '—'}, dzienna porcja: ${fmt(r.daily, 3)} ${r.it.unit})`;
+      const line = `• ${r.it.name} [${r.it.category} | ${r.info.group || '—'}]: masz ${r.st == null ? '?' : fmt(r.st, 2)} ${r.it.unit} (starczy do: ${r.st != null && r.st <= 0 ? (r.si?.shortSince ? `BRAK od ${v31Date(r.si.shortSince)}` : 'DZIŚ (Brak)') : r.fc?.lastCovered ? v31Date(r.fc.lastCovered) : '—'}, dzienna porcja: ${fmt(r.daily, 3)} ${r.it.unit})`;
       (groups[r.status] || groups.OK).push(line);
     }
     const text = `Cześć! Oto mój aktualny bilans zapasów spożywczych (${new Date().toLocaleDateString('pl-PL')}, Faza ${day.phase ?? 0}, ${day.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'}):\n\n`
@@ -496,8 +502,7 @@ export function renderZapasy(root, ctx) {
       + `⚠️ ŚREDNI STAN:\n${groups.WARNING.join('\n') || 'Wszystko zabezpieczone.'}\n\n`
       + `🟢 WYSTARCZAJĄCY ZAPAS:\n${groups.OK.join('\n') || 'Brak pozycji z dużym zapasem.'}\n\n`
       + '👉 Na podstawie powyższego stanu pomóż mi zaplanować zakupy lub podpowiedz alternatywy.';
-    try { await navigator.clipboard.writeText(text); ctx.flash('🤖 Skopiowano raport dla AI do schowka!'); }
+    try { await navigator.clipboard.writeText(text); ctx.flash('Skopiowano raport zapasów do schowka.'); }
     catch { ctx.flash('Nie udało się skopiować raportu.'); }
-    ctx.rerender();
   }
 }

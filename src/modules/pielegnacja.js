@@ -4,6 +4,7 @@
 // Widoki: Dzień (lista kontrolna wg pór, licznik „odczekaj”), Tydzień, Produkty, Plan (edycja, eksport).
 import { h, clear, add, plural } from '../ui/dom.js';
 import { segmented, progressRing, sheet } from '../ui/components.js';
+import { signal, unlockAudio } from '../ui/signal.js';
 import { icon } from '../ui/icons.js';
 import { region } from '../ui/patch.js';
 import { SRC } from '../core/data.js';
@@ -43,7 +44,7 @@ export function renderPielegnacja(root, ctx) {
   msg, h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))));
 
   // Licznik odczekania: pasek u dołu ekranu (jak przerwa w Treningu); „Pomiń” zamyka
-  function startTimer(s) { timer = { label: s.text, start: Date.now(), sec: s.wait * 60 }; timerBox.refresh(); }
+  function startTimer(s) { unlockAudio(); timer = { label: s.text, start: Date.now(), sec: s.wait * 60 }; timerBox.refresh(); }
   const timerBox = region(() => {
     if (!timer) return null;
     const time = h('strong', { class: 'pg-timer-t' }), fill = h('span', { class: 'pg-timer-fill' });
@@ -62,7 +63,7 @@ export function renderPielegnacja(root, ctx) {
       time.textContent = left > 0 ? `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` : 'Gotowe';
       fill.style.width = `${Math.min(100, (el / timer.sec) * 100)}%`;
       bar.classList.toggle('is-ready', left <= 0);
-      if (left <= 0 && !announced) { announced = true; live.textContent = `Czas minął. Możesz przejść do kolejnego kroku po: ${timer.label}.`; }
+      if (left <= 0 && !announced) { announced = true; live.textContent = `Czas minął. Możesz przejść do kolejnego kroku po: ${timer.label}.`; if (!timer.signaled) { timer.signaled = true; if (timer.sec - el > -5) signal(); } }
     };
     tick();
     const id = setInterval(() => (bar.isConnected && timer ? tick() : clearInterval(id)), 1000);

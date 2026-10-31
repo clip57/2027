@@ -1,8 +1,8 @@
 // Diagnostyka spójności danych (I8, audyt 25.09.2026): tylko odczyt, nic nie zmienia w dzienniku. Wynik = lista kontroli
 // { id, level: 'ok' | 'info' | 'warn', title, detail, href } — widok w module Dane, test w tests/unit/diagnostics.test.mjs.
-import { stockAt, allItems } from './inventory.js';
+import { stockInfo, allItems } from './inventory.js';
 import { SRC } from '../data.js';
-import { addDays } from '../dates.js';
+import { addDays, shortDate } from '../dates.js';
 import { PLAN_START, TRAIN_START } from '../resolver.js';
 import { packStatus, markersIn } from '../private.js';
 import rekomp from '../../data/rekomp.json' with { type: 'json' };
@@ -15,19 +15,19 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   const push = (id, level, title, detail = '', href = null) => out.push({ id, level, title, detail, href });
   if (health && !health.ok) push('storage', 'warn', 'Zapis niedostępny', health.error || 'Baza danych nie działa — zmiany nie są zapisywane.');
 
-  // Zapasy: stany ujemne (np. zużycie z planu większe niż wpisany stan) i dawno nieaktualizowane pozycje
+  // Zapasy: braki wg planu (stan 0 i niepokryte zużycie — K1: stan nie schodzi poniżej zera) i dawno nieaktualizowane pozycje
   const items = [...allItems(), ...custom].filter(it => it.tracked !== false);
-  const neg = [], stale = [], unknown = [];
+  const short = [], stale = [], unknown = [];
   const since = addDays(today, -STALE_DAYS);
   for (const it of items) {
-    const st = stockAt(state.inv, it.id, today);
-    if (st == null) { unknown.push(it.name); continue; }
-    if (st < 0) neg.push(`${it.name} (${st})`);
+    const si = stockInfo(state.inv, it.id, today);
+    if (si == null) { unknown.push(it.name); continue; }
+    if (si.shortSince) short.push(`${it.name} (od ${shortDate(si.shortSince)})`);
     const last = [...(state.inv.counts[it.id] || []), ...(state.inv.moves[it.id] || [])].reduce((m, x) => (x.date > m ? x.date : m), '');
     if (last && last < since) stale.push(it.name);
   }
-  push('neg', neg.length ? 'warn' : 'ok', neg.length ? `Ujemne stany: ${neg.length}` : 'Brak ujemnych stanów',
-    neg.length ? `${neg.slice(0, 6).join(', ')}${neg.length > 6 ? '…' : ''} — wpisz rzeczywisty stan w Zapasach.` : '', neg.length ? '#/zapasy?s=CRITICAL' : null);
+  push('short', short.length ? 'warn' : 'ok', short.length ? `Braki wg planu: ${short.length}` : 'Brak braków wg planu',
+    short.length ? `${short.slice(0, 6).join(', ')}${short.length > 6 ? '…' : ''} — kup albo wpisz rzeczywisty stan w Zapasach.` : '', short.length ? '#/zapasy?s=CRITICAL' : null);
   push('stale', stale.length ? 'info' : 'ok', stale.length ? `Bez inwentaryzacji i zakupów od ponad ${STALE_DAYS} dni: ${stale.length}` : `Stany aktualizowane w ostatnich ${STALE_DAYS} dniach`,
     stale.length ? `${stale.slice(0, 6).join(', ')}${stale.length > 6 ? '…' : ''} — prognoza liczona z planu może się rozjechać z rzeczywistością; sprawdź stan.` : '', stale.length ? '#/zapasy' : null);
   if (unknown.length) push('unknown', 'info', `Pozycje bez stanu: ${unknown.length}`, 'Bez inwentaryzacji nie ma prognozy ani listy zakupów dla tych pozycji.', '#/zapasy');

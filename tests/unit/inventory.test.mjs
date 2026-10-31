@@ -5,7 +5,7 @@ import path from 'node:path';
 import { Store } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
 import { preview, apply } from '../../src/core/sync/bundle.js';
-import { stockAt, forecast, status, statusInfo, shoppingList, nextShopping, allItems, setCustomItems, lastOperation, undoOperation, restoreRows } from '../../src/core/calc/inventory.js';
+import { stockAt, stockInfo, forecast, status, statusInfo, shoppingList, nextShopping, allItems, setCustomItems, lastOperation, undoOperation, restoreRows } from '../../src/core/calc/inventory.js';
 import { reduce } from '../../src/core/storage/store.js';
 import { consumptionForDay } from '../../src/core/calc/consumption.js';
 import { catalogById } from '../../src/core/data.js';
@@ -47,7 +47,8 @@ test('zakup po inwentaryzacji zwiększa stan; nowsza inwentaryzacja zastępuje s
   assert.equal(stockAt(s.state.inv, 'banan', '2026-10-22'), 720, 'czwartek bez banana');
   await s.record('inv.count', { prod: 'banan', qty: 100, date: '2026-10-22' });
   assert.equal(stockAt(s.state.inv, 'banan', '2026-10-23'), 100, '23.10 — dzień NT, bez banana (D-103)');
-  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-24'), -20, 'sobota — dzień T');
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-24'), 0, 'sobota — dzień T: zużycie 120 g > stan 100 g — stan 0, nie −20 (K1)');
+  assert.deepEqual(stockInfo(s.state.inv, 'banan', '2026-10-24'), { qty: 0, shortSince: '2026-10-24', deficit: 20 }, 'brak od 24.10, niedobór 20 g');
 });
 
 test('prognoza uwzględnia czwartki i fazy', async () => {
@@ -254,4 +255,39 @@ test('U8 (audyt 23.10.2026): przywrócenie stanów Zapasów z kopii automatyczne
   assert.equal(last.key, op);
   await s.recordMany(undoOperation(s.state.inv, last, today).list);
   assert.equal(stockAt(s.state.inv, 'banan', today), 5 - use('banan', '2026-10-29'));
+});
+
+test('K1 (audyt 31.10.2026): stan nie schodzi poniżej zera, a zakup po braku nie jest pomniejszany o zużycie z dni braku', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  const use = d => consumptionForDay(d).skyr || 0;
+  await s.record('inv.count', { prod: 'skyr', qty: 225, date: '2026-10-25' });
+  assert.equal(stockAt(s.state.inv, 'skyr', '2026-10-26'), 225 - use('2026-10-26'));
+  for (const d of ['2026-10-27', '2026-10-28', '2026-10-30']) assert.equal(stockAt(s.state.inv, 'skyr', d), 0, `${d}: 0, nie wartość ujemna`);
+  const si = stockInfo(s.state.inv, 'skyr', '2026-10-28');
+  assert.equal(si.shortSince, '2026-10-27', 'brak od pierwszego dnia, którego nie pokrył stan');
+  assert.equal(si.deficit, Math.round((use('2026-10-26') + use('2026-10-27') + use('2026-10-28') - 225) * 1e6) / 1e6, 'niedobór = niepokryte zużycie wg planu');
+  // zakup po braku: liczony w całości, potem tylko zużycie dnia zakupu i kolejnych
+  await s.record('inv.move', { prod: 'skyr', qty: 450, date: '2026-10-29', kind: 'purchase' });
+  assert.equal(stockAt(s.state.inv, 'skyr', '2026-10-29'), 450 - use('2026-10-29'), 'zakup pokrywa zużycie dnia zakupu');
+  assert.equal(stockInfo(s.state.inv, 'skyr', '2026-10-29').shortSince, null, 'po zakupie — koniec braku');
+  assert.equal(stockAt(s.state.inv, 'skyr', '2026-10-30'), Math.max(0, 450 - use('2026-10-29') - use('2026-10-30')));
+});
+
+test('K1: korekta dnia i ruch ujemny przy zerze nie dają wartości ujemnych; „Cofnij” po braku', async () => {
+  const s = await new Store(new MemoryAdapter()).open();
+  await s.record('inv.count', { prod: 'banan', qty: 0, date: '2026-10-26' });
+  await s.record('inv.dayshift', { date: '2026-10-27', dir: -1 });
+  await s.record('inv.move', { prod: 'banan', qty: -500, date: '2026-10-27', kind: 'adjust' });
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-27'), 0);
+  assert.equal(stockInfo(s.state.inv, 'banan', '2026-10-26').shortSince, null, 'stan 0 wpisany dziś — bez „braku od” do pierwszego dnia z zużyciem');
+  await s.record('inv.move', { prod: 'banan', qty: 1200, date: '2026-10-28', kind: 'purchase' });
+  const after = stockAt(s.state.inv, 'banan', '2026-10-28');
+  assert.ok(after > 0 && after <= 1200);
+  const op = lastOperation(s.allEvents());
+  await s.recordMany(undoOperation(s.state.inv, op, '2026-10-28').list);
+  assert.equal(stockAt(s.state.inv, 'banan', '2026-10-28'), 0, '„Cofnij” zakupu po braku — z powrotem 0, nie wartość ujemna');
+  for (const it of allItems()) {
+    const q = stockAt(s.state.inv, it.id, '2027-03-28');
+    if (q != null) assert.ok(q >= 0, `${it.id}: ${q}`);
+  }
 });

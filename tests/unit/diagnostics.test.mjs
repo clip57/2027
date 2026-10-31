@@ -16,18 +16,18 @@ test('diagnostyka: pusty dziennik — bez ostrzeżeń (poza brakiem stanów)', a
   assert.equal(by(d, 'unknown').level, 'info');
 });
 
-test('diagnostyka: ujemny stan, stara inwentaryzacja, blok CFA z przyszłą datą, kwarantanna, serie sprzed startu', async () => {
+test('diagnostyka: brak wg planu (od kiedy), stara inwentaryzacja, blok CFA z przyszłą datą, kwarantanna, serie sprzed startu', async () => {
   const s = await open();
   const futureBlock = SRC.cfa.D.bloki.find(b => b.data > '2026-10-21');
   await s.recordMany([
-    ['inv.count', { prod: 'banan', qty: 10, date: '2026-10-19' }],          // zużycie z planu > stan -> ujemny
+    ['inv.count', { prod: 'banan', qty: 10, date: '2026-10-19' }],          // zużycie z planu > stan -> brak od 20.10 (K1: stan 0, nie ujemny)
     ['inv.count', { prod: 'kefir', qty: 5000, date: '2026-09-10' }],        // ponad 14 dni bez inwentaryzacji
     ['cfa.done', { block: futureBlock.nr, done: true, plan: 15 }],
     ['train.set', { date: '2026-09-21', ex: 'x_test', set: 1, done: true }],
   ]);
   const d = diagnose(s.state, { today: '2026-10-21', quarantined: 2, cloud: { config: {}, pending: 3, lastSync: null } });
-  assert.equal(by(d, 'neg').level, 'warn');
-  assert.match(by(d, 'neg').detail, /Banan/);
+  assert.equal(by(d, 'short').level, 'warn');
+  assert.match(by(d, 'short').detail, /Banan \(od 20\.10\)/);
   assert.equal(by(d, 'stale').level, 'info');
   assert.match(by(d, 'stale').detail, /Kefir/);
   assert.equal(by(d, 'cfa-future').level, 'warn');

@@ -113,9 +113,11 @@ export function renderStudy(root, ctx, P) {
       return h('div', { class: 'panel' },
         h('div', { class: 'cfa-dayhead' },
           h('div', {}, h('h2', {}, `${dayShort(date)} ${longDate(date)}`),
-            h('p', { class: 'muted' }, `${dDone} / ${blocks.length} bloków${isMock ? ` · ${P.mock.day(date)}` : ''}${R ? (recall ? ' · recall 22:00' : ' · bez recall') : ''}`),
+            h('p', { class: 'muted' }, `${blocks.length ? `${dDone} / ${blocks.length} bloków` : 'bez bloków'}${isMock ? ` · ${P.mock.day(date)}` : ''}${R ? (recall ? ' · recall 22:00' : ' · bez recall') : ''}`),
             nextBlock && h('p', { class: 'cf-next' }, `Następny: blok ${nextBlock.blok} · ${nextBlock.godz} · ${nextBlock.temat}`)),
-          progressRing(dDone, blocks.length || 1, 'Bloki dnia')),
+          // D6 (audyt 31.10): dzień bez bloków — znacznik „wolne” zamiast pierścienia 0 / 1 (0 %)
+          blocks.length ? progressRing(dDone, blocks.length, 'Bloki dnia')
+            : h('span', { class: 'cf-free' }, date > first && date < last ? 'wolne' : 'poza planem')),
         blocks.length ? h('div', { class: 'cfa-list' }, blocks.map(b => blockRow(b, b === nextBlock)))
           : h('p', {}, date > first && date < last ? 'Dzień wolny w planie — brak bloków.' : 'Brak bloków w tym dniu (poza planem).'),
         recall && h('div', { class: `cfa-row cf-recall${rDone ? ' is-done' : ''}` },

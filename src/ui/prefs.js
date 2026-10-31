@@ -1,6 +1,6 @@
 // Preferencje interfejsu PER URZĄDZENIE (motyw, zwinięty panel). Celowo poza dziennikiem zdarzeń i plikiem synchronizacji:
 // nie są danymi użytkownika i nie powinny nadpisywać wyboru na innym urządzeniu. Brak dostępu do localStorage = wartości domyślne.
-const KEY = { theme: 'p2027.theme', side: 'p2027.sidebar' };
+const KEY = { theme: 'p2027.theme', side: 'p2027.sidebar', sound: 'p2027.sound' };
 const get = (k, d) => { try { return localStorage.getItem(KEY[k]) ?? d; } catch { return d; } };
 const set = (k, v) => { try { localStorage.setItem(KEY[k], v); } catch { /* tryb prywatny — tylko bieżąca sesja */ } };
 
@@ -16,3 +16,6 @@ export const saveTheme = pref => set('theme', pref);
 export function setTheme(pref) { saveTheme(pref); applyTheme(pref); }
 export const sideCollapsed = () => get('side', 'expanded') === 'collapsed';
 export const setSideCollapsed = v => set('side', v ? 'collapsed' : 'expanded');
+// Sygnał dźwiękowy końca odliczania (minutniki, przerwa w Treningu) — domyślnie włączony (D5)
+export const soundOn = () => get('sound', 'on') !== 'off';
+export const setSound = on => set('sound', on ? 'on' : 'off');

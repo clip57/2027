@@ -186,7 +186,7 @@ function renderWeek(root, ctx, date) {
     h('div', { class: 'row daynav' },
       mondayOf(PLAN_START) < mon && h('a', { class: 'btn dz-nav', href: wlink(addDays(mon, -7)), 'aria-label': 'Poprzedni tydzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni tydzień')),
       h('a', { class: 'btn dz-nav', href: `#/dzis${date === ctx.today ? '' : `?d=${date < PLAN_START ? PLAN_START : date}`}` }, 'Dzień'),
-      h('a', { class: 'btn dz-nav', href: wlink(addDays(mon, 7)), 'aria-label': 'Następny tydzień' }, h('span', {}, 'Następny tydzień'), icon('chevron-right', { size: 18 })))),
+      addDays(mon, 7) <= PLAN_END && h('a', { class: 'btn dz-nav', href: wlink(addDays(mon, 7)), 'aria-label': 'Następny tydzień' }, h('span', {}, 'Następny tydzień'), icon('chevron-right', { size: 18 })))),   // D15: bez tygodni po końcu planu
     h('ol', { class: 'wk-grid', 'aria-label': 'Dni tygodnia' }, week.map(x => h('li', {},
       h('a', { class: `wk-day${x.date === ctx.today ? ' is-today' : ''}${x.outside ? ' is-out' : ''}`, href: `#/dzis?d=${x.date}`,
         'aria-label': `${x.dayName}, ${longDate(x.date)}${x.date === ctx.today ? ' (dziś)' : ''}` },
@@ -210,27 +210,7 @@ export function renderDzis(root, ctx) {
   const r = resolveDay(date);
   // Dzień sprzed startu planu (D-088): bez planu dnia — tylko informacja i przejście do pierwszego dnia planu
   const nav = (n, label, ic) => h('a', { class: 'btn dz-nav', href: `#/dzis?d=${addDays(date, n)}`, 'aria-label': label }, n < 0 && icon(ic, { size: 18 }), h('span', {}, label), n > 0 && icon(ic, { size: 18 }));
-  // Dzień zero (D-097): start planu — planowanie i zobowiązanie; bez diety, treningu, nauki i suplementów, pielęgnacja tak
-  if (r.zero) {
-    const cm0 = careModel(ctx.store?.state?.careDefs || []), cp0 = cm0.empty ? null : progress(stepsFor(cm0, date), ctx.store?.state?.careDone || {}, date);
-    add(root, h('header', { class: 'dz-head' },
-      h('div', {}, h('h1', {}, date === ctx.today ? 'Dziś — Dzień zero' : 'Dzień zero'),
-        h('div', { class: 'topline' }, h('span', { class: 'date' }, `${r.dayName}, ${longDate(date)}`), h('span', { class: 'chip' }, 'start planu'))),
-      h('div', { class: 'row daynav' }, date !== ctx.today && h('a', { class: 'btn dz-nav', href: '#/dzis' }, 'Dziś'),
-        nav(1, 'Następny dzień', 'chevron-right'))),
-    h('section', { class: 'panel dz-zero', 'aria-labelledby': 'dz-zero-h' },
-      h('p', { class: 'eyebrow' }, 'Plan 2027 · dzień 0 z 180'),
-      h('h2', { id: 'dz-zero-h' }, 'Ostateczne planowanie i szlify'),
-      h('p', {}, `Dziś bez diety, treningu, nauki i suplementów. To dzień na dopracowanie planu i zobowiązanie się do skrupulatnego przestrzegania go przez następne 180 dni — od ${longDate(addDays(date, 1))} do ${longDate(PLAN_END)} (Wielkanoc).`),
-      h('ul', { class: 'dz-zero-list' },
-        h('li', {}, icon('sparkles', { size: 16 }), cp0 ? `Pielęgnacja: ${cp0.done} / ${cp0.total} kroków` : 'Pielęgnacja — według planu z modułu'),
-        h('li', {}, icon('calendar-range', { size: 16 }), `Dzień 1: ${dayShort(addDays(date, 1))} ${shortDate(addDays(date, 1))} — start diety, treningu, suplementacji i planu CFA`)),
-      h('div', { class: 'row' },
-        h('a', { class: 'btn primary', href: `#/pielegnacja?d=${date}` }, icon('sparkles', { size: 18 }), h('span', {}, 'Pielęgnacja')),
-        h('a', { class: 'btn', href: '#/kalendarz' }, icon('calendar', { size: 18 }), h('span', {}, 'Kalendarz planu')),
-        h('a', { class: 'btn', href: `#/dzis?d=${addDays(date, 1)}` }, h('span', {}, 'Dzień 1'), icon('chevron-right', { size: 18 })))));
-    return;
-  }
+  // D14 (audyt 31.10.2026): widok „Dnia zero” (D-097) usunięty — po D-100 plan nie ma Dnia zero (`phases.zero`), resolver traktuje go ogólnie
   // Dzień poza planem (D-088, D-097): przed Dniem zero albo po końcu planu (28.03.2027)
   if (r.outside) {
     const target = r.after ? PLAN_END : PLAN_START;
@@ -308,7 +288,7 @@ export function renderDzis(root, ctx) {
     h('div', { class: 'row quicklinks' },
       h('a', { class: 'btn ql', href: `#/dzis?v=tydzien&d=${date}` }, icon('calendar-range', { size: 18 }), h('span', {}, 'Tydzień')),
       h('a', { class: 'btn ql', href: `#/kalendarz?m=${date.slice(0, 7)}` }, icon('calendar', { size: 18 }), h('span', {}, 'Kalendarz')),
-      !r.noDiet && h('a', { class: 'btn ql', href: `#/dieta?f=${r.phase ?? 0}&w=${r.dietVariant}` }, icon('utensils', { size: 18 }), h('span', {}, 'Jadłospis dnia')),
+      !r.noDiet && h('a', { class: 'btn ql', href: `#/dieta?d=${r.date}` }, icon('utensils', { size: 18 }), h('span', {}, 'Jadłospis dnia')),
       h('a', { class: 'btn ql', href: `#/suplementy?d=${date}` }, icon('pill', { size: 18 }), h('span', {}, 'Suplementacja dnia')),
       r.training?.length > 0 && h('a', { class: 'btn ql', href: `#/trening?d=${date}` }, icon('dumbbell', { size: 18 }), h('span', {}, 'Trening dnia')),
       r.cfa.inPlan && h('a', { class: 'btn ql', href: `#/cfa?v=dzien&d=${date}` }, icon('graduation-cap', { size: 18 }), h('span', {}, 'Bloki CFA')),

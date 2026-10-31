@@ -23,6 +23,12 @@ const TYPE = { 'inv.count': 'stany magazynu', 'inv.move': 'zakupy i korekty', 'c
   'care.def': 'kroki i produkty pielęgnacji', 'care.done': 'odhaczenia pielęgnacji', 'mpw.done': 'bloki MPW', 'mpw.err.put': 'wpisy error logu MPW' };
 // Środowisko uruchomienia: każde (przeglądarka, aplikacja z ekranu początkowego, plik lokalny) ma OSOBNĄ bazę danych.
 export const appVersion = () => document.querySelector('meta[name="app-version"]')?.content || 'nieznana';
+// D16: wersja czytelna — data budowy i skrót zawartości („31.10.2026 · 4f1c2a”); pełny numer w Diagnostyce i podpowiedzi
+export function versionLabel() {
+  const built = document.querySelector('meta[name="app-built"]')?.content, v = appVersion();
+  const hash = (v.split('+')[1] || '').slice(0, 6);
+  return /^\d{4}-\d{2}-\d{2}$/.test(built || '') && hash ? `${built.slice(8, 10)}.${built.slice(5, 7)}.${built.slice(0, 4)} · ${hash}` : v;
+}
 export function runMode() {
   if (globalThis.__SINGLE__) return 'plik lokalny (jeden plik HTML)';
   const standalone = matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -63,12 +69,12 @@ export async function renderDane(root, ctx) {
   // Kolejność (D-077): synchronizacja — najczęstsza czynność — na górze; potem aktualizacja kodu, stan zapisu, kontrola, kopie
   const syncSlot = h('div', { class: 'dn-slot' });
   add(root, h('header', { class: 'dn-head' }, h('h1', {}, 'Dane i synchronizacja'),
-    h('div', { class: 'topline' }, h('span', { class: 'date' }, `${runMode()} · wersja ${appVersion()}`))), msg, syncSlot,
+    h('div', { class: 'topline' }, h('span', { class: 'date' }, `${runMode()} · wersja ${versionLabel()}`))), msg, syncSlot,
     h('section', { class: 'panel', 'aria-labelledby': 'h-stan' }, h('h2', { id: 'h-stan' }, 'Stan zapisu'),
       h('dl', { class: 'kv' },
         h('dt', {}, 'Zapis'), h('dd', { style: { color: health.ok ? 'var(--ok-ink)' : 'var(--err-ink)' } }, health.ok ? 'działa, każdy zapis sprawdzany odczytem' : (health.error || 'niedostępny')),
         h('dt', {}, 'Ochrona przed usunięciem'), h('dd', {}, health.persisted ? 'przyznana przez przeglądarkę' : 'nieprzyznana — eksportuj kopię regularnie'),
-        h('dt', {}, 'Wersja aplikacji'), h('dd', {}, appVersion()),
+        h('dt', {}, 'Wersja aplikacji'), h('dd', { title: appVersion() }, versionLabel(), h('span', { class: 'muted small block' }, appVersion())),
         h('dt', {}, 'Uruchomiono jako'), h('dd', {}, runMode(), h('span', { class: 'muted block' }, 'To miejsce ma własną, oddzielną bazę danych — dane z innych miejsc trafiają tu tylko przez import pliku 2027-sync.json albo synchronizację w chmurze.'),
           // U-h: WebKit usuwa dane witryny w karcie Safari po 7 dniach bez otwierania; aplikacja z ekranu początkowego jest z tego wyłączona
           runMode() === 'karta przeglądarki' && h('span', { class: 'banner warn dn-evict' }, 'Karta przeglądarki: Safari może usunąć dane tej witryny po 7 dniach bez jej otwierania. Na iPhonie używaj aplikacji z ekranu początkowego (Udostępnij → Do ekranu początkowego) i synchronizuj dane (plik lub chmura) po każdej pracy.')),
@@ -162,7 +168,8 @@ export async function renderDane(root, ctx) {
 
   // --- Kontrola stanów (tylko odczyt; edycja stanów — moduł Zapasy)
   if (store) {
-    const rows = allItems().map(it => {
+    // W3 (audyt 31.10.2026): także pozycje własne użytkownika — ta sama lista co w Zapasach
+    const rows = [...allItems(), ...(store.state.catalogUser || [])].map(it => {
       const st = stockAt(store.state.inv, it.id, ctx.today);
       const fc = forecast(it.id, st, ctx.today);
       return { it, st, fc, status: status(it, st, fc) };

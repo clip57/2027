@@ -28,3 +28,12 @@ export function add(parent, ...kids) {
   for (const c of kids.flat(Infinity)) if (c != null && c !== false && c !== '') parent.append(c instanceof Node ? c : document.createTextNode(String(c)));
   return parent;
 }
+
+// Wartość pola liczbowego (W2, audyt 31.10.2026): null — pole puste (usunięcie wartości), NaN — wpis, którego przeglądarka nie odczytała
+// (np. przecinek dziesiętny w przeglądarce bez obsługi polskiego formatu: `value` jest wtedy pusty, ale `validity.badInput` = true) —
+// wcześniej taki wpis zapisywał się jak puste pole i po cichu kasował ciężar serii. Przecinek w polu tekstowym zamieniany na kropkę.
+export function numberOf(el) {
+  if (el.validity?.badInput) return NaN;
+  const raw = String(el.value ?? '').trim().replace(',', '.');
+  return raw === '' ? null : Number(raw);
+}

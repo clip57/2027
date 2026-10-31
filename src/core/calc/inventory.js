@@ -19,16 +19,33 @@ export function baseCount(inv, prod, date) {
   return best;
 }
 
-export function stockAt(inv, prod, date) {
+// Stan z dolną granicą 0 (K1, audyt 31.10.2026): symulacja dzień po dniu — zużycie z planu nie może przekroczyć tego, co jest.
+// Wcześniej stan schodził poniżej zera, a zużycie z dni braku „zjadało” następny zakup (skyr: 225 g → −225 g; po zakupie 450 g — 75 g
+// zamiast 300 g). W dniu D najpierw zakupy, korekty i korekty dnia z datą D, potem zużycie dnia D (zakup pokrywa potrzeby dnia zakupu).
+// Wynik: { qty, shortSince (pierwszy dzień obecnego braku albo null), deficit (zużycie wg planu niepokryte od tego dnia) }.
+// Dziennik zdarzeń bez zmian — zmienia się wyłącznie obliczenie.
+export function stockInfo(inv, prod, date) {
   const base = baseCount(inv, prod, date);
   if (!base) return null; // brak inwentaryzacji = stan nieznany
-  let q = base.qty;
-  for (const m of inv.moves[prod] || []) if (after(m, base) && m.date <= date) q += m.qty;
-  for (let d = addDays(base.date, 1); d <= date; d = addDays(d, 1)) q -= useFor(prod, d);
-  // Korekty dnia (przyciski „+1 dzień / −1 dzień” z pierwotnego modułu): dodają lub odejmują
-  // zużycie całego dnia dla wszystkich pozycji naraz.
-  for (const s of inv.shifts || []) if (after(s, base) && s.date <= date) q += s.dir * useFor(prod, s.date);
-  return round(q);
+  const byDay = new Map();
+  const put = (d, x) => byDay.set(d, (byDay.get(d) || 0) + x);
+  for (const m of inv.moves[prod] || []) if (after(m, base) && m.date <= date) put(m.date, m.qty);
+  // Korekty dnia (przyciski „+1 dzień / −1 dzień” z pierwotnego modułu): dodają lub odejmują zużycie całego dnia dla wszystkich pozycji naraz.
+  for (const s of inv.shifts || []) if (after(s, base) && s.date <= date) put(s.date, s.dir * useFor(prod, s.date));
+  let q = Math.max(0, base.qty + (byDay.get(base.date) || 0)), shortSince = null, deficit = 0;
+  for (let d = addDays(base.date, 1); d <= date; d = addDays(d, 1)) {
+    q = Math.max(0, q + (byDay.get(d) || 0));
+    const need = useFor(prod, d);
+    if (need > q + 1e-9) { deficit += need - q; shortSince ||= d; q = 0; }
+    else { q -= need; if (q > 1e-9 || need > 0) { shortSince = null; deficit = 0; } }   // dzień pokryty — koniec okresu braku
+  }
+  if (q > 1e-9) { shortSince = null; deficit = 0; }
+  return { qty: round(q), shortSince, deficit: round(deficit) };
+}
+
+export function stockAt(inv, prod, date) {
+  const s = stockInfo(inv, prod, date);
+  return s ? s.qty : null;
 }
 
 // ---- Cofanie zmian zapasów (B1, audyt 23.10.2026) ----

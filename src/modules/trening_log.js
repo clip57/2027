@@ -1,6 +1,6 @@
 // Dziennik szczegółów sesji (D-106): panel z sekcjami Basen / Rower / Sauna / Notatka wg protokołów z Rekompozycji (bez kolana — D-111).
 // Zapis po każdej zmianie pola (zdarzenie `train.detail`, jeden dokument na dzień); bez przerysowywania strony, żeby nie gubić fokusu. Definicja pól: core/trainlog.js.
-import { h, clear } from '../ui/dom.js';
+import { h, clear, numberOf } from '../ui/dom.js';
 import { LOG, NOTE_MAX, mainKind, withValue, fieldOk, swimPace, paceText } from '../core/trainlog.js';
 
 const filled = (doc, sec) => Object.keys(doc?.[sec] || {}).length;
@@ -28,9 +28,8 @@ export function sessionLog(store, date, r, ctx, msg) {
     if (f.type === 'num') {
       const input = h('input', { type: 'number', inputmode: 'decimal', min: String(f.min), max: String(f.max), step: String(f.step), value: cur() ?? '', 'aria-label': `${LOG[sec].title}: ${f.label}${f.unit ? `, ${f.unit}` : ''}`,
         onchange: e => {
-          const raw = e.target.value;
-          if (raw === '') { e.target.removeAttribute('aria-invalid'); return save(sec, key, null); }
-          const v = Number(raw);
+          const v = numberOf(e.target);   // W2: wpis nieodczytany (badInput) = błąd, nie puste pole
+          if (v === null) { e.target.removeAttribute('aria-invalid'); return save(sec, key, null); }
           if (!Number.isFinite(v) || v < f.min || v > f.max) { e.target.setAttribute('aria-invalid', 'true'); clear(msg).append(h('div', { class: 'banner err', role: 'alert' }, `${f.label}: wartość z zakresu ${f.min}–${f.max}.`)); return null; }
           e.target.removeAttribute('aria-invalid'); return save(sec, key, v);
         } });

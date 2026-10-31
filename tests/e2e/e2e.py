@@ -30,7 +30,7 @@ def expected_stock(start, per_day, since=_dt.date(2026, 9, 22)):
     # „dziś” w strefie przeglądarki testowej (Europe/Warsaw), nie serwera (UTC) — inaczej między 22:00 a 24:00 UTC różnica 1 dnia
     d, q, today = max(since + _dt.timedelta(days=1), PLAN_START), start, TODAY()
     while d <= min(today, PLAN_END):
-        if d != ZERO: q -= per_day(d)
+        if d != ZERO: q = max(0, q - per_day(d))   # K1 (audyt 31.10.2026): stan nie schodzi poniżej zera
         d += _dt.timedelta(days=1)
     return q
 # Dane do bloku zapasów: prawdziwa kopia użytkownika (SOURCES_DIR) albo SYNTETYCZNA kopia z fikcyjnymi wartościami
@@ -223,7 +223,7 @@ async def run_variant(pw, name, url, mobile):
     ok('Przyprawy' in txt and 'Zamienniki' in txt, f'{tag} Dieta: przyprawy i zamienniki')
     await pg.goto(url + '#/suplementy?d=2026-10-19'); await pg.wait_for_selector('.dose-list')
     txt = await pg.inner_text('main')
-    ok('Tauryna' in txt and 'od 2026-10-18 do 2027-03-28' in txt and '2027-03-21' not in txt,
+    ok('Tauryna' in txt and 'od 18.10.2026 do 28.03.2027' in txt and '21.03.2027' not in txt,
        f'{tag} Suplementacja: tauryna i okres preparatów czasowych (D-103c)')
     ok('Stan i prognoza pochodz' not in txt and 'Potem nie są kontynuowane' not in txt, f'{tag} Suplementacja: bez usuniętych podpisów')
     # najbliższy wtorek (test niezależny od dnia uruchomienia)
@@ -420,7 +420,7 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv-item')
     inv = await pg.inner_text('main')
     ok('55' in await pg.inner_text('.dash'), f'{tag} Zapasy: 55 pozycji')
-    for lab in ['Dodaj', 'Zakupy', 'Paragon', 'Cofnij', 'Historia', 'Status AI', 'Kopia']:
+    for lab in ['Dodaj', 'Zakupy', 'Paragon', 'Cofnij', 'Historia', 'Raport', 'Kopia']:
         ok(await pg.locator('.actions').get_by_text(lab, exact=False).count() > 0, f'{tag} Zapasy: przycisk {lab}')
     ok(await pg.locator('.pills .pill-b').count() == 9, f'{tag} Zapasy: 9 kategorii')
     ok(await pg.locator('.counters .counter').count() == 4 and await pg.locator('.counters .c-shop').count() == 1, f'{tag} Zapasy: liczniki statusów + „Do zakupów” (U-c)')
@@ -453,6 +453,11 @@ async def run_variant(pw, name, url, mobile):
     await pg.get_by_role('button', name='Cofnij', exact=True).click()
     await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value === v', before, timeout=8000)
     ok(True, f'{tag} Zapasy: cofnięcie ostatniej zmiany przywraca stan')
+    # K1 (D-113): stan nie spada poniżej 0 — korekta dnia sprawdzana przy stanie dodatnim (po zakupie opakowania)
+    await pg.locator('.inv-item').first.get_by_role('button', name='+ opakowanie', exact=False).click()
+    await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value !== v', before, timeout=8000)
+    before = await pg.locator('.inv-item').first.locator('input[type=number]').input_value()
+    ok(float(before) > 0, f'{tag} Zapasy: stan dodatni przed korektą dnia ({before})')
     await pg.locator('.daycard > summary').click()   # korekta dnia — sekcja zwinięta (Faza 5)
     await pg.get_by_role('button', name='−1 dzień (odlicz)').click()
     await wait_js(pg, 'v => document.querySelector(".inv-item input[type=number]").value !== v', before, timeout=8000)

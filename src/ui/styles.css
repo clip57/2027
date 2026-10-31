@@ -275,6 +275,10 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 .timer { display: inline-flex; align-items: center; gap: .3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .1rem .2rem .1rem .6rem; }
 .timer-v { font-family: var(--font-round); font-weight: 700; font-size: .82rem; min-width: 3rem; text-align: right; }
 .timer-b { min-height: 32px; padding: .2rem .7rem; font-size: .78rem; border-radius: 999px; }
+.timer.is-run { border-color: var(--accent); }
+.timer.is-run .timer-v { color: var(--accent); }
+.timer.is-done { border-color: var(--success); }
+.timer.is-done .timer-v { color: var(--success); }
 .prep-note { margin: .55rem 0 0; padding: .55rem .75rem; border-radius: 10px; font-size: .88rem; border-left: 3px solid transparent; }
 .prep-note.n-safe { background: color-mix(in srgb, var(--diet) 10%, transparent); border-color: var(--diet); }
 .prep-note.n-crit { background: color-mix(in srgb, var(--bad) 10%, transparent); border-color: var(--bad); }
