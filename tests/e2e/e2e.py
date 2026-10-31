@@ -381,7 +381,10 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/kalendarz?m=2026-10'); await pg.wait_for_selector('.kl-day')
     ok(await pg.locator('.kl-day').count() == 31 and await pg.locator('.kl-day.is-today').count() == (1 if TODAY().strftime('%Y-%m') == '2026-10' else 0), f'{tag} Kalendarz: październik — 31 dni')
     # F-K1 (D-113): klik dnia — podgląd pod siatką (bez przechodzenia); „Otwórz w Dziś” — pełny plan dnia
-    await pg.locator('a.kl-day[href="#/kalendarz?m=2026-10&d=2026-10-18"]').click(); await pg.wait_for_selector('.kl-preview')
+    await pg.locator('a.kl-day[href="#/kalendarz?m=2026-10&d=2026-10-18"]').click()
+    # podgląd dnia dzisiejszego może być widoczny już przed kliknięciem (październik) — czekamy na podgląd WYBRANEGO dnia
+    try: await wait_js(pg, "() => (document.querySelector('.kl-preview')?.textContent || '').includes('18 października 2026')", timeout=8000)
+    except TimeoutError: pass
     pv = await pg.inner_text('.kl-preview')
     ok('18 października 2026' in pv and await pg.locator('.kl-p-slots li').count() > 0 and await pg.locator('a.kl-day.is-sel').count() == 1, f'{tag} Kalendarz: podgląd wybranego dnia pod siatką')
     await pg.locator('.kl-open').click(); await pg.wait_for_selector('.dz-plan-h')
@@ -1501,7 +1504,7 @@ async def run_d113(pw, name, url, mobile):
     await pg.get_by_role('button', name='Zakupy', exact=True).click(); await pg.wait_for_selector('dialog.shop-dialog')
     ok(await pg.locator('dialog .shop-group').count() >= 2, f'{tag} Tryb zakupów: lista pogrupowana wg kategorii')
     cb = pg.locator('dialog .shop-list input[type=checkbox]')
-    await cb.nth(0).check(); await pg.wait_for_timeout(300)
+    await cb.nth(0).check(); await pg.wait_for_selector('dialog .shop-list li.is-done')   # zapis `setting` zakończony (upd po record)
     await pg.locator('dialog .sheet-head button').click(); await pg.reload(); await pg.wait_for_selector('.inv-item')
     await pg.get_by_role('button', name='Zakupy', exact=True).click(); await pg.wait_for_selector('dialog.shop-dialog')
     ok('1 / ' in await pg.inner_text('dialog .prog') and await pg.locator('dialog .shop-list li.is-done').count() == 1, f'{tag} Tryb zakupów: odhaczenie zapisane (po przeładowaniu)')
