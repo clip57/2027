@@ -9,7 +9,7 @@ osiągnięciu zera w zapasach, więc napraw to. Najpierw przedstaw bardzo szczeg
 
 ---
 
-> **Status (31.10.2026): plan wdrożony w D-113** — decyzje §7 1–6 zaakceptowane przez użytkownika, prototyp zaakceptowany; K1, W1–W3,
+> **Status (1.11.2026): plan wdrożony i opublikowany w D-113 (`main`, 31.10.2026; iPhone sprawdzony)** — decyzje §7 1–6 zaakceptowane przez użytkownika, prototyp zaakceptowany; K1, W1–W3,
 > D1–D17 i wszystkie 24 funkcje z §5 — wykonane (szczegóły i ograniczenia: `docs/RAPORT_D113.md`). Punkt 7 (D1 — popołudnie od 16.11) — otwarty.
 
 ## 0. Najważniejsze w skrócie

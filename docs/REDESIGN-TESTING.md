@@ -11,6 +11,7 @@
 | Poprawki audytu (D-107) | w `npm run e2e` — `run_d107` | B1 „Cofnij” (760 g po pomyłce, drugie „Cofnij” bez przywracania błędu, zerowanie jako jedna operacja), B2 puste pole „Stan”, B3 „Teraz” o 10:03 w miejscu i zmiana dnia (zegar i powrót do aplikacji), B4 stoper po 25 h, B5 `.ics`, B6 MPW w czwartki 16:00, B7 ikona „monitor”, B8 seria tygodni, B9 sloty Pielęgnacji, B10 dwie karty bez nowych połączeń IndexedDB (web) | — |
 | Ryzyka i ulepszenia audytu (D-108) | w `npm run e2e` — `run_d108` | U7 CSP bez `localhost`, U6 zadania MPW wczytane dopiero w module (web: 1 zapytanie, `2027.html`: 0), U4 tygodnie w Treningu (← → na komputerze, „Ten tydzień”, pierwszy tydzień planu), U3 skróty `g k / p / e / n` (przed i po 12.11), U1 „Czas własny” i slot „Nauka MPW”, R2 blokada pliku postępu z innego planu i opis bloków, U8 przywrócenie stanów Zapasów z kopii i „Cofnij”; D-109: 31.12 bez zakupów, 01.01 bez treningu z blokami MPW; axe na nowych widokach i oknach — oba warianty buildu | — |
 | System 2.0 (D-110) | w `npm run e2e` — `run_d110` | D-112: brak animacji nieskończonych w „Dziś”, przeciąganie arkusza za treść (w dół zamyka, w górę nie), zakładka bieżącego modułu — na górę bez przerysowania, `scrollRestoration = manual`; „Teraz”: „zostało N min” i upływ punktu `--el` (zegar 19.10 10:40), odliczanie w miejscu po 65 s (bez przerysowania), poświata `data-domain`; kolejność „Teraz” → „Wymaga uwagi”; jednostka KPI; gradient pierścienia; przewinięcie: nowy moduł od góry, „Wstecz” przywraca; wejście ekranu tylko przy zmianie trasy (nie po zapisie); „Widok” CFA w jednym wierszu; telefon: pływający pasek dolny, pasek tytułu po przewinięciu, arkusz — krótkie przeciągnięcie wraca, długie zamyka; komputer: poświata kursora, zmiana motywu z odsłonięciem (wybór zapisany od razu, tło `#f3f4f7`), axe w obu motywach | — |
+| System 3.0 „Precision” (D-113) | w `npm run e2e` — `run_d113` | Ustawienia (akcent zapamiętany od startu, axe), brak stanów ujemnych w Zapasach, tryb zakupów (grupy wg kategorii, odhaczenie zapisane po przeładowaniu, „Kupione” z inną ilością, „Cofnij”), szczegóły pozycji (wykres), dawki Suplementacja ↔ Dziś (bez dublowania nazw, D-041), podgląd dnia w Kalendarzu, wykres postępu i mapa wykonania CFA, licznik 53 min, ⌘K (lista poleceń, data → dzień), pasek górny, brak błędów JS | — |
 | CI — „Testy 2027” | `.github/workflows/testy.yml` (push poza `main`, PR, wywołanie z `pages.yml`) | jednostkowe, `plan_check`, `verify_all --data-only`, budowa, `cfa_smoke`, E2E, a11y, Trening, `e2e:sync`, `e2e:cloud` — przed każdą publikacją na `main` (błąd zatrzymuje wdrożenie) | Python 3.12 + Playwright 1.56 (instalowane w CI) |
 | Trening: arkusze i dziennik sesji | `npm run build && npm run e2e:trening` | arkusze System kolana i Sauna (D-105); dziennik sesji (D-106; bez sekcji Kolano — D-111): zapis pól, zakres, przeładowanie, cofnięcie, sekcje wg dnia, Historia, axe — 390 ciemny / 1100 jasny | — |
 | Dostępność | `npm run build && npm run a11y` | (D-110: przed axe oczekiwanie na koniec animacji czasowych — wejście ekranu, okna; pomijane nieskończone i sterowane przewijaniem) axe-core WCAG 2.1 A/AA na 20 widokach + 7 stanach interakcji (`STATES`: odhaczona seria, blok CFA, krok Meal Prep, rozwinięte sekcje poradnika/Rekompozycji/Diety, okno techniki) × 390/1280 px × motyw jasny/ciemny (108 przebiegów) + przewijanie w poziomie | jw. |
@@ -20,6 +21,17 @@ dodatkowo `npm run e2e:sync`, jeśli zmiana dotyka `src/app.js`, `src/core/**`, 
 `npm run e2e:cloud`, jeśli dotyka `src/core/sync/**`, `src/core/storage/**`, `src/modules/dane*.js` albo `src/app.js`.
 
 ## 2. Wyniki regresji
+
+### D-113 — audyt 31.10.2026 i System 3.0 „Precision” (31.10.2026, konfiguracja B)
+| Zestaw | Wynik |
+|---|---|
+| `npm test` | 266 / 266 (nowe: `checks`, `commands`, akcenty w `tokens`, etykiety stanów, K1) |
+| `plan_check.mjs` / `verify_all.py --data-only` / `cfa_smoke.py` | 0 błędów (3 znane ostrzeżenia) / 0 błędów / 0 błędów |
+| `npm run e2e` | 1577 / 1577 (`run_d113`: 37 kontroli na wariant) |
+| `npm run a11y` / `e2e:trening` | 0 naruszeń / 0 błędów |
+| `npm run e2e:sync` / `e2e:cloud` | 23 / 23 / 100 / 100 |
+| Przegląd widoków (1233 renderów, 320–1920 px, daty 16.10.2026–30.03.2027) | 0 wartości ujemnych, NaN, `undefined`, „Invalid Date”; brak przewijania w poziomie |
+| CI („Testy 2027” przebieg 17, „Publikacja 2027” przebieg 40) | sukces; opublikowane `8074976` |
 
 ### D-112 — iPhone: przewijanie, skoki strony, arkusz (25.10.2026, konfiguracja B)
 | Zestaw | Wynik |
@@ -306,6 +318,12 @@ Zmiana któregokolwiek z nich = aktualizacja testu w tym samym kroku.
    ponownym dodaniu do ekranu początkowego — **usunięcie aplikacji z ekranu początkowego usuwa jej bazę**: wcześniej synchronizacja w chmurze
    albo eksport pliku (RAPORT_D110 §8); Ustawienia → Dostępność: „Ogranicz ruch” (bez animacji), „Ogranicz przezroczystość”
    i „Zwiększ kontrast” (bez szkła i poświat). **Do wykonania przez użytkownika.**
+
+14. **System 3.0 „Precision” (D-113)** — iPhone (Safari i PWA): **potwierdzone przez użytkownika 1.11.2026**. MacBook (Safari i Chrome) — **do wykonania przez użytkownika**:
+   pasek górny (ścieżka, dzień planu, stan synchronizacji, przełącznik motywu), ⌘K z poleceniami (puste pole = lista, „12.11” = przejście do dnia),
+   Ustawienia (akcent, gęstość, rozmiar tekstu, sygnał), „Dziś” w dwóch kolumnach z podsumowaniem wieczorem (od 20:00), Zapasy — tryb zakupów
+   (odhaczenie na jednym urządzeniu widoczne na drugim po synchronizacji), odhaczanie dawek w Suplementacji i w „Dziś”, podgląd dnia w Kalendarzu,
+   postęp nauki względem planu. Sygnał minutnika wymaga włączonego ekranu.
 
 **MacBook (Safari i Chrome):** panel boczny z grupami, zwijanie zapamiętane, przełącznik motywu, dashboard na 1280–1440 px.
 D-110: pływający panel boczny, poświata pod kursorem na kartach, zmiana motywu z odsłonięciem kołem (Safari 18+, Chrome), ⌘K u góry ekranu.

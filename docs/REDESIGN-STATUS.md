@@ -1,7 +1,8 @@
 # REDESIGN-STATUS — stan po Fazach 3–4, stabilizacji 5.0, Fazie 5 (wszystkie moduły) i Etapach 0–3 audytu — 25.09.2026
 
 > **System 2.0 (D-110, 24.10.2026):** nowy wygląd całej aplikacji — `docs/RAPORT_D110.md`, specyfikacja `REDESIGN-SPEC.md` (§1, §2, §4, §5).
-> **Stan bieżący (25.10.2026):** `main` = gałąź `claude/eager-newton-j2309e` (D-110 i D-111, publikacja 25.10.2026). Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
+> **System 3.0 „Precision” (D-113, 31.10.2026):** kolejny wygląd — `docs/RAPORT_D113.md`, decyzja w `REDESIGN-DECISIONS.md` §C13 (warstwa `precision.css`, paleta grafitowa, Inter Display, akcent do wyboru, pasek górny, Ustawienia, wykresy z danych). Dotyczy w pełni „Dziś”, „Zapasów”, Suplementacji, Kalendarza, planu nauki i Tygodnia; w Meal Prep, Pielęgnacji, Rekompozycji i Dane — wspólna warstwa bez przebudowy układu.
+> **Stan bieżący (1.11.2026):** D-113 opublikowany na `main` (`8074976`, 31.10.2026), działanie na iPhonie potwierdzone; `main` = gałąź `claude/eager-newton-j2309e`. Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
 > Poniższe zapisy o commitach (`69d5d94`, `b65b9fa`, `4e68589`) są historyczne.
 
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).
@@ -13,7 +14,7 @@ Pages — prawdopodobnie test lokalny. Użytkownik zatwierdził wdrożenie napra
 **Stan 25.09.2026:** na `main` opublikowane są plan CFA D-086/D-087 (`0c768b1`) i — po zakończeniu regresji — Etapy 0–3 audytu
 (D-088 start planu 25.09, poprawki B1–B9, UX U-a…U-i, CSP, diagnostyka, funkcje I1–I5, I7, I11; raport `docs/RAPORT_ETAPY_0_3.md`).
 **Wersja opublikowana `4e68589` (Fazy 3–5, wszystkie moduły) sprawdzona ręcznie przez użytkownika na urządzeniach według
-`REDESIGN-TESTING.md` §5 — działa (24.09.2026).** Pozostaje Faza 7 z plikami użytkownika (`SOURCES_DIR`, `PRIVATE_PACK`).
+`REDESIGN-TESTING.md` §5 — działa (24.09.2026).** Regresja z plikami użytkownika (`SOURCES_DIR`, `PRIVATE_PACK`) — poza repozytorium, nieuruchamiana w środowisku pracy.
 
 ## 1. Przebieg (kontekst)
 | Etap | Zakres | Raport |
@@ -127,11 +128,13 @@ mikro-odstępy < 3 px. Pozostałe moduły — wg tabeli:
 | ✅ 8 | Rekompozycja | `rekompozycja.js` | „Etap 6: Rekompozycja” (7/9/15) | znaczniki `{private:N}` / `.priv-in`, `.priv-miss`, `.rk-sec` bez zmian logiki |
 | ✅ 9 | Dane | `dane.js` | „Komunikaty”, `kv` | sekcje synchronizacji i aktualizacji — **tylko wygląd**; teksty rozróżniające kod/dane zostają |
 
-### Faza 6 — responsywność i iOS
+### Faza 6 — responsywność i iOS (wykonana: D-110…D-113)
+> Regresja automatyczna 320 / 375 / 390 / 768 / 1024 / 1280 / 1440 / 1920 px (D-113: 1233 renderów, 0 NaN/ujemnych, brak przewijania w poziomie); iPhone — kontrola użytkownika 24.09, 25.10 i 31.10–1.11.2026. MacBook (Safari) — do sprawdzenia przez użytkownika.
 Zrzuty i kontrola na 320, 375, 390, 430, 768, 1280, 1440 px (jasny/ciemny); tabele CFA/Rekompozycji na < 600 px
 (rozważyć listę kart — **zmiana struktury: najpierw zgoda użytkownika**); ręczna kontrola na iPhonie (`REDESIGN-TESTING.md` §4).
 
-### Faza 7 — regresja końcowa
+### Faza 7 — regresja końcowa (wykonana w ramach D-113)
+> Wyniki: `RAPORT_D113.md` §6 (jednostkowe 266, E2E 1577, a11y 0, Trening 0, sync 23/23, chmura 100/100). Z plikami użytkownika (`SOURCES_DIR`, `PRIVATE_PACK`) — nie uruchamiano (poza repozytorium).
 Wszystkie zestawy z `REDESIGN-TESTING.md`, build obu wariantów, cykl eksport → import na czystym profilu, aktualizacja SW
 stara → nowa bez utraty danych, testy wizualne na 7 szerokościach.
 

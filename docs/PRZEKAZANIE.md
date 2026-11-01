@@ -1,21 +1,22 @@
-# Przekazanie projektu — stan na 31.10.2026 (po D-113)
+# Przekazanie projektu — stan na 1.11.2026 (po D-113, opublikowanym)
 
 Dokument dla kolejnej instancji Claude Code. Zawiera to, czego nie da się wywnioskować z kodu: sposób pracy z użytkownikiem,
-stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność czytania: `CLAUDE.md` → ten plik → `docs/RAPORT_D097.md`
-→ `docs/DECYZJE_2027.md` (D-086…D-097) → `docs/REDESIGN-STATUS.md` / `REDESIGN-SPEC.md` / `REDESIGN-DECISIONS.md` / `REDESIGN-TESTING.md`.
+stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność czytania: `CLAUDE.md` → ten plik → `docs/RAPORT_D113.md`
+→ `docs/DECYZJE_2027.md` (D-086…D-113) → `docs/REDESIGN-STATUS.md` / `REDESIGN-SPEC.md` / `REDESIGN-DECISIONS.md` / `REDESIGN-TESTING.md`.
 
 ## 1. Gałęzie i publikacja
 - Historycznie praca na gałęzi `redesign-faza4` (do D-097). Publikacja = fast-forward gałęzi roboczej na `main`
-  (`git push origin <gałąź>:main`), workflow „Publikacja 2027” (`.github/workflows/pages.yml`) buduje i publikuje `dist/web` na GitHub Pages.
-- **Stan 31.10.2026:** praca na gałęzi `claude/eager-newton-j2309e` — D-113 (audyt i System 3.0 „Precision”); publikacja na `main`
-  jednorazowo po całości (decyzja użytkownika).
+  (`git push origin <gałąź>:main`; przed publikacją sprawdź zielone „Testy 2027” dla tego commita), workflow „Publikacja 2027” (`.github/workflows/pages.yml`) buduje i publikuje `dist/web` na GitHub Pages.
+- **Stan 1.11.2026:** D-113 (audyt i System 3.0 „Precision”) opublikowany na `main` **31.10.2026** jednorazowo po całości (decyzja użytkownika;
+  fast-forward `git push origin claude/eager-newton-j2309e:main`, `main` = `8074976`; workflow „Testy 2027” i „Publikacja 2027” zielone).
+  Gałąź robocza `claude/eager-newton-j2309e` = `main`. Kolejna zmiana = nowy etap na tej gałęzi (po scaleniu — zacznij od `main`).
 - **Stan 24.10.2026:** praca na gałęzi `claude/eager-newton-j2309e`; `main` = **`a824797`** (D-107…D-109, publikacja fast-forward
   `git push origin claude/eager-newton-j2309e:main` na polecenie użytkownika). D-110 (System 2.0) i D-111 — opublikowane na `main` 25.10.2026 (fast-forward z gałęzi roboczej).
 - Repozytorium jest **publiczne** — stąd surowe zasady prywatności (CLAUDE.md §3 p. 5, moduł Pielęgnacja).
 
 ## 2. Zasady współpracy z użytkownikiem (utrwalone w rozmowach)
 - Język: polski (odpowiedzi, dokumentacja, commity).
-- **Commit, push i publikacja na `main` wyłącznie na wyraźne polecenie** (typowo: „zrób commit, push i publikację na main”). Bez polecenia — nie commituj
+- **Commit, push i publikacja na `main` wyłącznie na wyraźne polecenie (w D-113 użytkownik polecił: jedna publikacja po całości, nie etapami)** (typowo: „zrób commit, push i publikację na main”). Bez polecenia — nie commituj
   (także gdy prosi o to hook). Nigdy push na `main` bez polecenia.
 - Przy niejasnościach w poleceniu planu — pytania z opcjami (AskUserQuestion), opcja zalecana pierwsza z „(Recommended)”; odpowiedzi zapisuj w decyzji D-0xx.
 - Zmiany modelu danych, synchronizacji, bezpieczeństwa lub usuwanie funkcji — najpierw pytanie. D2, I9, I12 — zamknięte bez wdrożenia (D-111).
@@ -34,24 +35,34 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
 
 Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 
-## 4. Otwarte sprawy — stan 25.10.2026 (po D-111)
+## 4. Otwarte sprawy — stan 1.11.2026 (po D-113)
 **Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
 obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,
 znacznik pielęgnacji w niedziele świąteczne i akcje GitHub na Node 24 — wykonane; D2, I9, I12 — zamknięte bez wdrożenia; D-110 i D-111 —
 opublikowane na `main` (25.10.2026).
 
 **D-112 (25.10.2026):** zgłoszenie z iPhone'a (słabe przewijanie, skoki na początek strony, arkusz nie zamyka się przeciągnięciem) —
-poprawione na gałęzi (`docs/RAPORT_D112.md`); do kontroli na iPhonie po publikacji za zgodą użytkownika.
+poprawione i opublikowane (`docs/RAPORT_D112.md`); potwierdzone na iPhonie.
+
+**D-113 (31.10.2026):** audyt (`docs/RAPORT_AUDYT_2026-10-31.md`) i System 3.0 „Precision” — wykonane i opublikowane w całości (K1, W1–W3, D1–D17,
+24 funkcje, przebudowa wyglądu; `docs/RAPORT_D113.md`, decyzja D-113 w `DECYZJE_2027.md`, §C13 w `REDESIGN-DECISIONS.md`). Użytkownik sprawdził działanie
+na iPhonie (Safari i PWA) 1.11.2026 — wszystko działa. Nowe zapisy: wyłącznie `setting` (`supp.dose:*`, `zapasy.shop:*` — `src/core/calc/checks.js`).
 
 **Do decyzji użytkownika:**
 1. **D1 — popołudnie od 16.11** (odłożone 25.10): bloki MPW 15:30 / 16:30 / 17:30 kolidują z planem dnia w 108 ze 119 dni
    (`RAPORT_AUDYT_2026-10-23.md` D1). Termin: przed 16.11.
 
 **Niedokończone / do dopracowania:**
-1. Ręczna kontrola D-110 na urządzeniach (`RAPORT_D110.md` §8, `REDESIGN-TESTING.md` §5 p. 13) — środowisko nie ma WebKit; tu także
-   pasek statusu PWA w motywie ciemnym (D-067) i `CryptoKey` w IndexedDB w Safari (`SYNC_CHMURA.md`).
-2. Fazy 6–7 redesignu formalnie otwarte (urządzenia, regresja końcowa) — testy automatyczne obejmują 320–1920 px (D-110), brak potwierdzenia na sprzęcie.
-3. `npm run verify` i test migracji kopii ZAPASY wymagają plików użytkownika (`SOURCES_DIR`) — w tym środowisku zawsze pominięte.
+1. **Kontrola D-113 na MacBooku (Safari i Chrome)** — pasek górny, ⌘K z poleceniami, Ustawienia, „Dziś” w dwóch kolumnach, tryb zakupów
+   (`REDESIGN-TESTING.md` §5 p. 14); iPhone — potwierdzony. Środowisko pracy nie ma WebKit (testy tylko w Chromium); niesprawdzone: pasek
+   statusu PWA w motywie ciemnym (D-067) i `CryptoKey` w IndexedDB w Safari (`SYNC_CHMURA.md`).
+2. **Meal Prep, Pielęgnacja, Rekompozycja, Dane, Więcej** — tylko wspólna warstwa „Precision” (paleta, krój, plakietki, wykresy), bez własnej przebudowy
+   układu (opcjonalne dopracowanie, jeśli wyglądają słabo na tle „Dziś” i „Zapasów”).
+3. Fazy 6–7 redesignu: regresja automatyczna 320–1920 px (D-110, D-113; przegląd 1233 renderów) i kontrola użytkownika na iPhonie — **wykonane**.
+4. Ograniczenia D-113 (`RAPORT_D113.md` §5): sygnał minutnika tylko przy włączonym ekranie (Web Audio); wykres postępu nauki liczy bloki wg dnia
+   w planie (dziennik nie zapisuje daty odhaczenia); ilość zmieniona w trybie zakupów nie synchronizuje się (odhaczenia tak).
+5. `a11y.py` nie ma jeszcze tras `#/ustawienia` i `#/zapasy?a=zakupy` (sprawdzane axe w `run_d113` w `e2e.py`) — do dopisania przy okazji.
+6. `npm run verify` i test migracji kopii ZAPASY wymagają plików użytkownika (`SOURCES_DIR`) — w tym środowisku zawsze pominięte.
 
 ## 4a. Niedokończone po D-097 (historyczne — kolejność zalecana)
 > **Stan 24.10.2026:** punkty 1–4 wykonane — E2E i `verify_all.py` na kalendarzu V44 (wyniki w `RAPORT_D103.md` §6); punkt 2 (`UPGRADE` w `private_pack_lib.py`) — reguły do D-103c i D-104 (potwierdzone w audycie 23.10.2026, U5). Przy następnej zmianie planu dopisz nowe reguły.
@@ -82,5 +93,6 @@ poprawione na gałęzi (`docs/RAPORT_D112.md`); do kontroli na iPhonie po publik
 - Testy przeglądarkowe (`e2e`, `e2e:sync`, `e2e:cloud`, `a11y`) wymagają Pythona 3 z pakietem **`playwright`** (sprawdzone na 1.56) i Chromium:
   `pip install playwright` (+ `python3 -m playwright install chromium`, jeśli środowisko nie ma przeglądarki; w chmurze Claude Code Chromium jest w `/opt/pw-browsers`).
 - Bez `SOURCES_DIR` / `PRIVATE_PACK` testy używają danych syntetycznych (`tests/e2e/fixtures.py`); `npm run verify` wymaga plików użytkownika.
-- Nowe konto GitHub/Claude: potrzebny dostęp z prawem zapisu do `clip57/2027` (push na `redesign-faza4` i `main`).
-- Jeśli sesja wyznacza inną gałąź roboczą niż `redesign-faza4` — zapytaj użytkownika przed publikacją; publikuje wyłącznie push na `main`.
+- Nowe konto GitHub/Claude: potrzebny dostęp z prawem zapisu do `clip57/2027` (push na gałąź roboczą i `main`).
+- Gałąź roboczą wyznacza sesja (obecnie `claude/eager-newton-j2309e`); publikuje wyłącznie push na `main` — tylko na polecenie użytkownika.
+- Drzewa robocze `git worktree`: `node_modules` jest dowiązaniem — nie używaj `git add -A` bez sprawdzenia `git status` (zob. pułapki w `CLAUDE.md`).

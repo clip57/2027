@@ -15,7 +15,15 @@ magazynu, makro w kcal), kolumna boczna z podsumowaniem na komputerze, siatka ak
 użytkownika (LifeOS, mobilne „productivity”); elementy tych projektów bez pokrycia w danych (Focus Score, nastrój, AI chat,
 „efficiency”) są świadomie pominięte.
 
-**System 2.0 (D-110, 24.10.2026) — „głębia przez światło”:** ten sam układ informacji i te same klasy, nowocześniejszy materiał.
+**System 3.0 „Precision” (D-113, 31.10.2026) — obowiązujący wygląd; zastępuje w tych miejscach System 2.0:** warstwa `src/ui/precision.css`
+(po `system.css`); paleta grafitowa (projekt OKLCH, zapis hex — tokeny w `tokens.css`, kontrast w `tokens.test.mjs`); akcent do wyboru (`data-accent`: indygo
+domyślnie, turkus, bursztyn); **bez tła „aurora”, poświat i gradientów kart** (`--aur`, `--tint`, `--glow-a` = 0, `--rim` ledwie widoczny) — szkło nadal tylko
+na elementach pływających; Inter Display (`--font-display`, opsz 32) dla nagłówków i dużych liczb; metadane nagłówków jako jedna linia z kropkami (bez plakietek);
+plakietki stanu = ikona + słowo (`statusBadge`), bez emoji; kolor jako sygnał (kolory modułów w danych, czerwień dla braków); liczby-bohaterowie z mini-wykresami
+z prawdziwych danych (`metric`, `charts.js`); pasek górny na komputerze (≥ 900 px, poza `<main>`); gęstość i rozmiar tekstu z Ustawień (`data-density`, `data-text`).
+Zasady ruchu i preferencje systemowe bez zmian (D-110, D-112: bez animacji nieskończonych). Opis i wyjątki: `docs/RAPORT_D113.md`, `docs/REDESIGN-DECISIONS.md` §C13.
+
+**System 2.0 (D-110, 24.10.2026) — „głębia przez światło” (częściowo zastąpiony przez D-113, zob. wyżej):** ten sam układ informacji i te same klasy, nowocześniejszy materiał.
 Tło „aurora” — stała poświata u góry ekranu w kolorze bieżącego modułu (w „Dziś” — bieżącego punktu planu), karty z krawędzią
 światła (`--rim`) i miękkim cieniem także w motywie ciemnym, **szkło wyłącznie na elementach pływających** (pasek dolny, panel boczny,
 pasek tytułu, okna, liczniki przerwy, przyklejone skróty), duże liczby z ciasnym odstępem liter i pomniejszoną jednostką, pierścienie

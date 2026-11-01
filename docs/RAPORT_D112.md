@@ -34,6 +34,7 @@ Przebieg 25.10.2026 (oba warianty buildu, dane syntetyczne): `npm test` 253 — 
 `npm run e2e:cloud` 100/100. Pomiary (§1) — skrypty poza repozytorium (liczniki CDP), wynik powtarzalny.
 
 ## 4. Do sprawdzenia na iPhonie
+> **Potwierdzone przez użytkownika** (kontrola 25.10.2026 po publikacji i ponownie 1.11.2026 po D-113): przewijanie, pasek tytułu, zamykanie arkusza — działają.
 - Przewijanie „Dziś” i innych modułów — płynne; bez powrotu na początek strony po chwili (także przy włączonej synchronizacji w chmurze).
 - Pasek tytułu pojawia się po przewinięciu poza nagłówek i znika po powrocie na górę.
 - Arkusz (np. technika ćwiczenia w Treningu): przeciągnięcie w dół za uchwyt / nagłówek albo za treść, gdy jest na górze — zamyka;

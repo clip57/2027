@@ -13,7 +13,7 @@ zaakceptowany („Tak”) przed przebudową pozostałych modułów. Zapis decyzj
 | 2 | Fundament „Precision”: tokeny (paleta grafitowa z projektu OKLCH, akcenty indygo / turkus / bursztyn), Inter Display, `precision.css`, minifikacja CSS, komponenty (`metric`, `statusBadge`, `timerChip`), wykresy SVG (`sparkline`, `areaChart`, `donut`, `heatmap`, `stockAxis`), pasek górny, Ustawienia, komunikat z „Cofnij”, paleta ⌘K z poleceniami, prototyp Dziś/Zapasy |
 | 3 | Moduły codzienne: tryb zakupów (F-Z2/F-Z3/F-Z5), szczegóły pozycji (F-Z4), odhaczanie dawek (F-D4), „Wymaga uwagi” z akcjami (F-D2), podsumowanie dnia (F-D3), postęp ćwiczenia i rekord (F-T2), sygnał przerwy (F-T1), pierścień makro w Diecie (F-DI2), Dieta dla daty (F-DI1) |
 | 4 | Nauka: postęp względem planu (F-N1), licznik bloku 53 min (F-N2), mapa wykonania (F-N3); Kalendarz — podgląd dnia (F-K1); Tydzień — wykonanie z dziennika (F-G3) |
-| 5 | Pozostałe moduły w Precision (Meal Prep, Pielęgnacja, Bezpieczeństwo — ikony zamiast emoji, Rekompozycja, Dane, Więcej); F-G6: pamięć wyników `stockInfo` |
+| 5 | Bezpieczeństwo — ikony Lucide zamiast emoji (V4); Meal Prep, Pielęgnacja, Rekompozycja, Dane i Więcej — **tylko wspólna warstwa „Precision”** (paleta, krój, plakietki, wykresy), bez własnej przebudowy układu; F-G6: pamięć wyników `stockInfo`; poprawka przewijania w poziomie paska górnego przy 1024 px |
 
 ## 2. Dane i zgodność
 
@@ -58,9 +58,17 @@ Zmienione oczekiwania testów (świadome zmiany zachowania): korekta dnia w Zapa
   przy wygaszonym ekranie PWA nie zagra dźwięku — ograniczenie systemu.
 - Wykres „Postęp względem planu” liczy bloki wg dnia bloku w planie (dziennik nie przechowuje daty odhaczenia bloku).
 - Ilość w trybie zakupów zmieniana przed „Kupione” jest stanem okna (nie synchronizuje się); odhaczenia — tak.
-- D1 (popołudnie od 16.11) — bez zmian, decyzja użytkownika później.
+- D1 (popołudnie od 16.11) — bez zmian, decyzja użytkownika później (potrzebna przed 16.11, najlepiej do ok. 10.11).
+- Meal Prep, Pielęgnacja, Rekompozycja, Dane i Więcej nie mają dedykowanej przebudowy układu (por. §1, etap 5) — opcjonalne dopracowanie.
+- `a11y.py` nie obejmuje jeszcze tras `#/ustawienia` i `#/zapasy?a=zakupy`; dostępność tych widoków sprawdza `run_d113` (axe).
+- Testy w Chromium (brak WebKit w środowisku pracy); kontrola Safari na iPhonie wykonana przez użytkownika, na MacBooku — do wykonania.
 
-## 6. Wyniki końcowe (31.10.2026, stan publikowany)
+## 6. Publikacja i wyniki końcowe (31.10.2026, stan publikowany)
+
+Commity na gałęzi `claude/eager-newton-j2309e` → `main` (fast-forward, `8074976`): etap 0–1 (`67bf2c4`), etap 2 (`d4700be`), poprawka repozytorium (`0eae2b9` — usunięte
+przypadkowe dowiązanie `node_modules`), etapy 3–6 (`e59bf34`), poprawka wyścigów w testach CI (`8074976`). Workflow „Testy 2027” (przebieg 17) i „Publikacja 2027”
+(przebieg 40) — sukces. **Kontrola użytkownika na iPhonie (Safari i PWA) 1.11.2026 — działa.**
+
 
 | Zestaw | Wynik |
 |---|---|

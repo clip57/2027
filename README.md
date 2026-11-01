@@ -2,7 +2,7 @@
 
 Osobista platforma: plan dnia, dieta, suplementacja, meal prep, zapasy, trening i nauka CFA. Działa offline, instaluje się na ekranie początkowym iPhone'a i w Docku macOS, dane synchronizuje przez plik w iCloud Drive. Bez płatnych usług.
 
-**Stan:** wszystkie etapy (0–6) zakończone — moduły: Dziś, Dieta, Suplementacja, Zapasy, Meal Prep, Trening (z animacją ruchu i statystykami), CFA, Bezpieczeństwo żywności (karty, tabela, poradnik), Rekompozycja, Dane i synchronizacja (`docs/SPEC_2027_etap1_v1.1.md`, sekcja 9).
+**Stan (1.11.2026):** wszystkie etapy (0–6) zakończone, wygląd „Precision” (D-113) opublikowany — moduły: Dziś, Kalendarz, Pielęgnacja, Dieta, Suplementacja (z odhaczaniem dawek), Zapasy (tryb zakupów, stan nigdy poniżej zera), Meal Prep, Trening (z animacją ruchu, statystykami i postępem ćwiczeń), CFA i MPW, Bezpieczeństwo żywności, Rekompozycja, Dane i synchronizacja (plik, chmura), Ustawienia (`docs/SPEC_2027_etap1_v1.1.md`, `docs/RAPORT_D113.md`). Aktualny stan i otwarte sprawy: `docs/PRZEKAZANIE.md`.
 
 **Dla Claude Code / kontynuacji prac:** zacznij od `CLAUDE.md`, potem `docs/REDESIGN-STATUS.md`, `docs/REDESIGN-SPEC.md`, `docs/REDESIGN-DECISIONS.md`, `docs/REDESIGN-TESTING.md`.
 
