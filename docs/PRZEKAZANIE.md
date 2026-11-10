@@ -48,9 +48,17 @@ poprawione i opublikowane (`docs/RAPORT_D112.md`); potwierdzone na iPhonie.
 24 funkcje, przebudowa wyglądu; `docs/RAPORT_D113.md`, decyzja D-113 w `DECYZJE_2027.md`, §C13 w `REDESIGN-DECISIONS.md`). Użytkownik sprawdził działanie
 na iPhonie (Safari i PWA) 1.11.2026 — wszystko działa. Nowe zapisy: wyłącznie `setting` (`supp.dose:*`, `zapasy.shop:*` — `src/core/calc/checks.js`).
 
+**Audyt 10.11.2026 („baza na dekadę” — `docs/RAPORT_AUDYT_2026-11-10.md`):** tylko audyt i plan, kod bez zmian. Najważniejsze: plan kończy się
+28.03.2027 i jest wkompilowany w program (68% pakietu JS to dane planu) → proponowany „silnik planów 2.0” (plany jako dane użytkownika, wyjątki
+i odstępstwa w aplikacji); dziennik zdarzeń nie skaluje się na 10 lat (start 4,8–17 s przy 480 tys. zdarzeń) → migawka + ogon; brak powiadomień;
+kierunek designu „System 4.0” (trzy warianty); 12 rozszerzeń zewnętrznych; mapa drogowa 9 etapów. **Czeka na 10 decyzji użytkownika (§11 raportu) —
+nie wdrażaj niczego z tego raportu przed nimi.**
+
 **Do decyzji użytkownika:**
 1. **D1 — popołudnie od 16.11** (odłożone 25.10): bloki MPW 15:30 / 16:30 / 17:30 kolidują z planem dnia w 108 ze 119 dni
    (`RAPORT_AUDYT_2026-10-23.md` D1). Termin: przed 16.11.
+2. **Decyzje 2–10 z audytu 10.11.2026** (`RAPORT_AUDYT_2026-11-10.md` §11): kierunek designu, silnik planów 2.0, miejsce treści planu, nowe rodzaje
+   danych, poziom powiadomień, adres i nazwa, zakres „rdzenia życia”, asystent AI, start etapu 1.
 
 **Niedokończone / do dopracowania:**
 1. **Kontrola D-113 na MacBooku (Safari i Chrome)** — pasek górny, ⌘K z poleceniami, Ustawienia, „Dziś” w dwóch kolumnach, tryb zakupów
