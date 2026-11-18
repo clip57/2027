@@ -71,3 +71,7 @@ Przebieg 26 „Testy 2027” (`e06426e`): zadania `testy` i `webkit` — zaliczo
 `[wygląd bez zmian]` w zdaniu o samej funkcji, a zmiana dotyczyła wyglądu („Dane” — nowa sekcja). Strażnik zadziałał zgodnie z regułą, ale reguła była
 zbyt szeroka: odtąd znacznik liczy się tylko jako **osobna linia** opisu commitu (`grep -x`). Przy okazji: liczenie różnic przez histogram
 (bez wycofywanej funkcji Pillow), limit zadania `webkit` 60 min (instalacja zależności systemowych WebKit trwała w CI ok. 30 min).
+Przebieg 27 (`21d9e52`, sama dokumentacja): `e2e:cloud` 98 / 100 — wyścig w teście, niezależny od D-115: krok „B: zmiana wysłana” czekał
+na zapytanie do serwera, a nie na zapis zdarzenia; A, wracając do sieci, mogło pobrać dane przed zapisem zmiany B, a zegar testu nie
+wywoływał kolejnego sprawdzenia. Poprawka: oczekiwanie na zapis zdarzenia B (`cloud_sync.py`); lokalnie 100 / 100. Przebieg 28 (`ba3940a`):
+wszystkie zadania (`testy`, `webkit`, `wizualny`) zaliczone.

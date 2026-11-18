@@ -305,8 +305,11 @@ async def main():
         ok(await stock(A, URL, 'Banan') == 111, 'A offline: aplikacja działa, zmiana zapisana lokalnie')
         await dane(A, URL); t = await sync(A, 'Brak połączenia')
         ok('bezpieczne na tym urządzeniu' in t, 'A offline: „Synchronizuj teraz” — czytelny komunikat, bez utraty danych')
+        nb = len(srv.events)
         await set_stock(B, URL, 'Banan', 222)                      # późniejsza zmiana (nowszy HLC)
-        ok(await until(lambda: event_calls(srv) > c0), 'B: zmiana wysłana automatycznie')
+        # D-115: czekamy na ZAPIS zdarzenia B na serwerze, nie tylko na zapytanie (wcześniej: event_calls > c0) — inaczej A mogło wrócić do sieci
+        # i pobrać dane przed zapisem zmiany B, a kolejne sprawdzenie A (zegar testu stoi) już nie następowało (przebieg CI 27: 98/100)
+        ok(await until(lambda: event_calls(srv) > c0 and len(srv.events) > nb), 'B: zmiana wysłana automatycznie')
         c1 = len(srv.events)
         await A.context.set_offline(False)
         ok(await until(lambda: len(srv.events) == c1 + 1), 'A: po powrocie sieci zaległa zmiana wysłana automatycznie')
