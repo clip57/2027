@@ -60,6 +60,12 @@ Zmienione oczekiwania testów (świadome zmiany): D-110 „pierścień »Teraz«
 w Treningu); kolor tła motywu jasnego porównywany po przeliczeniu na sRGB (tokeny w OKLCH). Poprawiony test zależny od daty uruchomienia
 (zakładka „CFA” / „MPW” — teraz wg zegara testu; od 12.11 dawał fałszywy błąd niezależnie od zmian).
 
+**Etap 2 (pełna regresja na buildzie etapu 2, 18.11.2026):** jednostkowe 275 / 275 · E2E **1696 / 1696** (z `run_d114b`: 46 kontroli w obu wariantach) ·
+a11y 0 naruszeń · Trening 0 błędów · `e2e:sync` 23 / 23 · `e2e:cloud` 100 / 100 · `plan_check`, `verify_all --data-only` (13 kontroli, 1 źródłowa pominięta), `cfa_smoke` — 0 błędów ·
+porządki legacy: 120 zrzutów piksel w piksel — 115 identycznych, różnice tylko numer wersji w „Dane” i szum wygładzania paska górnego.
+Wykryte w trakcie i naprawione: cel dotykowy zakładki widoku < 44 px (CFA „Dzień” / „Error log” — `min-width: 44px`), odświeżanie punktowe harmonogramu CFA
+różne od pełnego przerysowania (gesty dołączane teraz obserwatorem dodanych węzłów, jednakowo w obu ścieżkach), gesty w testach pod pigułką / paskiem.
+
 ## 5. Ograniczenia
 
 - Testy w Chromium (brak WebKit w środowisku): gesty dotyku, tarcza i tryb skupienia wymagają sprawdzenia na iPhonie (Safari i aplikacja z ekranu początkowego).
