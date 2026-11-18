@@ -53,6 +53,9 @@ Testy wykryły w trakcie pracy i naprawione przed commitem: przesłonięcie funk
 minutnika Pielęgnacji i komunikatami na komputerze (pigułka przeniesiona do lewego dolnego rogu kolumny treści i chowana przy pasku modułu),
 wskazówkę widoczną w dniu innym niż dziś (`hidden` na SVG), układ „Dziś” innego dnia na telefonie (`grid-area` bez nazwanych obszarów).
 
+CI: przebieg 20 „Testy 2027” zatrzymał się na instalacji Chromium — `ubuntu-latest` to od listopada 2026 Ubuntu 26.04, nieobsługiwane przez
+Playwright 1.56 (błąd niezależny od zmian; dotyczyłby też publikacji z `main`). Poprawka: `runs-on: ubuntu-24.04` w `testy.yml` (`c1f03de`) — przebieg 21 „Testy 2027” na tym obrazie: **wszystkie kroki zaliczone**.
+
 Zmienione oczekiwania testów (świadome zmiany): D-110 „pierścień »Teraz« z gradientem” → tarcza z upływem punktu (M8; gradient pierścienia sprawdzany
 w Treningu); kolor tła motywu jasnego porównywany po przeliczeniu na sRGB (tokeny w OKLCH). Poprawiony test zależny od daty uruchomienia
 (zakładka „CFA” / „MPW” — teraz wg zegara testu; od 12.11 dawał fałszywy błąd niezależnie od zmian).
