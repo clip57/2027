@@ -38,7 +38,22 @@ jedyna różnica — nowa sekcja „Dziennik błędów” w „Dane”).
 
 ## 3. Testy
 
-Wyniki pełnej regresji — §5 (uzupełniane po przebiegu).
+Pełna regresja na buildzie D-115 (18.11.2026, lokalnie):
+
+| Zestaw | Wynik |
+|---|---|
+| `npm run lint` · `npm run typecheck` | 0 błędów · 0 błędów |
+| Jednostkowe | 281 / 281 (+ 1 pominięty — kopia ZAPASY wymaga `SOURCES_DIR`); nowe: `errlog.test.mjs`, `types.test.mjs` |
+| E2E (z `run_d115`: 18 kontroli w obu wariantach) | **1714 / 1714** |
+| a11y | 0 naruszeń |
+| Trening | 0 błędów (118 kontroli) |
+| WebKit (`npm run e2e:webkit`) | **234 / 234** |
+| Budżety (`npm run budget`) | 9 pomiarów, 0 przekroczeń |
+| `e2e:sync` · `e2e:cloud` | 23 / 23 · 100 / 100 |
+| `plan_check` · `verify_all --data-only` · `cfa_smoke` | 0 błędów · 0 błędów (1 kontrola źródłowa pominięta) · 0 błędów |
+| Strażnik wizualny (HEAD ↔ zmiany) | 120 zrzutów, różne tylko 4 — „Dane” (nowa sekcja „Dziennik błędów”) |
+
+Zmienione testy: `e2e.py` i `a11y.py` uruchamiają się tylko jako skrypt (`if __name__ == "__main__"`) — można je importować (budżety, WebKit).
 
 ## 4. Ograniczenia
 
