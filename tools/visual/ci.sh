@@ -3,7 +3,7 @@
 # i bieżącego, zbudowanych na tej samej maszynie, i porównanie piksel w piksel (tools/visual/compare.py, z tolerancją szumu krawędzi).
 # Użycie: tools/visual/ci.sh <commit bazowy> <katalog wyników>   (katalog: przed/, po/, roznice/ + podsumowanie.md)
 # Kod wyjścia jak compare.py: 0 — bez zmian wyglądu, 1 — zmiany, 2 — brakujące zrzuty. O tym, czy zmiana to błąd, decyduje workflow
-# (znacznik „[wygląd bez zmian]” w opisie commitu = każda różnica jest błędem).
+# (osobna linia „[wygląd bez zmian]” w opisie commitu = każda różnica jest błędem).
 set -euo pipefail
 BASE="$1"; OUT="${2:-${TMPDIR:-/tmp}/wizualny}"
 ROOT="$(git rev-parse --show-toplevel)"; cd "$ROOT"

@@ -21,7 +21,7 @@ for f in files:
       W, H = x.width + y.width + 16, max(x.height, y.height); c = Image.new('RGB', (W, H), (255, 0, 255)); c.paste(x, (0, 0)); c.paste(y, (x.width + 16, 0)); c.save(out / f.name)
     continue
   d = ImageChops.difference(x, y).convert('L').point(lambda v: 255 if v > TOL else 0)
-  n = sum(1 for p in d.getdata() if p)
+  n = d.size[0] * d.size[1] - d.histogram()[0]   # piksele różne (obraz binarny 0/255)
   if n > MIN_PX:
     box = d.getbbox(); print('RÓŻNICA', f.name, n, 'px', box); changed.append(f.name); rows.append((f.name, f'{n} px w obszarze {box}'))
     if out:

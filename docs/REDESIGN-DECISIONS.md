@@ -197,7 +197,7 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 
 - Każdy push poza `main`, PR i publikacja: zadanie `wizualny` w „Testy 2027” — zrzuty 30 widoków × 390/1280 px × ciemny/jasny dla bazy
   i bieżącego commitu, różnice w podsumowaniu i artefakcie. Zmiana stylów, która **nie** ma zmieniać wyglądu (porządki, przenoszenie reguł
-  między warstwami) — opis commitu z `[wygląd bez zmian]`: wtedy każda różnica zatrzymuje testy.
+  między warstwami) — osobna linia `[wygląd bez zmian]` w opisie commitu: wtedy każda różnica zatrzymuje testy.
 - Przerysowanie w miejscu i podmiana fragmentu zachowują rozwinięte sekcje i przesunięte paski (klucze: `id` › `data-key` › tekst nagłówka).
   Sekcja, która ma się zwijać po akcji, musi to robić jawnie (np. `ontoggle` + stan w module), nie przez przerysowanie.
 - Testy wyglądu także w WebKit (Safari): `npm run e2e:webkit`.

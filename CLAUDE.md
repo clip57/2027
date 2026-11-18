@@ -38,7 +38,7 @@ adres) — czekają na użytkownika.
   projektu, kluczy, haseł ani `service_role`.** Opis i kontrola ręczna: `docs/SYNC_CHMURA.md`.
 - **Wygląd (D-110…D-114):** tokeny tylko w `src/ui/tokens.css` (kolory w OKLCH), **nowe reguły tylko w `src/ui/instrument.css`** (warstwa
   `@layer instrument` nad `legacy`); bez animacji nieskończonych i kodu w zdarzeniu `scroll`; gesty zawsze z odpowiednikiem przyciskiem;
-  wykresy i metryki tylko z prawdziwych danych. Zmiana stylów „bez zmiany wyglądu” — opis commitu z `[wygląd bez zmian]` (strażnik w CI).
+  wykresy i metryki tylko z prawdziwych danych. Zmiana stylów „bez zmiany wyglądu” — osobna linia `[wygląd bez zmian]` w opisie commitu (strażnik w CI).
 - **Pakiet prywatny (D-091):** po zmianie planu zaktualizuj `UPGRADE` w `tools/extract/private_pack_lib.py`.
 
 ## 1. Architektura (stan zweryfikowany w kodzie 18.11.2026)

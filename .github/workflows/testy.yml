@@ -58,7 +58,7 @@ jobs:
   # D-115 (T4): ten sam silnik co Safari na iPhonie i Macu — równolegle z testami w Chromium
   webkit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 60   # instalacja zależności systemowych WebKit (apt) trwała w CI do ok. 30 min
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -75,8 +75,8 @@ jobs:
         run: npm run e2e:webkit
 
   # D-115 (T5): strażnik wizualny — zrzuty commitu bazowego i bieżącego na tej samej maszynie, różnice jako artefakt i w podsumowaniu.
-  # Zmiana wyglądu jest zwykle zamierzona, więc różnice nie zatrzymują testów — chyba że opis commitu zawiera „[wygląd bez zmian]”
-  # (porządki stylów, refaktoryzacja): wtedy każda różnica jest błędem.
+  # Zmiana wyglądu jest zwykle zamierzona, więc różnice nie zatrzymują testów — chyba że opis commitu ma osobną linię „[wygląd bez zmian]”
+  # (porządki stylów, refaktoryzacja): wtedy każda różnica jest błędem (wzmianka w zdaniu się nie liczy).
   wizualny:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -103,7 +103,7 @@ jobs:
           else BASE="HEAD^"; fi
           set +e; tools/visual/ci.sh "$BASE" "$RUNNER_TEMP/wizualny"; rc=$?; set -e
           cat "$RUNNER_TEMP/wizualny/roznice/podsumowanie.md" >> "$GITHUB_STEP_SUMMARY" || true
-          if git log -1 --format=%B | grep -qF '[wygląd bez zmian]' && [ "$rc" != 0 ]; then echo "::error::Commit oznaczony [wygląd bez zmian], a wygląd się zmienił"; exit 1; fi
+          if git log -1 --format=%B | grep -qxF '[wygląd bez zmian]' && [ "$rc" != 0 ]; then echo "::error::Commit oznaczony [wygląd bez zmian], a wygląd się zmienił"; exit 1; fi
           [ "$rc" = 1 ] && echo "::notice::Zmiany wyglądu względem bazy — zobacz artefakt „wizualny-roznice”" || true
       - uses: actions/upload-artifact@v5
         if: always()
