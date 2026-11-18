@@ -2,6 +2,7 @@
 import { h, clear } from './dom.js';
 import { icon } from './icons.js';
 import { startCountdown, stopCountdown, countdown } from './signal.js';
+import { attachSwipes } from './gestures.js';
 
 // Przełącznik segmentowy (faza, wariant, dzień). options: [{value, label, hint}]
 export function segmented(label, options, value, onChange) {
@@ -10,7 +11,8 @@ export function segmented(label, options, value, onChange) {
     box.append(h('button', { class: 'seg-b', 'aria-pressed': String(o.value === value),
       onclick: () => onChange(o.value) }, h('span', {}, o.label), o.hint && h('small', {}, o.hint)));
   }
-  return h('div', { class: 'seg-wrap' }, h('span', { class: 'seg-label' }, label), box);
+  // D-114 etap 2: przełącznik widoków modułu („Widok”) — jednolity pasek zakładek na każdej stronie (etykieta tylko dla czytników ekranu)
+  return h('div', { class: `seg-wrap${label === 'Widok' ? ' is-view' : ''}` }, h('span', { class: 'seg-label' }, label), box);
 }
 
 export const stat = (label, value, hint) => h('div', { class: 'stat' },
@@ -59,6 +61,7 @@ export function sheet(title, ...body) {
   d.append(head, h('div', { class: 'sheet-body' }, msg, ...body.filter(Boolean)));
   dragToClose(d, head, close);
   document.body.append(d); d.showModal();
+  attachSwipes(d);   // D-114 etap 2: gest na listach w oknach (tryb zakupów)
   return { el: d, close, error: e => { clear(msg).append(h('div', { class: 'banner err' }, e?.message || String(e))); msg.scrollIntoView?.({ block: 'nearest' }); } };
 }
 

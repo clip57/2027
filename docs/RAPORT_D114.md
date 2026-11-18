@@ -4,7 +4,7 @@ Decyzja użytkownika (18.11.2026) do `docs/RAPORT_AUDYT_2026-11-10.md`: „Zajmi
 z nim związane. „Instrument” niech będzie głównym motywem.” Zapis decyzji: `docs/DECYZJE_2027.md` (D-114), `docs/REDESIGN-DECISIONS.md` (C14).
 
 Zgodnie z przyjętym procesem (§6.7 audytu) etap 1 to **fundament i prototyp dwóch ekranów — „Dziś” (tarcza, pigułka, gesty) i tryb skupienia
-Treningu** — do sprawdzenia przed przebudową pozostałych modułów. **Stan: gałąź robocza `claude/eager-newton-j2309e`, bez publikacji na `main`.**
+Treningu** — do sprawdzenia przed przebudową pozostałych modułów. **Stan: etap 1 zaakceptowany 18.11.2026; etap 2 (wszystkie moduły) wykonany — gałąź robocza `claude/eager-newton-j2309e`, bez publikacji na `main`.**
 
 ## 1. Zakres
 
@@ -68,9 +68,25 @@ w Treningu); kolor tła motywu jasnego porównywany po przeliczeniu na sRGB (tok
 - Pigułka „na żywo” na telefonie zajmuje pas nad paskiem dolnym (treść i komunikaty przesunięte wyżej); minutniki i przerwa — w pamięci karty (po przeładowaniu znikają, jak dotąd).
 - Gest przesunięcia w prototypie: dawki w planie dnia i karta serii; pozostałe listy (zakupy, kroki, bloki) — etap 2.
 
-## 6. Etap 2 (po akceptacji prototypu)
+## 6. Etap 2 (akceptacja prototypu 18.11.2026: „Akceptuję, przejdź do etapu 2”)
 
-Wszystkie moduły w „Instrument” — w tym pięć dotąd tylko „przemalowanych” (Meal Prep, Pielęgnacja, Rekompozycja, Dane, Więcej); jedna anatomia
-strony (wspólny szablon); wykresy interaktywne (wartość pod palcem, zakres); tryby skupienia Nauki (licznik 53 min), Zakupów i Gotowania; własny pasek
-dolny i pulpit; gesty na listach; migracja reguł z `legacy` do `instrument` i usuwanie nadpisanych; zrzuty wzorcowe jako strażnik; pełna regresja
-i publikacja na Twoje polecenie.
+| Część | Co zrobione |
+|---|---|
+| Jedna anatomia strony | Dawne karty-bohaterowie (Trening, CFA / MPW, Meal Prep, Pielęgnacja, Rekompozycja) są nagłówkiem strony: tytuł krojem tytułowym, nadtytuł w kolorze modułu (`--mod` z `data-domain`), przyrząd (pierścień) po prawej, linia pod nagłówkiem; pola robocze w nagłówku (następna seria, czas treningu, następny krok) — jako karty. Przełącznik widoków każdego modułu („Widok”) — jednolity pasek zakładek z podkreśleniem w kolorze modułu (`segmented()` dodaje `.is-view`; etykieta tylko dla czytników ekranu). |
+| Płaskie listy | Bloki nauki (CFA, MPW, karta MPW w „Dziś”) — wiersze rozdzielone linią zamiast kart w karcie, następny blok ze znacznikiem; „Składniki na jutro” w Meal Prep — wiersze z linią zamiast żółtej krawędzi przy każdym. |
+| Gesty na listach | Przesunięcie w prawo zaznacza, w lewo cofa — dawki (Suplementacja), bloki nauki, serie (Trening), kroki Meal Prep i Pielęgnacji, lista w trybie zakupów. Reguły `SWIPE_RULES` w `gestures.js` (wiersz → kontrolka; gest wywołuje tę samą kontrolkę, więc te same zapisy), dołączane po przerysowaniu (`app.js`), do każdego później dodanego fragmentu (obserwator `MutationObserver` na `#app` w `app.js` — także odświeżanie punktowe P2) i w oknach (`sheet()`). |
+| Tryby skupienia | Wspólna powłoka `src/ui/focus.js` (pasek, podziałka, pierścień minutnika, klawiatura). **Nauka** (`#/cfa?v=fokus`, `#/mpw?v=fokus`, `study_focus.js`; przycisk „Tryb skupienia” przy następnym bloku dnia): jeden blok naraz — temat, źródło, zadania bloku, minutnik 53 min (ten sam co w widoku dnia, widoczny w pigułce po wyjściu), „Blok wykonany”, poprzedni / następny. **Gotowanie** (`#/mealprep?v=fokus`, przycisk „Tryb gotowania”): krok po kroku, minutnik przy kroku z czasem, zapis `prep.step` jak w karcie. Ekran nie gaśnie w każdym trybie skupienia. |
+| Wykresy interaktywne | `charts.js` (`barChart`, `lineChart`, `areaChart`): wartość pod kursorem (komputer) i pod palcem (telefon: przesunięcie poziome — odczyt, pionowe — przewijanie); serie nazwane (plan / wykonane, stan / prognoza). |
+| Własny pasek i pulpit | Ustawienia → „Pasek i pulpit”: cztery zakładki paska dolnego (pozostałe moduły w „Więcej”, „Domyślne” przywraca zakładki z rejestru — CFA / MPW wg daty) i karty widoczne w „Dziś” (preferencje urządzenia `p2027.tabs`, `p2027.cards`). |
+| Dane | Na komputerze (≥ 1100 px) dwie kolumny sekcji (synchronizacja plikiem obok chmury) — bez pustej połowy ekranu. |
+| Porządki w `legacy` | Usunięte **389 deklaracji zawsze nadpisanych** przez późniejszą regułę z tym samym selektorem (skrypt na drzewie CSS; bez wartości zapasowych w tej samej regule i bez par skrót / właściwość szczegółowa). Sprawdzone zrzutami: 115 ze 120 identycznych piksel w piksel, różnice — numer wersji w „Dane” i szum wygładzania w pasku górnym. Źródło stylów `legacy` 217 → 207 KB. Pełne przeniesienie reguł modułów z `legacy` do `instrument` (cel ok. 35–45 % mniej CSS) — dalej moduł po module, przy kolejnych zmianach. |
+| Strażnik wizualny | `tools/visual/snap.py` (wszystkie widoki, 390 / 1280 px, motywy, dane syntetyczne, stały zegar) i `tools/visual/compare.py` (piksel w piksel) — zmiana stylów bez zmiany wyglądu = 0 różnic. Katalogi zrzutów poza repozytorium. |
+
+Testy etapu 2: blok `run_d114b` w `e2e.py` (anatomia, tryby skupienia Nauki i gotowania, gesty na listach, odczyt wykresu, pasek dolny, karty „Dziś”, Dane, dostępność) — wyniki pełnej regresji w §4.
+
+## 7. Dalej (poza etapem 2)
+
+- Publikacja na `main` — na polecenie użytkownika (potem kontrola na iPhonie: tarcza, gesty, tryby skupienia, blokada ekranu, pigułka).
+- Przenoszenie pozostałych reguł modułów z `legacy` do `instrument` przy kolejnych zmianach (strażnik: `tools/visual`).
+- Wybór zakresu na wykresach (4 tyg. / 3 mies. / rok) i „Horyzont” (oś czasu od minuty do dekady) — drugi krok z audytu, po silniku planów.
+- Tryb skupienia Zakupów — dziś tryb zakupów jest oknem z gestami; pełny ekran po sprawdzeniu w sklepie.

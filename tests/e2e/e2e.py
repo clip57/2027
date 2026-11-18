@@ -1664,9 +1664,10 @@ async def run_d110(pw, name, url, mobile):
     await ctx.close(); await b.close()
 
 async def touch_swipe(pg, loc, dx, steps=12):
-    """Przesunięcie palcem (zdarzenia dotyku przez CDP — Playwright nie ma gestu przesunięcia); start 40 px od lewej krawędzi elementu."""
+    """Przesunięcie palcem (zdarzenia dotyku przez CDP — Playwright nie ma gestu przesunięcia); start w ~1/3 szerokości wiersza (poza polem
+    wyboru i przyciskiem na początku wiersza — gest zaczęty na polu jest pomijany)."""
     box = await loc.bounding_box()
-    x, y = box['x'] + 40, box['y'] + box['height'] / 2
+    x, y = box['x'] + min(110, box['width'] / 3), box['y'] + box['height'] / 2
     cdp = await pg.context.new_cdp_session(pg)
     await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': x, 'y': y}]})
     for i in range(1, steps + 1):
@@ -1842,6 +1843,99 @@ async def run_d114(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów JS {errs[:3]}')
     await b.close()
 
+async def run_d114b(pw, name, url, mobile):
+    """D-114 etap 2: anatomia stron (nagłówek bez karty, pasek zakładek widoku), tryby skupienia Nauki (MPW) i gotowania (Meal Prep),
+    gesty na listach odhaczanych, odczyt wartości na wykresie, własny pasek dolny, karty „Dziś”, Dane w dwóch kolumnach (komputer), dostępność."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-114/2]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 11, 18, 10, 40))
+    # --- Anatomia: nagłówek-bohater bez karty, przełącznik widoków jako pasek zakładek (etykieta tylko dla czytników ekranu)
+    await pg.goto(url + '#/mpw'); await pg.wait_for_selector('.hero-tr h1')
+    an = await pg.evaluate("""[getComputedStyle(document.querySelector('.hero-tr')).backgroundColor, document.querySelector('.seg-wrap.is-view .seg-label').getBoundingClientRect().width,
+      document.querySelector('.seg-wrap.is-view [role=group]').getAttribute('aria-label')]""")
+    ok(an[0] in ('rgba(0, 0, 0, 0)', 'transparent') and an[1] <= 1 and an[2] == 'Widok', f'{tag} Anatomia: nagłówek bez karty, zakładki widoku ({an})')
+    for r in ('#/trening?v=stat', '#/bezpieczenstwo', '#/pielegnacja'):
+        await pg.goto(url + '#/wiecej'); await pg.goto(url + r); await pg.wait_for_selector('main h1')
+        ok(await pg.locator('.seg-wrap.is-view').count() == 1, f'{tag} Anatomia: pasek zakładek widoku w {r}')
+    # --- Tryb skupienia Nauki (MPW 18.11: bloki A–C 15:30–18:23)
+    await pg.goto(url + '#/mpw?v=dzien&d=2026-11-18'); await pg.wait_for_selector('.cfa-row')
+    n0 = await pg.locator('.cfa-row .set-toggle[aria-pressed="true"]').count()
+    await pg.goto(url + '#/mpw?v=fokus&d=2026-11-18'); await pg.wait_for_selector('.fx-set')
+    fx = await pg.evaluate("[document.documentElement.hasAttribute('data-focus'), document.querySelector('main h1').textContent, document.querySelector('.fx-set h3').textContent, document.querySelectorAll('.fx-sc').length]")
+    ok(fx[0] and fx[1] == 'Nauka MPW' and fx[2].startswith('Blok A · 15:30') and fx[3] == 3, f'{tag} Nauka: tryb skupienia — blok A, podziałka 3 bloków ({fx})')
+    v = await axe_audit(pg); ok(not v, f'{tag} Nauka (skupienie): dostępność {v[:2]}')
+    await pg.get_by_role('button', name=re.compile('^Start minutnika 53 min')).click(); await pg.wait_for_timeout(200)
+    ok(await pg.inner_text('.fx-timer .fx-rest-t') == '53:00' or await pg.inner_text('.fx-timer .fx-rest-n') == 'Trwa', f'{tag} Nauka: minutnik 53 min uruchomiony')
+    await pg.get_by_role('button', name='Blok wykonany').click(); await wait_js(pg, "() => document.querySelector('.fx-set h3')?.textContent.startsWith('Blok B')")
+    ok(await pg.locator('.fx-sc.is-done').count() == 1, f'{tag} Nauka: blok wykonany → następny blok')
+    if mobile: await pg.get_by_role('link', name='Zakończ tryb skupienia').click()
+    else: await pg.keyboard.press('Escape')
+    await pg.wait_for_selector('.cfa-row')
+    n1 = await pg.locator('.cfa-row .set-toggle[aria-pressed="true"]').count()
+    lv = await pg.evaluate("[document.getElementById('live').hidden, document.querySelector('#live .lv-l')?.textContent || '']")
+    ok(n1 == n0 + 1 and not await pg.evaluate("document.documentElement.hasAttribute('data-focus')"), f'{tag} Nauka: wyjście — blok odhaczony w widoku dnia ({n0} → {n1})')
+    ok(lv[0] is False and lv[1].startswith('Blok A'), f'{tag} Nauka: minutnik bloku w pigułce „na żywo” po wyjściu ({lv})')
+    await pg.get_by_role('button', name=re.compile('^Zatrzymaj minutnik')).click(); await pg.wait_for_timeout(150)
+    # --- Tryb gotowania (Meal Prep)
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.mp-focus')
+    c0 = await pg.locator('.prep-list input:checked').count()
+    await pg.locator('.mp-focus').click(); await pg.wait_for_selector('.fx-set')
+    st = await pg.inner_text('.fx-set h3')
+    await pg.get_by_role('button', name='Krok wykonany').click(); await wait_js(pg, "() => document.querySelector('.fx-set h3')?.textContent.startsWith('Krok 2 ')")
+    ok(st.startswith('Krok 1 z ') and await pg.locator('.fx-sc.is-done').count() == 1, f'{tag} Gotowanie: krok wykonany → następny ({st})')
+    v = await axe_audit(pg); ok(not v, f'{tag} Gotowanie: dostępność {v[:2]}')
+    await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('.prep-list')
+    ok(await pg.locator('.prep-list input:checked').count() == c0 + 1, f'{tag} Gotowanie: ten sam zapis kroku w Meal Prep')
+    # --- Gesty na listach (telefon): Suplementacja, Meal Prep, bloki MPW
+    if mobile:
+        for route, row, on in (('#/suplementy', '.dose-list li', '.dose-ck[aria-pressed="true"]'), ('#/mealprep', '.prep-list li:has(input:not(:checked))', '.prep-list input:checked'),
+                               ('#/mpw?v=dzien&d=2026-11-18', '.cfa-row.is-next', '.cfa-row .set-toggle[aria-pressed="true"]')):
+            await pg.goto(url + '#/wiecej'); await pg.goto(url + route); await pg.wait_for_selector(row)
+            r0 = pg.locator(f'{row} >> visible=true').first; await r0.evaluate("e => e.scrollIntoView({ block: 'center' })"); await pg.wait_for_timeout(250)   # nie pod pigułką i paskiem dolnym
+            k0 = await pg.locator(on).count()
+            await touch_swipe(pg, r0, 220)
+            await wait_js(pg, "a => document.querySelectorAll(a[0]).length > a[1]", [on, k0])
+            ok(await pg.locator(on).count() == k0 + 1, f'{tag} Gest na liście {route}: przesunięcie w prawo odhacza')
+    # --- Wykres interaktywny: postęp planu MPW (odczyt wartości pod kursorem / palcem)
+    await pg.goto(url + '#/mpw?v=plan'); await pg.wait_for_selector('.cf-prog-chart svg')
+    svg = pg.locator('.cf-prog-chart svg').first; box = await svg.bounding_box()
+    if mobile: await pg.touchscreen.tap(box['x'] + box['width'] * 0.3, box['y'] + box['height'] * 0.5)
+    else: await pg.mouse.move(box['x'] + box['width'] * 0.3, box['y'] + box['height'] * 0.5)
+    await pg.wait_for_timeout(150)
+    sc = await pg.evaluate("[document.querySelector('.cf-prog-chart svg').classList.contains('is-scrub'), getComputedStyle(document.querySelector('.cf-prog-chart .ch-scrub')).display, document.querySelector('.cf-prog-chart .ch-scrub-t').textContent]")
+    ok(sc[0] and sc[1] != 'none' and 'plan' in sc[2], f'{tag} Wykres: odczyt wartości pod {"palcem" if mobile else "kursorem"} ({sc[2]})')
+    # --- Własny pasek dolny i karty „Dziś” (Ustawienia)
+    await pg.goto(url + '#/ustawienia'); await pg.wait_for_selector('.set-tabs')
+    await pg.get_by_label('Zakładka 4').select_option('zapasy'); await pg.wait_for_selector('.set-tabs')
+    tabs = await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())')
+    ok(tabs == ['Dziś', 'Dieta', 'Trening', 'Zapasy', 'Więcej'], f'{tag} Pasek dolny: własny wybór zakładek ({tabs})')
+    await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
+    more = await pg.eval_on_selector_all('.more-list a', 'e => e.map(x => x.textContent.trim())')
+    ok('Zapasy' not in more and 'MPW' in more, f'{tag} Więcej: bez modułów z paska, z modułem zdjętym z paska')
+    await pg.goto(url + '#/ustawienia'); await pg.wait_for_selector('.set-tabs')
+    v = await axe_audit(pg); ok(not v, f'{tag} Ustawienia (pasek, karty): dostępność {v[:2]}')
+    await pg.get_by_role('button', name='Domyślne').click(); await pg.wait_for_timeout(150)
+    ok(await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())') == ['Dziś', 'Dieta', 'Trening', 'MPW', 'Więcej'], f'{tag} Pasek dolny: przywrócone domyślne')
+    await pg.get_by_role('checkbox', name='Meal prep').uncheck()
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-aside')
+    cards = await pg.eval_on_selector_all('.dz-card h2', 'e => e.map(x => x.textContent)')
+    ok('Meal prep' not in cards and 'Suplementy' in cards, f'{tag} „Dziś”: karta ukryta w Ustawieniach ({cards})')
+    await pg.goto(url + '#/ustawienia'); await pg.wait_for_selector('.set-cards'); await pg.get_by_role('checkbox', name='Meal prep').check()
+    # --- Dane: dwie kolumny sekcji na komputerze
+    if not mobile:
+        await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-head'); await pg.wait_for_timeout(300)
+        cols = await pg.evaluate("getComputedStyle(document.querySelector('main')).gridTemplateColumns.split(' ').length")
+        ok(cols == 2, f'{tag} Dane: dwie kolumny sekcji ({cols})')
+    sw, w = await pg.evaluate('[document.documentElement.scrollWidth, innerWidth]')
+    ok(sw <= w, f'{tag} bez przewijania w poziomie ({sw}/{w})')
+    ok(not errs, f'{tag} brak błędów JS {errs[:3]}')
+    await b.close()
+
 async def main():
     srv = serve(8765)
     async with async_playwright() as pw:
@@ -1872,6 +1966,8 @@ async def main():
         await run_d113(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d114(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d114(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d114b(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d114b(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

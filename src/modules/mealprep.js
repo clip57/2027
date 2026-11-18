@@ -7,6 +7,9 @@ import { resolveDay, PLAN_START, DIET_START } from '../core/resolver.js';
 import { longDate, addDays, dayShort, shortDate } from '../core/dates.js';
 import { coverage } from '../core/calc/inventory.js';
 import { icon } from '../ui/icons.js';
+import { swipeRow } from '../ui/gestures.js';
+import { sfx } from '../ui/signal.js';
+import { focusTop, focusScale, focusTimer, focusKeys } from '../ui/focus.js';
 
 // {produkt} -> gramatura z planu diety na dany dzień; brak pozycji w planie = jawna informacja
 export function resolveText(text, phase, variant, pack) {
@@ -46,6 +49,7 @@ const ORDER = [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && SRC.mealp
   .concat(EVE, [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && !SRC.mealprep.phases[i].cards.some(Boolean)));
 const dietLabel = v => (v === 'T' ? 'dzień treningowy' : 'dzień nietreningowy');
 
+let prepPos = null;   // D-114: bieżący krok trybu gotowania { date, key }
 export function renderMealPrep(root, ctx) {
   const { store, today } = ctx;
   const q = ctx.params?.get('d');
@@ -102,6 +106,60 @@ export function renderMealPrep(root, ctx) {
     catch (e) { state[key] = !value; refresh(); clear(msg).append(h('div', { class: 'banner err' }, e.message)); }
   };
 
+  // D-114 etap 2: tryb gotowania — krok po kroku (ten sam zapis `prep.step`), minutnik przy kroku z czasem, ekran nie gaśnie
+  if (ctx.params.get('v') === 'fokus') return prepFocus();
+  function prepFocus() {
+    const exit = `#/mealprep${date === today ? '' : `?d=${date}`}`;
+    const steps = order.flatMap(pi => SRC.mealprep.phases[pi].cards.map(id => byId[id]).filter(Boolean).flatMap(c => c.blocks.flatMap((b, bi) =>
+      (b.items || []).map((it, i) => { const pk = prepKey(c.id, bi, i); return { pk, key: prepKeyText(date, pk), it, card: c, phase: SRC.mealprep.phases[pi].title }; }))));
+    const wrap = h('div', { class: 'fx', style: { '--dc': 'var(--prep)' } });
+    add(root, wrap);
+    if (!steps.length) {
+      add(wrap, focusTop({ exit, title: 'Gotowanie' }), h('p', { class: 'fx-msg' }, 'Brak kroków przygotowania tego dnia.'), h('a', { class: 'btn primary fx-wide', href: exit }, 'Wróć do Meal Prep'));
+      return;
+    }
+    const isDone = x => !!state[x.key];
+    if (!prepPos || prepPos.date !== date || !steps.some(x => x.key === prepPos.key)) prepPos = { date, key: (steps.find(x => !isDone(x)) || steps[steps.length - 1]).key };
+    const cur = steps.find(x => x.key === prepPos.key), i = steps.indexOf(cur), k = steps.filter(isDone).length;
+    const go = d => { const n = steps[i + d]; if (!n) return; prepPos = { date, key: n.key }; ctx.rerender(); };
+    const save = async v => {
+      if (!store) return;
+      try { await store.record('prep.step', { date, card: cur.pk.card, idx: cur.pk.idx, done: v }); } catch (e) { ctx.flash(e.message || String(e)); return false; }
+      return true;
+    };
+    const complete = async () => {
+      sfx('check');
+      if (!(await save(true))) return;
+      const n = steps.find(x => !store.state.prep[x.key]);
+      if (n) prepPos = { date, key: n.key }; else sfx('done');
+      ctx.rerender();
+    };
+    const undo = async () => { if (await save(false)) ctx.rerender(); };
+    const groups = [];
+    for (const x of steps) { const g = groups[groups.length - 1]; if (g && g.card === x.card) g.items.push(x); else groups.push({ card: x.card, items: [x] }); }
+    const mins = timerMin(cur.it);
+    const card = h('section', { class: `fx-set${isDone(cur) ? ' is-done' : ''}`, 'aria-labelledby': 'fx-set-h' },
+      h('div', { class: 'fx-set-h' },
+        h('button', { class: 'fx-nav', 'aria-label': 'Poprzedni krok', disabled: i === 0 || null, onclick: () => go(-1) }, icon('chevron-left', { size: 22 })),
+        h('h3', { id: 'fx-set-h' }, `Krok ${i + 1} z ${steps.length}`, isDone(cur) && h('span', { class: 'fx-tag' }, icon('check', { size: 14 }), 'wykonany')),
+        h('button', { class: 'fx-nav', 'aria-label': 'Następny krok', disabled: i === steps.length - 1 || null, onclick: () => go(1) }, icon('chevron-right', { size: 22 }))),
+      h('div', { class: 'fx-ex fx-study' },
+        h('p', { class: 'fx-k' }, `${cur.phase} · ${cur.card.title}${cur.card.time ? ` · ${cur.card.time}` : ''}`),
+        h('h2', { class: 'fx-name fx-step-t' }, textOf(cur.card, cur.it))),
+      isDone(cur)
+        ? h('button', { class: 'fx-undo', onclick: undo }, icon('undo-2', { size: 18 }), h('span', {}, 'Cofnij — krok niewykonany'))
+        : h('button', { class: 'primary fx-go', onclick: complete }, icon('check', { size: 22 }), h('span', {}, 'Krok wykonany')));
+    swipeRow(card, isDone(cur) ? { left: { label: 'Cofnij', ic: 'undo-2', tone: 'neutral', run: undo } } : { right: { label: 'Krok wykonany', ic: 'check', run: complete } });
+    const n2 = steps[i + 1];
+    add(wrap,
+      focusTop({ exit, title: 'Gotowanie', sub: `${dayShort(date)} ${shortDate(date)} · ${k} / ${steps.length} kroków` }),
+      focusScale(groups.map(g => g.items.map(x => ({ done: isDone(x), cur: x === cur }))), `Kroki: ${k} z ${steps.length} wykonanych`),
+      mins && !isDone(cur) && focusTimer(`mp|${cur.key}`, mins, cur.card.title, ctx.flash),
+      card,
+      n2 && h('p', { class: 'fx-next' }, h('span', { class: 'fx-l' }, 'Następnie'), `${n2.card.title} · ${textOf(n2.card, n2.it)}`));
+    focusKeys(wrap, { exit, primary: isDone(cur) ? null : complete, nav: go });
+  }
+
   add(root, msg,
     h('section', { class: 'hero-tr' },
       h('div', { class: 'hero-tr-main' },
@@ -111,7 +169,8 @@ export function renderMealPrep(root, ctx) {
         h('div', { class: 'row daynav mp-daynav' },
           date > PLAN_START && h('a', { class: 'btn dz-nav', href: `#/mealprep?d=${addDays(date, -1)}`, 'aria-label': 'Poprzedni dzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
           date !== today && h('a', { class: 'btn dz-nav', href: '#/mealprep' }, 'Dziś'),
-          h('a', { class: 'btn dz-nav', href: `#/mealprep?d=${tomorrow}`, 'aria-label': 'Następny dzień' }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 })))),
+          h('a', { class: 'btn dz-nav', href: `#/mealprep?d=${tomorrow}`, 'aria-label': 'Następny dzień' }, h('span', {}, 'Następny dzień'), icon('chevron-right', { size: 18 }))),
+        allSteps.length > 0 && h('a', { class: 'btn primary mp-focus', href: `#/mealprep?v=fokus${date === today ? '' : `&d=${date}`}` }, icon('focus', { size: 18 }), h('span', {}, 'Tryb gotowania'))),
       h('div', { class: 'hero-tr-side' }, ringBox),
       h('div', { class: 'hero-tr-map' }, nextBox)),
     h('nav', { class: 'mp-jump', 'aria-label': 'Fazy dnia' }, order.map(i => h('a', { class: 'chip-b', href: `#mp-ph-${i}` }, SRC.mealprep.phases[i].title))),

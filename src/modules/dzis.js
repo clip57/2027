@@ -6,6 +6,7 @@ import { dayDial, dayEnd } from '../ui/dial.js';
 import { swipeRow } from '../ui/gestures.js';
 import { play, onChange } from '../ui/motion.js';
 import { sfx } from '../ui/signal.js';
+import { hiddenCards } from '../ui/prefs.js';
 import { sparkline, donut } from '../ui/charts.js';
 import { region, swap } from '../ui/patch.js';
 import { icon } from '../ui/icons.js';
@@ -120,7 +121,9 @@ const macroMix = t => { const k = [t.p * 4, t.c * 4, t.f * 9], sum = k.reduce((a
     { label: `Udział energii: białko ${pc[0]} %, węglowodany ${pc[1]} %, tłuszcz ${pc[2]} %`, size: 34, stroke: 6 }),
     h('span', { class: 'dz-mix-l', 'aria-hidden': 'true' }, [['m-p', 'B', pc[0]], ['m-c', 'W', pc[1]], ['m-f', 'T', pc[2]]].map(([c, l, v]) => h('span', { class: c }, `${l} ${v}%`)))); };
 
-const card = (title, ic, href, ...body) => h('section', { class: 'dz-card' },
+// D-114 etap 2: karty ukryte w Ustawieniach („Karty w »Dziś«”) — preferencja urządzenia
+const CARD_ID = { 'Suplementy': 'supp', 'Pielęgnacja': 'care', 'Meal prep': 'prep', 'Zapasy': 'inv', 'Plan MPW': 'plan', 'Plan CFA': 'plan', 'Aktywność treningowa': 'act' };
+const card = (title, ic, href, ...body) => hiddenCards().has(CARD_ID[title]) ? null : h('section', { class: 'dz-card' },
   h('div', { class: 'dz-card-h' }, h('span', { class: 'dz-ic' }, icon(ic, { size: 18 })), h('h2', {}, title),
     href && h('a', { class: 'dz-more', href, 'aria-label': `${title} — otwórz moduł` }, icon('chevron-right', { size: 18 }))), ...body);
 

@@ -3,7 +3,7 @@
 import { h, add } from './dom.js';
 import { segmented } from './components.js';
 import { icon } from './icons.js';
-import { ACCENTS, DENSITIES, TEXT_SIZES, uiPref, setUiPref, soundOn, setSound, startPref, setStartPref, oledOn, setOled, sfxOn, setSfx } from './prefs.js';
+import { ACCENTS, DENSITIES, TEXT_SIZES, uiPref, setUiPref, soundOn, setSound, startPref, setStartPref, oledOn, setOled, sfxOn, setSfx, tabsPref, setTabsPref, DZ_CARDS, hiddenCards, setHiddenCards } from './prefs.js';
 import { signal, unlockAudio, sfx } from './signal.js';
 
 const row = (title, hint, control) => h('div', { class: 'set-row' },
@@ -36,6 +36,26 @@ export function renderSettings(root, ctx) {
       row('Ekran startowy', 'Moduł otwierany przy uruchomieniu aplikacji (bez adresu).',
         h('select', { 'aria-label': 'Ekran startowy', onchange: e => { setStartPref(e.target.value); ctx.flash('Zapisano ekran startowy.', 'info'); } },
           ctx.modules.map(m => h('option', { value: m.id, selected: m.id === startPref() || null }, m.name))))),
+    // D-114 etap 2: własny pasek dolny (telefon) i karty w „Dziś”
+    (() => {
+      const ids = ctx.allModules.map(m => m.id), cur = tabsPref(ids) || ctx.defaultTabs;
+      const pickTab = (i, id) => {
+        const next = [...cur]; const j = next.indexOf(id);
+        if (j >= 0) next[j] = next[i];   // moduł już na pasku — zamiana miejscami
+        next[i] = id;
+        setTabsPref(next.join(',') === ctx.defaultTabs.join(',') ? null : next); ctx.rerender();
+      };
+      const hid = hiddenCards();
+      return h('section', { class: 'panel set-sec', 'aria-labelledby': 'set-nav' }, h('h2', { id: 'set-nav' }, icon('sliders-horizontal', { size: 18 }), 'Pasek i pulpit'),
+        row('Pasek dolny (telefon)', 'Cztery moduły na pasku; pozostałe w „Więcej”.',
+          h('div', { class: 'set-tabs' }, cur.map((id, i) => h('label', { class: 'set-tab' }, h('span', {}, `Zakładka ${i + 1}`),
+            h('select', { 'aria-label': `Zakładka ${i + 1}`, onchange: e => pickTab(i, e.target.value) }, ctx.allModules.map(m => h('option', { value: m.id, selected: m.id === id || null }, m.name))))),
+            tabsPref(ids) && h('button', { class: 'set-test', onclick: () => { setTabsPref(null); ctx.rerender(); } }, icon('undo-2', { size: 16 }), h('span', {}, 'Domyślne')))),
+        row('Karty w „Dziś”', 'Które karty podsumowań widać obok planu dnia.',
+          h('div', { class: 'set-cards', role: 'group', 'aria-label': 'Karty w „Dziś”' }, DZ_CARDS.map(([id, label]) => h('label', { class: 'set-card' },
+            h('input', { type: 'checkbox', checked: !hid.has(id) || null, onchange: e => { const s2 = hiddenCards(); if (e.target.checked) s2.delete(id); else s2.add(id); setHiddenCards(s2); } }),
+            h('span', {}, label))))));
+    })(),
     h('section', { class: 'panel set-sec', 'aria-labelledby': 'set-data' }, h('h2', { id: 'set-data' }, icon('database', { size: 18 }), 'Dane'),
       h('p', { class: 'muted' }, 'Ustawienia dotyczą tylko tego urządzenia i nie są synchronizowane. Dane aplikacji, kopie i synchronizacja — w module Dane.'),
       h('a', { class: 'btn', href: '#/dane' }, icon('database', { size: 18 }), h('span', {}, 'Dane i synchronizacja'))));

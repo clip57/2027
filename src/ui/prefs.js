@@ -1,7 +1,7 @@
 // Preferencje interfejsu PER URZĄDZENIE (motyw, zwinięty panel). Celowo poza dziennikiem zdarzeń i plikiem synchronizacji:
 // nie są danymi użytkownika i nie powinny nadpisywać wyboru na innym urządzeniu. Brak dostępu do localStorage = wartości domyślne.
 const KEY = { theme: 'p2027.theme', side: 'p2027.sidebar', sound: 'p2027.sound', accent: 'p2027.accent', density: 'p2027.density', text: 'p2027.text', start: 'p2027.start',
-  oled: 'p2027.oled', sfx: 'p2027.sfx' };
+  oled: 'p2027.oled', sfx: 'p2027.sfx', tabs: 'p2027.tabs', cards: 'p2027.cards' };
 const get = (k, d) => { try { return localStorage.getItem(KEY[k]) ?? d; } catch { return d; } };
 const set = (k, v) => { try { localStorage.setItem(KEY[k], v); } catch { /* tryb prywatny — tylko bieżąca sesja */ } };
 
@@ -46,3 +46,14 @@ export const oledOn = () => get('oled', '0') === '1';
 export function setOled(on) { set('oled', on ? '1' : '0'); applyTheme(); }
 export const sfxOn = () => get('sfx', 'off') === 'on';
 export const setSfx = on => set('sfx', on ? 'on' : 'off');
+
+// D-114 etap 2: własny pasek dolny — 4 moduły (identyfikatory po przecinku); nieprawidłowa lista = domyślne zakładki z rejestru.
+// Karty w „Dziś” — lista ukrytych kart (identyfikatory). Preferencje urządzenia (telefon i komputer mogą mieć inne).
+export function tabsPref(valid) {
+  const ids = String(get('tabs', '') || '').split(',').filter(Boolean);
+  return ids.length === 4 && new Set(ids).size === 4 && ids.every(id => valid.includes(id)) ? ids : null;
+}
+export const setTabsPref = ids => set('tabs', ids ? ids.join(',') : '');
+export const DZ_CARDS = [['supp', 'Suplementy'], ['care', 'Pielęgnacja'], ['prep', 'Meal prep'], ['inv', 'Zapasy'], ['plan', 'Plan nauki'], ['act', 'Aktywność treningowa']];
+export const hiddenCards = () => new Set(String(get('cards', '') || '').split(',').filter(Boolean));
+export const setHiddenCards = ids => set('cards', [...ids].join(','));

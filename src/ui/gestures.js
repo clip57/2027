@@ -72,3 +72,33 @@ export function swipeRow(row, { right = null, left = null } = {}) {
   row.classList.add('gx-row');
   return row;
 }
+
+// D-114 etap 2: gest na listach odhaczanych — reguła „wiersz → kontrolka” (przycisk z aria-pressed albo pole wyboru). Przesunięcie
+// w prawo zaznacza, w lewo odznacza — wywołaniem tej samej kontrolki (te same zapisy, ta sama walidacja i komunikaty co dotknięcie).
+// Dołączane po przerysowaniu widoku i do każdego później dodanego fragmentu (obserwator w app.js) oraz w oknach (sheet()).
+export const SWIPE_RULES = [
+  ['.dose-list li', '.dose-ck'],                     // Suplementacja
+  ['.cfa-row', '.set-toggle'],                        // bloki CFA / MPW (moduł i „Dziś”)
+  ['.set:not(.set-h)', '.set-toggle'],                // serie w Treningu
+  ['.prep-list li', 'input[type="checkbox"]'],        // kroki Meal Prep
+  ['.pg-step', 'input[type="checkbox"]'],             // kroki Pielęgnacji
+  ['.shop-list li', 'input[type="checkbox"]'],       // tryb zakupów
+];
+const isOn = c => (c.type === 'checkbox' ? c.checked : c.getAttribute('aria-pressed') === 'true');
+export function swipeToggle(row, control) {
+  return swipeRow(row, {
+    right: { label: 'Zrobione', ic: 'check', run: () => { if (!isOn(control) && !control.disabled) control.click(); } },
+    left: { label: 'Cofnij', ic: 'undo-2', tone: 'neutral', run: () => { if (isOn(control) && !control.disabled) control.click(); } },
+  });
+}
+export function attachSwipes(root) {
+  if (!root?.querySelectorAll || !('ontouchstart' in globalThis || navigator.maxTouchPoints > 0)) return;
+  for (const [rowSel, ctlSel] of SWIPE_RULES) {
+    const rows = [...(root.matches?.(rowSel) ? [root] : []), ...root.querySelectorAll(rowSel)];
+    for (const row of rows) {
+      if (row.classList.contains('gx-row')) continue;   // już z gestem (np. dawki w „Dziś”)
+      const c = row.querySelector(ctlSel);
+      if (c) swipeToggle(row, c);
+    }
+  }
+}

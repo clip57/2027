@@ -3,6 +3,7 @@
 // Daty lokalne (naprawa błędu UTC z v1/v2).
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
 import { segmented, progressRing, section, timerChip } from '../ui/components.js';
+import { renderStudyFocus } from './study_focus.js';
 import { areaChart, heatmap } from '../ui/charts.js';
 import { cfaSourceLine } from '../core/resolver.js';
 import { addDays, diffDays, longDate, shortDate, dayShort, weekday, parse } from '../core/dates.js';
@@ -53,6 +54,8 @@ export function renderStudy(root, ctx, P) {
     try { await store.record(P.types.done, { block: nr, done: value, ...P.doneExtra }); after([nr]); } catch (e) { err(e); }
   };
   const toExam = diffDays(today, EXAM), toStart = diffDays(today, D.stat.start);
+  // D-114 etap 2: tryb skupienia — jeden blok naraz, minutnik 53 min (te same zapisy co widok dnia)
+  if (view === 'fokus') return renderStudyFocus(root, ctx, P, { done: () => store?.state?.[P.fields.done] || new Set(), toggle });
   const toggleRecall = async (date, value) => {
     if (!store) return err(new Error('Baza danych jest niedostępna.'));
     try { await store.record('setting', { key: R.key(date), value }); after([]); } catch (e) { err(e); }
@@ -89,7 +92,8 @@ export function renderStudy(root, ctx, P) {
       h('p', { class: 'cfa-meta' }, h('span', { class: `mode ${P.modeClass[b.tryb] || ''}` }, b.tryb), h('span', { class: 'muted' }, `${b.godz} · nr ${b.nr}`),
         P.meta?.(b)),
       // F-N2 (D-113): licznik bloku 53 min przy następnym bloku dnia (stan interfejsu, sygnał na koniec — bez zapisu w dzienniku)
-      next && b.data === today && !done.has(b.nr) && h('p', { class: 'cf-timer' }, timerChip(`study|${P.id}|${b.nr}`, 53, `Blok ${b.blok}: ${b.temat}`, ctx.flash, { startLabel: 'Start 53 min' })),
+      next && b.data === today && !done.has(b.nr) && h('p', { class: 'cf-timer' }, timerChip(`study|${P.id}|${b.nr}`, 53, `Blok ${b.blok}: ${b.temat}`, ctx.flash, { startLabel: 'Start 53 min' }),
+        h('a', { class: 'btn cf-focus', href: `#/${P.id}?v=fokus&d=${b.data}` }, icon('focus', { size: 16 }), h('span', {}, 'Tryb skupienia'))),
       // Zadania bloku (MPW: instrukcja wykonania z planu) — zwinięte, bez przerysowania przy odhaczaniu innych bloków; U6: tekst spoza pakietu (`taskOf`)
       P.tasks && P.taskOf(b) && h('details', { class: 'cf-task' }, h('summary', {}, 'Zadania bloku'), h('p', {}, P.taskOf(b)))));
 
@@ -307,7 +311,7 @@ export function renderStudy(root, ctx, P) {
         h('p', { class: 'muted' }, mark == null ? `Plan zaczyna się ${dayShort(days[0])} ${shortDate(days[0])}.` : `Do dziś wg planu: ${dueNow} ${plural(dueNow, 'blok', 'bloki', 'bloków')} · wykonane z nich: ${doneNow} (${dueNow ? Math.round((doneNow / dueNow) * 100) : 0}%)`)),
       h('div', { class: 'cf-prog-grid' },
         h('div', { class: 'cf-prog-chart' }, areaChart(days.map(d => `${dayShort(d)} ${shortDate(d)}`), [{ values: planCum, cls: 'is-plan', fill: false }, { values: doneCum }],
-          { title: `Bloki narastająco: plan ${D.bloki.length}, do dziś wg planu ${dueNow}, wykonane z nich ${doneNow}`, height: 150, max: D.bloki.length, mark: mark ?? -1 }),
+          { title: `Bloki narastająco: plan ${D.bloki.length}, do dziś wg planu ${dueNow}, wykonane z nich ${doneNow}`, height: 150, max: D.bloki.length, mark: mark ?? -1, names: ['plan', 'wykonane'] }),
           h('p', { class: 'cf-legend' }, h('span', { class: 'lg-done' }, 'wykonane'), h('span', { class: 'lg-plan' }, 'plan'), mark != null && h('span', { class: 'lg-today' }, 'dziś'))),
         h('div', { class: 'cf-heat' }, h('p', { class: 'muted small' }, 'Wykonanie dni'),
           heatmap(weeks, { label: `Wykonanie bloków w dniach planu: ${weeks.flat().filter(c => c?.v === 1).length} dni w całości` }),

@@ -8,13 +8,14 @@ import { autoRound, autoCheck, describeError, cloudStatus } from './core/sync/cl
 import { setCustomItems } from './core/calc/inventory.js';
 import { GROUPS, byId, modulesOn } from './modules/registry.js';
 import { icon } from './ui/icons.js';
-import { THEMES, themePref, applyTheme, saveTheme, sideCollapsed, setSideCollapsed, startPref } from './ui/prefs.js';
+import { THEMES, themePref, applyTheme, saveTheme, sideCollapsed, setSideCollapsed, startPref, tabsPref } from './ui/prefs.js';
 import { renderSettings } from './ui/settings.js';
 import { PLAN_START, PLAN_END } from './core/resolver.js';
 import { diffDays, dayShort, shortDate } from './core/dates.js';
 import { setupShortcuts, searchButton, setCommandExtras } from './ui/search.js';
 import { mountLive, liveRoute, liveTick } from './ui/live.js';
 import { keepAwake } from './ui/wakelock.js';
+import { attachSwipes } from './ui/gestures.js';
 import { renderDzis } from './modules/dzis.js';
 import { renderDane } from './modules/dane.js';
 import { renderDieta } from './modules/dieta.js';
@@ -184,10 +185,15 @@ function topbar(id) {
     h('a', { class: `tb-icon${id === 'ustawienia' ? ' is-on' : ''}`, href: '#/ustawienia', 'aria-label': 'Ustawienia', title: 'Ustawienia' }, icon('settings', { size: 18 })));
 }
 
+// D-114 etap 2: zakładki paska dolnego — wybór użytkownika (Ustawienia) albo domyślne z rejestru (D-095: CFA do 11.11, MPW od 12.11)
+function tabModules(MODULES) {
+  const ids = tabsPref(MODULES.map(m => m.id));
+  return ids ? ids.map(id => MODULES.find(m => m.id === id)) : MODULES.filter(m => m.tab);
+}
 function nav(current) {
   // Zakładki i kolejność w grupach zależne od dnia (D-095: od 12.11.2026 MPW zamiast CFA)
   const MODULES = modulesOn(today());
-  const tabs = MODULES.filter(m => m.tab);
+  const tabs = tabModules(MODULES);
   const moreActive = !tabs.some(m => m.id === current);
   const collapsed = sideCollapsed();
   return [
@@ -234,8 +240,8 @@ async function render(keepFocus = false) {
   const keepY = keepFocus === true ? scrollY : null, t0 = performance.now();
   const { id, params } = route();
   renderedDay = today(); tick = null;
-  // D-114: tryb skupienia (Trening) — pełny ekran bez paneli nawigacji, ekran nie gaśnie; każda inna trasa kończy tryb
-  const focus = id === 'trening' && params.get('v') === 'fokus';
+  // D-114: tryb skupienia (Trening, Nauka, Meal Prep) — pełny ekran bez paneli nawigacji, ekran nie gaśnie; każda inna trasa kończy tryb
+  const focus = ['trening', 'cfa', 'mpw', 'mealprep'].includes(id) && params.get('v') === 'fokus';
   document.documentElement.toggleAttribute('data-focus', focus);
   keepAwake(focus);
   setCustomItems(ctx.store?.state?.catalogUser || []);
@@ -261,10 +267,10 @@ async function render(keepFocus = false) {
     h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/dane' }, 'Przejdź do Dane'),
       h('button', { 'aria-label': 'Zamknij komunikat synchronizacji', onclick: () => { cloudUi.dismissed = true; render(true); } }, 'Zamknij'))));
   if (id === 'ustawienia') {
-    renderSettings(main, { ...ctx, rerender: () => render(true), flash: (text, cls = 'warn', o) => toast(text, cls, o), themeSwitch, modules: modulesOn(today()).filter(m => m.tab || m.id === 'zapasy' || m.id === 'kalendarz') });
+    renderSettings(main, { ...ctx, rerender: () => render(true), flash: (text, cls = 'warn', o) => toast(text, cls, o), themeSwitch, modules: modulesOn(today()).filter(m => m.tab || m.id === 'zapasy' || m.id === 'kalendarz'), allModules: modulesOn(today()), defaultTabs: modulesOn(today()).filter(m => m.tab).map(m => m.id) });
   } else if (id === 'wiecej') {
     add(main, h('h1', {}, 'Więcej'), searchButton(() => ctx.store?.state, 'more-search'),
-      GROUPS.map(g => { const list = modulesOn(today()).filter(m => m.group === g && !m.tab); return list.length ? h('section', { class: 'more-sec' },
+      GROUPS.map(g => { const all = modulesOn(today()), onTabs = new Set(tabModules(all).map(m => m.id)), list = all.filter(m => m.group === g && !onTabs.has(m.id)); return list.length ? h('section', { class: 'more-sec' },
         h('p', { class: 'side-gl' }, g),
         h('div', { class: 'more-list' }, list.map(m => h('a', { href: `#/${m.id}`, style: { '--dc': `var(--${m.domain})` } },
           h('span', { class: 'more-ic' }, icon(m.icon, { size: 20 })), h('span', { class: 'more-n' }, m.name), icon('chevron-right', { size: 18 }))))) : null; }),
@@ -289,6 +295,7 @@ async function render(keepFocus = false) {
   if (keepY != null && Math.abs(scrollY - keepY) > 1 && touchedAt < t0) scrollTo(0, keepY);
   restoreFocus(focusK);
   liveRoute(id, document.title, focus);   // D-114: pigułka „na żywo” po przerysowaniu (widoczność zależna od trasy)
+  attachSwipes(main);   // D-114 etap 2: gest przesunięcia na listach odhaczanych
 }
 
 // ---- D-110: przewijanie i przejścia między ekranami ----
@@ -370,6 +377,9 @@ async function boot() {
   applyTheme();
   toastBox();
   mountLive();   // D-114: pigułka „na żywo” — poza #app (nie znika przy przerysowaniu)
+  // D-114 etap 2: gesty na listach także w fragmentach dodanych później (odświeżanie punktowe P2, wiersze dokładane przez moduły)
+  new MutationObserver(recs => { for (const r of recs) for (const n of r.addedNodes) if (n.nodeType === 1) attachSwipes(n); })
+    .observe(document.getElementById('app'), { childList: true, subtree: true });
   setupShortcuts(() => ctx.store?.state);
   // D-113 (F-G1): polecenie „Zmień motyw” w palecie ⌘K — kolejny motyw jak przycisk w pasku górnym
   setCommandExtras({ theme: () => { const nx = { dark: 'light', light: 'system', system: 'dark' }[themePref()] || 'dark'; saveTheme(nx); applyTheme(nx); render(true); } });   // I5: skróty klawiaturowe (⌘K, /, ← →, g + litera, ?)

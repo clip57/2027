@@ -271,7 +271,7 @@ export function renderZapasy(root, ctx) {
             h('div', { class: 'zp-hist-c', style: { '--ch': `var(--${r.status === 'CRITICAL' ? 'danger' : r.status === 'WARNING' ? 'warning' : 'success'})` } },
               areaChart(ser.map(p => `${dayShort(p.date)} ${shortDate(p.date)}`), [{ values: past }, { values: fut, cls: 'is-plan', fill: false }],
                 { title: `${it.name}: stan ${back ? `${shortDate(back.date)} ${fmt(back.qty, 1)} ${it.unit}, ` : ''}dziś ${fmt(r.st, 1)} ${it.unit}, prognoza ${shortDate(to)} ${fmt(ser[ser.length - 1].qty ?? 0, 1)} ${it.unit}`,
-                  height: 96, mark: 13, fmt: v => `${fmt(v, 0)} ${it.unit}` })),
+                  height: 96, mark: 13, fmt: v => `${fmt(v, 0)} ${it.unit}`, names: ['stan', 'prognoza'] })),
             h('p', { class: 'muted small' }, `Zużycie wg planu: ostatnie 14 dni ${fmt(usedBetween(it.id, addDays(today, -13), today), 1)} ${it.unit} · następne 14 dni ${fmt(usedBetween(it.id, addDays(today, 1), to), 1)} ${it.unit}`,
               r.si?.shortSince ? ` · brak od ${dayShort(r.si.shortSince)} ${shortDate(r.si.shortSince)}` : r.fc?.runOut ? ` · skończy się ${dayShort(r.fc.runOut)} ${shortDate(r.fc.runOut)}` : ''));
         };

@@ -2,6 +2,39 @@
 const NS = 'http://www.w3.org/2000/svg';
 const sv = (tag, attrs = {}, text) => { const e = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, String(v))); if (text != null) e.textContent = text; return e; };
 
+// D-114 etap 2: wykres interaktywny — wartość pod palcem albo kursorem (pionowa linia, punkt, podpis). Tylko ulepszenie: pełna treść
+// wykresu jest w etykiecie dla czytników ekranu. Dotyk: decyzja w pierwszym ruchu — poziomo odczyt, pionowo zwykłe przewijanie (D-112).
+// pts: [{ x, y, text }] we współrzędnych viewBox; W — szerokość viewBox, H — dół obszaru wykresu.
+function scrub(svg, pts, W, H) {
+  if (!pts.length) return svg;
+  const g = sv('g', { class: 'ch-scrub', 'aria-hidden': 'true' }), line = sv('line', { y1: 2, y2: H, class: 'ch-scrub-l' });
+  const dot = sv('circle', { r: 4, class: 'ch-scrub-d' }), bg = sv('rect', { rx: 4, height: 18, y: 0, class: 'ch-scrub-bg' }), tx = sv('text', { y: 13, 'text-anchor': 'middle', class: 'ch-scrub-t' });
+  g.append(line, dot, bg, tx); g.style.display = 'none'; svg.append(g); svg.classList.add('is-scrub');
+  const near = cx => { const r = svg.getBoundingClientRect(), vx = (cx - r.left) * (W / r.width); return pts.reduce((a, p) => (Math.abs(p.x - vx) < Math.abs(a.x - vx) ? p : a), pts[0]); };
+  let hideT = null;
+  const show = p => {
+    clearTimeout(hideT); g.style.display = '';
+    line.setAttribute('x1', p.x); line.setAttribute('x2', p.x); dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
+    tx.textContent = p.text;
+    const w = Math.min(W, (tx.getComputedTextLength?.() || p.text.length * 6) + 12), x = Math.min(W - w / 2, Math.max(w / 2, p.x));
+    tx.setAttribute('x', x); bg.setAttribute('x', x - w / 2); bg.setAttribute('width', w);
+  };
+  const hide = (ms = 0) => { clearTimeout(hideT); hideT = setTimeout(() => { g.style.display = 'none'; }, ms); };
+  svg.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') show(near(e.clientX)); });
+  svg.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hide(); });
+  let x0 = 0, y0 = 0, mode = null;
+  svg.addEventListener('touchstart', e => { if (e.touches.length !== 1) return; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; mode = 'maybe'; }, { passive: true });
+  svg.addEventListener('touchmove', e => {
+    if (!mode) return;
+    const t = e.touches[0];
+    if (mode === 'maybe') { if (Math.abs(t.clientX - x0) < 6 && Math.abs(t.clientY - y0) < 6) return; mode = Math.abs(t.clientX - x0) > Math.abs(t.clientY - y0) ? 'scrub' : null; if (!mode) return; }
+    if (e.cancelable) e.preventDefault();
+    show(near(t.clientX));
+  }, { passive: false });
+  svg.addEventListener('touchend', e => { if (mode === 'maybe') show(near(e.changedTouches[0].clientX)); mode = null; hide(2200); });
+  return svg;
+}
+
 export function barChart(items, { title = '', unit = '', height = 150, fmt = v => String(v) } = {}) {
   const W = 320, H = height, pad = 22, max = Math.max(1, ...items.map(i => i.value));
   const bw = (W - pad) / Math.max(1, items.length);
@@ -14,7 +47,7 @@ export function barChart(items, { title = '', unit = '', height = 150, fmt = v =
     const every = Math.ceil(items.length / 6); // najwyżej ~6 podpisów, zawsze ostatni
     if (i % every === (items.length - 1) % every) svg.append(sv('text', { x: x + bw * 0.35, y: H + 12, 'text-anchor': 'middle', class: 'ch-lab' }, it.label));
   });
-  return svg;
+  return scrub(svg, items.map((it, i) => ({ x: pad + i * bw + bw * 0.5, y: H - (it.value / max) * (H - 14), text: `${it.label}: ${fmt(it.value)}${unit}` })), W, H);
 }
 
 export function lineChart(points, { title = '', unit = '', height = 150, fmt = v => String(v) } = {}) {
@@ -29,7 +62,7 @@ export function lineChart(points, { title = '', unit = '', height = 150, fmt = v
   points.forEach((p, i) => svg.append(sv('circle', { cx: x(i), cy: y(p.value), r: 3.2, class: 'ch-dot' })));
   [0, points.length - 1].filter((v, i, a) => a.indexOf(v) === i).forEach(i =>
     svg.append(sv('text', { x: x(i), y: H + 12, 'text-anchor': i === 0 ? 'start' : 'end', class: 'ch-lab' }, points[i].label)));
-  return svg;
+  return scrub(svg, points.map((p, i) => ({ x: x(i), y: y(p.value), text: `${p.label}: ${fmt(p.value)}${unit}` })), W, H);
 }
 
 // ==========================================================================
@@ -59,7 +92,7 @@ export function sparkline(values, { label = '', kind = 'bars', max = null, w = 1
 }
 
 // Wykres obszaru z osią (np. postęp nauki: wykonane vs plan). series: [{ values, cls }] — wspólna oś X (labels)
-export function areaChart(labels, series, { title = '', height = 140, max = null, fmt = v => String(v), mark = null } = {}) {
+export function areaChart(labels, series, { title = '', height = 140, max = null, fmt = v => String(v), mark = null, names = null } = {}) {
   const W = 320, H = height, pad = 6, n = Math.max(2, labels.length);
   const top = Math.max(1, max ?? Math.max(...series.flatMap(s => s.values.filter(v => v != null))));
   const x = i => pad + (i * (W - 2 * pad)) / (n - 1), y = v => H - 4 - (v / top) * (H - 14);
@@ -75,7 +108,9 @@ export function areaChart(labels, series, { title = '', height = 140, max = null
   if (mark != null && mark >= 0 && mark < labels.length) svg.append(sv('line', { x1: x(mark), x2: x(mark), y1: 6, y2: H - 4, class: 'ch-mark' }));
   svg.append(sv('text', { x: pad, y: H + 13, class: 'ch-lab' }, labels[0]), sv('text', { x: W - pad, y: H + 13, 'text-anchor': 'end', class: 'ch-lab' }, labels[labels.length - 1]));
   svg.append(sv('text', { x: W - pad, y: y(top) - 3, 'text-anchor': 'end', class: 'ch-lab' }, fmt(top)));
-  return svg;
+  const main = series[0]?.values || [];
+  return scrub(svg, labels.map((l, i) => ({ i, l })).filter(({ i }) => series.some(s => s.values[i] != null)).map(({ i, l }) => ({ x: x(i), y: y(main[i] ?? 0),
+    text: `${l}: ${series.map((s, k) => (s.values[i] == null ? null : `${names?.[k] ? `${names[k]} ` : ''}${fmt(s.values[i])}`)).filter(Boolean).join(' · ')}` })), W, H - 4);
 }
 
 // Pierścień udziałów (np. makroskładniki w kcal). parts: [{ value, cls, label }]

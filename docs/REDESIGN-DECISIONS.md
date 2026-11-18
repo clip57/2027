@@ -174,6 +174,7 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
   (linie i podziałki), `--lum` (poświata danych: 1 ciemny, 0 jasny), `--face` (tarcza), głęboka czerń `data-oled` (tylko motyw ciemny).
 - **Elementy sygnaturowe (prototyp):** tarcza dnia (`dial.js`), pigułka „na żywo” (`live.js`), gest przesunięcia (`gestures.js`), ruch (`motion.js`),
   tryb skupienia Treningu (`trening_focus.js`, wake lock `wakelock.js`), dźwięki interfejsu (`signal.js` → `sfx`).
+- **Etap 2 (po akceptacji 18.11.2026):** nagłówki-bohaterowie jako tytuł strony, przełącznik widoków jako pasek zakładek (`.seg-wrap.is-view`), płaskie listy, gesty na listach (`SWIPE_RULES`), tryby skupienia Nauki i gotowania (`focus.js`), wykresy z odczytem wartości, własny pasek dolny i karty „Dziś”, porządki w `legacy`, strażnik `tools/visual`.
 - **Nie robimy:** animowanych teł i shaderów, paralaksy, neonu, szkła na kartach z treścią, pętli, wykresów i „wniosków” bez danych (§6.6 audytu).
 
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
