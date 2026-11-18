@@ -32,8 +32,14 @@ for (const [id, t] of Object.entries(LAZY)) if (js.includes(JSON.parse(t).values
 // Arkusz = tokeny (jedyne źródło wartości) + style modułów + warstwa komponentów systemu projektowego
 // D-113: warstwa System 3.0 „Precision” (precision.css) na końcu; arkusz minifikowany (F-G6) — fonty wariantu jednoplikowego osadzane
 // PRZED minifikacją (esbuild może zdjąć cudzysłowy z url(), a podstawienie szuka dokładnego tekstu `url("fonts/…")`)
+// D-114 (System 4.0 „Instrument”): dwie warstwy kaskady. `legacy` — tokeny i style do D-113 w dotychczasowej kolejności (kaskada wewnątrz
+// bez zmian, sprawdzone zrzutami piksel w piksel); `instrument` — nowy system, zawsze nad `legacy` bez wyścigu specyficzności.
+// Reguły przenoszone z `legacy` do `instrument` moduł po module; tokeny (jedyne źródło wartości) zostają w tokens.css.
 const CSS_TARGET = ['safari16', 'chrome110', 'firefox115'];
-const cssRaw = ['src/ui/tokens.css', 'src/ui/styles.css', 'src/ui/system.css', 'src/ui/precision.css'].map(f => fs.readFileSync(P(f), 'utf8')).join('\n');
+const readCss = list => list.map(f => fs.readFileSync(P(f), 'utf8')).join('\n');
+const CSS_LEGACY = ['src/ui/tokens.css', 'src/ui/styles.css', 'src/ui/system.css', 'src/ui/precision.css'];
+const CSS_INSTRUMENT = ['src/ui/instrument.css'];
+const cssRaw = `@layer legacy, instrument;\n@layer legacy {\n${readCss(CSS_LEGACY)}\n}\n@layer instrument {\n${readCss(CSS_INSTRUMENT)}\n}\n`;
 const minCss = async t => (await transform(t, { loader: 'css', minify: true, target: CSS_TARGET, legalComments: 'none', charset: 'utf8' })).code.trim();
 const css = await minCss(cssRaw);
 const FONTS = fs.readdirSync(P('public/fonts')).filter(f => f.endsWith('.woff2'));

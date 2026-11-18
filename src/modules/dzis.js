@@ -1,7 +1,11 @@
 // Widok „Dziś” (Etap 2+): wynik resolvera czytelnie podzielony na sloty i podpunkty.
 // Suplementy pochodzą wyłącznie z SUPLEMENTACJI (D-001) — tekst źródłowy PLAN_DNIA ich nie powtarza.
 import { h, add, fmt, plural } from '../ui/dom.js';
-import { progressRing, metric, statusBadge } from '../ui/components.js';
+import { metric, statusBadge } from '../ui/components.js';
+import { dayDial, dayEnd } from '../ui/dial.js';
+import { swipeRow } from '../ui/gestures.js';
+import { play, onChange } from '../ui/motion.js';
+import { sfx } from '../ui/signal.js';
 import { sparkline, donut } from '../ui/charts.js';
 import { region, swap } from '../ui/patch.js';
 import { icon } from '../ui/icons.js';
@@ -18,6 +22,7 @@ import { careModel, stepsFor, progress, slotProgress, placeSlotProgress, slotDef
 import { mpwDaySpan } from '../core/calc/mpw.js';
 import { doseKey, doseDone } from '../core/calc/checks.js';
 import { byId, isTab } from './registry.js';
+import { slotClock, currentSlot, toMin, minLabel } from '../core/calc/now.js';
 
 const suppName = id => SRC.supplements.supplements[id]?.name || id;
 // Czas nauki MPW dnia z godzin bloków (B6): „159 min · od 16:00” w czwartki od 07.01, „symulacja 180 min · 15:30–18:30”, z P1–P7 — od 8:00
@@ -32,24 +37,8 @@ function cfaBlock(b, slot) {
     h('p', { class: 'cfa-meta' }, h('span', { class: 'chip' }, b.tryb), b.godz !== `${slot.from}–${slot.to}` && h('span', { class: 'muted' }, b.godz)));
 }
 
-// Upływ czasu w punkcie planu (D-110): ułamek od–do (także przez północ, np. sen 23:00–07:00) i minuty do końca
-const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
-export function slotClock(s, hhmm) {
-  const f = toMin(s.from); let t = toMin(s.to), c = toMin(hhmm);
-  if (t <= f) t += 1440;
-  if (c < f) c += 1440;
-  return { frac: Math.min(1, Math.max(0, (c - f) / (t - f))), left: Math.max(0, t - c) };
-}
-const minLabel = m => (m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`);
-
-// Bieżący slot wyznaczany z zegara (tylko dla dzisiejszego dnia).
-export function currentSlot(slots, hhmm) {
-  let cur = null;
-  for (const s of slots) if (s.from <= hhmm && (s.to > s.from ? hhmm < s.to : true)) cur = s;
-  if (!cur && hhmm < slots[0].from) return { current: null, next: slots[0] };
-  const i = cur ? slots.indexOf(cur) : -1;
-  return { current: cur, next: slots[i + 1] || null };
-}
+// Upływ czasu w punkcie planu i bieżący slot (D-110) — od D-114 w core/calc/now.js (wspólne z tarczą dnia i pigułką „na żywo”)
+export { slotClock, currentSlot };
 
 function slotView(s, now, care) {
   // Gdy posiłek jest jednocześnie tytułem slotu (Śniadanie 09:00), kcal trafia do tytułu, a podpunkt się nie powtarza.
@@ -73,14 +62,21 @@ function slotView(s, now, care) {
         icon('sparkles', { size: 14 }), h('span', {}, `Pielęgnacja ${care[s.id].done} / ${care[s.id].total}`)),
       s.doses.length > 0 && h('div', { class: 'slot-supps' },
         h('p', { class: 'supps-h' }, 'Suplementy'),
-        h('ul', {}, s.doses.map(d => h('li', { class: doseCtx?.done(d) ? 'is-taken' : null }, doseCtx && doseBtn(d), h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp)), h('span', { class: 'sd' }, d.label),
-          d.note && h('span', { class: 'muted' }, ` · ${d.note}`)))))));
+        h('ul', {}, s.doses.map(d => doseRow(d, h('li', { class: doseCtx?.done(d) ? 'is-taken' : null }, doseCtx && doseBtn(d), h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp)), h('span', { class: 'sd' }, d.label),
+          d.note && h('span', { class: 'muted' }, ` · ${d.note}`))))))));
 }
 // F-D4 (D-113): odhaczanie dawek w planie dnia (ten sam zapis `setting` co w Suplementacji); kontekst ustawiany przy renderze „Dziś”
-let doseCtx = null;
+let doseCtx = null, justDose = null;
 const doseBtn = d => { const on = doseCtx.done(d);
-  return h('button', { class: 'set-toggle dose-ck', 'aria-pressed': String(on), 'aria-label': `${suppName(d.supp)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
-    onclick: () => doseCtx.mark(d, !on) }, on ? '✓' : ''); };
+  const b = h('button', { class: 'set-toggle dose-ck', 'aria-pressed': String(on), 'aria-label': `${suppName(d.supp)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
+    onclick: () => doseCtx.mark(d, !on) }, on ? '✓' : '');
+  // D-114: ruch jako odpowiedź — tylko dawka zmieniona przed chwilą (po przerysowaniu) dostaje animację zatwierdzenia
+  if (justDose === doseCtx.key(d)) { justDose = null; requestAnimationFrame(() => play(b, on ? 'pop' : 'flip')); }
+  return b; };
+// D-114: gest — przesunięcie wiersza dawki w prawo = przyjęte, w lewo = cofnięcie (odpowiednik: przycisk w wierszu)
+const doseRow = (d, li) => (!doseCtx ? li : swipeRow(li, doseCtx.done(d)
+  ? { left: { label: 'Cofnij', ic: 'undo-2', tone: 'neutral', run: () => doseCtx.mark(d, false) } }
+  : { right: { label: 'Przyjęte', ic: 'check', run: () => doseCtx.mark(d, true) } }));
 
 // ---- Dane dashboardu — wyłącznie z resolvera i dziennika zdarzeń (bez metryk fikcyjnych) ----
 function dayData(r, date, store, today) {
@@ -311,37 +307,55 @@ export function renderDzis(root, ctx) {
   const slotIdx = now?.current ? r.slots.indexOf(now.current) : -1;
   const allDoses = r.slots.flatMap(s => s.doses);
   const dset = ctx.store?.state?.settings || {};
-  doseCtx = ctx.store && date <= ctx.today && allDoses.length ? { done: d => doseDone(dset, date, d),
-    mark: async (d, v) => { try { await ctx.store.record('setting', { key: doseKey(date, d), value: v }); ctx.rerender(); } catch (e) { ctx.flash(e.message || String(e)); } } } : null;
+  doseCtx = ctx.store && date <= ctx.today && allDoses.length ? { done: d => doseDone(dset, date, d), key: d => doseKey(date, d),
+    mark: async (d, v) => { justDose = doseKey(date, d); if (v) sfx('check');
+      try { await ctx.store.record('setting', { key: doseKey(date, d), value: v }); ctx.rerender(); } catch (e) { justDose = null; ctx.flash(e.message || String(e)); } } } : null;
   const taken = doseCtx ? allDoses.filter(d => doseCtx.done(d)).length : 0;
   const nextDose = () => allDoses.find(x => x.time >= hhmm);
   // Kafel KPI (D-110): ikona i pasek w kolorze domeny, liczba z jednostką pomniejszoną (tekst kafla bez zmian — „0 / 11 bloków”)
   // D-113: kafel KPI = metric() — liczba krojem Display, jednostka pomniejszona, podpis i mini-wykres z prawdziwych danych (klasy kafli bez zmian)
-  const kpi = (label, ic, dom, value, unit, hint, extra, cls = '', chart = null, href = null) =>
-    metric({ label, ic, value, unit, hint, chart: chart || extra, dom, cls: `dz-kpi ${cls}`.trim(), href });
+  const kpi = (label, ic, dom, value, unit, hint, extra, cls = '', chart = null, href = null) => {
+    const el = metric({ label, ic, value, unit, hint, chart: chart || extra, dom, cls: `dz-kpi ${cls}`.trim(), href });
+    onChange(el.querySelector('.stat-v'), `dz:${label}:${date}`, String(value));   // D-114: zmiana wartości — krótka animacja licznika
+    return el; };
   const bar = (v, max, dom) => h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%`, background: `var(--${dom})` } }));
   // Pielęgnacja (D-094): plan z danych użytkownika; bez planu — bez karty i bez znaczników w slotach
   const cm = careModel(ctx.store?.state?.careDefs || []), cDone = ctx.store?.state?.careDone || {};
   // D-111: krok przypięty do slotu innego wariantu dnia — znacznik w slocie tego dnia o tej porze (np. niedziela świąteczna bez basenu)
   const care = cm.empty ? null : { date, ...placeSlotProgress(slotProgress(cm, cDone, date), r.slots, slotDefs(SRC.dayTemplate)) };
   const careP = cm.empty ? null : progress(stepsFor(cm, date), cDone, date);
-  const nowBox = region(() => {
+  // D-114 (System 4.0 „Instrument”): tarcza dnia — w dniu bieżącym ze wskazówką „teraz” i odczytem w środku; odświeżana w miejscu
+  const showSlot = sl => {
+    const el = document.getElementById(sl.id);
+    if (!el) return;
+    const past = el.closest('details.dz-past');
+    if (past && !past.open) { past.open = true; pastOpen = true; }
+    el.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    play(el, 'glow', 1200);
+  };
+  const dial = dayDial({ slots: r.slots, hhmm: now ? hhmm : null, label: now ? 'Tarcza dnia: punkty planu' : `Tarcza dnia: plan ${shortDate(date)}`,
+    caption: `${dayShort(date)} ${shortDate(date)}`, onShow: showSlot });
+  // Odczyt obok tarczy (D-110: „Teraz” z upływem czasu i odliczaniem; klasy i teksty bez zmian — testy i czytniki ekranu).
+  // M8 (audyt 10.11.2026): bez pierścienia postępu dnia — postęp dnia pokazuje tarcza (wskazówka i wewnętrzny łuk)
+  const nowRead = region(() => {
     if (!now || !(now.current || now.next)) return null;
-    const idx = now.current ? r.slots.indexOf(now.current) : -1;
-    // D-110: postęp bieżącego punktu w czasie (od–do) i czas do końca; przed pierwszym punktem — czas do rozpoczęcia
     const clk = now.current ? slotClock(now.current, hhmm) : null;
     const wait = !now.current ? (toMin(now.next.from) - toMin(hhmm) + 1440) % 1440 : 0;
-    return h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz', style: { '--dc': `var(--${(now.current || now.next).domain || 'accent'})` } },
-      h('div', { class: 'dz-now-main' },
-        h('p', { class: 'nowcard-l' }, now.current ? `Teraz · ${now.current.from}–${now.current.to}` : 'Za chwilę'),
-        h('p', { class: 'nowcard-t' }, (now.current || now.next).title),
-        clk ? h('div', { class: 'dz-now-prog' }, h('span', { class: 'dz-now-bar', 'aria-hidden': 'true' }, h('span', { style: { width: `${(clk.frac * 100).toFixed(1)}%` } })),
-          h('span', { class: 'dz-now-left' }, `zostało ${minLabel(clk.left)}`))
-          : h('p', { class: 'dz-now-left' }, `za ${minLabel(wait)} · ${now.next.from}`),
-        now.current && now.next && h('p', { class: 'muted' }, `Następnie ${now.next.from} · ${now.next.title}`),
-        now.current && h('a', { class: 'btn', href: `#${now.current.id}` }, 'Pokaż w planie')),
-      idx >= 0 && h('div', { class: 'dz-now-side' }, progressRing(idx + 1, r.slots.length, 'Postęp dnia'), h('span', { class: 'muted' }, `punkt ${idx + 1} z ${r.slots.length}`)));
+    return h('div', { class: 'dz-now-main' },
+      h('p', { class: 'nowcard-l' }, now.current ? `Teraz · ${now.current.from}–${now.current.to}` : 'Za chwilę'),
+      h('p', { class: 'nowcard-t' }, (now.current || now.next).title),
+      clk ? h('div', { class: 'dz-now-prog' }, h('span', { class: 'dz-now-bar', 'aria-hidden': 'true' }, h('span', { style: { width: `${(clk.frac * 100).toFixed(1)}%` } })),
+        h('span', { class: 'dz-now-left' }, `zostało ${minLabel(clk.left)}`))
+        : h('p', { class: 'dz-now-left' }, `za ${minLabel(wait)} · ${now.next.from}`),
+      now.current && now.next && h('p', { class: 'muted dz-now-next' }, `Następnie ${now.next.from} · ${now.next.title}`),
+      now.current && h('a', { class: 'btn', href: `#${now.current.id}` }, 'Pokaż w planie'));
   });
+  const nowDom = () => { const x = now?.current || now?.next; return x?.own ? 'text-2' : x?.domain || 'accent'; };   // „Czas własny” — neutralnie, jak na tarczy
+  const nowBox = now && (now.current || now.next)
+    ? h('section', { class: 'nowcard dz-now', 'aria-label': 'Teraz', style: { '--dc': `var(--${nowDom()})` } }, h('div', { class: 'dz-now-dial' }, dial.el), nowRead.el)
+    : h('section', { class: 'dz-dayface', 'aria-label': 'Tarcza dnia' }, dial.el,
+      h('div', { class: 'dz-dayface-t' }, h('p', { class: 'nowcard-l' }, 'Plan dnia'), h('p', { class: 'dz-dayface-h' }, `${r.slots.length} ${plural(r.slots.length, 'punkt', 'punkty', 'punktów')} · ${r.slots[0].from}–${dayEnd(r.slots)}`),
+        h('p', { class: 'muted' }, 'Dotknij łuku albo przeciągnij po tarczy, aby zobaczyć punkt planu.')));
   const suppFoot = region(() => { const nd = nextDose();
     return h('p', { class: 'dz-foot' }, date !== ctx.today ? 'Szczegóły w planie dnia poniżej.' : nd ? `Następna pora: ${nd.time} — szczegóły w planie dnia.` : 'Wszystkie dzisiejsze dawki za Tobą.'); });
 
@@ -370,7 +384,7 @@ export function renderDzis(root, ctx) {
       r.mpw.inPlan && h('a', { class: 'btn ql', href: `#/mpw?v=dzien&d=${date}` }, icon('landmark', { size: 18 }), h('span', {}, 'Bloki MPW')),
       careP && h('a', { class: 'btn ql', href: `#/pielegnacja?d=${date}` }, icon('sparkles', { size: 18 }), h('span', {}, 'Pielęgnacja'))),
     h('div', { class: 'dz-grid' },
-      nowBox.el,   // D-110: najpierw „Teraz” (co robię), potem „Wymaga uwagi” — ta sama kolejność na telefonie i komputerze
+      nowBox,   // D-110: najpierw „Teraz” (co robię), potem „Wymaga uwagi” — ta sama kolejność na telefonie i komputerze
       date === ctx.today && attentionCard(ctx),
       h('div', { class: 'stats dz-kpis' },
         r.noDiet ? kpi('Dieta', 'utensils', 'diet', 'Bez diety', null, `dieta od ${longDate(DIET_START)}`)
@@ -437,11 +451,11 @@ export function renderDzis(root, ctx) {
     hhmm = t;
     const n = { ...currentSlot(r.slots, t), hhmm: t };
     if (n.current !== prev.current || n.next !== prev.next) {
-      now = n; nowBox.refresh(); ambient();
+      now = n; nowRead.refresh(); dial.update(t); ambient(); nowBox.style?.setProperty('--dc', `var(--${nowDom()})`);
       for (const s of new Set([prev.current, n.current].filter(Boolean))) { const el = document.getElementById(s.id); if (el) swap(el, slotView(s, now, care)); }
     } else if (t !== prev.hhmm) {
       // ta sama pora: odliczanie w karcie „Teraz” i wypełnienie linii osi czasu (bez przebudowy punktów planu)
-      now = n; nowBox.refresh();
+      now = n; nowRead.refresh(); dial.update(t);
       if (n.current) document.getElementById(n.current.id)?.style.setProperty('--el', slotClock(n.current, t).frac.toFixed(3));
     }
     if (nextDose()?.time !== dose) suppFoot.refresh();

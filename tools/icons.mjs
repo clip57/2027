@@ -14,7 +14,9 @@ export const NAMES = ['sun', 'moon', 'monitor', 'utensils', 'dumbbell', 'graduat
   'undo-2', 'history', 'clipboard-list', 'settings', 'snowflake', 'thermometer', 'refrigerator', 'soup', 'archive', 'map-pin', 'alarm-clock', 'save', 'receipt', 'sliders-horizontal', 'package-check', 'clock-3',
   'cloud', 'cloud-check', 'cloud-off', 'lock', 'log-in', 'log-out',
   'smartphone', 'trash-2', 'download', 'folder-open', 'pencil', 'calendar-plus', 'calendar-range', 'keyboard', 'activity', 'bell', 'arrow-right',
-  'sparkles', 'sun-medium', 'droplets', 'landmark'];
+  'sparkles', 'sun-medium', 'droplets', 'landmark',
+  // D-114 (System 4.0): tryb skupienia, ikony zamiast emoji (M4), ustawienia OLED i dźwięków
+  'focus', 'trophy', 'bone', 'thermometer-sun', 'lock-keyhole', 'volume-2', 'moon-star'];
 const out = {};
 for (const n of NAMES) {
   const svg = fs.readFileSync(path.join(DIR, `${n}.svg`), 'utf8');

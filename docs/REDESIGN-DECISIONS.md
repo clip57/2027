@@ -164,6 +164,18 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
   komunikat z akcją („Cofnij”, 10 s), stan synchronizacji w pasku górnym.
 - **Nowe zapisy tylko przez `setting`** (bez nowych typów zdarzeń): dawki `supp.dose:*`, lista zakupów `zapasy.shop:*` — jeden klucz na pozycję.
 
+## C14. System 4.0 „Instrument” (D-114, 18.11.2026 — etap 1: fundament i prototyp)
+- **Kierunek:** aplikacja jako precyzyjny przyrząd — tarcze, podziałki, świecące dane na głębokiej czerni; zasady: jeden przyrząd na ekran,
+  ruch jako odpowiedź (jednorazowy, bez pętli — D-112), bezpośrednia manipulacja z odpowiednikiem przyciskiem, dane świecą — reszta milczy,
+  czas zawsze widoczny, szybkość jest częścią wyglądu (≤ 100 ms reakcji przy procesorze × 4).
+- **Warstwy kaskady:** `@layer legacy, instrument` — style do D-113 w `legacy` (kaskada wewnątrz bez zmian, sprawdzone zrzutami piksel w piksel),
+  nowy system w `src/ui/instrument.css` (zawsze nad `legacy`, bez podbijania specyficzności). Reguły przenoszone z `legacy` moduł po module.
+- **Tokeny:** kolory w OKLCH (test kontrastu przelicza OKLCH na sRGB; test gamutu), skala pisma 8 stopni, 4 promienie, `--hair` / `--tick`
+  (linie i podziałki), `--lum` (poświata danych: 1 ciemny, 0 jasny), `--face` (tarcza), głęboka czerń `data-oled` (tylko motyw ciemny).
+- **Elementy sygnaturowe (prototyp):** tarcza dnia (`dial.js`), pigułka „na żywo” (`live.js`), gest przesunięcia (`gestures.js`), ruch (`motion.js`),
+  tryb skupienia Treningu (`trening_focus.js`, wake lock `wakelock.js`), dźwięki interfejsu (`signal.js` → `sfx`).
+- **Nie robimy:** animowanych teł i shaderów, paralaksy, neonu, szkła na kartach z treścią, pętli, wykresów i „wniosków” bez danych (§6.6 audytu).
+
 ## D. Zasady nienaruszalne (skrót — pełna lista w `CLAUDE.md`)
 1. Nie zmieniaj modelu danych, typów zdarzeń, bazy `p2027`, formatu `2027-sync.json`, logiki `reduce()`/resolvera.
 2. Nie dodawaj automatycznej synchronizacji ani automatycznego przeładowania.

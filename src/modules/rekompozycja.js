@@ -6,7 +6,9 @@ import { longDate } from '../core/dates.js';
 import { icon } from '../ui/icons.js';
 import rekomp from '../data/rekomp.json' with { type: 'json' };
 
-const BOX = { key: ['📌', 'Najważniejsze'], cal: ['🗓', 'Harmonogram'], stop: ['⛔', 'Uwaga'], go: ['✅', 'Tak działaj'] };
+// M4 (D-114): ikony Lucide zamiast emoji
+const BOX = { key: ['target', 'Najważniejsze'], cal: ['calendar', 'Harmonogram'], stop: ['triangle-alert', 'Uwaga'], go: ['circle-check', 'Tak działaj'] };
+const lock = () => icon('lock-keyhole', { size: 14 });
 
 // Tekst ze znacznikami {private:N} -> węzły; treść z pakietu albo wyraźny znacznik braku.
 function rich(text, pack) {
@@ -15,7 +17,7 @@ function rich(text, pack) {
     const m = part.match(/^\{private:(\d+)\}$/);
     if (!m) return part;
     const b = sec?.blocks?.find(x => x.marker === Number(m[1]));
-    return b ? h('span', { class: 'priv-in', title: 'z pakietu prywatnego' }, b.text) : h('span', { class: 'priv-miss' }, '🔒 fragment w pakiecie prywatnym');
+    return b ? h('span', { class: 'priv-in', title: 'z pakietu prywatnego' }, b.text) : h('span', { class: 'priv-miss' }, lock(), ' fragment w pakiecie prywatnym');
   });
 }
 
@@ -33,9 +35,9 @@ function block(b, pack) {
     case 'small': return h('p', { class: 'rk-small' }, rich(b.text, pack));
     case 'list': return h(b.ordered ? 'ol' : 'ul', { class: 'rk-list' }, b.items.map(i => h('li', {}, rich(i, pack))));
     case 'table': return table(b.head, b.rows, pack, b.caption);
-    case 'box': { const [ic, lab] = BOX[b.kind] || ['ℹ️', 'Informacja'];
-      return h('aside', { class: `rk-box rk-${b.kind}` }, h('p', { class: 'rk-box-h' }, h('span', { 'aria-hidden': 'true' }, ic), b.label || lab), h('p', {}, rich(b.text, pack))); }
-    case 'decision': return h('aside', { class: 'rk-box rk-decision' }, h('p', { class: 'rk-box-h' }, '✍️ Decyzja użytkownika — obowiązuje'), h('p', {}, b.text));
+    case 'box': { const [ic, lab] = BOX[b.kind] || ['info', 'Informacja'];
+      return h('aside', { class: `rk-box rk-${b.kind}` }, h('p', { class: 'rk-box-h' }, icon(ic, { size: 15 }), b.label || lab), h('p', {}, rich(b.text, pack))); }
+    case 'decision': return h('aside', { class: 'rk-box rk-decision' }, h('p', { class: 'rk-box-h' }, icon('pencil', { size: 15 }), 'Decyzja użytkownika — obowiązuje'), h('p', {}, b.text));
     case 'original': return h('details', { class: 'rk-orig' }, h('summary', {}, 'Pierwotne uzasadnienie (nie stanowi obecnej decyzji)'), h('p', {}, rich(b.text, pack)));
     default: return h('p', {}, rich(b.text, pack));
   }
@@ -44,7 +46,7 @@ function block(b, pack) {
 // Sekcje prywatne w całości z pakietu (bloki: p / h / list / table)
 function privateSection(id, pack) {
   const sec = pack?.sections?.find(s => s.id === `rek-${id}`);
-  if (!sec) return [h('p', { class: 'priv-miss block' }, '🔒 Ta sekcja jest w pakiecie prywatnym. Zaimportuj plik 2027-prywatne.json w module Dane i synchronizacja.')];
+  if (!sec) return [h('p', { class: 'priv-miss block' }, lock(), ' Ta sekcja jest w pakiecie prywatnym. Zaimportuj plik 2027-prywatne.json w module Dane i synchronizacja.')];
   return sec.blocks.map(b => b.type === 'h' ? h('h3', { class: 'rk-h3' }, b.text) : b.type === 'list' ? h('ul', { class: 'rk-list' }, b.items.map(i => h('li', {}, i)))
     : b.type === 'table' ? table(b.rows[0] || [], b.rows.slice(1), null) : h('p', {}, b.text));
 }
@@ -62,7 +64,7 @@ export function renderRekompozycja(root, ctx) {
       h('p', { class: 'eyebrow' }, `Plan indywidualny · realny początek planu ${longDate(PLAN_REAL_START)}`),
       h('h1', {}, 'Plan rekompozycji'),
       h('p', { class: 'muted' }, 'Dieta, trening, regeneracja i monitoring — z uwzględnieniem Twoich decyzji. Sekcje i zdania z danymi medycznymi pochodzą z pakietu prywatnego.'),
-      !pack && h('p', { class: 'priv-miss block' }, '🔒 Pakiet prywatny nie jest zaimportowany — część treści jest ukryta.'))),
+      !pack && h('p', { class: 'priv-miss block' }, lock(), ' Pakiet prywatny nie jest zaimportowany — część treści jest ukryta.'))),
     h('div', { class: 'rk-tools' },
       h('label', { class: 'rk-search' }, h('span', { class: 'sr-only' }, 'Szukaj w planie'),
         h('input', { type: 'search', value: ctx.params.get('q') || '', placeholder: 'Szukaj w planie (np. kreatyna, sen, sauna)',
@@ -73,9 +75,9 @@ export function renderRekompozycja(root, ctx) {
       ? `„${ctx.params.get('q')}”: ${hits.length} ${plural(hits.length, 'sekcja', 'sekcje', 'sekcji')}`
       : `Brak „${ctx.params.get('q')}” w treści planu (fragmenty z pakietu prywatnego nie są przeszukiwane).`),
     h('nav', { class: 'rk-toc', 'aria-label': 'Spis treści' }, (hits || rekomp.sections).map(s =>
-      h('a', { href: `#/rekompozycja?s=${s.id}`, class: `rk-toc-a${s.id === open ? ' is-on' : ''}` }, h('span', { class: 'rk-n' }, s.num), s.title, s.private && h('span', { 'aria-label': 'prywatne' }, ' 🔒')))),
+      h('a', { href: `#/rekompozycja?s=${s.id}`, class: `rk-toc-a${s.id === open ? ' is-on' : ''}` }, h('span', { class: 'rk-n' }, s.num), s.title, s.private && h('span', { class: 'rk-lock', role: 'img', 'aria-label': 'prywatne' }, lock())))),
     (hits || rekomp.sections).map(s => h('details', { class: 'rk-sec', id: `rk-${s.id}`, open: s.id === open || (hits && hits.length <= 3) || null },
-      h('summary', {}, h('span', { class: 'rk-n' }, s.num), h('span', { class: 'rk-t' }, s.title), s.private && h('span', { class: 'rk-lock' }, '🔒')),
+      h('summary', {}, h('span', { class: 'rk-n' }, s.num), h('span', { class: 'rk-t' }, s.title), s.private && h('span', { class: 'rk-lock', role: 'img', 'aria-label': 'prywatne' }, lock())),
       h('div', { class: 'rk-body' }, s.private ? privateSection(s.id, pack) : s.blocks.map(b => block(b, pack))))));
   if (open) requestAnimationFrame(() => document.getElementById(`rk-${open}`)?.scrollIntoView({ block: 'start' }));
 }

@@ -2,7 +2,8 @@
 
 > **System 2.0 (D-110, 24.10.2026):** nowy wygląd całej aplikacji — `docs/RAPORT_D110.md`, specyfikacja `REDESIGN-SPEC.md` (§1, §2, §4, §5).
 > **System 3.0 „Precision” (D-113, 31.10.2026):** kolejny wygląd — `docs/RAPORT_D113.md`, decyzja w `REDESIGN-DECISIONS.md` §C13 (warstwa `precision.css`, paleta grafitowa, Inter Display, akcent do wyboru, pasek górny, Ustawienia, wykresy z danych). Dotyczy w pełni „Dziś”, „Zapasów”, Suplementacji, Kalendarza, planu nauki i Tygodnia; w Meal Prep, Pielęgnacji, Rekompozycji i Dane — wspólna warstwa bez przebudowy układu.
-> **Stan bieżący (1.11.2026):** D-113 opublikowany na `main` (`8074976`, 31.10.2026), działanie na iPhonie potwierdzone; `main` = gałąź `claude/eager-newton-j2309e`. Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
+> **System 4.0 „Instrument” (D-114, 18.11.2026 — etap 1):** fundament (warstwy kaskady `legacy` / `instrument`, tokeny w OKLCH, skale, OLED) i prototyp „Dziś” (tarcza dnia, pigułka „na żywo”, gesty, ruch) oraz trybu skupienia Treningu — `docs/RAPORT_D114.md`, §C14 w `REDESIGN-DECISIONS.md`. Na gałęzi roboczej, bez publikacji; czeka na akceptację prototypu przed etapem 2 (wszystkie moduły).
+> **Stan (1.11.2026):** D-113 opublikowany na `main` (`8074976`, 31.10.2026), działanie na iPhonie potwierdzone; `main` = gałąź `claude/eager-newton-j2309e`. Aktualny stan, zasady i otwarte sprawy: `docs/PRZEKAZANIE.md` §4.
 > Poniższe zapisy o commitach (`69d5d94`, `b65b9fa`, `4e68589`) są historyczne.
 
 Wersja kodu: `package.json` 0.2.0; numer builda generowany z treści (`<meta name="app-version">`, widoczny w module Dane).

@@ -3,7 +3,8 @@
 // mapa mięśni z free-exercise-db (domena publiczna).
 import { h, clear, add, fmt, plural, numberOf } from '../ui/dom.js';
 import { progressRing, segmented, section, statGrid, stat, sheet } from '../ui/components.js';
-import { signal, unlockAudio } from '../ui/signal.js';
+import { unlockAudio, timersChanged } from '../ui/signal.js';
+import { restNow, setRest, restLeft, restStale, restSignal } from '../ui/live.js';
 import { icon } from '../ui/icons.js';
 import { movementPlayer } from '../ui/movement.js';
 import { barChart, lineChart, sparkline } from '../ui/charts.js';
@@ -17,6 +18,7 @@ import { region, swap } from '../ui/patch.js';
 import { sheetBody, phaseList, phaseLabel, dayNoteCard } from './trening_sheets.js';
 import { sessionLog } from './trening_log.js';
 import { summarize } from '../core/trainlog.js';
+import { renderFocus } from './trening_focus.js';
 
 const T = SRC.training;
 const M = muscles.exercises;
@@ -24,20 +26,21 @@ const TABS = [['pon', 'PN', 1], ['wt', 'WT', 2], ['sr', 'ŚR', 3], ['czw', 'CZW'
 const strip = html => (html || '').replace(/<[^>]+>/g, ' ').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 const serie = n => (n === 1 ? 'seria' : n >= 2 && n <= 4 ? 'serie' : 'serii');
 // Parametry ćwiczenia z planu (wiersz źródłowy `raw` ma pierwszeństwo — zawiera też zakres ruchu i progresję).
-const spec = e => (e.raw ? { reps: e.raw[2], rir: e.raw[3], rest: e.raw[4], range: e.raw[5], prog: e.raw[6] } : { reps: e.reps, rir: e.rir, rest: e.rest });
+export const spec = e => (e.raw ? { reps: e.raw[2], rir: e.raw[3], rest: e.raw[4], range: e.raw[5], prog: e.raw[6] } : { reps: e.reps, rir: e.rir, rest: e.rest });
 const mmss = sec => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
 
 // Licznik przerwy między seriami (D-068): stan wyłącznie interfejsu, w pamięci karty — nie trafia do dziennika zdarzeń
 // ani do pliku synchronizacji. Czas liczony od znacznika startu (poprawny także po wygaszeniu ekranu telefonu).
-let rest = null; // { key, date, name, set, of, next, start, min, max, label }
-function startRest(e, set, of, date, next) {
+// D-114: stan wspólny z pigułką „na żywo” (ui/live.js) — przerwa widoczna i sygnalizowana także w innych modułach.
+export function startRest(e, set, of, date, next) {
   const r = restSeconds(spec(e).rest);
-  rest = r && next ? { key: `${date}|${e.id}|${set}`, date, name: e.name, set, of, next, start: Date.now(), ...r, label: spec(e).rest } : null;
-  if (rest) unlockAudio();   // odhaczenie serii = gest użytkownika — Safari odblokowuje dźwięk sygnału końca przerwy (F-T1)
+  setRest(r && next ? { key: `${date}|${e.id}|${set}`, date, name: e.name, set, of, next, start: Date.now(), ...r, label: spec(e).rest, href: location.hash } : null);
+  if (restNow()) unlockAudio();   // odhaczenie serii = gest użytkownika — Safari odblokowuje dźwięk sygnału końca przerwy (F-T1)
 }
 function restBar() {
+  let rest = restNow();
   if (!rest) return null;
-  if ((Date.now() - rest.start) / 1000 > rest.max + 300) { rest = null; return null; } // dawno zakończona — nie wracamy do niej
+  if (restStale(rest)) { setRest(null); return null; } // dawno zakończona — nie wracamy do niej
   const time = h('strong', { class: 'tr-rest-t' }), note = h('span', { class: 'tr-rest-n' }), fill = h('span', { class: 'tr-rest-fill' });
   const live = h('span', { class: 'sr-only', role: 'status', 'aria-live': 'polite' });
   let ready = false;
@@ -46,11 +49,11 @@ function restBar() {
     h('div', { class: 'tr-rest-main' }, note, time, h('span', { class: 'tr-rest-next' }, `Następnie: ${rest.next.e.name} · seria ${rest.next.set} z ${rest.next.of}`),
       h('span', { class: 'tr-rest-bar', role: 'presentation' }, fill)),
     h('div', { class: 'tr-rest-act' },
-      h('button', { onclick: () => { rest.min += 30; rest.max += 30; ready = false; rest.signaled = false; tick(); } }, '+30 s'),
-      h('button', { 'aria-label': 'Pomiń przerwę', onclick: () => { rest = null; bar.remove(); } }, icon('skip-forward', { size: 18 }), h('span', {}, 'Pomiń'))),
+      h('button', { onclick: () => { rest.min += 30; rest.max += 30; ready = false; rest.signaled = false; tick(); timersChanged(); } }, '+30 s'),
+      h('button', { 'aria-label': 'Pomiń przerwę', onclick: () => { bar.remove(); setRest(null); } }, icon('skip-forward', { size: 18 }), h('span', {}, 'Pomiń'))),
     live);
   function tick() {
-    if (!rest) return false;
+    if (restNow() !== rest) return false;   // przerwa zakończona albo zastąpiona (np. w pigułce „na żywo”)
     const el = (Date.now() - rest.start) / 1000, left = rest.min - el;
     time.textContent = left > 0 ? mmss(Math.ceil(left)) : `+${mmss(-left)}`;
     fill.style.width = `${Math.min(100, (el / rest.min) * 100)}%`;
@@ -58,12 +61,12 @@ function restBar() {
     bar.classList.toggle('is-ready', left <= 0);
     if (left <= 0 && !ready) {
       ready = true; live.textContent = `Przerwa zakończona. Następnie: ${rest.next.e.name}, seria ${rest.next.set}.`;
-      if (!rest.signaled) { rest.signaled = true; if (left > -5) signal(); }   // raz na przerwę, tylko w chwili końca (nie po powrocie do widoku); „+30 s” — ponownie
+      restSignal();   // raz na przerwę, tylko w chwili końca (nie po powrocie do widoku); „+30 s” — ponownie (wspólne z pigułką)
     }
     return true;
   }
   tick();
-  const id = setInterval(() => { if (!rest || !bar.isConnected) clearInterval(id); else tick(); }, 1000); // nowy widok = nowy pasek
+  const id = setInterval(() => { if (restNow() !== rest || !bar.isConnected) { clearInterval(id); if (bar.isConnected && !restNow()) bar.remove(); } else tick(); }, 1000); // nowy widok = nowy pasek
   return bar;
 }
 
@@ -147,10 +150,16 @@ function lastResult(train, exId, before) {
   return d ? { date: d, sets: byDate[d].sort((a, b) => a.set - b.set) } : null;
 }
 
+// M4 (D-114): ikony arkuszy z danych (emoji w training.json → ikona Lucide; tekst danych bez zmian)
+const SHEET_IC = { '🦵': 'bone', '♨️': 'thermometer-sun' };
 const VIEWS = [{ value: 'sesja', label: 'Trening' }, { value: 'stat', label: 'Statystyki' }, { value: 'historia', label: 'Historia' }];
 
 export function renderTrening(root, ctx) {
   const view = ctx.params.get('v') || 'sesja';
+  // D-114: tryb skupienia — pełny ekran bez przełącznika widoków (te same zapisy serii, ta sama przerwa)
+  if (view === 'fokus') return renderFocus(root, ctx, { spec, lastResult, startRest, techniqueDialog });
+  // M2 (audyt 10.11.2026): Statystyki i Historia z nagłówkiem strony (h1) — w widoku sesji tytułem jest nazwa sesji dnia
+  if (view !== 'sesja') add(root, h('header', { class: 'tr-head' }, h('h1', {}, view === 'stat' ? 'Statystyki treningów' : 'Historia treningów')));
   add(root, h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => { location.hash = `#/trening?v=${v}`; })));
   if (view === 'stat') return renderStats(root, ctx);
   if (view === 'historia') return renderHistory(root, ctx);
@@ -199,7 +208,7 @@ function renderSession(root, ctx) {
   sessionMuscles.secondary = [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.secondary || []))].filter(m => !sessionMuscles.primary.includes(m));
   // Arkusze (System kolana, Sauna): z danych ustrukturyzowanych (D-105); awaryjnie — dawny, spłaszczony tekst
   const sheets = T.sheetsData
-    ? T.sheetsData.map(sh => ({ label: `${sh.icon} ${sh.title}`, open: () => sheetDialog(`${sh.icon} ${sh.title}`, ...sheetBody(sh)) }))
+    ? T.sheetsData.map(sh => ({ label: sh.title, ic: SHEET_IC[sh.icon] || 'info', open: () => sheetDialog(sh.title, ...sheetBody(sh)) }))
     : T.sheets.filter(s => s.length > 5).map(sh => ({ label: sh.split('✕')[0].trim(), open: () => infoDialog(sh) }));
   // „Ostatnio” = wyniki z dni wcześniejszych niż ten dzień — zapisy tego dnia ich nie zmieniają, więc liczone raz na widok (P2)
   const lastMemo = new Map();
@@ -235,7 +244,7 @@ function renderSession(root, ctx) {
       h('h1', {}, r.sessionLabel),
       r.note && h('p', {}, r.note),
       total > 0 && h('p', { class: 'muted' }, `${exercises.filter((_, i) => plan[i].n > 0).length} ćwiczeń · ${total} ${serie(total)}`),
-      h('div', { class: 'row' }, sheets.map(sh => h('button', { class: 'chip-b', onclick: sh.open }, sh.label)))),
+      h('div', { class: 'row' }, sheets.map(sh => h('button', { class: 'chip-b', onclick: sh.open }, sh.ic && icon(sh.ic, { size: 16 }), h('span', {}, sh.label))))),
     total > 0 && h('div', { class: 'hero-tr-side' }, progressRing(done, total, 'Wykonane serie'), h('span', { class: 'muted' }, `${done} / ${total} serii`)),
     // Następna seria z planu albo podsumowanie ukończonej sesji (wyłącznie z dziennika — D-069)
     total > 0 && (nx
@@ -243,7 +252,10 @@ function renderSession(root, ctx) {
         h('div', {}, h('p', { class: 'eyebrow' }, done ? 'Następna seria' : 'Pierwsza seria'),
           h('p', { class: 'tr-next-t' }, `${nx.e.name} · seria ${nx.set} z ${nx.of}`),
           h('p', { class: 'muted' }, `plan: ${spec(nx.e).reps} powt. · RIR ${spec(nx.e).rir} · przerwa ${spec(nx.e).rest}${lastLine(nx.e)}`)),
-        h('a', { class: 'btn', href: `#ex-${nx.e.id}` }, icon('chevron-down', { size: 18 }), h('span', {}, 'Przejdź do ćwiczenia')))
+        h('div', { class: 'tr-next-act' },
+          // D-114: tryb skupienia — jedna seria naraz, duże cyfry, ekran nie gaśnie
+          h('a', { class: 'btn primary tr-focus', href: `#/trening?v=fokus&d=${date}` }, icon('focus', { size: 18 }), h('span', {}, 'Tryb skupienia')),
+          h('a', { class: 'btn', href: `#ex-${nx.e.id}` }, icon('chevron-down', { size: 18 }), h('span', {}, 'Przejdź do ćwiczenia'))))
       : h('div', { class: 'tr-next tr-done' },
         h('span', { class: 'tr-done-ic' }, icon('circle-check', { size: 22 })),
         h('div', {}, h('p', { class: 'tr-next-t' }, 'Sesja ukończona'),
@@ -265,7 +277,7 @@ function renderSession(root, ctx) {
   function optionalSets(e) {
     const rows = Object.values(log).filter(v => v.date === date && v.ex === e.id).sort((a, b) => a.set - b.set);
     return h('div', { class: 'opt' },
-      h('p', { class: 'opt-note' }, `⚠️ To ćwiczenie nie jest elementem Fazy ${phase}. Zapis serii jest opcjonalny i oznaczany w statystykach.`),
+      h('p', { class: 'opt-note' }, icon('triangle-alert', { size: 16 }), ` To ćwiczenie nie jest elementem Fazy ${phase}. Zapis serii jest opcjonalny i oznaczany w statystykach.`),
       rows.length > 0 && h('div', { class: 'sets' }, h('div', { class: 'set set-h' }, h('span', {}, 'Seria'), h('span', {}, 'kg'), h('span', {}, 'powt.'), h('span', {}, 'RIR'), h('span', {})),
         rows.map(v => h('div', { class: `set${v.done ? ' is-done' : ''}` },
           h('button', { class: 'set-toggle', 'aria-pressed': String(!!v.done), onclick: () => save(e.id, v.set, { done: !v.done, opt: true }, true) }, v.done ? '✓' : String(v.set)),
@@ -282,7 +294,7 @@ function renderSession(root, ctx) {
     return h('details', { class: 'meal' }, h('summary', {}, h('span', { class: 'meal-n' }, p ? phaseLabel(kind, p) : label)),
       h('div', { class: 'why-body' }, p ? phaseList(p) : h('p', {}, text.replace(/^(Rozgrzewka|Schłodzenie) 10 min ▾\s*/, ''))));
   };
-  add(root, dayNoteCard(T.dayNotes?.[key], key), sessionLog(store, date, r, ctx, msg), phaseBlock('warmup', '🔥 Rozgrzewka · 10 min'));
+  add(root, dayNoteCard(T.dayNotes?.[key], key), sessionLog(store, date, r, ctx, msg), phaseBlock('warmup', [icon('flame', { size: 16 }), 'Rozgrzewka · 10 min']));
 
   const article = ({ e, n }, idx) => {
     const rom = e.raw ? spec(e) : null;
@@ -299,7 +311,7 @@ function renderSession(root, ctx) {
           onclick: () => {
             const key = `${date}|${e.id}|${s}`;
             if (!v.done && date === ctx.today) startRest(e, s, n, date, nextSet(plan, { ...store?.state?.train, [key]: { done: true } }, date));
-            else if (v.done && rest?.key === key) rest = null;
+            else if (v.done && restNow()?.key === key) setRest(null);
             save(e.id, s, { done: !v.done }, 'point');
           } }, v.done ? '✓' : String(s)),
         num('kg', 'kg', '0.5'), num('reps', 'powt.', '1'), num('rir', 'RIR', '1'),
@@ -347,8 +359,8 @@ function renderSession(root, ctx) {
   }
   const arts = new Map();
   add(root, h('div', { class: 'ex-list' }, plan.map((x, idx) => { const el = article(x, idx); arts.set(x.e.id, { el, x, idx }); return el; })));
-  const restBox = region(() => (rest?.date === date ? restBar() : null));
-  add(root, phaseBlock('cooldown', '❄️ Schłodzenie · 10 min'), restBox.el);
+  const restBox = region(() => (restNow()?.date === date ? restBar() : null));
+  add(root, phaseBlock('cooldown', [icon('snowflake', { size: 16 }), 'Schłodzenie · 10 min']), restBox.el);
   // P2: po odhaczeniu serii — nagłówek sesji, karta tego ćwiczenia, wyróżnienie następnego ćwiczenia i licznik przerwy
   function refresh(exId) {
     log = store.state.train;
@@ -374,7 +386,8 @@ function renderStats(root, ctx) {
   const withMin = all.filter(s => s.minutes);
   const totalMin = withMin.reduce((a, s) => a + s.minutes, 0);
   const vol = all.reduce((a, s) => a + s.volume, 0);
-  const wk = weekly(train, sess, 12, today, details);
+  // M3 (audyt 10.11.2026): bez tygodni sprzed startu treningów (puste słupki z datami sprzed planu)
+  const wk = weekly(train, sess, 12, today, details).filter(w => w.week >= weekStart(TRAIN_FROM));
   const streak = streakWeeks(train, sess, today, details);
   const wkLabel = w => shortDate(w.week);
   const range = ctx.params.get('r') || '7';
@@ -396,8 +409,12 @@ function renderStats(root, ctx) {
       (() => { const ns = all.reduce((a, s) => a + s.sets, 0);
         return stat('Objętość', `${fmt(Math.round(vol))} kg`, `${fmt(ns)} ${plural(ns, 'seria', 'serie', 'serii')} · ${fmt(all.reduce((a, s) => a + s.reps, 0))} powt.`); })(),
       stat('Rekordy', String(recs.filter(r => r.e1rm).length), 'ćwiczeń z szacowanym 1RM')),
-    section('st-vol', 'Objętość tygodniowa (kg × powt.)', barChart(wk.map(w => ({ label: wkLabel(w), value: w.volume, hl: w.week === weekStart(today) })), { title: 'Objętość tygodniowa', unit: ' kg', fmt: v => fmt(Math.round(v)) })),
-    section('st-time', 'Czas treningów tygodniowo (min)', barChart(wk.map(w => ({ label: wkLabel(w), value: w.minutes, hl: w.week === weekStart(today) })), { title: 'Czas tygodniowo', unit: ' min' })),
+    section('st-vol', 'Objętość tygodniowa (kg × powt.)', wk.some(w => w.volume > 0)
+      ? barChart(wk.map(w => ({ label: wkLabel(w), value: w.volume, hl: w.week === weekStart(today) })), { title: 'Objętość tygodniowa', unit: ' kg', fmt: v => fmt(Math.round(v)) })
+      : h('p', { class: 'muted st-empty' }, 'Brak serii z ciężarem i powtórzeniami — wykres pojawi się po wpisaniu kg i powtórzeń.')),
+    section('st-time', 'Czas treningów tygodniowo (min)', wk.some(w => w.minutes > 0)
+      ? barChart(wk.map(w => ({ label: wkLabel(w), value: w.minutes, hl: w.week === weekStart(today) })), { title: 'Czas tygodniowo', unit: ' min' })
+      : h('p', { class: 'muted st-empty' }, 'Brak zapisanego czasu treningów — zapisz go stoperem albo wpisz ręcznie w widoku Trening.')),
     section('st-mus', 'Serie na grupę mięśni',
       h('div', { class: 'controls' }, segmented('Okres', [{ value: '7', label: '7 dni' }, { value: '28', label: '28 dni' }], range, r => go({ r }))),
       msSorted.length === 0 ? h('p', { class: 'muted' }, 'Brak serii w tym okresie.') : h('div', { class: 'mus-grid' },

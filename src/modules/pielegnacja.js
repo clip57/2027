@@ -4,7 +4,7 @@
 // Widoki: Dzień (lista kontrolna wg pór, licznik „odczekaj”), Tydzień, Produkty, Plan (edycja, eksport).
 import { h, clear, add, plural } from '../ui/dom.js';
 import { segmented, progressRing, sheet } from '../ui/components.js';
-import { signal, unlockAudio } from '../ui/signal.js';
+import { signal, unlockAudio, timersChanged } from '../ui/signal.js';
 import { icon } from '../ui/icons.js';
 import { region } from '../ui/patch.js';
 import { SRC } from '../core/data.js';
@@ -44,7 +44,8 @@ export function renderPielegnacja(root, ctx) {
   msg, h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))));
 
   // Licznik odczekania: pasek u dołu ekranu (jak przerwa w Treningu); „Pomiń” zamyka
-  function startTimer(s) { unlockAudio(); timer = { label: s.text, start: Date.now(), sec: s.wait * 60 }; timerBox.refresh(); }
+  // D-114: pasek odliczania widoczny → pigułka „na żywo” się chowa (timersChanged odświeża jej widoczność)
+  function startTimer(s) { unlockAudio(); timer = { label: s.text, start: Date.now(), sec: s.wait * 60 }; timerBox.refresh(); timersChanged(); }
   const timerBox = region(() => {
     if (!timer) return null;
     const time = h('strong', { class: 'pg-timer-t' }), fill = h('span', { class: 'pg-timer-fill' });
@@ -54,7 +55,7 @@ export function renderPielegnacja(root, ctx) {
       h('span', { class: 'pg-timer-ic' }, icon('timer', { size: 20 })),
       h('div', { class: 'pg-timer-main' }, h('span', { class: 'pg-timer-n' }, `Odczekaj · ${timer.label}`), time,
         h('span', { class: 'pg-timer-bar', role: 'presentation' }, fill)),
-      h('button', { 'aria-label': 'Zamknij licznik', onclick: () => { timer = null; timerBox.refresh(); } }, icon('x', { size: 18 }), h('span', {}, 'Zamknij')),
+      h('button', { 'aria-label': 'Zamknij licznik', onclick: () => { timer = null; timerBox.refresh(); timersChanged(); } }, icon('x', { size: 18 }), h('span', {}, 'Zamknij')),
       live);
     const tick = () => {
       if (!timer) return;

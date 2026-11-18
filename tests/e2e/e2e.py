@@ -1,6 +1,6 @@
 """Testy E2E (Chromium, Playwright): oba warianty budowy, iPhone 390×844 i komputer 1280×800.
 Uruchomienie: python3 tests/e2e/e2e.py  (wymaga dist/ oraz opcjonalnie SOURCES_DIR z kopią ZAPASY)."""
-import asyncio, re, json, os, sys, time, threading, http.server, functools, tempfile, pathlib
+import asyncio, re, json, os, sys, time, threading, http.server, functools, tempfile, pathlib, math
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures
@@ -153,7 +153,7 @@ async def run_variant(pw, name, url, mobile):
     ok(th == 'dark' or await pg.evaluate("localStorage.getItem('p2027.theme')") is not None, f'{tag} Motyw: domyślnie ciemny')
     if mobile:
         labels = await pg.eval_on_selector_all('.tabs a', 'e => e.map(x => x.textContent.trim())')
-        study = 'MPW' if _dt.datetime.now(ZoneInfo('Europe/Warsaw')).date() >= _dt.date(2026, 11, 12) else 'CFA'   # D-095: zamiana 12.11
+        study = 'MPW' if TODAY() >= _dt.date(2026, 11, 12) else 'CFA'   # D-095: zamiana 12.11 — wg zegara testu (VCLOCK), nie daty uruchomienia
         ok(labels == ['Dziś', 'Dieta', 'Trening', study, 'Więcej'], f'{tag} Pasek dolny: 4 sekcje + Więcej ({labels})')
         ok(await pg.locator('.tabs a svg[aria-hidden=true]').count() == 5, f'{tag} Pasek dolny: ikony dekoracyjne z etykietą tekstową')
         await pg.goto(url + '#/wiecej'); await pg.wait_for_selector('.more-list')
@@ -1569,8 +1569,9 @@ async def run_d110(pw, name, url, mobile):
     inf = await pg.evaluate("document.getAnimations().filter(a => a.effect?.getComputedTiming().iterations === Infinity).map(a => a.animationName || a.constructor.name)")
     ok(inf == [], f'{tag} D-112: bez animacji nieskończonych w „Dziś” (praca w każdej klatce przewijania) {inf}')
     ok(await pg.locator('.dz-kpi .unit').count() >= 2 and 'bloków' in await pg.inner_text('.dz-kpis'), f'{tag} Kafle KPI: jednostka pomniejszona, tekst bez zmian')
-    grad = await pg.evaluate("(() => { const fg = document.querySelector('.dz-now .ring-fg'); const id = (fg.getAttribute('stroke') || '').match(/#([^)]+)/); return !!(id && document.getElementById(id[1])?.querySelectorAll('stop').length === 2); })()")
-    ok(grad, f'{tag} Pierścień „Teraz”: gradient w dokumencie (unikalny identyfikator)')
+    # D-114 (M8): w „Teraz” tarcza dnia zamiast pierścienia postępu — upływ bieżącego punktu jako jasny łuk tarczy
+    dl = await pg.evaluate("[document.querySelectorAll('.dz-now .ring').length, getComputedStyle(document.querySelector('.dz-now .dl-elapsed')).display !== 'none']")
+    ok(dl == [0, True], f'{tag} „Teraz”: tarcza z upływem punktu zamiast pierścienia (D-114, M8) {dl}')
     await pg.evaluate("document.querySelector('main').dataset.mark = '1'")
     await pg.clock.fast_forward(65_000); await pg.wait_for_timeout(300)
     left2 = await pg.inner_text('.dz-now-left')
@@ -1582,6 +1583,8 @@ async def run_d110(pw, name, url, mobile):
     y0 = await pg.evaluate('scrollY')
     await pg.locator(('.tabs' if mobile else '.side') + ' a[href="#/trening"]').click(); await pg.wait_for_selector('.ex'); await pg.wait_for_timeout(200)
     y1, enter = await pg.evaluate("[scrollY, document.querySelector('main').dataset.enter]")
+    grad = await pg.evaluate("(() => { const fg = document.querySelector('.hero-tr .ring-fg'); const id = (fg.getAttribute('stroke') || '').match(/#([^)]+)/); return !!(id && document.getElementById(id[1])?.querySelectorAll('stop').length === 2); })()")
+    ok(grad, f'{tag} Pierścień postępu (Trening): gradient w dokumencie (unikalny identyfikator)')
     await pg.go_back(); await pg.wait_for_selector('.meal'); await pg.wait_for_timeout(300)
     y2 = await pg.evaluate('scrollY')
     ok(y0 > 1000 and y1 == 0 and enter == 'module' and abs(y2 - y0) < 5, f'{tag} Przewinięcie: nowy moduł od góry ({y0} → {y1}), „Wstecz” wraca ({y2}); wejście „{enter}”')
@@ -1651,12 +1654,193 @@ async def run_d110(pw, name, url, mobile):
         await pg.get_by_role('button', name='Motyw: Jasny').click()
         ok(await pg.evaluate("localStorage.getItem('p2027.theme')") == 'light', f'{tag} Motyw: wybór zapisany od razu')
         await wait_js(pg, "() => document.documentElement.getAttribute('data-theme') === 'light' && !document.documentElement.classList.contains('vt-theme')", timeout=5000)
-        ok(await pg.evaluate("getComputedStyle(document.body).backgroundColor") == 'rgb(245, 247, 250)', f'{tag} Motyw jasny po odsłonięciu (tło #f5f7fa)')
+        # D-114: kolory w OKLCH — porównanie po przeliczeniu na sRGB (piksel na płótnie), nie tekstu stylu obliczonego
+        bg = await pg.evaluate("(() => { const x = document.createElement('canvas').getContext('2d'); x.fillStyle = getComputedStyle(document.body).backgroundColor; x.fillRect(0, 0, 1, 1); return [...x.getImageData(0, 0, 1, 1).data].slice(0, 3).join(','); })()")
+        ok(bg == '245,247,250', f'{tag} Motyw jasny po odsłonięciu (tło #f5f7fa: {bg})')
         v = await axe_audit(pg); ok(not v, f'{tag} Dziś jasny: dostępność {v[:2]}')
         await pg.get_by_role('button', name='Motyw: Ciemny').click()
         await wait_js(pg, "() => document.documentElement.getAttribute('data-theme') === 'dark' && !document.documentElement.classList.contains('vt-theme')", timeout=5000)
     ok(not errs, f'{tag} brak błędów konsoli ({errs[:2]})')
     await ctx.close(); await b.close()
+
+async def touch_swipe(pg, loc, dx, steps=12):
+    """Przesunięcie palcem (zdarzenia dotyku przez CDP — Playwright nie ma gestu przesunięcia); start 40 px od lewej krawędzi elementu."""
+    box = await loc.bounding_box()
+    x, y = box['x'] + 40, box['y'] + box['height'] / 2
+    cdp = await pg.context.new_cdp_session(pg)
+    await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': x, 'y': y}]})
+    for i in range(1, steps + 1):
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': x + dx * i / steps, 'y': y}]})
+        await asyncio.sleep(0.016)
+    await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []})
+    await cdp.detach()
+
+D114_SMALL = "[...document.querySelectorAll('main button, main a')].filter(e => e.offsetParent).map(e => e.getBoundingClientRect()).filter(r => r.height < 43.5 || r.width < 43.5).length"
+D114_SAVED = """(async () => { const db = await new Promise((res, rej) => { const r = indexedDB.open('p2027'); r.onsuccess = () => res(r.result); r.onerror = rej; });
+  const all = await new Promise(res => { const r = db.transaction('events').objectStore('events').getAll(); r.onsuccess = () => res(r.result); });
+  return all.filter(e => e.t === 'train.set' && e.d.date === '2026-11-18').map(e => [e.d.set, e.d.reps, e.d.done]); })()"""
+D114_OVERLAP = """[...document.querySelectorAll('.sf-facts')].flatMap(dl => { const r = [...dl.querySelectorAll('dt')].map(d => d.getBoundingClientRect());
+  return r.flatMap((a, i) => r.slice(i + 1).filter(b => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1)); }).length
+  + [...document.querySelectorAll('.sf-facts dt')].filter(d => d.scrollWidth > d.clientWidth + 1).length"""
+D114_BG = """(() => { const x = document.createElement('canvas').getContext('2d'); x.fillStyle = getComputedStyle(document.body).backgroundColor; x.fillRect(0, 0, 1, 1);
+  return [document.documentElement.hasAttribute('data-oled'), [...x.getImageData(0, 0, 1, 1).data].slice(0, 3).join(','), document.querySelector('meta[name=theme-color]').content, localStorage.getItem('p2027.oled')]; })()"""
+
+async def run_d114(pw, name, url, mobile):
+    """D-114 (System 4.0 „Instrument”): warstwy kaskady, tarcza dnia (dotyk, klawiatura, upływ czasu, inny dzień), pigułka „na żywo”
+    (punkt planu, przerwa w innym module, +30 s, zakończenie, tytuł karty), gest przesunięcia dawki, tryb skupienia Treningu
+    (te same zapisy serii, przerwa, wyjście), głęboka czerń (OLED), dźwięki interfejsu, M1–M4, dostępność, bez animacji nieskończonych."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-114]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 11, 18, 10, 40))
+    # Arkusz stylów: dwie warstwy kaskady (legacy → instrument)
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    layers = await pg.evaluate("[...document.styleSheets].flatMap(s => { try { return [...s.cssRules]; } catch { return []; } }).filter(r => r.constructor.name === 'CSSLayerStatementRule').map(r => r.nameList.join(','))")
+    ok('legacy,instrument' in layers, f'{tag} Style: warstwy kaskady legacy → instrument ({layers})')
+    # --- Tarcza dnia: 34 punkty planu, 6 minionych, bieżący „Czas własny” 10:10–11:03, w środku godzina i numer punktu
+    dial = await pg.evaluate("""(() => { const k = document.querySelector('.dz-now [role=slider]'); return { n: document.querySelectorAll('.dz-now .dl-arc').length,
+      past: document.querySelectorAll('.dz-now .dl-arc.is-past').length, now: document.querySelectorAll('.dz-now .dl-arc.is-now').length,
+      vt: k?.getAttribute('aria-valuetext'), v: document.querySelector('.dz-now .dl-v')?.textContent, s: document.querySelector('.dz-now .dl-s')?.textContent,
+      hand: getComputedStyle(document.querySelector('.dz-now .dl-hand')).display }; })()""")
+    ok(dial['n'] == 34 and dial['past'] == 6 and dial['now'] == 1 and dial['vt'] == '10:10–11:03: Czas własny (teraz)' and dial['v'] == '10:40' and dial['s'] == 'punkt 7 z 34' and dial['hand'] != 'none',
+       f'{tag} Tarcza: 34 łuki, 6 minionych, bieżący punkt, godzina w środku ({dial})')
+    # klawiatura: → następny punkt (podgląd w środku), Enter — punkt w planie, Esc — powrót do „teraz”
+    await pg.locator('.dz-now [role=slider]').focus(); await pg.keyboard.press('ArrowRight')
+    vt = await pg.get_attribute('.dz-now [role=slider]', 'aria-valuetext')
+    pick = await pg.evaluate("[document.querySelector('.dz-now .dl-t').textContent, document.querySelector('.dz-now .dl').classList.contains('is-pick'), document.querySelectorAll('.dz-now .dl-arc.is-pick').length]")
+    ok(vt == '11:03–11:20: Przerwa żywieniowa' and pick == ['Przerwa żywieniowa', True, 1], f'{tag} Tarcza: klawisz → — podgląd następnego punktu ({vt}, {pick})')
+    await pg.keyboard.press('Enter'); await pg.wait_for_timeout(700)
+    inview = await pg.evaluate("(() => { const r = document.getElementById('slot.1103').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; })()")
+    ok(inview, f'{tag} Tarcza: Enter — punkt widoczny w planie dnia')
+    await pg.locator('.dz-now [role=slider]').focus(); await pg.keyboard.press('Escape')
+    ok(await pg.get_attribute('.dz-now [role=slider]', 'aria-valuetext') == '10:10–11:03: Czas własny (teraz)' and await pg.locator('.dz-now .dl-arc.is-pick').count() == 0, f'{tag} Tarcza: Esc — powrót do „teraz”')
+    if mobile:
+        # dotknięcie pierścienia o 18:45 (trening 18:15–19:35) — podgląd tego punktu
+        await pg.evaluate('scrollTo(0, 0)'); await pg.wait_for_timeout(200)
+        box = await pg.locator('.dz-now .dl-face-w').bounding_box()
+        ang = math.radians(90 + (18 * 60 + 45) / 1440 * 360); sc = box['width'] / 300
+        await pg.touchscreen.tap(box['x'] + (150 + 124 * math.cos(ang)) * sc, box['y'] + (150 + 124 * math.sin(ang)) * sc); await pg.wait_for_timeout(150)
+        vt = await pg.get_attribute('.dz-now [role=slider]', 'aria-valuetext')
+        ok(vt == '18:15–19:35: Rower 55 min + ABS', f'{tag} Tarcza: dotknięcie łuku 18:45 — podgląd punktu ({vt})')
+        await pg.locator('.dz-now [role=slider]').focus(); await pg.keyboard.press('Escape')
+    # upływ czasu: godzina w środku tarczy i wskazówka w miejscu (bez przerysowania strony)
+    await pg.evaluate("document.querySelector('main').dataset.mark = '1'")
+    rot0 = await pg.get_attribute('.dz-now .dl-hand', 'transform')
+    await pg.clock.fast_forward(65_000); await pg.wait_for_timeout(300)
+    rot1 = await pg.get_attribute('.dz-now .dl-hand', 'transform')
+    ok(await pg.inner_text('.dz-now .dl-v') == '10:41' and rot0 != rot1 and await pg.evaluate("document.querySelector('main').dataset.mark") == '1',
+       f'{tag} Tarcza: upływ czasu w miejscu ({rot0} → {rot1})')
+    inf = await pg.evaluate("document.getAnimations().filter(a => a.effect?.getComputedTiming().iterations === Infinity).length")
+    ok(inf == 0, f'{tag} Tarcza: bez animacji nieskończonych (D-112)')
+    v = await axe_audit(pg); ok(not v, f'{tag} Dziś z tarczą: dostępność {v[:2]}')
+    # inny dzień: tarcza jako podgląd planu (bez karty „Teraz” i bez wskazówki)
+    await pg.goto(url + '#/dzis?d=2026-11-16'); await pg.wait_for_selector('.dz-dayface .dl')
+    other = await pg.evaluate("[document.querySelectorAll('.nowcard').length, getComputedStyle(document.querySelector('.dz-dayface .dl-hand')).display, document.querySelector('.dz-dayface .dl-v').textContent, document.querySelector('.dz-dayface .dl-s').textContent]")
+    ok(other == [0, 'none', '34 punkty', '07:00–23:00'], f'{tag} Tarcza innego dnia: podgląd planu bez wskazówki ({other})')
+    sw, w = await pg.evaluate('[document.documentElement.scrollWidth, innerWidth]')
+    ok(sw <= w, f'{tag} Inny dzień: bez przewijania w poziomie ({sw}/{w})')
+    # --- Pigułka „na żywo”: punkt planu poza „Dziś”, ukryta w „Dziś”
+    await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
+    lv = await pg.evaluate("[document.getElementById('live').hidden, document.querySelector('#live .lv-l')?.textContent, document.querySelector('#live .lv-v')?.textContent, document.documentElement.hasAttribute('data-live')]")
+    want = await pg.evaluate("`${663 - new Date().getHours() * 60 - new Date().getMinutes()} min`")   # do 11:03 od bieżącej godziny zegara testu
+    ok(lv == [False, 'Czas własny', want, True], f'{tag} Pigułka: bieżący punkt planu w innym module ({lv})')
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+    ok(await pg.evaluate("document.getElementById('live').hidden") is True, f'{tag} Pigułka: ukryta w „Dziś” (punkt planu na tarczy)')
+    # przerwa: odhaczenie serii w Treningu (dziś) → pigułka w innym module, +30 s, zakończenie; tytuł karty z odliczaniem
+    await pg.goto(url + '#/trening?d=2026-11-18'); await pg.wait_for_selector('.ex')
+    await pg.locator('.set:not(.set-h) .set-toggle').first.click(); await pg.wait_for_selector('.tr-rest')
+    ok(await pg.evaluate("document.getElementById('live').hidden") is True, f'{tag} Pigułka: ukryta w Treningu (pasek przerwy)')
+    await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
+    t1 = await pg.inner_text('#live .lv-v')
+    ok(await pg.inner_text('#live .lv-l') == 'Przerwa' and rest_left(t1) > 50 and t1 in await pg.title(), f'{tag} Pigułka: przerwa w innym module ({t1}, tytuł: {await pg.title()})')
+    await pg.get_by_role('button', name='Wydłuż przerwę o 30 s').click(); await pg.wait_for_timeout(150)
+    t2 = await pg.inner_text('#live .lv-v')
+    ok(rest_left(t2) - rest_left(t1) >= 28, f'{tag} Pigułka: +30 s ({t1} → {t2})')
+    v = await axe_audit(pg); ok(not v, f'{tag} Pigułka (przerwa): dostępność {v[:2]}')
+    await pg.get_by_role('button', name='Zakończ przerwę').click(); await pg.wait_for_timeout(150)
+    ok(await pg.inner_text('#live .lv-l') == 'Czas własny' and 'Przerwa' not in await pg.title(), f'{tag} Pigułka: zakończona przerwa — znów punkt planu')
+    await pg.goto(url + '#/trening?d=2026-11-18'); await pg.wait_for_selector('.ex')
+    await pg.locator('.set:not(.set-h) .set-toggle').first.click(); await pg.wait_for_selector('.set-toggle[aria-pressed="true"]', state='detached')   # cofnięcie serii — czysty stan
+    # --- Gest: przesunięcie wiersza dawki w prawo = przyjęte, w lewo = cofnięcie (telefon)
+    if mobile:
+        await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
+        row = pg.locator('.dz-plan > .day .slot-supps li').first
+        await row.scroll_into_view_if_needed(); await pg.wait_for_timeout(200)
+        n0 = await pg.locator('.dose-ck[aria-pressed="true"]').count()
+        await touch_swipe(pg, row, 220); await wait_js(pg, "n => document.querySelectorAll('.dose-ck[aria-pressed=\"true\"]').length > n", n0)
+        n1 = await pg.locator('.dose-ck[aria-pressed="true"]').count()
+        row = pg.locator('.dz-plan > .day .slot-supps li').first
+        await row.scroll_into_view_if_needed(); await pg.wait_for_timeout(200)
+        await touch_swipe(pg, row, -220); await wait_js(pg, "n => document.querySelectorAll('.dose-ck[aria-pressed=\"true\"]').length < n", n1)
+        n2 = await pg.locator('.dose-ck[aria-pressed="true"]').count()
+        await pg.wait_for_timeout(400)
+        ok(n1 == n0 + 1 and n2 == n0 and await pg.locator('.gx-act').count() == 0, f'{tag} Gest: dawka przesunięciem w prawo przyjęta, w lewo cofnięta ({n0} → {n1} → {n2})')
+        # ruch pionowy na wierszu to przewijanie, nie odhaczenie
+        row = pg.locator('.dz-plan > .day .slot-supps li').first
+        box = await row.bounding_box(); cdp = await pg.context.new_cdp_session(pg)
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': box['x'] + 60, 'y': box['y'] + 10}]})
+        for i in range(1, 8): await cdp.send('Input.dispatchTouchEvent', {'type': 'touchMove', 'touchPoints': [{'x': box['x'] + 64, 'y': box['y'] + 10 - i * 25}]})
+        await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []}); await cdp.detach(); await pg.wait_for_timeout(300)
+        ok(await pg.locator('.dose-ck[aria-pressed="true"]').count() == n0, f'{tag} Gest: ruch pionowy to przewijanie, nie odhaczenie')
+    # --- Tryb skupienia (Trening 18.11 — Rower + ABS: 4 ćwiczenia × 2 serie)
+    await pg.goto(url + '#/trening?d=2026-11-18'); await pg.wait_for_selector('.tr-focus')
+    await pg.locator('.tr-focus').click(); await pg.wait_for_selector('.fx-set')
+    fx = await pg.evaluate("""[document.documentElement.hasAttribute('data-focus'), [...document.querySelectorAll('.side, .tabs, .topbar')].every(e => getComputedStyle(e).display === 'none'),
+      document.querySelector('main h1').textContent, document.querySelector('.fx-set h3').textContent, document.querySelectorAll('.fx-sc').length, document.getElementById('live').hidden]""")
+    ok(fx == [True, True, 'Rower + ABS + sauna', 'Seria 1 z 2', 8, True], f'{tag} Tryb skupienia: pełny ekran, seria 1 z 2, podziałka 8 serii ({fx})')
+    v = await axe_audit(pg); ok(not v, f'{tag} Tryb skupienia: dostępność {v[:2]}')
+    small = await pg.evaluate(D114_SMALL)
+    ok(small == 0, f'{tag} Tryb skupienia: cele dotykowe ≥ 44 px ({small} mniejszych)')
+    # kroki ± (zapis po chwili, jedno zdarzenie), „Seria wykonana” → przerwa i następna seria
+    plus = pg.get_by_role('button', name='Powtórzenia: więcej')
+    for _ in range(3): await plus.click()
+    reps = await pg.input_value('.fx-num:nth-child(2) .fx-in')
+    await pg.wait_for_timeout(1300)
+    saved = await pg.evaluate(D114_SAVED)
+    ok(reps == '3' and [x for x in saved if x[1] is not None] == [[1, 3, False]], f'{tag} Tryb skupienia: kroki ± — jeden zapis po chwili ({reps}, {saved})')
+    await pg.get_by_role('button', name='Seria wykonana').click(); await pg.wait_for_selector('.fx-rest')
+    fx2 = await pg.evaluate("[document.querySelector('.fx-set h3').textContent, document.querySelectorAll('.fx-sc.is-done').length, document.querySelector('.fx-rest-t').textContent]")
+    ok(fx2 == ['Seria 2 z 2', 1, '1:00'], f'{tag} Tryb skupienia: seria wykonana → przerwa 1:00 i seria 2 ({fx2})')
+    await pg.get_by_role('button', name='Pomiń przerwę').click(); await pg.wait_for_timeout(150)
+    ok(await pg.locator('.fx-rest').count() == 0, f'{tag} Tryb skupienia: przerwa pominięta')
+    # wyjście: ✕ (telefon) albo Esc (komputer) → widok sesji z tą samą serią odhaczoną, bez trybu pełnoekranowego
+    if mobile: await pg.get_by_role('link', name='Zakończ tryb skupienia').click()
+    else: await pg.keyboard.press('Escape')
+    await pg.wait_for_selector('.ex')
+    ex = await pg.evaluate("[document.documentElement.hasAttribute('data-focus'), document.querySelectorAll('.set-toggle[aria-pressed=\"true\"]').length, document.querySelector('.ex .set:not(.set-h) input[placeholder=\"powt.\"]').value]")
+    ok(ex == [False, 1, '3'], f'{tag} Tryb skupienia: wyjście — ta sama seria w widoku sesji (te same zapisy) ({ex})')
+    # --- Ustawienia: głęboka czerń (OLED) i dźwięki interfejsu
+    await pg.goto(url + '#/ustawienia'); await pg.wait_for_selector('.set-sec')
+    await pg.get_by_role('group', name='Głęboka czerń').get_by_role('button', name='Włączona').click(); await pg.wait_for_timeout(200)
+    oled = await pg.evaluate(D114_BG)
+    ok(oled == [True, '0,0,0', '#000000', '1'], f'{tag} Ustawienia: głęboka czerń — tło czarne, pasek przeglądarki czarny ({oled})')
+    await pg.reload(); await pg.wait_for_selector('.set-sec')
+    ok(await pg.evaluate("document.documentElement.hasAttribute('data-oled')"), f'{tag} Ustawienia: głęboka czerń od startu (przed pierwszym renderem)')
+    v = await axe_audit(pg); ok(not v, f'{tag} Ustawienia (OLED): dostępność {v[:2]}')
+    await pg.get_by_role('group', name='Głęboka czerń').get_by_role('button', name='Wyłączona').click()
+    await pg.get_by_role('group', name='Dźwięki interfejsu').get_by_role('button', name='Włączone').click(); await pg.wait_for_timeout(150)
+    ok(await pg.evaluate("[document.documentElement.hasAttribute('data-oled'), localStorage.getItem('p2027.sfx')]") == [False, 'on'], f'{tag} Ustawienia: OLED wyłączony, dźwięki interfejsu włączone')
+    # --- M1–M4
+    await pg.goto(url + '#/bezpieczenstwo'); await pg.wait_for_selector('.sf-facts')
+    over = await pg.evaluate(D114_OVERLAP)
+    ok(over == 0, f'{tag} M1: Bezpieczeństwo — etykiety faktów bez nachodzenia ({over})')
+    await pg.goto(url + '#/trening?v=stat'); await pg.wait_for_selector('main h1')
+    st = await pg.evaluate("[document.querySelector('main h1').textContent, /\\b(17|24|31)\\.08|\\b(07|14|21|28)\\.09|\\b05\\.10/.test(document.querySelector('main').innerText)]")
+    ok(st == ['Statystyki treningów', False], f'{tag} M2/M3: Statystyki z nagłówkiem, bez tygodni sprzed startu treningów ({st})')
+    await pg.goto(url + '#/trening?v=historia'); await pg.wait_for_selector('main h1')
+    ok(await pg.inner_text('main h1') == 'Historia treningów', f'{tag} M2: Historia z nagłówkiem')
+    emo = re.compile('[\U0001F300-\U0001FAFF☀-➿]')
+    await pg.goto(url + '#/trening?d=2026-11-16'); await pg.wait_for_selector('.ex')
+    t = await pg.evaluate("[...document.querySelectorAll('.hero-tr .chip-b, .meal-n, .opt-note')].map(e => e.textContent).join(' | ')")
+    ok(not emo.search(t) and 'System kolana' in t, f'{tag} M4: Trening — ikony zamiast emoji ({t[:80]})')
+    await pg.goto(url + '#/rekompozycja'); await pg.wait_for_selector('.rk-sec')
+    ok(not emo.search(await pg.inner_text('main')), f'{tag} M4: Rekompozycja — kłódka i ramki jako ikony')
+    ok(not errs, f'{tag} brak błędów JS {errs[:3]}')
+    await b.close()
 
 async def main():
     srv = serve(8765)
@@ -1686,6 +1870,8 @@ async def main():
         await run_d110(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d113(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d113(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d114(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d114(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')

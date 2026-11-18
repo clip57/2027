@@ -13,6 +13,8 @@ import { renderSettings } from './ui/settings.js';
 import { PLAN_START, PLAN_END } from './core/resolver.js';
 import { diffDays, dayShort, shortDate } from './core/dates.js';
 import { setupShortcuts, searchButton, setCommandExtras } from './ui/search.js';
+import { mountLive, liveRoute, liveTick } from './ui/live.js';
+import { keepAwake } from './ui/wakelock.js';
 import { renderDzis } from './modules/dzis.js';
 import { renderDane } from './modules/dane.js';
 import { renderDieta } from './modules/dieta.js';
@@ -221,16 +223,21 @@ function clockTick() {
   if (document.visibilityState === 'hidden' || !renderedDay) return;
   if (today() !== renderedDay) { softRender(); return; }
   try { tick?.(); } catch (e) { console.error(e); }
+  liveTick();   // D-114: pigułka „na żywo” — minuty do końca bieżącego punktu planu
 }
 
 async function render(keepFocus = false) {
   const app = document.getElementById('app');
-  const focus = keepFocus === true ? focusKey() : null;
+  const focusK = keepFocus === true ? focusKey() : null;
   // D-112: przerysowanie w miejscu (zapis, zmiana z chmury w tle) zachowuje przewinięcie — moduł rysowany asynchronicznie (Dane, MPW)
   // na chwilę skraca stronę i przeglądarka przycinała przewinięcie do góry („skok na początek tej samej strony”)
   const keepY = keepFocus === true ? scrollY : null, t0 = performance.now();
   const { id, params } = route();
   renderedDay = today(); tick = null;
+  // D-114: tryb skupienia (Trening) — pełny ekran bez paneli nawigacji, ekran nie gaśnie; każda inna trasa kończy tryb
+  const focus = id === 'trening' && params.get('v') === 'fokus';
+  document.documentElement.toggleAttribute('data-focus', focus);
+  keepAwake(focus);
   setCustomItems(ctx.store?.state?.catalogUser || []);
   const main = h('main', { class: 'main', id: 'main', tabindex: '-1', 'data-enter': keepFocus === true ? null : enterType });
   enterType = null;
@@ -280,7 +287,8 @@ async function render(keepFocus = false) {
   if (id === 'dzis') { const t = main.querySelector('h1')?.textContent; const bar = app.querySelector('.appbar-t'); if (t && bar) bar.textContent = t; }
   watchTitle();
   if (keepY != null && Math.abs(scrollY - keepY) > 1 && touchedAt < t0) scrollTo(0, keepY);
-  restoreFocus(focus);
+  restoreFocus(focusK);
+  liveRoute(id, document.title, focus);   // D-114: pigułka „na żywo” po przerysowaniu (widoczność zależna od trasy)
 }
 
 // ---- D-110: przewijanie i przejścia między ekranami ----
@@ -361,6 +369,7 @@ function inPageLink(e) {
 async function boot() {
   applyTheme();
   toastBox();
+  mountLive();   // D-114: pigułka „na żywo” — poza #app (nie znika przy przerysowaniu)
   setupShortcuts(() => ctx.store?.state);
   // D-113 (F-G1): polecenie „Zmień motyw” w palecie ⌘K — kolejny motyw jak przycisk w pasku górnym
   setCommandExtras({ theme: () => { const nx = { dark: 'light', light: 'system', system: 'dark' }[themePref()] || 'dark'; saveTheme(nx); applyTheme(nx); render(true); } });   // I5: skróty klawiaturowe (⌘K, /, ← →, g + litera, ?)

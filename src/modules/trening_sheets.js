@@ -1,24 +1,27 @@
 // Arkusze treningu (System kolana, Sauna), listy rozgrzewki i schłodzenia oraz notatki dnia — rysowane z danych ustrukturyzowanych
 // (`training.json` → `sheetsData`, `warmupData`, `cooldownData`, `dayNotes`; D-105, `tools/extract/training_sheets.py`). Tekst oryginalny pozostaje w `sheets`/`warmup`/`cooldown`.
 import { h } from '../ui/dom.js';
+import { icon } from '../ui/icons.js';
 
-const LEVEL = { green: ['🟢', 'lv-g'], yellow: ['🟡', 'lv-y'], red: ['🔴', 'lv-r'] };
+// M4 (audyt 10.11.2026, D-114): kolor poziomu jako kropka (CSS, kolor --lv) zamiast emoji; nazwa poziomu zawsze obok
+const LEVEL = { green: ['lv-g'], yellow: ['lv-y'], red: ['lv-r'] };
+const dot = () => h('span', { class: 'lv-dot', 'aria-hidden': 'true' });
 // Kolor poziomu zawsze występuje razem z jego nazwą (Zielone / Żółte / Czerwone) — nie jest jedynym nośnikiem znaczenia.
 
 // System kolana: kryteria jako karty z trzema poziomami, potem „Co robić”, alarm i wskazówka.
 function kneeBody(s) {
   return [
-    h('p', { class: 'ks-legend' }, s.levels.map(l => h('span', { class: `lv-tag ${LEVEL[l.id][1]}` }, `${LEVEL[l.id][0]} ${l.label}`))),
+    h('p', { class: 'ks-legend' }, s.levels.map(l => h('span', { class: `lv-tag ${LEVEL[l.id][0]}` }, dot(), l.label))),
     h('h3', { class: 'sh-h' }, 'Jak oceniać'),
     h('div', { class: 'ks-crit-list' }, s.criteria.map(c => h('section', { class: 'ks-crit' },
       h('h4', {}, c.name),
-      h('dl', { class: 'ks-rows' }, s.levels.map(l => h('div', { class: `ks-row ${LEVEL[l.id][1]}` }, h('dt', {}, `${LEVEL[l.id][0]} ${l.label}`), h('dd', {}, c[l.id]))))))),
+      h('dl', { class: 'ks-rows' }, s.levels.map(l => h('div', { class: `ks-row ${LEVEL[l.id][0]}` }, h('dt', {}, dot(), l.label), h('dd', {}, c[l.id]))))))),
     h('h3', { class: 'sh-h' }, 'Co robić'),
     h('ul', { class: 'ks-actions' }, s.actions.map(a => {
       const l = s.levels.find(x => x.id === a.level);
-      return h('li', { class: `ks-row ${LEVEL[a.level][1]}` }, h('strong', {}, `${LEVEL[a.level][0]} ${l.label}`), h('span', {}, a.text));
+      return h('li', { class: `ks-row ${LEVEL[a.level][0]}` }, h('strong', {}, dot(), l.label), h('span', {}, a.text));
     })),
-    h('div', { class: 'ks-alert', role: 'note' }, h('strong', {}, `⚠️ ${s.alert.title}`), h('ul', {}, s.alert.items.map(x => h('li', {}, x)))),
+    h('div', { class: 'ks-alert', role: 'note' }, h('strong', {}, icon('triangle-alert', { size: 16 }), ` ${s.alert.title}`), h('ul', {}, s.alert.items.map(x => h('li', {}, x)))),
     h('p', { class: 'ks-tip' }, h('strong', {}, 'Wskazówka: '), s.tip)];
 }
 
@@ -27,7 +30,7 @@ function saunaBody(s) {
   return [
     h('dl', { class: 'sa-sum' }, s.summary.map(x => h('div', { class: 'sa-card' }, h('dt', {}, x.label), h('dd', {}, h('strong', {}, x.value), h('span', { class: 'muted' }, x.note))))),
     s.phases.map(ph => h('section', { class: 'sa-phase' }, h('h3', { class: 'sh-h' }, ph.name),
-      h('ol', { class: 'sa-steps' }, ph.steps.map(st => h('li', { class: st.alert ? 'is-alert' : '' }, h('strong', {}, st.alert ? `⚠️ ${st.label}` : st.label), h('span', {}, st.text)))))),
+      h('ol', { class: 'sa-steps' }, ph.steps.map(st => h('li', { class: st.alert ? 'is-alert' : '' }, h('strong', {}, st.alert && icon('triangle-alert', { size: 15 }), st.alert ? ` ${st.label}` : st.label), h('span', {}, st.text)))))),
     h('section', { class: 'sa-phase' }, h('h3', { class: 'sh-h' }, s.trainingDays.label), h('ul', { class: 'sa-list' }, s.trainingDays.lines.map(x => h('li', {}, x)))),
     h('section', { class: 'sa-phase' }, h('h3', { class: 'sh-h' }, s.thursday.label),
       h('ol', { class: 'sa-timeline' }, s.thursday.steps.map(x => h('li', {}, x))), h('p', { class: 'sa-total' }, s.thursday.total)),
@@ -40,7 +43,8 @@ export const sheetBody = s => (s.kind === 'traffic' ? kneeBody(s) : saunaBody(s)
 export const phaseList = p => h('ol', { class: 'ph-list' }, p.items.map(i => h('li', {},
   h('span', { class: 'ph-name' }, i.name), i.dose && h('span', { class: 'ph-dose' }, i.dose), i.en && h('span', { class: 'ph-en muted' }, i.en))));
 
-export const phaseLabel = (kind, p) => (kind === 'warmup' ? '🔥 Rozgrzewka' : p.title === 'Rozciąganie' ? '🧘 Rozciąganie' : '❄️ Schłodzenie') + ` · ${p.minutes} min`;
+export const phaseLabel = (kind, p) => [icon(kind === 'warmup' ? 'flame' : p.title === 'Rozciąganie' ? 'activity' : 'snowflake', { size: 16 }),
+  `${kind === 'warmup' ? 'Rozgrzewka' : p.title === 'Rozciąganie' ? 'Rozciąganie' : 'Schłodzenie'} · ${p.minutes} min`];
 
 // Notatka sesji z opisu dnia: wtorek i sobota (wskazówka do sesji), środa (struktura roweru). Czwartek ma własny panel, piątek ma tylko nagłówek.
 export function dayNoteCard(n, key) {

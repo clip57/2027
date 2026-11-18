@@ -3,8 +3,8 @@
 import { h, add } from './dom.js';
 import { segmented } from './components.js';
 import { icon } from './icons.js';
-import { ACCENTS, DENSITIES, TEXT_SIZES, uiPref, setUiPref, soundOn, setSound, startPref, setStartPref } from './prefs.js';
-import { signal, unlockAudio } from './signal.js';
+import { ACCENTS, DENSITIES, TEXT_SIZES, uiPref, setUiPref, soundOn, setSound, startPref, setStartPref, oledOn, setOled, sfxOn, setSfx } from './prefs.js';
+import { signal, unlockAudio, sfx } from './signal.js';
 
 const row = (title, hint, control) => h('div', { class: 'set-row' },
   h('div', { class: 'set-t' }, h('h3', {}, title), hint && h('p', { class: 'muted' }, hint)), h('div', { class: 'set-c' }, control));
@@ -17,6 +17,9 @@ export function renderSettings(root, ctx) {
       h('div', { class: 'topline' }, h('span', { class: 'date' }, 'Wygląd i zachowanie na tym urządzeniu'))),
     h('section', { class: 'panel set-sec', 'aria-labelledby': 'set-look' }, h('h2', { id: 'set-look' }, icon('sun-medium', { size: 18 }), 'Wygląd'),
       row('Motyw', 'Ciemny, jasny albo zgodnie z systemem.', ctx.themeSwitch(false)),
+      // D-114: głęboka czerń w motywie ciemnym (ekrany OLED — czarne tło, mniej światła i energii)
+      row('Głęboka czerń (OLED)', 'W motywie ciemnym tło całkowicie czarne — na ekranach OLED (iPhone) wygląda jak przyrząd i oszczędza energię.',
+        segmented('Głęboka czerń', [{ value: 'on', label: 'Włączona' }, { value: 'off', label: 'Wyłączona' }], oledOn() ? 'on' : 'off', v => { setOled(v === 'on'); ctx.rerender(); })),
       row('Akcent', 'Kolor przycisków, zaznaczeń i wskaźników.', h('div', { class: 'set-acc' }, pick('accent', ACCENTS),
         h('span', { class: 'set-swatch', 'aria-hidden': 'true' }))),
       row('Gęstość', 'Zwarta — mniejsze odstępy, więcej treści na ekranie.', pick('density', DENSITIES)),
@@ -26,6 +29,10 @@ export function renderSettings(root, ctx) {
         h('div', { class: 'row' },
           segmented('Sygnał', [{ value: 'on', label: 'Włączony' }, { value: 'off', label: 'Wyłączony' }], soundOn() ? 'on' : 'off', v => { setSound(v === 'on'); ctx.rerender(); }),
           h('button', { class: 'set-test', disabled: !soundOn() || null, onclick: () => { unlockAudio(); setTimeout(() => signal(), 60); } }, icon('bell', { size: 16 }), h('span', {}, 'Sprawdź')))),
+      row('Dźwięki interfejsu', 'Krótki dźwięk przy odhaczeniu (dawka, seria) i przy ukończonej sesji. Sygnał minutników działa niezależnie.',
+        h('div', { class: 'row' },
+          segmented('Dźwięki interfejsu', [{ value: 'on', label: 'Włączone' }, { value: 'off', label: 'Wyłączone' }], sfxOn() ? 'on' : 'off', v => { setSfx(v === 'on'); ctx.rerender(); }),
+          h('button', { class: 'set-test', disabled: !sfxOn() || null, 'aria-label': 'Sprawdź dźwięki interfejsu', onclick: () => { sfx('check'); setTimeout(() => sfx('done'), 260); } }, icon('volume-2', { size: 16 }), h('span', {}, 'Sprawdź')))),
       row('Ekran startowy', 'Moduł otwierany przy uruchomieniu aplikacji (bez adresu).',
         h('select', { 'aria-label': 'Ekran startowy', onchange: e => { setStartPref(e.target.value); ctx.flash('Zapisano ekran startowy.', 'info'); } },
           ctx.modules.map(m => h('option', { value: m.id, selected: m.id === startPref() || null }, m.name))))),

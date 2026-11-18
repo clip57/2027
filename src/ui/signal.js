@@ -1,7 +1,7 @@
 // Sygnał końca odliczania (D5, F-T1 — audyt 31.10.2026): krótki dźwięk z Web Audio (bez plików — działa w obu wariantach buildu)
 // i wibracja tam, gdzie przeglądarka ją obsługuje. Safari wymaga odblokowania dźwięku gestem użytkownika: `unlockAudio()` wołamy
 // w obsłudze dotknięcia, które uruchamia odliczanie (Start minutnika, odhaczenie serii, „Odczekaj”). Wyłączenie — preferencja urządzenia.
-import { soundOn } from './prefs.js';
+import { soundOn, sfxOn } from './prefs.js';
 
 let ac = null;
 export function unlockAudio() {
@@ -35,14 +35,46 @@ export function signal({ tones = 3 } = {}) {
 
 // Minutniki globalne: czas liczony od znacznika końca (poprawny po wygaszeniu ekranu), sygnał także po przejściu do innego widoku.
 // Stan w pamięci karty (nie w dzienniku zdarzeń) — po przeładowaniu strony minutniki znikają.
-const RUN = new Map();   // key -> { end, sec, label, to }
-export function startCountdown(key, sec, label, onEnd) {
-  stopCountdown(key);
+// D-114: zmiany minutników ogłaszane słuchaczom (pigułka „na żywo” w powłoce); `href` — trasa, z której uruchomiono minutnik.
+const RUN = new Map();   // key -> { end, sec, label, to, href }
+const subs = new Set();
+export const onTimers = fn => { subs.add(fn); return () => subs.delete(fn); };
+export const timersChanged = () => subs.forEach(fn => { try { fn(); } catch (e) { console.error(e); } });
+export function startCountdown(key, sec, label, onEnd, href = globalThis.location?.hash || '') {
+  stopCountdown(key, true);
   unlockAudio();
   const end = Date.now() + sec * 1000;
-  const to = setTimeout(() => { const r = RUN.get(key); if (r) r.done = true; signal(); onEnd?.(label); }, sec * 1000);
-  RUN.set(key, { end, sec, label, to, done: false });
+  const to = setTimeout(() => { const r = RUN.get(key); if (r) r.done = true; signal(); onEnd?.(label); timersChanged(); }, sec * 1000);
+  RUN.set(key, { end, sec, label, to, done: false, href });
+  timersChanged();
 }
-export function stopCountdown(key) { const r = RUN.get(key); if (r) { clearTimeout(r.to); RUN.delete(key); } }
+export function stopCountdown(key, quiet = false) { const r = RUN.get(key); if (r) { clearTimeout(r.to); RUN.delete(key); if (!quiet) timersChanged(); } }
 // null = nie działa; { left (s, ≥ 0), done }
 export function countdown(key) { const r = RUN.get(key); return r ? { left: Math.max(0, Math.ceil((r.end - Date.now()) / 1000)), done: r.done, sec: r.sec } : null; }
+// D-114: działające minutniki (bez zakończonych), najbliższy koniec pierwszy
+export const runningTimers = () => [...RUN.entries()].filter(([, r]) => !r.done)
+  .map(([key, r]) => ({ key, label: r.label, href: r.href, end: r.end, sec: r.sec, left: Math.max(0, Math.ceil((r.end - Date.now()) / 1000)) }))
+  .sort((a, b) => a.end - b.end);
+
+// D-114 (System 4.0): dźwięki interfejsu — krótkie, syntetyzowane; domyślnie wyłączone (Ustawienia → „Dźwięki interfejsu”).
+// „check” — odhaczenie (miękkie kliknięcie), „done” — ukończony dzień lub sesja (dwa tony). Wywoływane w obsłudze dotknięcia (gest
+// odblokowuje dźwięk w Safari).
+export function sfx(kind = 'check') {
+  if (!sfxOn()) return false;
+  unlockAudio();
+  if (!ac || ac.state === 'closed') return false;
+  try {
+    const notes = kind === 'done' ? [[660, 0, 0.16], [990, 0.12, 0.22]] : [[1320, 0, 0.05]];
+    const t0 = ac.currentTime + 0.01;
+    for (const [f, at, len] of notes) {
+      const osc = ac.createOscillator(), g = ac.createGain(), t = t0 + at;
+      osc.type = kind === 'done' ? 'sine' : 'triangle'; osc.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(kind === 'done' ? 0.12 : 0.08, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+      osc.connect(g).connect(ac.destination);
+      osc.start(t); osc.stop(t + len + 0.02);
+    }
+    return true;
+  } catch { return false; }
+}

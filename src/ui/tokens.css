@@ -1,9 +1,10 @@
 /* ==========================================================================
-   Projekt 2027 — system projektowy (tokeny). JEDYNE miejsce definicji kolorów, typografii, odstępów,
-   promieni, głębi, materiałów i ruchu. Motyw: data-theme="dark" | "light" na <html>; brak atrybutu = zgodnie z systemem.
-   Domyślnie ciemny (ustawiane przed pierwszym renderem). Kontrast par tekst/tło sprawdzony wg WCAG AA
-   (tests/unit/tokens.test.mjs). System 2.0 (D-110): głębia przez światło — tło „aurora”, materiały szklane tylko
-   dla elementów pływających (pasek dolny, panel boczny, okna, komunikaty), karty z krawędzią światła, ruch sprężysty.
+   Projekt 2027 — system projektowy (tokeny). JEDYNE miejsce definicji kolorów, typografii, odstępów, promieni, głębi,
+   materiałów i ruchu. Motyw: data-theme="dark" | "light" na <html>; brak atrybutu = zgodnie z systemem; data-oled — głęboka czerń
+   (tylko motyw ciemny). Domyślnie ciemny (ustawiane przed pierwszym renderem). Kontrast par tekst/tło sprawdzony wg WCAG AA
+   (tests/unit/tokens.test.mjs). D-114 (System 4.0 „Instrument”): kolory zapisane w OKLCH (L C H — jasność, nasycenie, odcień;
+   te same kolory co w D-113, z wyjątkiem jaśniejszych kolorów danych w motywie ciemnym), skala pisma 8 stopni, 4 promienie,
+   linie i podziałki przyrządów (--hair, --tick), poświata danych (--lum: 1 ciemny / 0 jasny).
    ========================================================================== */
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap;
   src: url("fonts/inter-latin.woff2") format("woff2");
@@ -21,34 +22,39 @@
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-round: var(--font);
   --font-display: "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI", Roboto, sans-serif;   /* D-113: nagłówki i duże liczby */
-  --fs-num: 2.25rem; --fs-hero: 3rem;   /* D-113: liczba w kafelku / liczba-bohater */
-  --fs-2xs: .75rem;   /* U-e: min. 12 px (było 11 px) */ --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem; --fs-kpi: 2.75rem; --fs-stat: 1.5rem;
-  --fs-display: clamp(1.875rem, 1.35rem + 1.5vw, 2.375rem);   /* tytuł strony (h1) */
+  /* D-114: skala pisma — 8 stopni (12 · 14 · 16 · 18 · 22 · 28 · 36 · 48 px) + odczyt trybu skupienia; dotychczasowe nazwy --fs-* to aliasy stopni */
+  --t-1: .75rem; --t-2: .875rem; --t-3: 1rem; --t-4: 1.125rem; --t-5: 1.375rem; --t-6: 1.75rem; --t-7: 2.25rem; --t-8: 3rem;
+  --t-giant: clamp(4.25rem, 2.4rem + 10vw, 7rem);
+  --fs-2xs: var(--t-1); --fs-xs: var(--t-1); --fs-sm: var(--t-2); --fs-md: var(--t-3); --fs-lg: var(--t-4); --fs-xl: var(--t-5); --fs-2xl: var(--t-6);
+  --fs-stat: var(--t-5); --fs-num: var(--t-7); --fs-kpi: var(--t-8); --fs-hero: var(--t-8);
+  --fs-display: clamp(1.75rem, 1.3rem + 1.4vw, 2.25rem);   /* tytuł strony (h1): 28–36 px */
   --track-tight: -.025em; --track-num: -.035em; --track-caps: .08em;   /* nagłówki / duże liczby / etykiety wersalikami */
   /* Odstępy (siatka 4 px) */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
-  /* Promienie (5 poziomów; zagnieżdżony = zewnętrzny − odstęp) */
-  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-full: 999px;
+  /* Promienie — 4 stopnie (D-114: precyzyjniej, mniejsze niż w D-110); zagnieżdżony = zewnętrzny − odstęp */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-full: 999px;
   --r-in: calc(var(--r-md) - 4px);                      /* element wewnątrz toru z paddingiem 4 px (segmenty, motyw) */
   --r-1: var(--r-md); --r-2: var(--r-lg);                  /* aliasy dotychczasowych nazw */
-  /* Ruch: krótko i sprężyście; „spring” = lekkie przestrzelenie (przyciski, wskaźniki), „out” = wejście okien */
-  --dur-1: 140ms; --dur-2: 220ms; --dur-3: 360ms;
-  --ease: cubic-bezier(.2, .8, .2, 1); --ease-out: cubic-bezier(.16, 1, .3, 1); --ease-spring: cubic-bezier(.34, 1.36, .64, 1);
+  /* Ruch: krótko i precyzyjnie; „emph” — wyraźne zwolnienie (wskaźniki, łuki), „spring” — lekkie przestrzelenie (zatwierdzenie gestem) */
+  --dur-1: 120ms; --dur-2: 200ms; --dur-3: 320ms; --dur-4: 560ms;
+  --ease: cubic-bezier(.2, .8, .2, 1); --ease-out: cubic-bezier(.16, 1, .3, 1); --ease-emph: cubic-bezier(.2, 0, 0, 1); --ease-spring: cubic-bezier(.34, 1.36, .64, 1);
   /* Układ */
   --tab-h: 64px; --appbar-h: 0px; --side-w: 252px; --side-w-min: 80px; --content-max: 1180px;
+  --dial: clamp(236px, 72vw, 300px);                        /* D-114: tarcza dnia */
   /* Pasek dolny (telefon) pływa nad krawędzią ekranu: odstęp od dołu i całe zajmowane miejsce (treść, komunikaty, liczniki nad nim) */
   --dock-b: max(var(--s-2), calc(env(safe-area-inset-bottom, 0px) - var(--s-2))); --nav-space: calc(var(--tab-h) + var(--dock-b));
+  --live-h: 0px;                                            /* D-114: pigułka „na żywo” nad paskiem dolnym (wysokość, gdy widoczna) */
 
   /* ---- Motyw jasny ---- */
   color-scheme: light;
-  --bg: #f5f7fa; --surface: #ffffff; --surface-2: #ffffff; --sunken: #eff1f5;
-  --text: #14171d; --text-2: #4c5058; --muted: #656971;
-  --border: #e2e4e8; --border-strong: #888c94;
-  --accent: #484dd2; --accent-ink: #ffffff; --accent-soft: #eaefff; --accent-hi: #5760e7;
-  --success: #0f6a31; --warning: #834600; --danger: #b02a2d; --info: #484dd2;
-  --on-success: #ffffff;                                   /* tekst/ikona na wypełnieniu --success (≥ 4,5:1) */
-  --btn: #ffffff; --btn-hover: #f4f6f8; --rail: #dcdee3;   /* przycisk domyślny; linia osi czasu */
-  --brand-1: #23245a; --brand-2: #07080c; --brand-arc: #a5a8ff; --brand-arc-2: #c9a0ff; --brand-ink: #ffffff;   /* znak „27” (jak ikona aplikacji, w obu motywach ciemny) */
+  --bg: oklch(0.975 0.005 258.3); --surface: oklch(1 0 0); --surface-2: oklch(1 0 0); --sunken: oklch(0.958 0.006 264.5);
+  --text: oklch(0.204 0.013 264.2); --text-2: oklch(0.431 0.014 264.4); --muted: oklch(0.52 0.014 264.5);
+  --border: oklch(0.918 0.006 264.5); --border-strong: oklch(0.639 0.013 264.5);
+  --accent: oklch(0.5 0.2 274.8); --accent-ink: oklch(1 0 0); --accent-soft: oklch(0.953 0.022 272.1); --accent-hi: oklch(0.559 0.201 274.9);
+  --success: oklch(0.4607 0.1203 149.99); --warning: oklch(0.46 0.109 59.1); --danger: oklch(0.501 0.17 24.9); --info: oklch(0.5 0.2 274.8);
+  --on-success: oklch(1 0 0);                                   /* tekst/ikona na wypełnieniu --success (≥ 4,5:1) */
+  --btn: oklch(1 0 0); --btn-hover: oklch(0.972 0.003 247.9); --rail: oklch(0.901 0.007 268.5);   /* przycisk domyślny; linia osi czasu */
+  --brand-1: oklch(0.294 0.095 278); --brand-2: oklch(0.135 0.009 272.5); --brand-arc: oklch(0.763 0.124 281.5); --brand-arc-2: oklch(0.778 0.138 303.2); --brand-ink: oklch(1 0 0);   /* znak „27” (jak ikona aplikacji, w obu motywach ciemny) */
   --e1: 0 1px 2px rgb(16 18 27 / .04), 0 2px 10px -4px rgb(16 18 27 / .07);
   --e2: 0 28px 56px -16px rgb(16 18 27 / .22), 0 4px 14px rgb(16 18 27 / .06);
   --e3: 0 14px 34px -10px rgb(16 18 27 / .22), 0 2px 6px rgb(16 18 27 / .06);   /* elementy pływające */
@@ -58,22 +64,24 @@
   /* Materiał szklany (tylko elementy pływające). Krycie dobrane tak, by tekst --text-2 i --accent miały ≥ 4,5:1 nad dowolną treścią */
   --glass: rgb(255 255 255 / .86); --glass-border: rgb(16 18 27 / .08); --glass-blur: blur(22px) saturate(1.8);
   --aur: 0%; --tint: 0%; --glow-a: 0%;                               /* natężenie poświaty tła („aurora”) i zabarwienia kart nagłówkowych */
+  --face: oklch(1 0 0); --lum: 0;                                   /* D-114: tarcza przyrządu; poświata danych wyłączona w jasnym motywie */
   /* domeny (sygnatura modułu — ikona, pasek, kropka) */
-  --cfa: #3054ae; --train: #a33e25; --regen: #7238a5; --care: #006b61;
-  --p-col: #0e5caf; --c-col: #915200; --f-col: #6a3ea5; --org: #00667e;
-  --warn-bg: #fef0d4; --warn-ink: #694500; --err-bg: #ffe7e4; --ok-ink: #196632;
+  --cfa: oklch(0.471 0.15 264.8); --train: oklch(0.5 0.139 35); --regen: oklch(0.47 0.17 305.2); --care: oklch(0.474 0.084 183.7);
+  --p-col: oklch(0.48 0.15 255); --c-col: oklch(0.5019 0.1152 62.29); --f-col: oklch(0.469 0.16 299.9); --org: oklch(0.473 0.087 221.4);
+  --warn-bg: oklch(0.959 0.04 84.6); --warn-ink: oklch(0.421 0.089 75.2); --err-bg: oklch(0.947 0.027 26.2); --ok-ink: oklch(0.451 0.111 149.8);
 }
 /* ---- Motyw ciemny (ręcznie wybrany albo systemowy). Oba bloki niżej MUSZĄ być identyczne
-   (pilnuje tego tests/unit/tokens.test.mjs, który sprawdza też kontrast par tokenów) ---- */
+   (pilnuje tego tests/unit/tokens.test.mjs, który sprawdza też kontrast par tokenów). D-114: kolory danych (domeny, stany) jaśniejsze
+   i bardziej nasycone — „świecą” na grafitowym tle (granica gamutu sRGB sprawdzona przy projektowaniu) ---- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #090a0d; --surface: #111316; --surface-2: #17191e; --sunken: #060609;
-  --text: #f2f3f6; --text-2: #babec4; --muted: #989ba3;
-  --border: #212327; --border-strong: #60636a;
-  --accent: #9eaeff; --accent-ink: #090a0d; --accent-soft: #232849; --accent-hi: #b4c2ff;
-  --success: #72d699; --warning: #f2b966; --danger: #f98f87; --info: #9eaeff;
-  --on-success: #090a0d; --btn: #1a1c20; --btn-hover: #202328; --rail: #24262b;
-  --brand-1: #23245a; --brand-2: #07080c; --brand-arc: #a5a8ff; --brand-arc-2: #c9a0ff; --brand-ink: #ffffff;
+  --bg: oklch(0.145 0.007 270.5); --surface: oklch(0.186 0.007 258.4); --surface-2: oklch(0.214 0.01 268.2); --sunken: oklch(0.124 0.008 285.2);
+  --text: oklch(0.964 0.004 271.4); --text-2: oklch(0.8 0.01 258.3); --muted: oklch(0.69 0.012 269.5);
+  --border: oklch(0.256 0.008 264.4); --border-strong: oklch(0.499 0.012 267.3);
+  --accent: oklch(0.77 0.118 274.8); --accent-ink: oklch(0.145 0.007 270.5); --accent-soft: oklch(0.29 0.06 275.5); --accent-hi: oklch(0.825 0.087 274.3);
+  --success: oklch(0.805 0.145 155); --warning: oklch(0.83 0.135 75); --danger: oklch(0.765 0.135 24); --info: oklch(0.77 0.118 274.8);
+  --on-success: oklch(0.145 0.007 270.5); --btn: oklch(0.226 0.008 264.4); --btn-hover: oklch(0.255 0.01 260.7); --rail: oklch(0.269 0.01 268.3);
+  --brand-1: oklch(0.294 0.095 278); --brand-2: oklch(0.135 0.009 272.5); --brand-arc: oklch(0.763 0.124 281.5); --brand-arc-2: oklch(0.778 0.138 303.2); --brand-ink: oklch(1 0 0);
   --e1: 0 1px 0 rgb(0 0 0 / .35), 0 10px 28px -18px rgb(0 0 0 / .9);
   --e2: 0 32px 72px -18px rgb(0 0 0 / .8), 0 6px 18px rgb(0 0 0 / .45);
   --e3: 0 18px 42px -12px rgb(0 0 0 / .75), 0 2px 8px rgb(0 0 0 / .4);
@@ -81,19 +89,20 @@
   --rim: inset 0 1px 0 rgb(255 255 255 / .035); --scrim: rgb(3 4 8 / .62);
   --glass: rgb(20 23 31 / .82); --glass-border: rgb(255 255 255 / .08); --glass-blur: blur(22px) saturate(1.6);
   --aur: 0%; --tint: 0%; --glow-a: 0%;
-  --cfa: #96aef7; --train: #f29676; --regen: #c6a0f2; --care: #69d3c6;
-  --p-col: #8cbaf7; --c-col: #edbb64; --f-col: #cba9f3; --org: #77cce6;
-  --warn-bg: #332305; --warn-ink: #f3d392; --err-bg: #3c1715; --ok-ink: #80dba2;
+  --face: oklch(0.168 0.007 264); --lum: 1;
+  --cfa: oklch(0.775 0.11 268); --train: oklch(0.77 0.135 40); --regen: oklch(0.78 0.132 305); --care: oklch(0.81 0.118 185);
+  --p-col: oklch(0.779 0.101 255.7); --c-col: oklch(0.82 0.12 79.7); --f-col: oklch(0.791 0.109 305.1); --org: oklch(0.801 0.09 219.7);
+  --warn-bg: oklch(0.269 0.05 79.5); --warn-ink: oklch(0.879 0.09 84.5); --err-bg: oklch(0.26 0.059 25.1); --ok-ink: oklch(0.819 0.12 155.2);
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme]) {
   color-scheme: dark;
-  --bg: #090a0d; --surface: #111316; --surface-2: #17191e; --sunken: #060609;
-  --text: #f2f3f6; --text-2: #babec4; --muted: #989ba3;
-  --border: #212327; --border-strong: #60636a;
-  --accent: #9eaeff; --accent-ink: #090a0d; --accent-soft: #232849; --accent-hi: #b4c2ff;
-  --success: #72d699; --warning: #f2b966; --danger: #f98f87; --info: #9eaeff;
-  --on-success: #090a0d; --btn: #1a1c20; --btn-hover: #202328; --rail: #24262b;
-  --brand-1: #23245a; --brand-2: #07080c; --brand-arc: #a5a8ff; --brand-arc-2: #c9a0ff; --brand-ink: #ffffff;
+  --bg: oklch(0.145 0.007 270.5); --surface: oklch(0.186 0.007 258.4); --surface-2: oklch(0.214 0.01 268.2); --sunken: oklch(0.124 0.008 285.2);
+  --text: oklch(0.964 0.004 271.4); --text-2: oklch(0.8 0.01 258.3); --muted: oklch(0.69 0.012 269.5);
+  --border: oklch(0.256 0.008 264.4); --border-strong: oklch(0.499 0.012 267.3);
+  --accent: oklch(0.77 0.118 274.8); --accent-ink: oklch(0.145 0.007 270.5); --accent-soft: oklch(0.29 0.06 275.5); --accent-hi: oklch(0.825 0.087 274.3);
+  --success: oklch(0.805 0.145 155); --warning: oklch(0.83 0.135 75); --danger: oklch(0.765 0.135 24); --info: oklch(0.77 0.118 274.8);
+  --on-success: oklch(0.145 0.007 270.5); --btn: oklch(0.226 0.008 264.4); --btn-hover: oklch(0.255 0.01 260.7); --rail: oklch(0.269 0.01 268.3);
+  --brand-1: oklch(0.294 0.095 278); --brand-2: oklch(0.135 0.009 272.5); --brand-arc: oklch(0.763 0.124 281.5); --brand-arc-2: oklch(0.778 0.138 303.2); --brand-ink: oklch(1 0 0);
   --e1: 0 1px 0 rgb(0 0 0 / .35), 0 10px 28px -18px rgb(0 0 0 / .9);
   --e2: 0 32px 72px -18px rgb(0 0 0 / .8), 0 6px 18px rgb(0 0 0 / .45);
   --e3: 0 18px 42px -12px rgb(0 0 0 / .75), 0 2px 8px rgb(0 0 0 / .4);
@@ -101,21 +110,41 @@
   --rim: inset 0 1px 0 rgb(255 255 255 / .035); --scrim: rgb(3 4 8 / .62);
   --glass: rgb(20 23 31 / .82); --glass-border: rgb(255 255 255 / .08); --glass-blur: blur(22px) saturate(1.6);
   --aur: 0%; --tint: 0%; --glow-a: 0%;
-  --cfa: #96aef7; --train: #f29676; --regen: #c6a0f2; --care: #69d3c6;
-  --p-col: #8cbaf7; --c-col: #edbb64; --f-col: #cba9f3; --org: #77cce6;
-  --warn-bg: #332305; --warn-ink: #f3d392; --err-bg: #3c1715; --ok-ink: #80dba2; } }
+  --face: oklch(0.168 0.007 264); --lum: 1;
+  --cfa: oklch(0.775 0.11 268); --train: oklch(0.77 0.135 40); --regen: oklch(0.78 0.132 305); --care: oklch(0.81 0.118 185);
+  --p-col: oklch(0.779 0.101 255.7); --c-col: oklch(0.82 0.12 79.7); --f-col: oklch(0.791 0.109 305.1); --org: oklch(0.801 0.09 219.7);
+  --warn-bg: oklch(0.269 0.05 79.5); --warn-ink: oklch(0.879 0.09 84.5); --err-bg: oklch(0.26 0.059 25.1); --ok-ink: oklch(0.819 0.12 155.2);
+} }
+/* D-114: głęboka czerń (  --bg: oklch(0 0 0); --surface: oklch(0.165 0.005 265); --surface-2: oklch(0.195 0.007 265); --sunken: oklch(0 0 0);
+  --border: oklch(0.24 0.006 265); --btn: oklch(0.195 0.006 265); --btn-hover: oklch(0.23 0.007 265); --rail: oklch(0.25 0.008 265);
+  --face: oklch(0.11 0.004 265); --accent-ink: oklch(0 0 0); --on-success: oklch(0 0 0);
+  --glass: rgb(9 10 13 / .84); --scrim: rgb(0 0 0 / .66);
+, Ustawienia) — tylko gdy obowiązuje motyw ciemny; tło i zagłębienia czarne, powierzchnie lekko uniesione */
+:root[data-oled][data-theme="dark"] {
+  --bg: oklch(0 0 0); --surface: oklch(0.165 0.005 265); --surface-2: oklch(0.195 0.007 265); --sunken: oklch(0 0 0);
+  --border: oklch(0.24 0.006 265); --btn: oklch(0.195 0.006 265); --btn-hover: oklch(0.23 0.007 265); --rail: oklch(0.25 0.008 265);
+  --face: oklch(0.11 0.004 265); --accent-ink: oklch(0 0 0); --on-success: oklch(0 0 0);
+  --glass: rgb(9 10 13 / .84); --scrim: rgb(0 0 0 / .66);
+}
+@media (prefers-color-scheme: dark) { :root[data-oled]:not([data-theme]) {
+  --bg: oklch(0 0 0); --surface: oklch(0.165 0.005 265); --surface-2: oklch(0.195 0.007 265); --sunken: oklch(0 0 0);
+  --border: oklch(0.24 0.006 265); --btn: oklch(0.195 0.006 265); --btn-hover: oklch(0.23 0.007 265); --rail: oklch(0.25 0.008 265);
+  --face: oklch(0.11 0.004 265); --accent-ink: oklch(0 0 0); --on-success: oklch(0 0 0);
+  --glass: rgb(9 10 13 / .84); --scrim: rgb(0 0 0 / .66);
+} }
 
 /* Akcent (D-113, Ustawienia): indygo w blokach motywów wyżej; turkus i bursztyn — atrybut data-accent na <html>. Kontrast par akcentu
    sprawdzany w tests/unit/tokens.test.mjs dla każdego wariantu i motywu. Selektor z motywem ma wyższą specyficzność niż sam akcent. */
-:root[data-accent="teal"] { --accent: #006b6c; --accent-ink: #ffffff; --accent-soft: #def6f5; --accent-hi: #007d7e; --info: #006b6c; }
-:root[data-theme="dark"][data-accent="teal"] { --accent: #57d4d4; --accent-ink: #090a0d; --accent-soft: #073232; --accent-hi: #81e5e4; --info: #57d4d4; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme])[data-accent="teal"] { --accent: #57d4d4; --accent-ink: #090a0d; --accent-soft: #073232; --accent-hi: #81e5e4; --info: #57d4d4; } }
-:root[data-accent="amber"] { --accent: #915200; --accent-ink: #ffffff; --accent-soft: #feeddb; --accent-hi: #a46400; --info: #915200; }
-:root[data-theme="dark"][data-accent="amber"] { --accent: #fdb862; --accent-ink: #090a0d; --accent-soft: #3e2503; --accent-hi: #ffce88; --info: #fdb862; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme])[data-accent="amber"] { --accent: #fdb862; --accent-ink: #090a0d; --accent-soft: #3e2503; --accent-hi: #ffce88; --info: #fdb862; } }
+:root[data-accent="teal"] { --accent: oklch(0.478 0.082 195.9); --accent-ink: oklch(1 0 0); --accent-soft: oklch(0.955 0.025 193.7); --accent-hi: oklch(0.534 0.091 195.8); --info: oklch(0.478 0.082 195.9); }
+:root[data-theme="dark"][data-accent="teal"] { --accent: oklch(0.801 0.11 195.2); --accent-ink: oklch(0.145 0.007 270.5); --accent-soft: oklch(0.289 0.045 195); --accent-hi: oklch(0.861 0.094 194.7); --info: oklch(0.801 0.11 195.2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme])[data-accent="teal"] { --accent: oklch(0.801 0.11 195.2); --accent-ink: oklch(0.145 0.007 270.5); --accent-soft: oklch(0.289 0.045 195); --accent-hi: oklch(0.861 0.094 194.7); --info: oklch(0.801 0.11 195.2); } }
+:root[data-accent="amber"] { --accent: oklch(0.5019 0.1152 62.29); --accent-ink: oklch(1 0 0); --accent-soft: oklch(0.955 0.03 69); --accent-hi: oklch(0.561 0.124 67.2); --info: oklch(0.5019 0.1152 62.29); }
+:root[data-theme="dark"][data-accent="amber"] { --accent: oklch(0.831 0.13 70.4); --accent-ink: oklch(0.145 0.007 270.5); --accent-soft: oklch(0.29 0.06 69.4); --accent-hi: oklch(0.879 0.104 75.6); --info: oklch(0.831 0.13 70.4); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme])[data-accent="amber"] { --accent: oklch(0.831 0.13 70.4); --accent-ink: oklch(0.145 0.007 270.5); --accent-soft: oklch(0.29 0.06 69.4); --accent-hi: oklch(0.879 0.104 75.6); --info: oklch(0.831 0.13 70.4); } }
 
 /* Aliasy dotychczasowych nazw (istniejące reguły korzystają z nowej palety bez zmian w kodzie modułów) */
 :root, :root[data-theme] {
+  --hair: color-mix(in oklch, var(--text) 9%, transparent); --tick: color-mix(in oklch, var(--text) 26%, transparent); --tick-hi: color-mix(in oklch, var(--text) 52%, transparent);
   --paper: var(--bg); --ink: var(--text); --ink-2: var(--text-2); --line: var(--border); --focus: var(--accent);
   --ok: var(--success); --warn: var(--warning); --bad: var(--danger); --err-ink: var(--danger);
   --diet: var(--success); --prep: var(--warning);
@@ -127,6 +156,6 @@
   :root { --ease-spring: linear(0, .006, .025 2.8%, .101 6.1%, .539 18.9%, .721 25.3%, .849 31.5%, .937 38.1%, .968 41.8%, .991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.8%, 1); }
 }
 /* Mniej ruchu / przezroczystości / więcej kontrastu — preferencje systemowe użytkownika mają pierwszeństwo przed efektami */
-@media (prefers-reduced-motion: reduce) { :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; } }
+@media (prefers-reduced-motion: reduce) { :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; --dur-4: 0ms; } }
 @media (prefers-reduced-transparency: reduce) { :root:root { --glass: var(--surface-2); --glass-blur: none; --aur: 0%; } }
-@media (prefers-contrast: more) { :root:root { --border: var(--border-strong); --glass: var(--surface-2); --glass-blur: none; --aur: 0%; --rim: inset 0 0 0 transparent; } }
+@media (prefers-contrast: more) { :root:root { --border: var(--border-strong); --glass: var(--surface-2); --glass-blur: none; --aur: 0%; --rim: inset 0 0 0 transparent; --hair: var(--border-strong); --lum: 0; } }
