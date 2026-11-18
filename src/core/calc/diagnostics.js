@@ -10,6 +10,7 @@ import { careModel } from './care.js';
 
 const STALE_DAYS = 14;
 
+/** @param {any} state @param {{ today?: string, custom?: any[], quarantined?: number, health?: any, cloud?: any }} [o] */
 export function diagnose(state, { today, custom = [], quarantined = 0, health = null, cloud = null } = {}) {
   const out = [];
   const push = (id, level, title, detail = '', href = null) => out.push({ id, level, title, detail, href });

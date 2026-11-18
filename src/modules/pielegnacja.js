@@ -14,7 +14,6 @@ import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, we
 
 const VIEWS = [{ value: 'dzien', label: 'Dzień' }, { value: 'tydzien', label: 'Tydzień' }, { value: 'produkty', label: 'Produkty' }, { value: 'plan', label: 'Plan' }];
 const STATUS_LABEL = Object.fromEntries(STATUS);
-const AREA_LABEL = Object.fromEntries(AREAS);
 // Sloty planu dnia, do których można przypiąć krok (postęp widoczny w „Dziś”): szablon, warianty dnia i układ dni z blokiem M — każdy raz,
 // z dniami wyliczonymi z kalendarza planu (B9); lista liczona przy pierwszym użyciu
 const SLOT_DEFS = slotDefs(SRC.dayTemplate);
@@ -25,6 +24,7 @@ const slotLabel = id => SLOTS().find(x => x[0] === id)?.[1] || (d => (d ? `${d.f
 // Licznik „odczekaj N min” — stan wyłącznie interfejsu (jak przerwa w Treningu, D-068): nie trafia do dziennika ani synchronizacji
 let timer = null;   // { label, start, sec }
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderPielegnacja(root, ctx) {
   const { store, today } = ctx;
   const view = ctx.params.get('v') || 'dzien';
@@ -34,7 +34,8 @@ export function renderPielegnacja(root, ctx) {
   const err = e => clear(msg).append(h('div', { class: 'banner err' }, e.message || String(e)));
   if (!store) { add(root, h('h1', {}, 'Pielęgnacja'), h('div', { class: 'banner err' }, 'Baza danych jest niedostępna.')); return; }
   // Stan pochodny — zmienne przeliczane po zapisie (P2: punktowe odświeżanie)
-  let model, done;
+  /** @type {any} */ let model;
+  let done;
   const derive = () => { model = careModel(store.state.careDefs || []); done = store.state.careDone || {}; };
   derive();
 

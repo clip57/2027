@@ -21,7 +21,7 @@ function dateOf(q) {
   const t = q.trim();
   let m = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m) return `${m[1]}-${m[2]}-${m[3]}`;
-  m = t.match(/^(\d{1,2})[.\/](\d{1,2})(?:[.\/](\d{4}))?$/);
+  m = t.match(/^(\d{1,2})[./](\d{1,2})(?:[./](\d{4}))?$/);
   if (!m) return null;
   const dd = m[1].padStart(2, '0'), mm = m[2].padStart(2, '0');
   const y = m[3] || (`${PLAN_START.slice(0, 4)}-${mm}-${dd}` >= PLAN_START ? PLAN_START.slice(0, 4) : PLAN_END.slice(0, 4));
@@ -120,7 +120,7 @@ export function setupShortcuts(getState) {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       const want = e.key === 'ArrowLeft' ? /^Poprzedni (dzień|tydzień)$/ : /^Następny (dzień|tydzień)$/;
       const a = [...document.querySelectorAll('main a')].find(x => want.test(x.getAttribute('aria-label') || x.textContent.trim()));
-      if (a) { e.preventDefault(); a.click(); }
+      if (a) { e.preventDefault(); /** @type {HTMLElement} */ (a).click(); }
     }
   });
 }

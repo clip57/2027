@@ -50,6 +50,7 @@ const ORDER = [...SRC.mealprep.phases.keys()].filter(i => i !== EVE && SRC.mealp
 const dietLabel = v => (v === 'T' ? 'dzień treningowy' : 'dzień nietreningowy');
 
 let prepPos = null;   // D-114: bieżący krok trybu gotowania { date, key }
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderMealPrep(root, ctx) {
   const { store, today } = ctx;
   const q = ctx.params?.get('d');

@@ -15,6 +15,7 @@ export function createCloudClient({ url, anonKey, fetch = globalThis.fetch?.bind
   if (!anonKey) throw new CloudError('Brak klucza projektu (Publishable Key).', 'bad-config');
   const base = url.replace(/\/$/, '');
 
+  /** @param {string} path @param {{ method?: string, body?: any, token?: string, prefer?: string, auth?: boolean }} [o] */
   async function call(path, { method = 'GET', body, token, prefer, auth = true } = {}) {
     const headers = { apikey: anonKey, 'Content-Type': 'application/json' };
     if (auth) headers.Authorization = `Bearer ${token}`;

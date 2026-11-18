@@ -1,0 +1,9 @@
+{
+  // Kontrola typów kodu JS (D-115, T3): `npm run typecheck` = tsc --noEmit nad src/ (JSDoc + src/globals.d.ts). Bez kompilacji — build robi esbuild.
+  "compilerOptions": {
+    "allowJs": true, "checkJs": true, "noEmit": true, "strict": false, "skipLibCheck": true,
+    "target": "es2023", "module": "esnext", "moduleResolution": "bundler", "resolveJsonModule": true,
+    "lib": ["es2023", "dom", "dom.iterable"], "types": []
+  },
+  "include": ["src/**/*.js", "src/**/*.d.ts"]
+}

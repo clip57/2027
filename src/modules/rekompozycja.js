@@ -51,6 +51,7 @@ function privateSection(id, pack) {
     : b.type === 'table' ? table(b.rows[0] || [], b.rows.slice(1), null) : h('p', {}, b.text));
 }
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderRekompozycja(root, ctx) {
   const pack = ctx.store?.state?.privatePack || null;
   const open = ctx.params.get('s');
@@ -58,7 +59,7 @@ export function renderRekompozycja(root, ctx) {
   const q = (ctx.params.get('q') || '').trim().toLowerCase();
   const textOf = s => JSON.stringify(s.blocks || '').toLowerCase() + ' ' + s.title.toLowerCase();
   const hits = q ? rekomp.sections.filter(s => textOf(s).includes(q)) : null;
-  const setAll = v => document.querySelectorAll('.rk-sec').forEach(d => { d.open = v; });
+  const setAll = v => document.querySelectorAll('details.rk-sec').forEach(d => { /** @type {HTMLDetailsElement} */ (d).open = v; });
   add(root,
     h('section', { class: 'hero-tr rk-hero' }, h('div', { class: 'hero-tr-main' },
       h('p', { class: 'eyebrow' }, `Plan indywidualny · realny początek planu ${longDate(PLAN_REAL_START)}`),

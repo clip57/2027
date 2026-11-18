@@ -4,8 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { createHash } from 'node:crypto';
-import { SRC, mpwByDay, plan } from '../../src/core/data.js';
+import { SRC, plan } from '../../src/core/data.js';
 import { weekday, dayName, range } from '../../src/core/dates.js';
 import { CFA_BLOCKS, CFA_PLAN_VERSION } from '../../src/core/storage/validate.js';
 import { cfaProgressEvents } from '../../src/core/migrate/cfa.js';
@@ -16,7 +15,7 @@ import { consumptionForDay } from '../../src/core/calc/consumption.js';
 
 const D = SRC.cfa.D, B = D.bloki;
 // PLAN0 — początek CAŁEGO planu: kalendarza, diety, suplementów, zakupów i treningów (18.10, D-103c; 15–17.10 usunięte); wyjątkowo bez treningu 01.11 i 02.11 (D-103b); CFA_START — pierwszy dzień planu CFA V44 (16.10; plan CFA ma własny zakres)
-const PLAN0 = '2026-10-18', DIET0 = '2026-10-18', TRAIN0 = '2026-10-18', CFA_START = '2026-10-16', END = '2026-11-11', PLAN_END = '2027-03-28';
+const PLAN0 = '2026-10-18', TRAIN0 = '2026-10-18', CFA_START = '2026-10-16', END = '2026-11-11', PLAN_END = '2027-03-28';
 const NO_JM = ['2026-10-16', '2026-10-23', '2026-10-25'], L_EXTRA = ['2026-10-22', '2026-10-29'], KL = ['2026-10-23', ...range('2026-11-03', END)];
 const M_TRAIN = ['2026-10-18', '2026-10-19', '2026-10-20', '2026-10-21', '2026-10-24', '2026-10-26', '2026-10-27', '2026-10-28', '2026-10-30', '2026-10-31'];   // D-103b: bez 17.10, 01.11 i 02.11
 const NO_TRAIN_M = ['2026-11-01', '2026-11-02'];   // dni wyjątkowo bez treningu z blokiem M i bez K/L (D-103b)

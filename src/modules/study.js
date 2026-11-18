@@ -45,7 +45,7 @@ export function renderStudy(root, ctx, P) {
   };
   derive();
   // Po zapisie: widok dnia i harmonogramu odświeżają tylko zmienione fragmenty (P2); pozostałe widoki — pełne przerysowanie
-  let update = () => ctx.rerender();
+  /** @type {(nrs?: any) => void} */ let update = () => ctx.rerender();
   const after = nrs => { derive(); update(nrs); };
   const msg = h('div', { role: 'status', 'aria-live': 'polite' });
   const err = e => clear(msg).append(h('div', { class: 'banner err' }, e.message || String(e)));
@@ -295,7 +295,7 @@ export function renderStudy(root, ctx, P) {
   // i mapa wykonania dni (tygodnie × dni). Wyłącznie z planu i dziennika postępu.
   function progressPanel() {
     const days = [...new Set(D.bloki.map(b => b.data))].sort(), by = new Map(days.map(d => [d, D.bloki.filter(b => b.data === d)]));
-    let cp = 0, cd = 0, mark = null;
+    let cp = 0, cd = 0, /** @type {number | null} */ mark = null;
     const planCum = [], doneCum = [];
     days.forEach((d, i) => { const l = by.get(d); cp += l.length; cd += l.filter(b => done.has(b.nr)).length;
       planCum.push(cp); doneCum.push(d <= today ? cd : null); if (d <= today) mark = i; });

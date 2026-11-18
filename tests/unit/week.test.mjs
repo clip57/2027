@@ -3,7 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { weekSummary, mondayOf } from '../../src/core/calc/week.js';
 import { resolveDay } from '../../src/core/resolver.js';
-import { SRC, mpwByDay } from '../../src/core/data.js';
 import { addDays } from '../../src/core/dates.js';
 
 test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (28 tygodni)', () => {

@@ -22,7 +22,7 @@ const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
 export const PLAN_END = SRC.phases.end || '9999-12-31';
-export const DAY_ZERO = SRC.phases.zero || null;   // D-100: Dzień zero usunięty z kalendarza (zero: null) — obsługa zostaje w kodzie
+export const DAY_ZERO = /** @type {any} */ (SRC.phases).zero || null;   // D-100: Dzień zero usunięty z kalendarza (zero: null) — obsługa zostaje w kodzie
 // D-100…D-103c: realny początek planu, start diety i treningów — z `phases.json` (`realStart`, `dietStart`, `trainStart`; obecnie wszystkie = `start`, 18.10.2026).
 // Flaga `noDiet` (dni planu przed startem diety) przy starcie diety = starcie planu nie występuje
 export const PLAN_REAL_START = SRC.phases.realStart || PLAN_START;
@@ -70,6 +70,7 @@ export function inValidity(d, date) {
 // Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (`week.json` → `exceptions`; D-087, D-096, D-103, D-103b: np. 01–02.11 i 03–11.11 bez treningu,
 // święta, czwartki od 07.01) — trening, sauna, dieta, recall.
 export function dayPlan(date) {
+  // eslint-disable-next-line no-restricted-syntax -- dayPlan() sama: tydzień bazowy + wyjątki dat
   const w = SRC.week.days[String(weekday(date))];
   // D-102, D-103b: plan CFA ma własny zakres (`nightRecall`) — recall CFA także w ewentualnych dniach sprzed startu planu, które są historią
   if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: NIGHT_RECALL.has(date), variant: null,

@@ -2,7 +2,7 @@
 // na nowej architekturze — stan liczony z inwentaryzacji i planu (D-003, D-027), zapis zdarzeniami,
 // bez dat zakodowanych na sztywno i bez wstawiania danych do innerHTML.
 import { h, clear, fmt, plural, add, numberOf } from '../ui/dom.js';
-import { stockAt, stockInfo, forecast, status, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation, stockSeries, usedBetween } from '../core/calc/inventory.js';
+import { stockAt, stockInfo, forecast, statusInfo, shoppingList, nextShopping, allItems, runway, INV_TYPES, lastOperation, undoOperation, stockSeries, usedBetween } from '../core/calc/inventory.js';
 import { shopKey, shopChecked, settingEvents } from '../core/calc/checks.js';
 import { areaChart } from '../ui/charts.js';
 import { randomId } from '../core/ids.js';
@@ -22,7 +22,6 @@ import { region, holdFocus } from '../ui/patch.js';
 const CATS = ['Wszystko', 'Śniadanie', 'Lunch', 'Przekąska', 'Po treningu', 'Obiad', 'Kolacja', 'Napoje', 'Suplementy'];
 const SORTS = [['days', 'Najmniej dni'], ['urgent', 'Najpilniejsze'], ['shop', 'Do zakupów'],
   ['name', 'Nazwa A–Z'], ['cat', 'Kategoria'], ['most', 'Najwięcej dni']];
-const LABEL = { OK: 'Zapas OK', WARNING: 'Średni stan', CRITICAL: 'Pilny brak', UNKNOWN: 'Brak stanu', UNTRACKED: 'Nieśledzony' };
 const DN = ['Nd', 'Pn', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob'], MN = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
 const v31Date = d => { const [y, m, dd] = d.split('-').map(Number); const x = new Date(y, m - 1, dd); return `${DN[x.getDay()]}, ${dd} ${MN[m - 1]}`; };
 const UNITS = ['g', 'kaps.', 'szt.', 'ml', 'tabl.'];
@@ -33,6 +32,7 @@ const inputQty = q => String(Math.round(q * 10) / 10);
 const opened = new Set();
 const keepOpen = key => ({ open: opened.has(key) || null, ontoggle: e => { if (e.target.open) opened.add(key); else opened.delete(key); } });
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderZapasy(root, ctx) {
   const { store, today } = ctx;
   if (!store) {
@@ -83,7 +83,8 @@ export function renderZapasy(root, ctx) {
     name: (a, b) => a.it.name.localeCompare(b.it.name, 'pl'),
     cat: (a, b) => (a.it.category || '').localeCompare(b.it.category || '', 'pl') || a.it.name.localeCompare(b.it.name, 'pl') };
   // Stan pochodny — zmienne (nie stałe): po punktowym odświeżeniu (P2) przyciski i okna czytają bieżące wartości
-  let rows, list, shopIds, counts, soonest, last, packs, known, byNeed, visible, outNow, oldest;
+  /** @type {any} */ let rows, list, shopIds, counts, soonest, last, packs, known, byNeed, outNow, oldest;
+  /** @type {any[]} */ let visible = undefined;
   const compute = () => {
     rows = items.map(it => {
       const si = stockInfo(store.state.inv, it.id, today), st = si ? si.qty : null;
@@ -318,7 +319,7 @@ export function renderZapasy(root, ctx) {
     let next = null;
     for (let i = visible.length - 1; i >= 0; i--) { const el = artOf.get(visible[i].it.id); if (el.parentNode !== invList) invList.insertBefore(el, next); next = el; }
     for (const [id, restore] of back) restore(artOf.get(id));
-    narrow((document.getElementById('zp-q')?.value || '').trim().toLowerCase());
+    narrow((/** @type {HTMLInputElement | null} */ (document.getElementById('zp-q'))?.value || '').trim().toLowerCase());
   }
 
   // D-113 (F-G1): polecenie z palety ⌘K — `a=zakupy` otwiera plan zakupów, `a=dodaj` okno nowej pozycji; parametr zdejmowany z adresu
@@ -366,11 +367,12 @@ export function renderZapasy(root, ctx) {
     const f = {};
     const field = (label, el) => h('label', { class: 'field' }, h('span', {}, label), el);
     const input = (key, props) => (f[key] = h('input', props));
+    /** @param {string} key @param {any[][]} opts @param {any} cur */
     const select = (key, opts, cur) => (f[key] = h('select', {}, opts.map(o => h('option', { value: o[0], selected: o[0] === cur || null }, o[1]))));
     const val = x => (x == null ? null : String(x));
     const dlg = dialog(edit ? `Edytuj pozycję: ${edit.name}` : 'Dodaj nową pozycję',
       field('Nazwa', input('name', { placeholder: 'np. Cynk organiczny, Dorsz', value: val(edit?.name) })),
-      field('Kategoria', select('cat', CATS.slice(1).concat([['Inne']]).map(c => (Array.isArray(c) ? c : [c, c])), edit?.category)),
+      field('Kategoria', select('cat', CATS.slice(1).concat(['Inne']).map(c => [c, c]), edit?.category)),
       field('Trwałość', select('shelf', [['short', 'Świeże (≤ 7 dni, alert < 2 dni)'], ['long', 'Trwałe (> 7 dni, alert < 7 dni)']], edit?.shelfLife)),
       field('Jednostka', select('unit', UNITS.map(u => [u, u]), edit?.unit)),
       field('Zużycie dzienne', input('daily', { type: 'number', step: 'any', min: '0', placeholder: 'np. 5 lub 0.3', value: val(edit?.daily_v31) })),
@@ -486,7 +488,7 @@ export function renderZapasy(root, ctx) {
     const check = () => {
       try { parsed = read(); } catch (e) { parsed = null; clear(pv); return dlg.error(e); }
       clear(dlg.el.querySelector('.sheet-msg'));
-      clear(pv).append(
+      add(clear(pv),
         parsed.rows.length ? h('ul', { class: 'rc-list' }, parsed.rows.map(x => h('li', {}, h('span', { class: 'rc-n' }, x.item.name),
           h('strong', {}, `${fmt(x.qty, 1)} ${x.item.unit}`), h('span', { class: 'muted' }, x.note || x.raw))))
           : h('p', {}, 'Nie rozpoznano żadnej pozycji.'),

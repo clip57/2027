@@ -21,6 +21,7 @@ function splitLimit(txt) {
 }
 const val = v => (v && v !== '—' ? v : null);
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderBezpieczenstwo(root, ctx) {
   const q = (ctx.params.get('q') || '').toLowerCase();
   const sec = ctx.params.get('s') || '';

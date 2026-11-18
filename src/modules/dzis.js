@@ -15,7 +15,7 @@ import { attention } from '../core/calc/attention.js';
 import { weekSummary, mondayOf } from '../core/calc/week.js';
 import { cloudStatus } from '../core/sync/cloud-local.js';
 import { resolveDay, cfaSourceLine, PLAN_START, PLAN_END, PLAN_REAL_START, DIET_START, TRAIN_START } from '../core/resolver.js';
-import { addDays, longDate, shortDate, dayShort, weekday } from '../core/dates.js';
+import { addDays, longDate, shortDate, dayShort } from '../core/dates.js';
 import { SRC, plan } from '../core/data.js';
 import { stockAt, forecast, statusInfo, shoppingList, nextShopping, allItems } from '../core/calc/inventory.js';
 import { sessions, weekStart } from '../core/calc/training.js';
@@ -274,6 +274,7 @@ function renderWeek(root, ctx, date) {
             h('span', { class: 'wk-exec-t' }, ex[x.date].rows.map(([l, a2, t]) => `${l} ${a2}/${t}`).join(' · ')))])))));
 }
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderDzis(root, ctx) {
   const date = ctx.params.get('d') || ctx.today;
   if (ctx.params.get('v') === 'tydzien') return renderWeek(root, ctx, date);
@@ -331,7 +332,7 @@ export function renderDzis(root, ctx) {
   const showSlot = sl => {
     const el = document.getElementById(sl.id);
     if (!el) return;
-    const past = el.closest('details.dz-past');
+    const past = /** @type {HTMLDetailsElement | null} */ (el.closest('details.dz-past'));
     if (past && !past.open) { past.open = true; pastOpen = true; }
     el.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     play(el, 'glow', 1200);

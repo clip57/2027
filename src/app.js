@@ -16,6 +16,8 @@ import { setupShortcuts, searchButton, setCommandExtras } from './ui/search.js';
 import { mountLive, liveRoute, liveTick } from './ui/live.js';
 import { keepAwake } from './ui/wakelock.js';
 import { attachSwipes } from './ui/gestures.js';
+import { captureUi, restoreUi } from './ui/patch.js';
+import { installErrorLog, attachErrorLog } from './core/errlog.js';
 import { renderDzis } from './modules/dzis.js';
 import { renderDane } from './modules/dane.js';
 import { renderDieta } from './modules/dieta.js';
@@ -70,7 +72,8 @@ function restoreFocus(k) {
   if (!el && k.sel) { const host = k.host ? document.getElementById(k.host) : document.getElementById('app'); el = host?.querySelectorAll(k.sel)[k.idx] || null; }
   if (el && el !== document.activeElement) {
     el.focus({ preventScroll: true });
-    if (el.tagName === 'INPUT' && ['search', 'text'].includes(el.type)) el.setSelectionRange(el.value.length, el.value.length);   // kursor na końcu wpisu
+    const inp = /** @type {HTMLInputElement} */ (el);
+    if (inp.tagName === 'INPUT' && ['search', 'text'].includes(inp.type)) inp.setSelectionRange(inp.value.length, inp.value.length);   // kursor na końcu wpisu
   }
 }
 const chan = 'BroadcastChannel' in globalThis ? new BroadcastChannel('p2027') : null;
@@ -141,6 +144,7 @@ function switchTheme(v, btn) {
   root.style.setProperty('--vt-x', `${Math.round(r.left + r.width / 2)}px`);
   root.style.setProperty('--vt-y', `${Math.round(r.top + r.height / 2)}px`);
   root.classList.add('vt-theme');
+  // eslint-disable-next-line no-restricted-syntax -- zmiana motywu (D-110): jedyne dozwolone użycie View Transitions
   const vt = document.startViewTransition(apply);
   vt.ready.catch(() => {}); vt.updateCallbackDone.catch(e => console.error(e));
   vt.finished.catch(() => {}).finally(() => root.classList.remove('vt-theme'));
@@ -238,6 +242,7 @@ async function render(keepFocus = false) {
   // D-112: przerysowanie w miejscu (zapis, zmiana z chmury w tle) zachowuje przewinięcie — moduł rysowany asynchronicznie (Dane, MPW)
   // na chwilę skraca stronę i przeglądarka przycinała przewinięcie do góry („skok na początek tej samej strony”)
   const keepY = keepFocus === true ? scrollY : null, t0 = performance.now();
+  const uiState = keepFocus === true ? captureUi(document.getElementById('main')) : null;   // D-115 (T2): sekcje i paski po kluczach
   const { id, params } = route();
   renderedDay = today(); tick = null;
   // D-114: tryb skupienia (Trening, Nauka, Meal Prep) — pełny ekran bez paneli nawigacji, ekran nie gaśnie; każda inna trasa kończy tryb
@@ -292,6 +297,7 @@ async function render(keepFocus = false) {
   // „Dziś”: w pasku tytułu nazwa wyświetlanego dnia (h1), nie modułu
   if (id === 'dzis') { const t = main.querySelector('h1')?.textContent; const bar = app.querySelector('.appbar-t'); if (t && bar) bar.textContent = t; }
   watchTitle();
+  restoreUi(main, uiState);   // D-115 (T2): przed przywróceniem przewinięcia — rozwinięta sekcja zmienia wysokość strony
   if (keepY != null && Math.abs(scrollY - keepY) > 1 && touchedAt < t0) scrollTo(0, keepY);
   restoreFocus(focusK);
   liveRoute(id, document.title, focus);   // D-114: pigułka „na żywo” po przerysowaniu (widoczność zależna od trasy)
@@ -374,6 +380,7 @@ function inPageLink(e) {
 }
 
 async function boot() {
+  installErrorLog();   // D-115 (T7): nieobsłużone błędy do lokalnego dziennika (Dane → Dziennik błędów)
   applyTheme();
   toastBox();
   mountLive();   // D-114: pigułka „na żywo” — poza #app (nie znika przy przerysowaniu)
@@ -390,8 +397,10 @@ async function boot() {
   document.addEventListener('focusout', () => setTimeout(() => { if (!isField(document.activeElement)) document.body.classList.remove('kbd'); }, 50));
   matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (themePref() === 'system') applyTheme('system'); });
   try {
+    // eslint-disable-next-line no-restricted-syntax -- jedyna instancja, od razu przez attachStore()
     ctx.store = attachStore(await new Store(new IdbAdapter()).open());
   } catch (e) { ctx.storeError = e.message; console.error(e); }
+  if (ctx.store?.health?.ok) attachErrorLog(ctx.store.adapter);
   // Inna karta/okno zmieniło dane -> doczytanie nowych zdarzeń z bazy do TEJ SAMEJ instancji magazynu (B10: bez nowego połączenia z IndexedDB
   // przy każdej zmianie; słuchacze i odwołania w otwartych oknach zostają) i przerysowanie w tle (softRender — wpis w polu i otwarte okno
   // nie giną). Powiadomienia w trakcie odczytu łączone w jeden kolejny odczyt.
@@ -411,7 +420,7 @@ async function boot() {
   // Zakładka bieżącego modułu (pasek dolny, panel boczny): ponowne dotknięcie przewija na górę, jak w aplikacjach systemowych;
   // przejście z widoku dnia / filtra do modułu przez zakładkę — od góry (D-112)
   document.addEventListener('click', e => {
-    const a = e.target.closest?.('.tabs a, .side a[href^="#/"]');
+    const a = /** @type {Element} */ (e.target).closest?.('.tabs a, .side a[href^="#/"]');
     if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (a.getAttribute('href') === (location.hash || '#/dzis')) {
       e.preventDefault();
@@ -457,7 +466,9 @@ async function boot() {
   addEventListener('focus', clockTick);
   ctx.cloudAuto.boot();
   if (!globalThis.__SINGLE__ && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-    try { setupUpdates(await navigator.serviceWorker.register('./sw.js')); } catch (e) { console.warn('Service worker:', e.message); }
+    // D-115 (T8): Trusted Types — adres service workera tylko przez politykę „p2027” (CSP: require-trusted-types-for 'script'; trusted-types p2027)
+    const tt = window.trustedTypes?.createPolicy?.('p2027', { createScriptURL: u => { if (u !== './sw.js') throw new TypeError(`Niedozwolony adres skryptu: ${u}`); return u; } });
+    try { setupUpdates(await navigator.serviceWorker.register(tt ? tt.createScriptURL('./sw.js') : './sw.js')); } catch (e) { console.warn('Service worker:', e.message); }
   }
 }
 // Aktualizacja kodu: nowy service worker jest pobierany w tle i CZEKA. Przeładowanie tylko po kliknięciu użytkownika.
@@ -476,6 +487,7 @@ function setupUpdates(reg) {
     const w = reg.installing;
     w?.addEventListener('statechange', () => { if (w.state === 'installed') markReady(); });
   });
+  // eslint-disable-next-line no-restricted-syntax -- przeładowanie tylko po kliknięciu „Nowa wersja — odśwież” (userAsked, D-057)
   navigator.serviceWorker.addEventListener('controllerchange', () => { if (userAsked) location.reload(); });
   // iOS: aplikacja z ekranu początkowego zwykle jest wznawiana, a nie uruchamiana — sprawdzamy przy powrocie na ekran
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') ctx.update.check(); });

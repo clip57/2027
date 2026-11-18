@@ -7,7 +7,7 @@ export const parse = s => { const [y, m, d] = s.split('-').map(Number); return n
 export const today = (now = new Date()) => ymd(now);
 export const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
 export const weekday = s => { const w = parse(s).getDay(); return w === 0 ? 7 : w; };
-export const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
+export const diffDays = (a, b) => Math.round((+parse(b) - +parse(a)) / 86400000);
 export const isValidDay = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && ymd(parse(s)) === s;
 export function* range(from, to) { for (let d = from; d <= to; d = addDays(d, 1)) yield d; }
 

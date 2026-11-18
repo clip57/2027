@@ -69,6 +69,7 @@ export const MPW_PLAN = {
 };
 
 // U6: zadania bloków wczytywane przy pierwszym otwarciu modułu (potem z pamięci karty); błąd wczytania nie blokuje widoku
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export async function renderMPW(root, ctx) {
   if (!planTasks('mpw')) await loadPlanTasks('mpw').catch(e => console.warn('Zadania bloków MPW:', e?.message || e));
   return renderStudy(root, ctx, MPW_PLAN);

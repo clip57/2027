@@ -26,6 +26,8 @@ export function classify(e) {
   return 'blocking';
 }
 
+/** @param {{ getStore?: () => any, run?: (store: any, mode: string) => Promise<any>, check?: ((store: any) => Promise<any>) | null, timers?: any, now?: () => number,
+ *   isVisible?: () => boolean, isOnline?: () => boolean, isMobile?: () => boolean, onApplied?: (r?: any) => void, onChange?: (s?: any) => void, cfg?: any }} [o] */
 export function createAutoSync({ getStore, run, check = null, timers = globalThis, now = () => Date.now(), isVisible = () => true,
   isOnline = () => true, isMobile = () => false, onApplied = () => {}, onChange = () => {}, cfg = AUTO } = {}) {
   // phase: 'off' | 'idle' | 'waiting' | 'running' | 'retry' | 'paused'

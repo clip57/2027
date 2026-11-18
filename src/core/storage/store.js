@@ -53,7 +53,7 @@ const DERIVE = {
   // Plan MPW (D-095): postęp i error log jak w CFA, osobne typy (numery bloków obu planów się pokrywają)
   'mpw.done': m => ({ mpwDone: new Set(vals(m).filter(e => e.d.done).map(e => e.d.block)) }),
   'mpw.err': m => ({ mpwErrors: vals(m).filter(e => e.t === 'mpw.err.put').map(e => ({ id: e.d.id, ...e.d.data })) }),
-  ...Object.fromEntries(Object.entries(OBJ).map(([g, [field, key, val]]) => [g, m => ({ [field]: Object.fromEntries(vals(m).map(e => [key(e), val(e)])) })])),
+  ...Object.fromEntries(Object.entries(/** @type {Record<string, any>} */ (OBJ)).map(([g, [field, key, val]]) => [g, m => ({ [field]: Object.fromEntries(vals(m).map(e => [key(e), val(e)])) })])),
   'private.pack': m => ({ privatePack: m?.get('private.pack')?.d.pack || null }),
   cat: m => ({ catalogUser: vals(m).filter(e => e.t === 'cat.upsert').map(e => e.d.item) }),
   // Pielęgnacja (D-094): definicje kroków i produktów bez usuniętych, w kolejności pierwszego pojawienia się
@@ -142,6 +142,7 @@ export function reduce(events) { return reduceInto(events).state; }
 
 export class Store {
   constructor(adapter) { this.adapter = adapter; this.events = new Map(); this.listeners = new Set();
+    /** @type {{ ok: boolean, persisted: boolean, error: any, quarantined: number, restored?: number }} */
     this.health = { ok: false, persisted: false, error: null, quarantined: 0 }; }
 
   async open() {
@@ -226,6 +227,7 @@ export class Store {
   }
 
   // Zapis pojedynczej zmiany z weryfikacją odczytem.
+  /** @param {import('../types').EventType} t @param {Record<string, any>} d @returns {Promise<import('../types').StoredEvent>} */
   async record(t, d) {
     if (!this.health.ok) throw new StorageError(this.health.error || 'Zapis wyłączony: baza nie jest dostępna');
     const e = this.makeEvent(t, d);
@@ -239,6 +241,7 @@ export class Store {
 
   // Zapis wielu zmian naraz ([[typ, treść], …]): te same zdarzenia co przy kolejnych `record()`, ale jedna transakcja,
   // jedna weryfikacja i jedno przeliczenie stanu (B8). Wszystkie albo żadne — błąd walidacji dowolnej treści odrzuca całość.
+  /** @param {[import('../types').EventType, Record<string, any>][]} list @returns {Promise<import('../types').StoredEvent[]>} */
   async recordMany(list) {
     if (!this.health.ok) throw new StorageError(this.health.error || 'Zapis wyłączony: baza nie jest dostępna');
     if (!list.length) return [];

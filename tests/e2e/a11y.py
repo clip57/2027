@@ -80,4 +80,5 @@ async def main():
     print(f'\n[{imp}] {vid} — {len(where)} miejsc'); [print('   ', x) for x in sorted(where)[:6]]
   print('\nNARUSZEŃ (typów):', len(found))
   sys.exit(1 if found or overflow else 0)
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

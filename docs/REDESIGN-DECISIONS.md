@@ -192,3 +192,13 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 - ~~D2, I9, I12~~ (Etap 4 audytu 25.09.2026) — **zamknięte bez wdrożenia (D-111, decyzja użytkownika 25.10.2026).**
 - ~~Potwierdzenie wyglądu na iPhonie (Safari i PWA)~~ — **potwierdzone przez użytkownika 24.09.2026** dla wersji `4e68589` (wszystkie punkty `REDESIGN-TESTING.md` §5).
   naprawy synchronizacji, wersji sprzed redesignu).
+
+## C15. Strażnik wizualny i stan interfejsu (D-115, 18.11.2026)
+
+- Każdy push poza `main`, PR i publikacja: zadanie `wizualny` w „Testy 2027” — zrzuty 30 widoków × 390/1280 px × ciemny/jasny dla bazy
+  i bieżącego commitu, różnice w podsumowaniu i artefakcie. Zmiana stylów, która **nie** ma zmieniać wyglądu (porządki, przenoszenie reguł
+  między warstwami) — opis commitu z `[wygląd bez zmian]`: wtedy każda różnica zatrzymuje testy.
+- Przerysowanie w miejscu i podmiana fragmentu zachowują rozwinięte sekcje i przesunięte paski (klucze: `id` › `data-key` › tekst nagłówka).
+  Sekcja, która ma się zwijać po akcji, musi to robić jawnie (np. `ontoggle` + stan w module), nie przez przerysowanie.
+- Testy wyglądu także w WebKit (Safari): `npm run e2e:webkit`.
+

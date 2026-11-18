@@ -4,7 +4,7 @@
 import { h, clear, add, fmt, plural, numberOf } from '../ui/dom.js';
 import { progressRing, segmented, section, statGrid, stat, sheet } from '../ui/components.js';
 import { unlockAudio, timersChanged } from '../ui/signal.js';
-import { restNow, setRest, restLeft, restStale, restSignal } from '../ui/live.js';
+import { restNow, setRest, restStale, restSignal } from '../ui/live.js';
 import { icon } from '../ui/icons.js';
 import { movementPlayer } from '../ui/movement.js';
 import { barChart, lineChart, sparkline } from '../ui/charts.js';
@@ -22,6 +22,7 @@ import { renderFocus } from './trening_focus.js';
 
 const T = SRC.training;
 const M = muscles.exercises;
+/** @type {[string, string, number][]} */
 const TABS = [['pon', 'PN', 1], ['wt', 'WT', 2], ['sr', 'ŚR', 3], ['czw', 'CZW', 4], ['pt', 'PT', 5], ['sob', 'SOB', 6], ['nd', 'ND', 7]];
 const strip = html => (html || '').replace(/<[^>]+>/g, ' ').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 const serie = n => (n === 1 ? 'seria' : n >= 2 && n <= 4 ? 'serie' : 'serii');
@@ -154,6 +155,7 @@ function lastResult(train, exId, before) {
 const SHEET_IC = { '🦵': 'bone', '♨️': 'thermometer-sun' };
 const VIEWS = [{ value: 'sesja', label: 'Trening' }, { value: 'stat', label: 'Statystyki' }, { value: 'historia', label: 'Historia' }];
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderTrening(root, ctx) {
   const view = ctx.params.get('v') || 'sesja';
   // D-114: tryb skupienia — pełny ekran bez przełącznika widoków (te same zapisy serii, ta sama przerwa)
@@ -178,6 +180,7 @@ function renderSession(root, ctx) {
   let log = store?.state?.train || {};
   // Zapisy szeregowane w kolejce: kolejny zapis tej samej serii widzi wynik poprzedniego.
   let queue = Promise.resolve();
+  /** @param {any} ex @param {any} set @param {any} patch @param {boolean | 'point'} [rerender] */
   const save = (ex, set, patch, rerender = false) => (queue = queue.then(() => saveNow(ex, set, patch, rerender)));
   const saveNow = async (ex, set, patch, rerender) => {
     if (!store) return;
@@ -207,6 +210,7 @@ function renderSession(root, ctx) {
   const sessionMuscles = { primary: [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.primary || []))] };
   sessionMuscles.secondary = [...new Set(plan.filter(x => x.n > 0).flatMap(x => M[x.e.name]?.secondary || []))].filter(m => !sessionMuscles.primary.includes(m));
   // Arkusze (System kolana, Sauna): z danych ustrukturyzowanych (D-105); awaryjnie — dawny, spłaszczony tekst
+  /** @type {{ label: string, ic?: string, open: () => void }[]} */
   const sheets = T.sheetsData
     ? T.sheetsData.map(sh => ({ label: sh.title, ic: SHEET_IC[sh.icon] || 'info', open: () => sheetDialog(sh.title, ...sheetBody(sh)) }))
     : T.sheets.filter(s => s.length > 5).map(sh => ({ label: sh.split('✕')[0].trim(), open: () => infoDialog(sh) }));

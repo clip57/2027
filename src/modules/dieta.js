@@ -30,6 +30,7 @@ function macroBar(t) {
     ['p-col', 'c-col', 'f-col'].map((c, i) => h('span', { style: { width: `${(k[i] / sum) * 100}%`, background: `var(--${c})` } })));
 }
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderDieta(root, ctx) {
   const dayNow = resolveDay(ctx.today);
   // D1: `?d=` — jadłospis obowiązujący w wybranym dniu (faza z `phaseFor`, wariant z kalendarza planu przez `resolveDay`)

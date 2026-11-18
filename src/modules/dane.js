@@ -1,4 +1,5 @@
 // Moduł „Dane i synchronizacja” (D-008, D-033, D-035): stan zapisu, wysyłka/odbiór pliku iCloud, importy, kontrola stanów.
+import { errorLog, clearErrorLog, errorLogText } from '../core/errlog.js';
 import { h, clear, fmt, add } from '../ui/dom.js';
 import { exportBundle, preview, previewEvents, apply } from '../core/sync/bundle.js';
 import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
@@ -22,10 +23,10 @@ const TYPE = { 'inv.count': 'stany magazynu', 'inv.move': 'zakupy i korekty', 'c
   'cfa.err.put': 'wpisy error logu', 'train.set': 'serie treningowe', 'train.detail': 'szczegóły treningu', setting: 'ustawienia', 'private.pack': 'pakiet prywatny', archive: 'archiwum',
   'care.def': 'kroki i produkty pielęgnacji', 'care.done': 'odhaczenia pielęgnacji', 'mpw.done': 'bloki MPW', 'mpw.err.put': 'wpisy error logu MPW' };
 // Środowisko uruchomienia: każde (przeglądarka, aplikacja z ekranu początkowego, plik lokalny) ma OSOBNĄ bazę danych.
-export const appVersion = () => document.querySelector('meta[name="app-version"]')?.content || 'nieznana';
+export const appVersion = () => document.querySelector('meta[name="app-version"]')?.getAttribute('content') || 'nieznana';
 // D16: wersja czytelna — data budowy i skrót zawartości („31.10.2026 · 4f1c2a”); pełny numer w Diagnostyce i podpowiedzi
 export function versionLabel() {
-  const built = document.querySelector('meta[name="app-built"]')?.content, v = appVersion();
+  const built = document.querySelector('meta[name="app-built"]')?.getAttribute('content'), v = appVersion();
   const hash = (v.split('+')[1] || '').slice(0, 6);
   return /^\d{4}-\d{2}-\d{2}$/.test(built || '') && hash ? `${built.slice(8, 10)}.${built.slice(5, 7)}.${built.slice(0, 4)} · ${hash}` : v;
 }
@@ -50,6 +51,7 @@ async function shareOrDownload(text, name, type = 'application/json') {
   return 'download';
 }
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export async function renderDane(root, ctx) {
   const { store } = ctx;
   const meta = store ? { exp: await store.adapter.getMeta('lastExport'), imp: await store.adapter.getMeta('lastImport'),
@@ -65,7 +67,7 @@ export async function renderDane(root, ctx) {
   const cloudEl = await cloudSection(ctx);
 
   // --- Stan zapisu
-  const health = store?.health || { ok: false, error: ctx.storeError };
+  const health = store?.health || { ok: false, persisted: false, quarantined: 0, restored: 0, error: ctx.storeError };
   // Kolejność (D-077): synchronizacja — najczęstsza czynność — na górze; potem aktualizacja kodu, stan zapisu, kontrola, kopie
   const syncSlot = h('div', { class: 'dn-slot' });
   add(root, h('header', { class: 'dn-head' }, h('h1', {}, 'Dane i synchronizacja'),
@@ -188,7 +190,7 @@ export async function renderDane(root, ctx) {
   // --- Przypomnienia w kalendarzu (I1): plik .ics z alarmami, generowany lokalnie z planu (bez serwera i bez kont)
   {
     const period = h('select', { 'aria-label': 'Okres' }, [[7, '7 dni'], [14, '14 dni'], [30, '30 dni'], [60, '60 dni']].map(([v, l]) => h('option', { value: String(v), selected: v === 14 || null }, l)));
-    const kinds = ICS_KINDS.map(([k, label]) => [k, h('input', { type: 'checkbox', checked: true, value: k })]);
+    const kinds = ICS_KINDS.map(([k]) => [k, h('input', { type: 'checkbox', checked: true, value: k })]);
     const icsMsg = h('p', { class: 'muted', role: 'status', 'aria-live': 'polite' });
     add(root, h('section', { class: 'panel dn-ics', 'aria-labelledby': 'h-ics' }, h('h2', { id: 'h-ics' }, icon('calendar-plus', { size: 18 }), 'Przypomnienia w kalendarzu'),
       h('p', { class: 'muted' }, 'Plik .ics z alarmami do Kalendarza (iPhone, Mac, zegarek) — od dziś na wybrany okres. Po zmianie planu wyeksportuj ponownie: te same wydarzenia zostaną zaktualizowane, nie zdublowane.'),
@@ -218,6 +220,26 @@ export async function renderDane(root, ctx) {
         icon(c.level === 'ok' ? 'circle-check' : c.level === 'warn' ? 'triangle-alert' : 'info', { size: 18 }),
         h('div', {}, h('p', { class: 'dg-t' }, c.title), c.detail && h('p', { class: 'muted' }, c.detail),
           c.href && h('a', { href: c.href }, 'Przejdź')))))));
+  }
+
+  // --- Dziennik błędów (D-115, T7): nieobsłużone błędy zapisane na tym urządzeniu — do skopiowania dla asystenta
+  {
+    const log = errorLog(), recent = log.slice().reverse();
+    const msg = h('p', { class: 'muted dn-err-msg', role: 'status' });
+    add(root, h('section', { class: 'panel dn-err', 'aria-labelledby': 'h-err' }, h('h2', { id: 'h-err' }, icon('bug', { size: 18 }), 'Dziennik błędów'),
+      h('p', { class: 'muted' }, log.length
+        ? `Zapisane na tym urządzeniu: ${log.length} (najwyżej 50, kolejne powtórzenia jako licznik). Zapisywane są tylko: komunikat błędu, miejsce w kodzie i widok — tylko na tym urządzeniu, bez synchronizacji.`
+        : 'Brak zarejestrowanych błędów na tym urządzeniu.'),
+      log.length > 0 && h('ul', { class: 'dn-err-list' }, recent.slice(0, 10).map(e => h('li', {},
+        h('p', { class: 'dg-t' }, e.msg, e.n > 1 && h('span', { class: 'muted' }, ` × ${e.n}`)),
+        h('p', { class: 'muted small' }, `${new Date(e.at).toLocaleString('pl-PL')} · ${e.kind} · ${e.route || '—'}${e.src ? ` · ${e.src}` : ''}`)))),
+      log.length > 0 && h('div', { class: 'row' },
+        h('button', { onclick: async () => {
+          try { await navigator.clipboard.writeText(errorLogText(errorLog(), { version: appVersion(), ua: navigator.userAgent })); msg.textContent = 'Skopiowano dziennik błędów do schowka.'; }
+          catch { msg.textContent = 'Nie udało się skopiować — przeglądarka nie dała dostępu do schowka.'; }
+        } }, icon('clipboard-list', { size: 16 }), 'Kopiuj dla asystenta'),
+        h('button', { onclick: async () => { await clearErrorLog(); ctx.flash('Wyczyszczono dziennik błędów.', 'ok'); ctx.rerender(); } }, icon('trash-2', { size: 16 }), 'Wyczyść')),
+      msg));
   }
 
   // --- Kopie automatyczne (U8, audyt 23.10.2026: opis działania i przywracanie stanów Zapasów z kopii)

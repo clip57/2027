@@ -64,6 +64,7 @@ function figure(regions, active, label) {
   return g;
 }
 
+/** @param {any} m @param {{ size?: string, title?: string }} [o] */
 export function bodyMap({ primary = [], secondary = [] }, { size = 'md', title } = {}) {
   const svg = s('svg', { viewBox: '0 0 210 212', class: `bodymap bm-${size}`, role: 'img',
     'aria-label': title || `Mięśnie główne: ${primary.map(m => MUSCLE_PL[m] || m).join(', ') || 'brak'}; pomocnicze: ${secondary.map(m => MUSCLE_PL[m] || m).join(', ') || 'brak'}` });

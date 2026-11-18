@@ -32,6 +32,7 @@ export function dayMarks(date) {
 const LEGEND = [['train', 'Trening / sauna / basen'], ['cfa', 'Nauka CFA'], ['mpw', 'Nauka MPW'], ['block', 'Weekend 8:00–15:23'],
   ['shop', 'Zakupy'], ['holiday', 'Święta — wolne'], ['exam', 'Egzamin'], ['pre', 'Przed startem planu'], ['nodiet', 'Bez diety']];
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderKalendarz(root, ctx) {
   const today = ctx.today;
   const clamp = ym => (ym < FIRST ? FIRST : ym > LAST ? LAST : ym);

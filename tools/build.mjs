@@ -72,7 +72,9 @@ const themeJs = tpl.match(/<script>([\s\S]*?)<\/script>/)[1];
 const connect = ["'self'", 'https://*.supabase.co', ...(process.env.BUILD_LOCAL_API ? ['http://localhost:*', 'http://127.0.0.1:*'] : [])].join(' ');
 const csp = ["default-src 'self'", `script-src 'self' 'sha256-${crypto.createHash('sha256').update(themeJs).digest('base64')}'`,
   "style-src 'self'", "img-src 'self' data: blob:", "font-src 'self'", `connect-src ${connect}`,
-  "manifest-src 'self'", "worker-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'"].join('; ');
+  "manifest-src 'self'", "worker-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'",
+  // D-115 (T8): Trusted Types — kod nie używa innerHTML; jedyne miejsce wymagające typu zaufanego to adres service workera (polityka p2027 w app.js)
+  "require-trusted-types-for 'script'", 'trusted-types p2027'].join('; ');
 fs.writeFileSync(P('dist/web/index.html'), put(put(put(tpl, '<meta charset="utf-8">', `<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="${csp}">`), '<!--HEAD-->',
   `${stamp}\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n<link rel="icon" href="icons/icon-192.png">\n<link rel="stylesheet" href="${cssName}">`),
   '<!--BODY-->', `<script src="${jsName}" defer></script>`));

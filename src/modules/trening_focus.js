@@ -181,7 +181,7 @@ function restGauge(date) {
   const ring = document.createElementNS(NS, 'svg');
   ring.setAttribute('viewBox', '0 0 128 128'); ring.setAttribute('class', 'fx-ring'); ring.setAttribute('aria-hidden', 'true');
   const bg = document.createElementNS(NS, 'circle'), fg = document.createElementNS(NS, 'circle');
-  for (const [c, cls] of [[bg, 'fx-ring-bg'], [fg, 'fx-ring-fg']]) { c.setAttribute('cx', 64); c.setAttribute('cy', 64); c.setAttribute('r', R); c.setAttribute('class', cls); }
+  for (const [c, cls] of /** @type {[SVGCircleElement, string][]} */ ([[bg, 'fx-ring-bg'], [fg, 'fx-ring-fg']])) { c.setAttribute('cx', '64'); c.setAttribute('cy', '64'); c.setAttribute('r', String(R)); c.setAttribute('class', cls); }
   fg.setAttribute('transform', 'rotate(-90 64 64)'); fg.setAttribute('stroke-dasharray', `${L} ${L}`);
   ring.append(bg, fg);
   const t = h('strong', { class: 'fx-rest-t' }), note = h('span', { class: 'fx-rest-n' }), planL = h('span', { class: 'fx-rest-p' }, `plan ${rest.label}`);

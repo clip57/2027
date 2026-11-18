@@ -16,7 +16,7 @@ export const NAMES = ['sun', 'moon', 'monitor', 'utensils', 'dumbbell', 'graduat
   'smartphone', 'trash-2', 'download', 'folder-open', 'pencil', 'calendar-plus', 'calendar-range', 'keyboard', 'activity', 'bell', 'arrow-right',
   'sparkles', 'sun-medium', 'droplets', 'landmark',
   // D-114 (System 4.0): tryb skupienia, ikony zamiast emoji (M4), ustawienia OLED i dźwięków
-  'focus', 'trophy', 'bone', 'thermometer-sun', 'lock-keyhole', 'volume-2', 'moon-star'];
+  'focus', 'trophy', 'bone', 'thermometer-sun', 'lock-keyhole', 'volume-2', 'moon-star', 'bug'];
 const out = {};
 for (const n of NAMES) {
   const svg = fs.readFileSync(path.join(DIR, `${n}.svg`), 'utf8');

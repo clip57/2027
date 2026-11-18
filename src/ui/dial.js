@@ -5,7 +5,7 @@
 // (rola slider): ← → poprzedni / następny punkt, Home / End, Enter — pokaż punkt w planie, Esc — powrót do „teraz”.
 // Odświeżanie w miejscu (`update`) z zegara modułu (ctx.tick, co 30 s) — bez animacji ciągłych (D-112).
 import { h } from './dom.js';
-import { toMin, slotClock } from '../core/calc/now.js';
+import { toMin } from '../core/calc/now.js';
 import { reduced } from './motion.js';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -56,7 +56,7 @@ export function dayDial({ slots, hhmm = null, label = 'Tarcza dnia', caption = '
     ticks.append(svg('line', { x1: f2(x0), y1: f2(y0), x2: f2(x1), y2: f2(y1), class: major ? 'dl-tk is-major' : hour ? 'dl-tk' : 'dl-tk is-minor' }));
   }
   const labels = svg('g', { class: 'dl-lab' });
-  for (const [hh, txt] of [[0, '00'], [6, '06'], [12, '12'], [18, '18']]) {
+  for (const [hh, txt] of /** @type {[number, string][]} */ ([[0, '00'], [6, '06'], [12, '12'], [18, '18']])) {
     const [x, y] = polar(96, angleOf(hh * 60));
     const t = svg('text', { x: f2(x), y: f2(y + 3.5), 'text-anchor': 'middle' }); t.textContent = txt; labels.append(t);
   }

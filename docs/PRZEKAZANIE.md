@@ -50,6 +50,11 @@ na iPhonie (Safari i PWA) 1.11.2026 — wszystko działa. Nowe zapisy: wyłączn
 
 **D-114 (18.11.2026) — System 4.0 „Instrument”, etap 1:** decyzja użytkownika: „tylko design”, wszystkie rekomendacje designu z audytu 10.11, „Instrument” głównym motywem. Wykonane na gałęzi roboczej (bez publikacji): warstwy kaskady, tokeny 4.0 (OKLCH, skale, OLED), tarcza dnia, pigułka „na żywo”, gesty, ruch, tryb skupienia Treningu, dźwięki interfejsu, M1–M4, M8. **Prototyp zaakceptowany 18.11; etap 2 wykonany** (wszystkie moduły, tryby skupienia Nauki i gotowania, gesty na listach, wykresy z odczytem, własny pasek dolny i karty „Dziś”, porządki w `legacy`, strażnik `tools/visual`) — `docs/RAPORT_D114.md`. **Opublikowane na `main` 18.11.2026 (polecenie użytkownika „Publikuj”); kontrola na iPhonie (Safari i PWA) — do potwierdzenia przez użytkownika.**
 
+**D-115 (18.11.2026) — „Fundament jakości” (T2–T9 audytu 10.11):** linter i kontrola typów w CI, dziennik błędów (Dane), Trusted Types,
+budżety wydajności, testy w WebKit, strażnik wizualny w CI, zachowanie stanu sekcji po kluczach, `CLAUDE.md` odchudzony (historia —
+`docs/HISTORIA_STANU.md`, pułapki — `docs/PULAPKI.md`). `docs/RAPORT_D115.md`. Na gałęzi roboczej — publikacja na polecenie użytkownika.
+Sesje w chmurze: środowisko „2027” (dostęp do pobierania przeglądarek Playwright — WebKit).
+
 **Audyt 10.11.2026 („baza na dekadę” — `docs/RAPORT_AUDYT_2026-11-10.md`):** tylko audyt i plan, kod bez zmian. Najważniejsze: plan kończy się
 28.03.2027 i jest wkompilowany w program (68% pakietu JS to dane planu) → proponowany „silnik planów 2.0” (plany jako dane użytkownika, wyjątki
 i odstępstwa w aplikacji); dziennik zdarzeń nie skaluje się na 10 lat (start 4,8–17 s przy 480 tys. zdarzeń) → migawka + ogon; brak powiadomień;
@@ -105,4 +110,4 @@ nie wdrażaj niczego z tego raportu przed nimi.**
 - Bez `SOURCES_DIR` / `PRIVATE_PACK` testy używają danych syntetycznych (`tests/e2e/fixtures.py`); `npm run verify` wymaga plików użytkownika.
 - Nowe konto GitHub/Claude: potrzebny dostęp z prawem zapisu do `clip57/2027` (push na gałąź roboczą i `main`).
 - Gałąź roboczą wyznacza sesja (obecnie `claude/eager-newton-j2309e`); publikuje wyłącznie push na `main` — tylko na polecenie użytkownika.
-- Drzewa robocze `git worktree`: `node_modules` jest dowiązaniem — nie używaj `git add -A` bez sprawdzenia `git status` (zob. pułapki w `CLAUDE.md`).
+- Drzewa robocze `git worktree`: `node_modules` jest dowiązaniem — nie używaj `git add -A` bez sprawdzenia `git status` (zob. `docs/PULAPKI.md`).

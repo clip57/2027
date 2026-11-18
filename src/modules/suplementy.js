@@ -15,6 +15,7 @@ const DAYS = ['pn', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
 // D2 (audyt 31.10.2026): daty jak w całej aplikacji („03.11.2026”, „pn 03.11”), nie ISO
 const dmy = d => `${shortDate(d)}.${d.slice(0, 4)}`;
 
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderSuplementy(root, ctx) {
   const date = ctx.params.get('d') || ctx.today;
   // Dieta NT (czwartek i wyjątki dat — D-087): uwaga o kreatynie bez banana

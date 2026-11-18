@@ -16,6 +16,7 @@ const jwtRole = key => {
 };
 // Klucz publiczny jest z założenia jawny (RLS + wyłączona rejestracja + szyfrowanie po stronie urządzenia chronią dane).
 // Klucze omijające RLS (sekretny `sb_secret_…`, starszy `service_role`) są odrzucane — nie mogą trafić na urządzenie.
+/** @param {{ url?: string, key?: string }} [o] */
 export function checkConfig({ url, key } = {}) {
   let u = String(url || '').trim().replace(/\/+$/, '').replace(/\/(rest|auth)\/v1$/, '');
   if (/^[a-z0-9-]+\.supabase\.co$/i.test(u)) u = `https://${u}`;
@@ -49,6 +50,7 @@ export const metaStorage = adapter => ({
   remove: k => adapter.setMeta(k, null),
 });
 
+/** @param {any} store @param {{ fetch?: typeof globalThis.fetch, now?: () => number }} [o] */
 export async function clientFor(store, { fetch, now } = {}) {
   const cfg = await loadConfig(store);
   if (!cfg) throw new CloudError('Synchronizacja w chmurze nie jest skonfigurowana na tym urządzeniu.', 'not-configured');
@@ -101,6 +103,7 @@ export async function signIn(store, { email, password }, deps = {}) {
 }
 
 // Pierwsze urządzenie (w chmurze brak parametrów szyfrowania) wymaga powtórzenia hasła — literówka byłaby nieodwracalna.
+/** @param {any} store @param {{ passphrase?: string, confirm?: string, iterations?: number }} [o] @param {any} [deps] */
 export async function unlock(store, { passphrase, confirm, iterations } = {}, deps = {}) {
   const client = await clientFor(store, deps);
   const user = await client.user();

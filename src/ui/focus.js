@@ -5,6 +5,7 @@ import { h } from './dom.js';
 import { icon } from './icons.js';
 import { countdown, startCountdown, stopCountdown } from './signal.js';
 
+/** @param {{ exit: string, title: string, sub?: string, onExit?: () => void, info?: { label: string, ic?: string, run: () => void } }} o */
 export function focusTop({ exit, title, sub, onExit, info }) {
   return h('header', { class: 'fx-top' },
     h('a', { class: 'fx-x', href: exit, 'aria-label': 'Zakończ tryb skupienia', onclick: () => onExit?.() }, icon('x', { size: 22 })),
@@ -23,7 +24,7 @@ export function focusTimer(key, minutes, label, flash) {
   const ring = document.createElementNS(NS, 'svg');
   ring.setAttribute('viewBox', '0 0 128 128'); ring.setAttribute('class', 'fx-ring'); ring.setAttribute('aria-hidden', 'true');
   const bg = document.createElementNS(NS, 'circle'), fg = document.createElementNS(NS, 'circle');
-  for (const [c, cls] of [[bg, 'fx-ring-bg'], [fg, 'fx-ring-fg']]) { c.setAttribute('cx', 64); c.setAttribute('cy', 64); c.setAttribute('r', R); c.setAttribute('class', cls); }
+  for (const [c, cls] of /** @type {[SVGCircleElement, string][]} */ ([[bg, 'fx-ring-bg'], [fg, 'fx-ring-fg']])) { c.setAttribute('cx', '64'); c.setAttribute('cy', '64'); c.setAttribute('r', String(R)); c.setAttribute('class', cls); }
   fg.setAttribute('transform', 'rotate(-90 64 64)'); fg.setAttribute('stroke-dasharray', `${L} ${L}`);
   ring.append(bg, fg);
   const t = h('strong', { class: 'fx-rest-t' }), note = h('span', { class: 'fx-rest-n' }), btn = h('button', { class: 'fx-tbtn' });

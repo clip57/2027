@@ -333,3 +333,5 @@ D-110: pływający panel boczny, poświata pod kursorem na kartach, zmiana motyw
 Stan: **wszystkie punkty tej sekcji (iPhone Safari i PWA, MacBook, synchronizacja wg `TEST_IPHONE_SYNC.md`) sprawdzone ręcznie
 przez użytkownika na wersji opublikowanej `4e68589` (Faza 5 zakończona) — działa (potwierdzenie 24.09.2026).**
 (`TEST_IPHONE_SYNC.md`) została potwierdzona dla wersji sprzed redesignu.
+
+**D-115:** klasy `.dn-err .dn-err-list .dn-err-msg` (Dane → Dziennik błędów, `run_d115`); testy `run_d115` (`e2e.py`), `tests/e2e/webkit.py` (WebKit), `tests/e2e/budget.py` (budżety), strażnik wizualny `tools/visual/ci.sh` (zadanie CI `wizualny`). `e2e.py` i `a11y.py` można importować (uruchomienie tylko jako skrypt).

@@ -1,101 +1,47 @@
 # CLAUDE.md — instrukcje dla Claude Code (projekt „2027”)
 
-Osobista aplikacja offline-first (PWA na GitHub Pages + wariant jednoplikowy): plan dnia, dieta, suplementacja, zapasy,
-meal prep, trening, nauka CFA, bezpieczeństwo żywności, plan rekompozycji. Jeden użytkownik, urządzenia: MacBook,
-iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych), przeglądarka na komputerze.
-Język interfejsu i dokumentacji: **polski**.
+Osobista aplikacja offline-first (PWA na GitHub Pages + wariant jednoplikowy `2027.html`): plan dnia, dieta, suplementacja, zapasy,
+meal prep, trening, nauka (CFA do 11.11.2026, MPW 16.11.2026–20.03.2027), bezpieczeństwo żywności, pielęgnacja, plan rekompozycji.
+Jeden użytkownik, urządzenia: MacBook, iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych),
+przeglądarka na komputerze. Język interfejsu i dokumentacji: **polski**.
 
-**Stan (18.11.2026): D-114 — System 4.0 „Instrument” (decyzja użytkownika 18.11 do audytu 10.11: „tylko design”, wszystkie rekomendacje designu, „Instrument” głównym motywem) — etap 1 (fundament + prototyp) zaakceptowany przez użytkownika 18.11, etap 2 (wszystkie moduły, tryby skupienia Nauki i gotowania, gesty na listach, wykresy z odczytem, własny pasek dolny) wykonany — **opublikowany na `main` 18.11.2026** (polecenie użytkownika „Publikuj”); kontrola na iPhonie (Safari i PWA) — do potwierdzenia przez użytkownika. Audyt „baza na dekadę”: `docs/RAPORT_AUDYT_2026-11-10.md` (decyzje nie-designowe — na później). D-113 (audyt 31.10 i System 3.0 „Precision”, etapy 0–6) — opublikowany na `main` 31.10.2026 (`8074976`), działanie na iPhonie potwierdzone przez użytkownika. Jedyna otwarta decyzja: D1 — popołudnie od 16.11 (użytkownik zdecyduje, najlepiej do ok. 10.11). Do dopracowania (opcjonalnie): Meal Prep, Pielęgnacja, Rekompozycja i Dane dostały tylko wspólną warstwę „Precision” (paleta, krój, komponenty), bez własnej przebudowy układu; kontrola paska górnego i ⌘K w Safari na Macu.** Historycznie: redesign UI/UX — Faza 5 zakończona; Fazy 6–7 (urządzenia, regresja końcowa) wykonane w ramach D-110…D-113 (automatyczne 320–1920 px + kontrola użytkownika na iPhonie 24.09, 25.10 i 31.10–1.11.2026).
-Faza 5.0 (stabilizacja Faz 3–4: kontrast, sygnatury modułów, linki w obrębie strony, dane syntetyczne w testach) — zakończona
-24.09.2026, raport `docs/RAPORT_REDESIGN_F5_0.md`. Faza 5, moduły 1–2 (Trening, CFA: system projektowy + licznik przerwy,
-następna seria, zaległe bloki CFA — D-068…D-070) — zakończone, raport `docs/RAPORT_REDESIGN_F5_TRENING_CFA.md`.
-Faza 5, moduły 3–4 (Dieta, Zapasy jako jeden system; kierunek „premium personal OS” — D-071…D-073) — zakończone,
-raport `docs/RAPORT_REDESIGN_F5_DIETA_ZAPASY.md`. Faza 5, moduły 5–9 (Meal Prep, Suplementacja, Bezpieczeństwo, Rekompozycja,
-Dane — D-074…D-077) — zakończone, raport `docs/RAPORT_REDESIGN_F5_POZOSTALE.md`. **Faza 5 zakończona**; Fazy 6–7
-(urządzenia, 7 szerokości, regresja końcowa) wykonane w ramach D-110…D-113.
-**Kontrola ręczna na urządzeniach (`REDESIGN-TESTING.md` §5) wykonana przez użytkownika 24.09.2026 — wszystko działa.**
-**Synchronizacja przez chmurę (Supabase, D-078…D-085)** — Etap 1 (rdzeń: `src/core/sync/crypto.js`, `cloud-api.js`,
-`cloud.js`, `tools/supabase/schema.sql`), Etap 2 (interfejs: sekcja „Synchronizacja w chmurze” w Dane —
-`src/modules/dane-cloud.js`, warstwa urządzenia `src/core/sync/cloud-local.js`, `tools/supabase/check.sql`, `npm run e2e:cloud`)
-i synchronizacja automatyczna (D-084: harmonogram `src/core/sync/cloud-auto.js`, podłączony w `app.js`; D-085: automatyczne
-pobieranie zmian — lekkie sprawdzanie) wykonane. Adres
-projektu i Publishable Key użytkownik wpisuje **na urządzeniu** (magazyn `meta`); synchronizacja automatyczna (przełącznik
-per urządzenie) + „Synchronizuj teraz”. Projekt, audyt, instrukcja i kontrola ręczna: `docs/SYNC_CHMURA.md`. Ręczna synchronizacja
-plikiem zostaje. Nigdy nie wpisuj do repozytorium adresu projektu, kluczy, haseł ani `service_role`.
-**Przekazanie projektu (stan, zasady współpracy, niedokończone zadania, pliki spoza repozytorium): `docs/PRZEKAZANIE.md` — czytaj najpierw.**
-Przed pracą przeczytaj: `docs/REDESIGN-STATUS.md` → `docs/REDESIGN-SPEC.md` → `docs/REDESIGN-DECISIONS.md` → `docs/REDESIGN-TESTING.md`.
-**Plan od 25.09.2026 (D-086, D-087):** plan CFA „MASTER SCHEDULE FINAL” v5 — 421 bloków po 53 min (25.09–11.11: 41 dni × 9,
-6 sobót × 8, 25.09 × 4), źródło `PLAN_NAUKI_CFA_LEVEL_I.html` (+ kontrola `MASTER_SCHEDULE_CFA.csv`); plan dnia: 12:13–12:20 przerwa
-kognitywna, 12:20 blok E, 13:13–13:30 przerwa na lunch, bez spaceru (`tools/extract/day_plan_d086.py`); **soboty** (poza mockiem
-07.11): 12:13–13:13 „Zakupy” zamiast przerwy i bloku E (`variants.zakupy`); **wyjątki dat** 25–27.09 w `week.json` → `exceptions`
-(`dayPlan()` w `resolver.js` — zawsze przez nią, nie przez `SRC.week.days[weekday]`; `tools/extract/day_plan_d087.py`);
-Faza 0 od 26.09 (F1 12.10, F2 16.11 bez zmian); suplementy czasowe 25.09.2026–21.03.2027. Spójność planu:
-`tests/unit/plan-cfa.test.mjs`. Raporty: `docs/RAPORT_PLAN_CFA_D086.md`, `docs/RAPORT_PLAN_CFA_D087.md`.
-**Plan CFA v7 i start planu 27.09.2026 (D-090):** 409 bloków (41 × 9 + 5 sobót × 8, 27.09–11.11), start planu i Faza 0 od 27.09,
-25–26.09 poza planem (wyjątki usunięte), suplementy czasowe 27.09.2026–21.03.2027. Raport: `docs/RAPORT_PLAN_CFA_D090.md`.
-**Plan CFA v9 (D-093):** 400 bloków (40 × 9 + 5 sobót × 8), **28.09–11.11**; 3 mocki (30.10, 03.11, 07.11), mixed practice 26–27.10
-(tryb PRACTICE), 33 sesje recall. **Start całego planu bez zmian: 27.09** — 27.09 to dzień planu bez bloków CFA. Raport: `docs/RAPORT_PLAN_CFA_D093.md`.
-**Start planu (D-088, data wg D-090):** `phases.json` → `start`; dni wcześniejsze poza planem (`inPlan()`/`PLAN_START` w `resolver.js`:
-bez planu dnia, treningu, dawek, bloków i zużycia; serie sprzed startu poza statystykami — `TRAIN_FROM`). Zdarzenia z tych dni
-zostają w dzienniku (nie usuwaj ich, nie filtruj w `reduce()` ani w synchronizacji). Raport: `docs/RAPORT_ETAPY_0_3.md`.
-**Audyt 25.09.2026 — Etapy 1–3 (D-089):** poprawki B1–B9, UX U-a…U-i, CSP w wariancie web (S1), Diagnostyka (I8), `.ics` (I1),
-„Wymaga uwagi” (I2), Tydzień (I3), wyszukiwanie ⌘K (I4), skróty (I5), paragon tekstem (I7), recall jako `setting` `cfa.recall:<data>` (I11).
-Etap 4: **P1 i P2 wdrożone (D-092)** — przyrostowe przeliczanie stanu (`Reducer` w `store.js`) i punktowe odświeżanie (`ui/patch.js`)
-w CFA, Treningu i Zapasach; raport `docs/RAPORT_P1_P2.md`. **D2, I9, I12 — zamknięte bez wdrożenia (decyzja użytkownika 25.10.2026, D-111).** Okna: zawsze `sheet()` z `components.js`;
-komunikaty po akcji: `ctx.flash()` (stały obszar `#toast`); zapisy zbiorcze: `store.recordMany()`.
-**Pakiet prywatny (D-091):** aktualizacja istniejącego pakietu `tools/extract/private_pack_lib.py <stary> <nowy>` (poza repozytorium),
-stan w Diagnostyce; instrukcja `docs/PAKIET_PRYWATNY.md`. Po zmianie planu: zaktualizuj `UPGRADE` w `private_pack_lib.py`.
-**Moduł „Pielęgnacja” (D-094):** plan pielęgnacji **wyłącznie w danych użytkownika** (import `2027-pielegnacja.json` w Dane, edycja w module;
-typy `care.def`, `care.done`; logika `src/core/calc/care.js`) — **nigdy nie dodawaj treści planu (produkty, leki, kroki) do repozytorium,
-testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. Niedziela z basenem: wariant planu dnia „basen” i kreatyna o 19:30 (`day_plan_d094.py`).
-Raport: `docs/RAPORT_PIELEGNACJA_D094.md`. Imię i nazwisko użytkownika nie mogą pojawić się nigdzie (także w plikach prywatnych).
-**Plan MPW (D-095):** moduł `mpw` — plan nauki do egzaminu na Maklera Papierów Wartościowych (`src/data/mpw.json` z `PLAN_NAUKI_MPW.html`
-+ kontrola `MASTER_SCHEDULE_MPW.csv`, `ONLY=mpw` w `extract_static.mjs`): obecnie v8 (D-096) — 392 bloki, A–C 15:30, 16:30, 17:30 (+ P1–P7 w 5 weekendowych dniach), 16.11.2026–20.03.2027,
-egzamin 21.03.2027 11:00. Widok wspólny z CFA (`src/modules/study.js`; konfiguracje `CFA_PLAN` w `cfa.js`, `MPW_PLAN` w `mpw.js`) — zmiany widoku nauki
-wprowadzaj tam, dla obu planów. Typy `mpw.done`, `mpw.err.put`, `mpw.err.del` (limit bloków `MPW_BLOCKS`). Zakładka: CFA do 11.11, od 12.11 MPW
-(`tabUntil`/`tabFrom`, `modulesOn(today)` w `registry.js` — nawigacja zawsze przez `modulesOn`, nie `MODULES.filter(m => m.tab)`). Godziny planu dnia
-bez zmian — bloki MPW w karcie „Nauka MPW” w „Dziś” (`resolveDay().mpw`), nie w slotach. Raport: `docs/RAPORT_MPW_D095.md`.
-**D-096 (29.09.2026):** plan MPW **v8** — 392 bloki, 16.11.2026–20.03.2027, w 6–7.03, 13–14.03 i 20.03 bloki P1–P7 8:00–15:23 w slotach A–G;
-**weekendowe bloki 8:00–15:23** w slotach A–G z `week.json` → `blocks` (`dayBlocks(date)` w `resolver.js`, `tools/extract/day_plan_d096.py`): studia (zjazdy,
-soboty bez zakupów), rozmowa kwalifikacyjna, praca magisterska, święta 26–27.12 i 27–28.03 (całkowicie wolne, bez treningu, NT), egzamin MPW 21.03;
-**wyjątki 28.09–03.10.2026** (przesunięte treningi) — testy ogólnej logiki na tygodniach od 05.10. Raport: `docs/RAPORT_D096.md`.
-**D-097 (29.09.2026):** **Dzień zero 29.09.2026** (`phases.zero`, `isZero`; bez diety, treningu, nauki, suplementów — pielęgnacja tak), plan do **28.03.2027**
-(`PLAN_END`, `inPlan` sprawdza też koniec); plan CFA **v12** (387 bloków, 30.09–11.11, soboty 9 bloków; od D-098 zastąpiony przez v13); **zakupy w czwartki** (warianty `czwartek` do 06.01
-i `czwartek_st` od 07.01 w `day_template.json`, `day_plan_d097.py`; od 07.01 bloki MPW w czwartki +30 min — `week.mpwShift`, `mpwBloki` w `data.js`, pole `godz_src`);
-najbliższe zakupy zawsze z planu dnia: `nextShopping(data, godz, min)` (slot `shop`), nie „sobota”; preparaty czasowe 30.09–28.03; reguła `cycle` w Pielęgnacji;
-moduł **Kalendarz** (`kalendarz.js`, 13 modułów). Raport: `docs/RAPORT_D097.md`. **Niedokończone:** E2E, `verify_all.py` i `UPGRADE` pakietu prywatnego mają stan sprzed D-097 — lista w `docs/PRZEKAZANIE.md` §4a (wykonane).
-**D-098 (06.10.2026):** plan CFA **v13** (342 bloki, 38 dni × 9, **05.10–11.11**) zastępuje v12, liczony od zera: `cfa.done` niesie `plan` (`CFA_PLAN_VERSION` = 13), stan liczy tylko `plan ≥ 13`,
-zapisy z v12 zostają w bazie, ale nie liczą się; dni 30.09–04.10 bez bloków i recallu CFA; guard ekstrakcji i testy na 342 bloki. Raport: `docs/RAPORT_D098.md`.
-**D-099 (08.10.2026):** plan CFA **v14** (340 bloków, 35 dni, **08.10–11.11**, 25×10 + 10×9, **blok J 21:00–21:53** poza pt i sob) zastępuje v13; bloki 1–192 jak w v13 (odhaczenia zachowane, `CFA_PLAN_VERSION` = 13);
-w dni z J resolver dokłada slot `slot.cfa.J` (`extra`) i układa wieczór: powrót 20:15–20:25, kolacja z chondroityną 20:50–21:00, przygotowanie posiłków 21:53–22:00 (`jEvening`, `hasJ`); recall 25 + 6 sesji końcowych z 12.11 (`recallSessions`, jeszcze bez widoku). Raport: `docs/RAPORT_D099.md`.
-**D-100 (08–09.10.2026, start 12.10):** **kalendarz od 08.10.2026** (dni do 07.10 i Dzień zero 29.09 usunięte — poza planem; `phases.zero` brak), **08–11.10 — dni bez diety i treningu** (flaga `noDiet`), **dieta, trening i realny początek planu od 12.10** (`phases.dietStart/trainStart/realStart`,
-`DIET_START`, `TRAIN_START`, `PLAN_REAL_START` w resolverze); 12.10 — normalny poniedziałek (UPPER 1 + sauna, dieta T); **Faza 1 od 19.10, Faza 2 od 23.11**;
-07–11.11 bez treningu z dietą NT; preparaty czasowe od 08.10 (172 dni); plan CFA bez zmian. Pielęgnacja: tylko daty w pliku użytkownika (poza repozytorium). Dane: `tools/extract/day_plan_d100.py`. Raport: `docs/RAPORT_D100.md`.
-**D-101/D-102 (13–15.10.2026):** plan CFA **V3** (326 bloków, 13.10–11.11; J 21:00–21:53 poza 15.10/23.10/25.10, K/L/M po południu 03–11.11, M także 22.10 i 29.10; bez Schwesera; recall z `nightRecall`), `CFA_PLAN_VERSION` = 14;
-**początek planu i pierwszy dzień liczenia wszystkiego poza CFA: 15.10.2026** (dni wcześniejsze — historia, poza planem; plan CFA ma własny zakres od 13.10), regularny trening i dieta od 16.10 (15.10 dzień nietreningowy NT), Faza 0 do 22.10, Faza 1 od 23.10, Faza 2 od 23.11;
-brak treningu 03–11.11 (dieta NT; 05.11 bez zakupów), 12–15.11 nominalnie; czwartki 15/22/29.10 — wariant `czwartek_k` (zakupy 19:05–19:30, mycie głowy 19:30–19:40); w dni z blokiem M posiłek 20:15 w trakcie bloku, mycie głowy tuż przed M (`mycieBeforeM`).
-Dane: `tools/extract/day_plan_d101.py`. Raport: `docs/RAPORT_D101.md`.
+**Stan (18.11.2026):** D-114 System 4.0 „Instrument” (etapy 1–2) opublikowany na `main` 18.11.2026 — kontrola na iPhonie do potwierdzenia
+przez użytkownika. D-115 „Fundament jakości” (T2–T9 z audytu 10.11: linter i typy, dziennik błędów, Trusted Types, budżety, WebKit,
+strażnik wizualny w CI, łatanie stanu po kluczach, ten plik) — na gałęzi roboczej; publikacja na `main` tylko na polecenie użytkownika.
+**Otwarta decyzja użytkownika: D1** — popołudnie od 16.11 (bloki MPW 15:30–18:23 nakładają się na plan dnia). Decyzje nie-designowe
+audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-10.md` §11: silnik planów przed 28.03.2027, nowe rodzaje danych, powiadomienia,
+adres) — czekają na użytkownika.
 
-**D-103 (16.10.2026):** plan CFA **V44** (313 bloków, 16.10–11.11, SchweserNotes 2026 + Practice CFA; J/M poza 16/23/25.10, K/L 23.10 i 03–11.11, L także 22/29.10; recall z `nightRecall`), `CFA_PLAN_VERSION` = 15; treningi od 17.10, Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12;
-dni treningowe z blokiem M (`mTrainDay`, 13 dni): trening 18:15–19:15, powrót z posiłkiem 19:15, prysznic i mycie głowy 19:25–19:40, bez sauny (`trainingBeforeM`, szablon `mTraining`); czwartki 22/29.10 — `czwartek_zl` (bez sauny, zakupy 17:45–18:40); 23.10 bez treningu; 24.12 bez zakupów (`czwartek_bz`), 25.12 wolny; okno „Wolne” pod K/L/M przycinane (`trimTrainWindow`).
-**D-106:** dziennik szczegółów sesji — zdarzenie `train.detail` (jeden dokument na dzień, LWW; stan `trainDetails`), pola basenu, roweru i sauny (kolano usunięte — D-111) wg protokołów (`src/core/trainlog.js` — definicja pól, `fieldOk` w formularzu, `src/modules/trening_log.js` — panel „Dziennik sesji”); w magazynie walidacja **tylko daty i zwykłego JSON** (zgodność w przód — nie zaostrzaj); odczyt toleruje nieznane pola i wartości. Testy: `npm run e2e:trening`. Raport: `docs/RAPORT_D106.md`.
-**D-107 (24.10.2026, poprawki audytu B1–B10 — `docs/RAPORT_D107.md`):** „Cofnij” w Zapasach cofa całą operację (stos; `lastOperation`/`undoOperation` w `core/calc/inventory.js`, zapisy zbiorcze przez `manyOp` z polem `op`, cofnięcia z polem `undo` — pola pomocnicze, `reduce()` je pomija); puste pole liczbowe ≠ 0; upływ czasu — `clockTick` w `app.js` (zmiana dnia → `softRender`) i `ctx.tick` modułu („Teraz” w „Dziś” w miejscu); stoper > 600 min zatrzymuje się bez minut; `.ics` po `slot.key` (warianty dnia); godziny MPW z bloków (`mpwDaySpan`); ikony — regex atrybutów z cyframi; seria tygodni z D-106; sloty Pielęgnacji z kalendarza (`slotOptions`); zmiana w innej karcie — `store.reload()` (ta sama instancja). Testy: `run_d107` w `e2e.py`.
-**D-108 (24.10.2026, ryzyka R1–R4 i ulepszenia U1–U8 z audytu — `docs/RAPORT_D108.md`):** wiersz z chmury, którego walidacja tej wersji nie przyjmuje → kwarantanna (`Store.quarantine`), wraca po aktualizacji przy otwarciu bazy (R1); import `postep-nauki.json` związany z wersją planu — inna wersja zablokowana, poprzednia przeliczana wg `progressRequirements` (`cfaProgressPlan`, R2); klucz kroku Meal Prep z `prepKey` (bloki 0–1 bez zmian, dalsze jako karta `<id>.b<blok>`) — `idx` zawsze < `PREP_IDX_LIMIT` (200, walidacja bez zmian) (R3); kopia przed chmurą raz na dobę lokalną (R4); sloty nauki bez bloku po 11.11 — „Czas własny” (`own`, `.slot.is-own`), slot w czasie bloków MPW — „Nauka MPW” z godzinami (U1); workflow „Testy 2027” (`testy.yml`) przed publikacją (U2); skróty `g k/p/e/n` (U3); Trening — tydzień wybranego dnia i przełączanie tygodni (U4); **plany nauki w pakiecie bez pól z `DROP` w `src/core/plan-split.js`, zadania MPW tylko przez `planTasks`/`loadPlanTasks` (`plan-tasks.js`, w przeglądarce `plan-tasks.web.js`)** (U6); `localhost` w CSP tylko w buildzie `BUILD_LOCAL_API=1` (U7); „Przywróć stany Zapasów” z kopii w Dane (`restoreRows`, U8). Testy: `run_d108` w `e2e.py`, `plan-split.test.mjs`.
-**D-109 (24.10.2026, D3 audytu — `docs/RAPORT_D109.md`):** 31.12 bez zakupów (wariant `czwartek_bz`, sauna zostaje) — zakupy 17.12, potem 07.01; 01.01 bez treningu, dieta NT, bloki MPW bez zmian; 06.01 bez zmian (`tools/extract/day_plan_d109.py` — uruchamiać po pozostałych skryptach planu dnia). D1 (MPW a plan dnia od 16.11) — decyzja później; D2 — bez zmian („Czas własny” 12.11).
-**D-105:** arkusze treningu (System kolana, Sauna) i listy rozgrzewki/schłodzenia z danych ustrukturyzowanych w `training.json` (`sheetsData`, `warmupData`, `cooldownData`, `dayNotes`; `tools/extract/training_sheets.py` po ekstrakcji, `src/modules/trening_sheets.js`).
-**D-103c (17.10.2026):** początek całego planu 18.10 (15–17.10 poza planem; plan CFA V44 ma własny zakres od 16.10), `tools/extract/day_plan_d103c.py`. **D-104:** skyr 75 g w śniadaniu i lunchu — przeliczone sumy diety (T/NT: 2595/2298, 2750/2453, 2931/2634 kcal), zapasy (150 g dziennie, limit 1800 g), Rekompozycja, meal prep (`tools/extract/diet_skyr75.py` po `extract_diet.py`).
-**D-103b (17.10.2026):** 15.10 usunięty z kalendarza (plan od 16.10); wyjątkowo bez treningu 17.10, 01.11 i 02.11 (dieta NT) — dni treningowe z blokiem M: 10 dni 18–31.10; kreatyna w niedzielę bez treningu z posiłkiem 20:15 (`tools/extract/day_plan_d103b.py`, uruchamiać po `day_plan_d103.py`).
-Dane: `tools/extract/day_plan_d103.py`. Kontrola: `node tools/verify/plan_check.mjs`, `python3 tests/e2e/cfa_smoke.py`. Raport: `docs/RAPORT_D103.md`.
-**D-110 (24.10.2026, System 2.0 — audyt designu i nowy wygląd całej aplikacji, `docs/RAPORT_D110.md`):** „głębia przez światło” — tło „aurora” w kolorze modułu (`data-domain` na `<html>`; w „Dziś” kolor bieżącego punktu planu), karty z krawędzią światła `--rim`, **szkło wyłącznie na elementach pływających** (pływający pasek dolny `.tabs` z „soczewką”, pływający panel boczny, pasek tytułu `.appbar` po przewinięciu na telefonie, nagłówek arkusza, liczniki przerwy, przyklejone skróty), chłodniejsza paleta, promienie 10/14/20/28, ruch sprężysty z funkcją; nowe tokeny w `tokens.css` (`--accent-hi`, `--btn`, `--rail`, `--glass*`, `--rim`, `--e3`, `--aur`, `--tint`, `--glow-a`, `--brand-*`, `--r-xl`, `--dur-3`, `--ease-out`, `--ease-spring`, `--dock-b`, `--nav-space`, `--appbar-h`); „Dziś”: „Teraz” przed „Wymaga uwagi”, upływ czasu punktu i odliczanie (`slotClock`, `ctx.tick`), plan dnia jako oś czasu (`--el`), podsumowania jako pas na telefonie; nawigacja: nowy moduł/widok od góry, „Wstecz” przywraca przewinięcie (`history.state.p2027`), wejście ekranu animacją CSS `main[data-enter]` (**bez View Transitions przy zmianie trasy**), zmiana motywu z odsłonięciem kołem (View Transitions, `switchTheme`), arkusze z uchwytem i zamykaniem przeciągnięciem (`dragToClose`), pierścienie z gradientem (`--ring`), nowa ikona aplikacji (`tools/app_icons.py`). Preferencje: `prefers-reduced-motion`, `-transparency`, `-contrast`, `forced-colors`. Dane, zdarzenia, synchronizacja i klasy testów bez zmian.
-**D-111 (25.10.2026, decyzje użytkownika i dopracowanie):** D1 na razie bez zmian; założenia V44 (`RAPORT_D103.md` §5) obowiązują; blok J bez zmian; **kolano usunięte z dziennika sesji** (`trainlog.js`/`trening_log.js` — dawne wpisy `knee` zostają w dzienniku zdarzeń, niewidoczne, przechodzą dalej przy zapisie; arkusz „System kolana” bez zmian); G-20, D-031 oraz D2, I9, I12 (Etap 4 audytu 25.09) zamknięte; **podzbiór fontu skryptem** `tools/fonts.py` (`inter-ui@4.1.1`, opsz 14; zakres `unicode-range` reguły rozszerzonej w `tokens.css` zapisuje skrypt; `tools/fonts.json`, strażnik `fonts.test.mjs`); **znacznik pielęgnacji** w slocie dnia o godzinie slotu przypiętego, gdy tego slotu w danym dniu nie ma (`placeSlotProgress`, `slotDefs` w `care.js`); akcje GitHub na Node 24 (checkout/setup-node/setup-python v7, upload-pages-artifact v5, deploy-pages v5).
-**D-112 (25.10.2026, iPhone — `docs/RAPORT_D112.md`):** bez animacji nieskończonych w widokach przewijanych (pulsy „teraz” usunięte — przeliczanie stylów w każdej klatce); bez kodu w czasie przewijania (pasek tytułu przez `IntersectionObserver` — `watchTitle()`, pozycje widoków zapisywane w `navigate()`, `history.scrollRestoration = 'manual'`); na górę od razu przy zmianie modułu, przywracanie pozycji („Wstecz”, `render(true)`) tylko bez dotyku w międzyczasie (`touchedAt`); arkusz przeciągany na zdarzeniach dotyku (nagłówek albo treść u góry, `dragToClose`); ponowne dotknięcie zakładki bieżącego modułu — na górę.
-**D-113 (31.10.2026, audyt i System 3.0 „Precision” — `docs/RAPORT_D113.md`, audyt `docs/RAPORT_AUDYT_2026-10-31.md`):** Zapasy — stan nigdy < 0 (`stockInfo`: niedobór, „brak od”, zakup z dnia D pokrywa zużycie dnia D); wygląd „Precision”: warstwa `src/ui/precision.css` (po `system.css`), paleta grafitowa (projekt OKLCH, zapis hex), akcent `data-accent` (indygo / turkus / bursztyn), Inter Display (`--font-display`, `inter-display.woff2` z `tools/fonts.py`), CSS minifikowany w buildzie, plakietki stanu bez emoji (`statusBadge`, `statusInfo.label`), komponenty `metric`, `timerChip`, wykresy `charts.js` (`sparkline`, `areaChart`, `donut`, `heatmap`, `stockAxis`) — **zawsze z prawdziwych danych**; pasek górny na komputerze (poza `<main>`), strona **Ustawienia** (`#/ustawienia`, `src/ui/settings.js`, preferencje urządzenia w `prefs.js`), paleta ⌘K z poleceniami (`commands()` w `search.js` — tylko nawigacja), komunikat z akcją (`ctx.flash(text, cls, { action })`, 10 s), sygnał końca odliczania (`src/ui/signal.js`, minutniki globalne). **Nowe zapisy wyłącznie przez `setting`** (`src/core/calc/checks.js`): dawki `supp.dose:<data>|<godz>|<preparat>`, lista zakupów `zapasy.shop:<data zakupów>|<pozycja>` — jeden klucz na pozycję. Funkcje: tryb zakupów, szczegóły pozycji (`stockSeries`), odhaczanie dawek (Suplementacja i Dziś), akcje w „Wymaga uwagi”, podsumowanie dnia, postęp ćwiczenia i rekord, postęp nauki względem planu, licznik bloku 53 min, mapa wykonania, podgląd dnia w Kalendarzu (`?d=`), wykonanie tygodnia, Dieta dla daty (`#/dieta?d=`). Pamięć `stockInfo` (WeakMap po obiekcie `inv`). **Opublikowane 31.10.2026; iPhone (Safari i PWA) sprawdzony przez użytkownika 1.11.2026 — działa.** Zakres „Precision” w modułach: pełna przebudowa — Dziś, Zapasy, Suplementacja (dawki), Kalendarz, nauka (widok „Plan”), Tydzień; częściowa (wspólne tokeny, krój, plakietki, wykresy) — Trening, Dieta, Bezpieczeństwo (ikony zamiast emoji); tylko wspólna warstwa — Meal Prep, Pielęgnacja, Rekompozycja, Dane, Więcej. Skrypty danych: `tools/extract/d113_units.py`, `d113_text.py` (po pozostałych). Testy: `run_d113` w `e2e.py`, `checks`/`commands` (unit).
-**D-114 (18.11.2026, System 4.0 „Instrument” — etap 1, `docs/RAPORT_D114.md`, decyzja w `DECYZJE_2027.md`, §C14 w `REDESIGN-DECISIONS.md`):** style w **warstwach kaskady** `@layer legacy, instrument` (`tools/build.mjs`): `legacy` = tokens → styles → system → precision (bez zmian kaskady wewnątrz), **nowe reguły tylko w `src/ui/instrument.css`** (warstwa zawsze nad `legacy` — bez podbijania specyficzności; `!important` z `legacy`, np. ograniczenie ruchu, nadal wygrywa); tokeny 4.0 w `tokens.css`: **kolory w OKLCH** (test kontrastu przelicza na sRGB, test gamutu), skala pisma `--t-1…--t-8` (`--fs-*` = aliasy), promienie 6/10/14/20, `--hair`/`--tick`/`--tick-hi` (linie, podziałki), `--lum` (poświata danych), `--face`, **`data-oled`** (głęboka czerń, preferencja `p2027.oled`, tylko motyw ciemny); **tarcza dnia** `src/ui/dial.js` (24 h, północ na dole; rola slider; `update(hhmm)` z `ctx.tick`; w innym dniu — podgląd planu `.dz-dayface`); **pigułka „na żywo”** `src/ui/live.js` (`#live` poza `#app`; przerwa → minutnik → punkt planu; stan przerwy `restNow/setRest` wspólny z Treningiem; `html[data-live]` powiększa `--nav-space`); **gesty** `src/ui/gestures.js` (`swipeRow`: zdarzenia dotyku, decyzja w pierwszym ruchu, warstwa akcji w rodzicu wiersza; zawsze z odpowiednikiem przyciskiem); **ruch** `src/ui/motion.js` (jednorazowe: `play`, `onChange`, `sweep`, `flip`; treść od razu końcowa — animacja tylko wizualna); **tryb skupienia** `#/trening?v=fokus` (`src/modules/trening_focus.js`; `html[data-focus]` chowa nawigację, `src/ui/wakelock.js` — ekran nie gaśnie; zapisy `train.set` jak w widoku sesji); dźwięki interfejsu `sfx()` (`p2027.sfx`, domyślnie wyłączone); bieżący punkt planu w `src/core/calc/now.js` (`slotClock`, `currentSlot` — re-eksport w `dzis.js`). M1–M4, M8 z audytu. **Bez nowych typów zdarzeń i zmian danych/synchronizacji.** Testy: `run_d114` w `e2e.py`, `instrument.test.mjs`, OKLCH/OLED/gamut w `tokens.test.mjs`. **Etap 2:** tryby skupienia `?v=fokus` także w CFA / MPW (`study_focus.js`) i Meal Prep (wspólna powłoka `src/ui/focus.js`; lista tras trybu w `render()` w `app.js`); gesty na listach — reguły `SWIPE_RULES` + `attachSwipes()` (po renderze, obserwator dodanych węzłów w `app.js`, w `sheet()`); przełącznik „Widok” = pasek zakładek (`.is-view`); wykresy z odczytem (`scrub` w `charts.js`); zakładki paska dolnego i karty „Dziś” z `prefs.js` (`tabsPref`, `hiddenCards`) — nawigacja przez `tabModules()` w `app.js`; strażnik wizualny `python3 tools/visual/snap.py <katalog>` + `compare.py` (zmiana stylów bez zmiany wyglądu = 0 różnic); testy `run_d114b`.
-Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-114).
+**Czytaj w razie potrzeby (nie wczytuj wszystkiego na start):**
+- `docs/PRZEKAZANIE.md` — stan, zasady współpracy, niedokończone zadania, pliki spoza repozytorium (**najpierw**, przy większej pracy);
+- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-114 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
+  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-115) i raporty `docs/RAPORT_D0xx.md`;
+- `docs/PULAPKI.md` — tabela pułapek, które już wystąpiły (część pilnują teraz linter i testy) — **przed zmianą UI, testów lub buildu**;
+- wygląd: `docs/REDESIGN-STATUS.md` → `REDESIGN-SPEC.md` → `REDESIGN-DECISIONS.md` → `REDESIGN-TESTING.md` (klasy używane przez testy).
 
----
+## 0. Reguły, które obowiązują zawsze (skrót z historii decyzji — szczegóły w `docs/HISTORIA_STANU.md`)
 
-## 1. Architektura (stan zweryfikowany w kodzie 24.09.2026)
+- **Plan dnia i daty:** typ dnia, dieta, trening, wyjątki dat — zawsze przez `dayPlan(date)` / `resolveDay(date)` z `resolver.js`
+  (nigdy `SRC.week.days[…]`); dni poza planem (`inPlan`, `PLAN_START`, `PLAN_END` = 28.03.2027) — bez planu, treningu, dawek, bloków;
+  zdarzeń z tych dni nie usuwaj i nie filtruj w `reduce()` ani w synchronizacji. Bloki weekendowe — `dayBlocks(date)`; najbliższe zakupy —
+  `nextShopping()`; zmiany godzin planu dnia — jako skrypt decyzji w `tools/extract/day_plan_dXXX.py` (źródeł użytkownika nie ma w repozytorium).
+- **Nauka:** widok wspólny CFA i MPW w `src/modules/study.js` (konfiguracje `CFA_PLAN`, `MPW_PLAN`); liczba bloków nigdy na sztywno
+  (`CFA_BLOCKS`, `MPW_BLOCKS` w `validate.js`); `cfa.done` z polem `plan` (`CFA_PLAN_VERSION`); pola z listy `DROP` (`plan-split.js`)
+  i zadania MPW tylko przez `planTasks`/`loadPlanTasks`. Nawigacja zawsze przez `modulesOn(today)` / `tabModules()`.
+- **Zapisy:** `ctx.store.record(type, data)` (typ z `EventType` — `src/core/types.d.ts`), zbiorcze `store.recordMany()`; **nowe ustawienia
+  i odhaczenia wyłącznie przez `setting`** (`src/core/calc/checks.js`: `supp.dose:…`, `zapasy.shop:…`, `cfa.recall:…`); Zapasy — operacje przez
+  `manyOp` (stos „Cofnij”). Okna zawsze `sheet()` z `components.js`; komunikaty po akcji `ctx.flash()`; przerysowanie w tle `softRender()`.
+- **Pielęgnacja (D-094):** plan wyłącznie w danych użytkownika — **nigdy nie dodawaj treści planu (produkty, leki, kroki) do repozytorium,
+  testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. **Imię i nazwisko użytkownika nie mogą pojawić się nigdzie**
+  (także w plikach prywatnych).
+- **Chmura (D-078…D-085):** adres projektu i Publishable Key użytkownik wpisuje na urządzeniu. **Nigdy nie wpisuj do repozytorium adresu
+  projektu, kluczy, haseł ani `service_role`.** Opis i kontrola ręczna: `docs/SYNC_CHMURA.md`.
+- **Wygląd (D-110…D-114):** tokeny tylko w `src/ui/tokens.css` (kolory w OKLCH), **nowe reguły tylko w `src/ui/instrument.css`** (warstwa
+  `@layer instrument` nad `legacy`); bez animacji nieskończonych i kodu w zdarzeniu `scroll`; gesty zawsze z odpowiednikiem przyciskiem;
+  wykresy i metryki tylko z prawdziwych danych. Zmiana stylów „bez zmiany wyglądu” — opis commitu z `[wygląd bez zmian]` (strażnik w CI).
+- **Pakiet prywatny (D-091):** po zmianie planu zaktualizuj `UPGRADE` w `tools/extract/private_pack_lib.py`.
+
+## 1. Architektura (stan zweryfikowany w kodzie 18.11.2026)
 
 | Warstwa | Pliki | Uwagi |
 |---|---|---|
@@ -106,7 +52,7 @@ Pełny rejestr decyzji produktowych: `docs/DECYZJE_2027.md` (D-001…D-114).
 | UI — komponenty | `src/ui/components.js`, `icons.js`, `prefs.js`, `charts.js`, `signal.js`, `settings.js`, `search.js`, `bodymap.js`, `figure.js`, `movement.js`, D-114: `dial.js`, `live.js`, `gestures.js`, `motion.js`, `wakelock.js` | `segmented, stat, statGrid, section, macroChips, progressRing, metric, statusBadge, timerChip`; wykresy SVG (`sparkline, areaChart, donut, heatmap, stockAxis` oraz starsze `barChart, lineChart`); ikony Lucide `icon(name,{size,label})`; preferencje per urządzenie (`prefs.js`: motyw, akcent, gęstość, rozmiar tekstu, dźwięk, ekran startowy); sygnał odliczania (`signal.js`); strona Ustawienia (`settings.js`); paleta ⌘K z poleceniami (`search.js`) |
 | Style | `@layer legacy` (`src/ui/tokens.css` → `styles.css` → `system.css` → `precision.css`), `@layer instrument` (`src/ui/instrument.css`) | sklejane i minifikowane przez `tools/build.mjs` (D-113, warstwy D-114). **Tokeny tylko w `tokens.css`; nowe reguły tylko w `instrument.css`** |
 | Dane źródłowe | `src/data/*.json` | generowane skryptami `tools/extract/*` z plików źródłowych użytkownika (NIE w repozytorium); traktuj jako tylko do odczytu |
-| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js, cloud-auto.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js` |
+| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js, cloud-auto.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js`, `errlog.js` (dziennik błędów, D-115), `types.d.ts` (typy zdarzeń i kontekstu modułu) |
 | Build | `tools/build.mjs` | esbuild → `dist/web/` (index + `app.<hash>.js/css` + `fonts/` + `sw.js` + manifest) i `dist/single/2027.html` (wszystko wbudowane) |
 | Ikony | `tools/icons.mjs` → `src/ui/icons.js` | plik wygenerowany i wersjonowany; regeneracja: `node tools/icons.mjs` (wymaga devDependency `lucide-static`) |
 | Fonty | `public/fonts/inter-latin*.woff2`, `inter-display.woff2` (D-113) | podzbiór Inter (OFL) ze skryptu `python3 tools/fonts.py` (D-111; opis i znaki przy foncie systemowym — `tools/fonts.json`) |
@@ -122,24 +68,30 @@ train.session, train.detail, prep.step, prep.test, private.pack, archive, care.d
 ## 2. Komendy
 
 ```bash
-npm ci                    # zależności (esbuild, axe-core, lucide-static)
-npm run build             # dist/web + dist/single/2027.html (wymagane przed testami E2E/a11y)
+npm ci                    # zależności (esbuild, axe-core, lucide-static, eslint, typescript)
+npm run build             # dist/web + dist/single/2027.html (wymagane przed testami w przeglądarce)
+npm run lint              # ESLint: zalecane reguły + pułapki projektu (eslint.config.js)
+npm run typecheck         # tsc --noEmit nad src/ (JSDoc, src/core/types.d.ts, src/globals.d.ts)
 npm test                  # testy jednostkowe (node --test)
-npm run e2e               # testy w przeglądarce: Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
+npm run e2e               # Python + Playwright + Chromium, obie wersje buildu, 390 i 1280 px
+npm run e2e:webkit        # WebKit (Safari): iPhone 390 px i Mac 1280 px, oba warianty, axe (wymaga `playwright install --with-deps webkit`)
 npm run e2e:sync          # synchronizacja między 2 profilami + aktualizacja kodu za zgodą (kilka razy przebudowuje dist/)
-npm run e2e:cloud         # synchronizacja w chmurze: 2 profile + plik 2027.html, lokalny fałszywy serwer Supabase (tests/e2e/fake_supabase.py); sam buduje wariant z CSP dla localhost (BUILD_LOCAL_API=1) i przywraca zwykły build
-npm run e2e:trening       # arkusze treningu (D-105) i dziennik sesji (D-106): 390/1100 px, ciemny/jasny, axe
-npm run a11y              # axe-core WCAG 2.1 A/AA: 26 widoków + 22 stany × 390/1280 px × jasny/ciemny + przewijanie w poziomie
-python3 tools/fonts.py    # podzbiór fontu Inter (pobiera inter-ui@4.1.1 przez npm pack; fonttools + brotli) — po dodaniu nowych znaków do tekstów
-npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika, w tym PLAN_NAUKI_CFA_LEVEL_I.html), bez nich nie działa
+npm run e2e:cloud         # synchronizacja w chmurze (lokalny fałszywy serwer Supabase; sam buduje wariant BUILD_LOCAL_API=1 i przywraca zwykły)
+npm run e2e:trening       # arkusze treningu (D-105) i dziennik sesji (D-106)
+npm run a11y              # axe-core WCAG 2.1 A/AA: widoki i stany × 390/1280 px × jasny/ciemny + przewijanie w poziomie
+npm run budget            # budżety wydajności: rozmiar pakietu, start przy 50 tys. zdarzeń, węzły DOM, czas reakcji (tests/e2e/budget.py)
+python3 tools/visual/snap.py <katalog> && python3 tools/visual/compare.py <przed> <po> [różnice]   # strażnik wizualny (w CI: tools/visual/ci.sh)
+python3 tools/fonts.py    # podzbiór fontu Inter — po dodaniu nowych znaków do tekstów
+node tools/verify/plan_check.mjs && python3 tests/e2e/cfa_smoke.py   # spójność planu dnia i nauki
+npm run verify            # weryfikacja danych ze źródłami — WYMAGA SOURCES_DIR (pliki użytkownika), bez nich nie działa
 ```
-Zmienne opcjonalne: `SOURCES_DIR` (katalog z plikami źródłowymi, m.in. `zapasy_kopia_2026-09-22.json`),
-`PRIVATE_PACK` (ścieżka do `2027-prywatne.json`). **Nie masz ich w repozytorium.** Bez nich E2E i `e2e:sync` używają
-**danych syntetycznych** z `tests/e2e/fixtures.py` (D-065: fikcyjne stany wyliczane wzorem z katalogu, pakiet prywatny
-z tekstami „[DANE TESTOWE] …”, pliki tylko w katalogu tymczasowym). Tylko `npm run verify` i test migracji kopii ZAPASY
-wymagają plików użytkownika (raportowane jako „pominięte”). Nigdy nie próbuj odtwarzać ani wymyślać plików użytkownika;
-nie dopisuj do fixtures wartości „podobnych do prawdziwych” — wyłącznie wzór z katalogu i teksty zastępcze.
-Workflow GitHub: `.github/workflows/testy.yml` („Testy 2027”, D-108/U2 — jednostkowe, `plan_check`, `verify_all --data-only`, budowa, `cfa_smoke`, E2E, a11y, Trening, `e2e:sync`, `e2e:cloud`; push poza `main` i PR) oraz `.github/workflows/pages.yml` (push do `main`: najpierw „Testy 2027”, potem Node 22, `npm ci` → `npm test` → `npm run build` → publikacja `dist/web`; błąd testów zatrzymuje publikację).
+Zmienne opcjonalne: `SOURCES_DIR` (pliki źródłowe użytkownika), `PRIVATE_PACK` (`2027-prywatne.json`). **Nie masz ich w repozytorium.**
+Bez nich testy używają **danych syntetycznych** z `tests/e2e/fixtures.py` (D-065). Nigdy nie próbuj odtwarzać ani wymyślać plików
+użytkownika; nie dopisuj do fixtures wartości „podobnych do prawdziwych” — wyłącznie wzór z katalogu i teksty zastępcze.
+W testach: jawne daty i zegar Playwright (`page.clock.install`), „dziś” w strefie Europe/Warsaw.
+Workflow GitHub: `.github/workflows/testy.yml` („Testy 2027” — zadania `testy` (lint, typy, jednostkowe, plan, budowa, E2E, a11y,
+Trening, sync, chmura, budżety), `webkit`, `wizualny`; push poza `main` i PR) oraz `pages.yml` (push do `main`: „Testy 2027” → budowa →
+publikacja `dist/web`; błąd testów zatrzymuje publikację). Testy na `ubuntu-24.04` (Playwright 1.56 nie obsługuje 26.04).
 
 ## 3. ZASADY BEZWZGLĘDNE (nie naruszaj bez wyraźnej zgody użytkownika)
 
@@ -175,92 +127,17 @@ Workflow GitHub: `.github/workflows/testy.yml` („Testy 2027”, D-108/U2 — j
 
 - Przed większą zmianą: zakres, wpływ na moduły, ryzyko regresji, plan testów. Zmiany w modelu danych, synchronizacji,
   architekturze lub usuwanie funkcji → **zatrzymaj się i zapytaj użytkownika**.
-- Faza 5: jeden moduł na raz, kolejność w `docs/REDESIGN-STATUS.md`. Po każdym module:
-  `npm run build && npm test && npm run e2e && npm run a11y` (+ `npm run e2e:sync`, gdy dotykasz `app.js`, `core/`, `build.mjs`).
+- Po każdej zmianie: `npm run lint && npm run typecheck && npm run build && npm test && npm run e2e && npm run a11y`
+  (+ `npm run e2e:sync`, gdy dotykasz `app.js`, `core/`, `build.mjs`; + `npm run e2e:webkit` przy zmianach UI, gestów, przewijania, okien).
 - Wygląd sprawdzaj zrzutami Playwright na 375, 390, 1280 i 1440 px, w motywie ciemnym **i** jasnym
   (`localStorage['p2027.theme']` = `dark`/`light`/`system` przed załadowaniem strony).
 - Raport po etapie: zmienione pliki, opis zmian (desktop / mobile / komponenty), czy zmieniła się logika, wyniki testów
   (uruchomione / zaliczone / niezaliczone / pominięte), build, ograniczenia. Nie deklaruj działania bez sprawdzenia.
 - Nowe istotne decyzje dopisuj do `docs/DECYZJE_2027.md` (kolejny numer D-0xx) i `docs/REDESIGN-DECISIONS.md`.
 
-## 5. Pułapki, które już wystąpiły w tym projekcie (nie powtarzaj)
+## 5. Pułapki
 
-| Pułapka | Skutek | Zasada |
-|---|---|---|
-| `String.replace(marker, kod)` z kodem zawierającym `$&` | uszkodzony `2027.html` | w buildzie podstawiaj funkcją: `text.replace(mark, () => value)` |
-| `el.append(cond && h(...))` / tablica w `append` | napisy „null”, „false”, tekst tablicy | używaj `add()` |
-| Kolizja nazw klas (np. `.check` w dwóch modułach) | rozjechany układ innego modułu | prefiks modułu dla nowych klas (`dz-`, `rk-`, `sf-`, `mp-`…) |
-| Walidacja głębokości treści w kopercie zdarzenia | pakiet prywatny trafiłby do kwarantanny | nie zaostrzaj walidacji istniejących typów; test `sync-compat` |
-| Odczyt stanu z chwili renderu przy szybkich zapisach | nadpisanie wcześniejszej zmiany | czytaj `store.state` w chwili zapisu; kolejkuj zapisy (`trening.js`) |
-| Testy zależne od dnia tygodnia / daty uruchomienia | fałszywe błędy (np. czwartek bez banana) | w testach używaj jawnych dat |
-| Serwer testowy: odpowiedź 304 wg daty pliku (1 s) | „brak aktualizacji” w teście SW | kopie z bieżącą datą (`deploy()` w `sync_update.py`) |
-| Kolor wpisany na sztywno w ciemnym motywie | kontrast poniżej AA | wyłącznie tokeny; `npm run a11y` w obu motywach |
-| `#fff` na `--success` (odhaczona seria) | kontrast 1,6:1 w ciemnym motywie; axe nie widział stanu | tekst na wypełnieniu = token `--on-…`; pary w `tests/unit/tokens.test.mjs`, stany w `a11y.py` (`STATES`) |
-| `style: {'--x': …}` przez `Object.assign` | zmienna CSS po cichu nieustawiona | `h()` używa `setProperty` dla `--*` (od Fazy 5.0) |
-| Odnośnik `href="#id"` (bez `/`) | router pokazuje „Dziś” zamiast przewinąć | obsługuje go `inPageLink()` w `app.js` (przewinięcie + fokus); trasy zawsze `#/modul` |
-| Wspólna reguła `border-color` kart w `system.css` | znikają kolorowe lewe krawędzie modułów | sygnatury przywrócone w `system.css`; nowe krawędzie dopisz tam lub zwiększ specyficzność |
-| Element w zwiniętym `<details>` w teście | `wait_for_selector` czeka na widoczność i kończy się błędem | `state='attached'` albo najpierw rozwiń sekcję |
-| `location.hash = ten sam adres` | brak `hashchange` — zapis wykonany, widok nieodświeżony (drugi wpis error logu CFA) | porównaj z `location.hash`, przy równości `ctx.rerender()` (`go()` w `cfa.js`) |
-| Oczekiwana wartość liczona w Pythonie od `date.today()` (UTC), a aplikacja w strefie Europe/Warsaw | 12 fałszywych błędów E2E między 22:00 a 24:00 UTC | „dziś” w testach zawsze w strefie przeglądarki: `datetime.now(ZoneInfo('Europe/Warsaw')).date()` (`expected_stock` w `e2e.py`) |
-| Funkcja zależna od „dziś” / godziny w teście | wynik zależny od dnia uruchomienia | zegar Playwright: `page.clock.install(time=…)` (`CLOCK` w `e2e.py`, `a11y.py`); przerwy — `clock.fast_forward` |
-| `--muted` na tle `--sunken` (jasny motyw) | 4,47:1 — poniżej AA | na `--sunken` używaj `--text-2` (para w `tokens.test.mjs`) |
-| `setInterval` sprawdzający `isConnected` przed wstawieniem elementu do DOM | licznik nigdy nie startuje | pierwsze wypełnienie bez warunku, zatrzymanie dopiero gdy element zniknie z DOM |
-| `<details>` przerysowywany po każdym zapisie | sekcja zamyka się po każdej korekcie | stan rozwinięcia w pamięci modułu (`keepOpen()` w `zapasy.js`) |
-| `page.goto(url + '#/dane')`, gdy strona już jest pod tym adresem | brak przerysowania; test czyta komunikat poprzedniej akcji | przed akcją wyczyść obszar komunikatu (aplikacja robi to w `run()` sekcji chmury) albo przejdź najpierw na inną trasę |
-| Nowa instancja `Store` bez słuchacza (przeładowanie po zmianie w innej karcie) | karta przestaje powiadamiać inne karty i planować synchronizację | zmiana w innej karcie → `store.reload()` (ta sama instancja i połączenie, D-107/B10); nowe instancje tylko przez `attachStore()` w `app.js` (test „dwie karty” w `e2e:cloud`, B10 w `run_d107`) |
-| Przerysowanie widoku „w tle” (np. po pobraniu z chmury) | utrata wpisu w polu, zamknięty arkusz | `softRender()` w `app.js` — czeka, aż pole straci fokus i żadne okno nie jest otwarte |
-| Element rozwijany (`details[open]`) w kolumnie siatki `auto` | kolumna rozpycha się do szerokości treści, sąsiednia `minmax(0,1fr)` spada do 0 — nazwa łamana po literze (Zapasy, „Więcej”, ≥ 1100 px) | po rozwinięciu jedna kolumna (`:has(.zp-more[open])`), układ dwukolumnowy zależny od szerokości listy (`@container`), test szerokości w `e2e.py` |
-| Licznik zapytań w teście E2E przy działającym sprawdzaniu co 30 s | fałszywy błąd: sprawdzenie „w locie” w chwili odczytu licznika | liczyć per profil (`user_agent` → `checks_of`/`calls_of` w `cloud_sync.py`) i odczytywać po ustaniu ruchu |
-| Przycisk z krótkim tekstem widocznym („+ 500 g”) | test szukający „+ opakowanie” go nie znajduje | pełna nazwa w `aria-label` (testy i czytniki ekranu używają nazwy dostępnej) |
-| Liczba bloków CFA wpisana na sztywno (416) w walidacji `cfa.done` i imporcie postępu | po zmianie planu bloki 417–432 odrzucane przy zapisie | `CFA_BLOCKS` w `validate.js`, test zgodności z `cfa.json` (`plan-cfa.test.mjs`); zmiana planu = przejrzeć `grep -rn "<stara liczba>"` |
-| Typ dnia / dieta czytane z `SRC.week.days[weekday]` | wyjątek daty (np. 27.09 — dieta NT) pominięty w Zapasach, Treningu, Suplementacji | zawsze `dayPlan(date)` z `resolver.js` (wyjątki `week.exceptions`, D-087) |
-| Test zależny od prawdziwego kalendarza planu (np. lista zakupów od 22.09) | wyjątek daty zmienia oczekiwane zużycie | w testach ogólnej logiki używaj tygodni bez wyjątków (od 05.10.2026) |
-| Tytuł slotu w „Dziś” czytany w teście przez `textContent` | w dniu bieżącym dopisek „teraz” — test zależny od godziny | tytuł bez znacznika: `.slot-title` → `firstChild.textContent` |
-| Zmiana godzin planu dnia bez źródłowego `PLAN_DNIA.html` | ponowna ekstrakcja przywróciłaby stary rozkład | zmiana jako funkcja decyzji w `tools/extract/` (np. `day_plan_d086.py`) stosowana po odczycie źródła |
-| `wait_for_selector('.slot')` w „Dziś” dnia bieżącego | pierwszy slot jest w zwiniętych „Minionych punktach” (U-a) — test czeka do przekroczenia czasu | czekaj na `.dz-plan-h`; przed odczytem treści rozwiń `details.dz-past` |
-| `wait_for_function('…')` z tekstem predykatu / `add_script_tag` w wariancie web | CSP (S1, bez `'unsafe-eval'` i skryptów inline) blokuje narzędzie testowe | odpytywanie przez `evaluate` (`wait_js` w testach), axe przez CDP `Runtime.evaluate` |
-| Pole `type=search` w oknie | pierwszy Esc tylko czyści tekst, okno zostaje | obsłuż `Escape` w polu (zamknięcie okna — `search.js`) |
-| Dni sprzed startu planu w nowych widokach (D-088) | trening, dawki, bloki dla 21–24.09 | zawsze przez `resolveDay`/`dayPlan` (`outside`), statystyki od `TRAIN_FROM` |
-| Stan pochodny jako `const` w module z punktowym odświeżaniem (P2) | przyciski w niezmienionych fragmentach działają na starym stanie (np. „Oznacz cały dzień” pomija odhaczone w międzyczasie) | stan pochodny w zmiennych `let` przeliczanych przed odświeżeniem (`derive()`/`compute()`); przyciski czytają zmienne, nie kopie z chwili renderu |
-| Zmiana `reduce()` / akumulatora `Reducer` | stan przyrostowy różny od pełnego — rozjazd widoków po zapisie i po ponownym otwarciu | jeden kod dla obu ścieżek; test `reduce-incremental.test.mjs` (kopia wzorcowa `reduce()` sprzed P1) musi przechodzić |
-| Nowa akcja w module z punktowym odświeżaniem | fragment zależny od zmiany nieodświeżony | dopisz go do `update`/`refresh` modułu albo użyj `ctx.rerender()`; przypadek do `run_p2` w `e2e.py` (porównanie z pełnym przerysowaniem) |
-| Pasek zakładek z `--muted` nad prześwitującym przyciskiem (półprzezroczyste tło paska) | kontrast 4,45:1 tylko na jednej trasie (a11y) | etykiety zakładek w `--text-2` |
-| Długie ciągi bez spacji (adresy w zadaniach MPW, „a/b/c”) w wierszu bloku | przewijanie w poziomie przy 320 px, pierścień dnia ściśnięty do zera | `overflow-wrap: anywhere` w `.cfa-body`, `min-width: 0` i `flex: none` pierścienia |
-| `Number('')` w polu liczbowym zapisującym dane | puste pole „Stan” zapisywało 0 („⛔ BRAK”) | puste / nieczytelne = bez zapisu i komunikat (B2, D-107); `Number.isFinite` po jawnym sprawdzeniu `''` |
-| Widok liczony z „dziś” / godziny tylko przy renderze | aplikacja wznowiona rano pokazywała wczorajszy dzień i „Teraz: Sen” | zmiana dnia — `clockTick` w `app.js`; zależność od godziny — `ctx.tick(fn)` w module (punktowo albo `ctx.soft()`), B3 |
-| „Cofnij” przywracające ilość poprzedniej inwentaryzacji | stan bez zużycia od tamtego dnia (+240 g), drugie „Cofnij” przywracało błąd | `lastOperation` / `undoOperation` (stos, stan „jakby operacji nie było”); zapisy zbiorcze w Zapasach przez `manyOp` (B1) |
-| Slot rozpoznawany po identyfikatorze szablonu bazowego | warianty dnia (basen, czwartek) pominięte w `.ics` | rola slotu z `slot.key` (resolver przekazuje), B5 |
-| Godziny lub dni wpisane na sztywno w tekście („od 15:30”, „(sobota)”) | błędny opis po zmianie planu (czwartki od 07.01 o 16:00) | z danych: `mpwDaySpan`, `slotOptions` (B6, B9) |
-| Wyrażenie `[a-z-]+` dla atrybutów SVG w `tools/icons.mjs` | ikony bez `x1`/`y2` (timer, monitor) | nazwy atrybutów z cyframi; test `icons.test.mjs` porównuje z plikami Lucide (B7) |
-| Test czytający pobrany plik przez `read_text()` | `\r\n` zamienione na `\n` — fałszywy błąd przy kontroli `.ics` | `read_bytes().decode('utf8')` |
-| `clock.fast_forward(t)` w Playwright przy zegarze co 30 s | zegar wywołany najwyżej raz — sprawdzenie „po 10:03” nie zachodzi | przeskok ≥ 60 s albo `run_for` |
-| Stałe (`const`) zdefiniowane w module po `return <widok>()` | `ReferenceError` przy kliknięciu (okno edycji Pielęgnacji się nie otwierało) | pomocnicze stałe i fragmenty (`region`) przed wyborem widoku; funkcje (`function`) mogą być niżej |
-| Pole planu nauki z listy `DROP` (`src/core/plan-split.js`) albo `zadania` użyte wprost w kodzie | w Node (testy) pole jest, w przeglądarce — `undefined` (build podaje plan bez niego) | nowe użycie = usunięcie pola z `DROP`; zadania MPW tylko przez `planTasks`/`loadPlanTasks`; strażnik `plan-split.test.mjs` |
-| Test chmury w wariancie web z produkcyjną CSP | `connect-src` bez `localhost` (U7) blokuje lokalny serwer testowy | `e2e:cloud` (`cloud_sync.py`) sam buduje wariant `BUILD_LOCAL_API=1`; nie dodawaj `localhost` do CSP publikowanej wersji |
-| Moduł przewinięty, nowa trasa (hash) — przewinięcie zostawało | nowy moduł otwierał się w połowie strony | D-110: `navigate()` w `app.js` — nowy moduł/widok od góry, „Wstecz” z pamięci (`history.state.p2027`); filtry bez zmiany przewinięcia |
-| View Transitions przy zmianie trasy | przerysowanie po przechwyceniu starego obrazu: +50–300 ms bez GPU — testy czytały stary widok | trasy: przerysowanie od razu + animacja CSS `main[data-enter]`; View Transitions tylko przy zmianie motywu (wybór zapisany przed przejściem, test czeka na warunek) |
-| Animacja sterowana przewijaniem (`animation-timeline: scroll()`) w predykacie „koniec animacji” | `getAnimations()` zwraca ją jako trwającą — test czeka bez końca | czekaj tylko na animacje czasowe: `a.timeline !== document.timeline` pomijaj (`axe_audit` w `e2e.py`, `a11y.py`) |
-| `stroke` na `.ring-fg` w CSS | nadpisuje gradient pierścienia (atrybut `stroke="url(#rg-N)"`) | kolor pierścienia przez `--ring` na `.ring` |
-| Element przyklejony (`position: sticky`) na telefonie z `top: safe-area` | chowa się pod paskiem tytułu `.appbar` | `top: calc(env(safe-area-inset-top) + var(--appbar-h))` |
-| Odstęp od dołu liczony z `--tab-h + safe-area` | treść / komunikat pod pływającym paskiem dolnym | `--nav-space` (pasek + odstęp `--dock-b`) |
-| Pomiar wymiarów w trakcie animacji `transform` (wejście ekranu) | `getBoundingClientRect()` = 43,9999 px — fałszywie „za mały cel dotykowy” | tolerancja 0,5 px w testach (`< 43.5`); animacje wejścia bez `scale` |
-| Przesunięcie w bok (animacja wejścia) poza szerokość ekranu | `scrollWidth` > szerokość w trakcie animacji — błąd „przewijanie w poziomie” | `.main { overflow-x: clip }` (przycięcie bez kontenera przewijania; `sticky` działa) |
-| Sekcja wypełniana po `await` w miejscu nad treścią wstawioną wcześniej (synchronizacja w „Dane”) | skok układu; test kolejności sekcji czasem czytał stronę przed wypełnieniem (CI, 1 / 1517) | elementy asynchroniczne przygotuj przed pierwszym `add(root, …)` (`cloudEl` w `dane.js`); po `await` dokładaj tylko na końcu strony |
-| Animacja nieskończona w widoku przewijanym (puls „teraz” na `box-shadow`, także na samym `transform`) | przeliczanie stylów w każdej klatce (181 w 3 s spoczynku, 325 przy przewijaniu) — szarpane przewijanie na iPhonie | bez animacji nieskończonych (strażnik w `run_d110`); wskaźnik — stała poświata (D-112) |
-| Kod w zdarzeniu `scroll` z odczytem układu (`getBoundingClientRect`) | praca wątku głównego w każdej klatce przewijania | `IntersectionObserver` (`watchTitle()`), pozycje zapisywane przy zmianie trasy (D-112) |
-| `scrollTo` po asynchronicznym przerysowaniu nowego modułu | szarpnięcie strony, którą użytkownik zaczął już przewijać | na górę przed przerysowaniem; przywracanie tylko bez dotyku w międzyczasie (`touchedAt`, D-112) |
-| Przerysowanie w miejscu modułu asynchronicznego (Dane, MPW) — zmiana z chmury w tle | strona na chwilę krótsza, przewinięcie spadało do góry (900 → 0) | `render(true)` przywraca pozycję (`keepY`, D-112) |
-| Przeciąganie na zdarzeniach wskaźnika (`pointer*`) na iOS | Safari przejmuje gest jako przewijanie (`pointercancel`) — arkusz się nie rusza | zdarzenia dotyku, `preventDefault` w pierwszym `touchmove` (`dragToClose`, D-112) |
-| Nowy znak w tekstach (strzałka, symbol, litera spoza podzbioru fontu) | wyświetlany fontem systemowym, `fonts.test.mjs` niezaliczony | `python3 tools/fonts.py` (dopisze znak do podzbioru albo do listy fontu systemowego); emoji z U+FE0F zawsze systemowe |
-| Wspólna reguła `border: 1px solid …` (skrót) na kartach w nowej warstwie | znika kolorowa lewa krawędź (Poradnik, stan pozycji w Zapasach) | w warstwach nadpisujących zmieniaj `border-color`/`box-shadow`, nie skrót `border` |
-| Dowiązanie `node_modules` w drzewie roboczym `git worktree` + `git add -A` | dowiązanie w commicie; po scaleniu zastąpiło katalog zależności | `.gitignore` obejmuje `node_modules` (także plik/dowiązanie); przed commitem `git status` |
-| Zakup „dziś” a oczekiwany stan w teście | stan na koniec dnia = zakup − dzisiejsze zużycie (K1) | porównuj ze stanem sprzed zakupu, nie z ilością zakupu |
-| Przycisk akcji w komunikacie o tej samej nazwie co w module („Cofnij”) | `get_by_role(..., exact=True)` znajduje dwa elementy | inna nazwa dostępna (`aria-label` „Cofnij tę zmianę”) |
-| Tło z gradientem (`background:` skrót) na elemencie sprawdzanym helperem `CONTRAST` | `backgroundColor` przezroczysty — fałszywie niski kontrast | kolor w `background-color`, połysk tylko w `background-image` (`.set-toggle[aria-pressed=true]`) |
-| Atrybut / właściwość `hidden` na elemencie SVG (`<g>`, `<path>`) | brak efektu — wskazówka tarczy widoczna w dniu innym niż dziś | widoczność SVG przez `style.display` (`show()` w `dial.js`) |
-| Zmienna lokalna o nazwie funkcji pomocniczej modułu (`const show = …` w funkcji, która woła `show()`) | `ReferenceError` (strefa martwa) tylko na jednej ścieżce — „Dziś” bez treści w wariancie web | nie przesłaniaj nazw pomocniczych; E2E obu wariantów przed commitem |
-| `grid-area: <nazwa>` na elemencie siatki bez nazwanych obszarów (telefon) | niejawne kolumny — rozjechany układ „Dziś” innego dnia | `grid-area` tylko w regułach, gdzie siatka ma `grid-template-areas` (≥ 1100 px) |
-| Kolor tokenu w OKLCH a `getComputedStyle(...).backgroundColor` w teście | tekst `oklch(...)` zamiast `rgb(...)` — fałszywy błąd porównania | porównuj po przeliczeniu (piksel na płótnie — jak `CONTRAST` w `e2e.py`) |
-| Test porównujący z datą uruchomienia przy zegarze testu ustawionym na inny dzień | po 12.11 test oczekiwał zakładki „MPW”, a aplikacja (19.10) pokazywała „CFA” | oczekiwanie liczone z zegara testu (`TODAY()` z `VCLOCK`), nie z `datetime.now()` |
-| Reguła z `!important` w warstwie `legacy` | wygrywa z każdą deklaracją warstwy `instrument` (także `!important`) | nadpisuj w `instrument` bez `!important`; regułę z `!important` usuń z `legacy` przy migracji modułu |
-| `runs-on: ubuntu-latest` w workflow z Playwright (11.2026: obraz Ubuntu 26.04) | „Playwright does not support chromium on ubuntu26.04” — testy CI i publikacja zatrzymane na instalacji przeglądarki | testy na `ubuntu-24.04` (`testy.yml`), do czasu aktualizacji Playwright z obsługą 26.04 |
+Pełna tabela: `docs/PULAPKI.md` (kilkadziesiąt pozycji — każda kosztowała już błąd). Najczęstsze: dołączanie warunkowe tylko przez `add()`;
+stan pochodny w module z punktowym odświeżaniem w `let` przeliczanych przed odświeżeniem; `reduce()` i `Reducer` — jeden kod
+dla obu ścieżek (`reduce-incremental.test.mjs`); w testach czekaj na stan (`wait_js`), nie na czas; elementy w zwiniętym `<details>` —
+`state='attached'`; nowy znak w tekstach → `python3 tools/fonts.py`; nadpisując style w `instrument`, zmieniaj `border-color`, nie skrót `border`.

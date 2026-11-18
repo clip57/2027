@@ -4,7 +4,7 @@
 // nakładanie się slotów, recall niezgodny z harmonogramem, liczby w `stat` niezgodne z blokami, wyjście poza limit zdarzeń.
 import { SRC, cfaByDay } from '../../src/core/data.js';
 import { resolveDay, PLAN_START, PLAN_END } from '../../src/core/resolver.js';
-import { addDays, weekday } from '../../src/core/dates.js';
+import { addDays } from '../../src/core/dates.js';
 import { CFA_BLOCKS, CFA_PLAN_VERSION } from '../../src/core/storage/validate.js';
 
 const D = SRC.cfa.D, errors = [], warns = [];
@@ -52,8 +52,8 @@ for (let d = D.stat.start < PLAN_START ? D.stat.start : PLAN_START; d <= (PLAN_E
   for (const b of planned) {
     const hits = carried.filter(x => x.b.nr === b.nr);
     if (hits.length !== 1) { err(`${d}: blok ${b.nr} (${b.blok} ${b.godz}) niesiony przez ${hits.length} slotów`); continue; }
-    const { s } = hits[0], [f, t] = b.godz.split('–');
-    if (!r.outside || true) { if (s.from !== f && !(r.cfa.isMock)) err(`${d}: blok ${b.blok} ${b.godz} ≠ slot ${s.id} ${s.from}–${s.to}`); }
+    const { s } = hits[0], [f] = b.godz.split('–');
+    if (s.from !== f && !r.cfa.isMock) err(`${d}: blok ${b.blok} ${b.godz} ≠ slot ${s.id} ${s.from}–${s.to}`);
   }
   // brak „zjedzonych” bloków: liczba bloków w widoku = liczba w planie
   if (r.cfa.blocks.length !== planned.length) err(`${d}: resolveDay.cfa.blocks=${r.cfa.blocks.length}, plan=${planned.length}`);

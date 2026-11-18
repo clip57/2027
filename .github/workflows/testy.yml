@@ -1,4 +1,5 @@
-# Testy (U2, audyt 23.10.2026): jednostkowe, kontrola planu i danych, budowa oraz testy w przeglądarce (Python + Playwright + Chromium) na danych
+# Testy (U2, audyt 23.10.2026; D-115): linter i typy, jednostkowe, kontrola planu i danych, budowa, testy w przeglądarce (Python + Playwright:
+# Chromium, WebKit), budżety wydajności i strażnik wizualny — na danych
 # syntetycznych (D-065 — bez plików użytkownika; testy wymagające SOURCES_DIR są pomijane). Uruchamiane przy każdym pushu poza main i w PR,
 # a przed publikacją na main — jako warunek wdrożenia (pages.yml wywołuje ten plik).
 name: Testy 2027
@@ -21,6 +22,10 @@ jobs:
       - uses: actions/setup-python@v7
         with: { python-version: '3.12' }
       - run: npm ci
+      - name: Linter i kontrola typów (D-115, T3)
+        run: |
+          npm run lint
+          npm run typecheck
       - name: Testy jednostkowe
         run: npm test
       - name: Kontrola planu i danych (bez plików użytkownika)
@@ -45,3 +50,61 @@ jobs:
         run: npm run e2e:sync
       - name: Synchronizacja w chmurze (lokalny serwer testowy)
         run: npm run e2e:cloud
+      - name: Budżety wydajności (D-115, T6)
+        run: |
+          npm run build
+          npm run budget
+
+  # D-115 (T4): ten sam silnik co Safari na iPhonie i Macu — równolegle z testami w Chromium
+  webkit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12' }
+      - run: npm ci
+      - run: npm run build
+      - name: Playwright i WebKit
+        run: |
+          python3 -m pip install playwright==1.56.0
+          python3 -m playwright install --with-deps webkit
+      - name: Testy w WebKit (iPhone 390 px i Safari 1280 px, oba warianty, axe)
+        run: npm run e2e:webkit
+
+  # D-115 (T5): strażnik wizualny — zrzuty commitu bazowego i bieżącego na tej samej maszynie, różnice jako artefakt i w podsumowaniu.
+  # Zmiana wyglądu jest zwykle zamierzona, więc różnice nie zatrzymują testów — chyba że opis commitu zawiera „[wygląd bez zmian]”
+  # (porządki stylów, refaktoryzacja): wtedy każda różnica jest błędem.
+  wizualny:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12' }
+      - run: npm ci
+      - name: Playwright, Chromium i Pillow
+        run: |
+          python3 -m pip install playwright==1.56.0 pillow
+          python3 -m playwright install --with-deps chromium
+      - name: Zrzuty bazy i bieżącego commitu, porównanie
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -n "$PR_BASE" ]; then BASE="$PR_BASE"
+          elif [ "$GITHUB_REF_NAME" != "main" ]; then BASE="$(git merge-base origin/main HEAD)"; [ "$BASE" = "$(git rev-parse HEAD)" ] && BASE="HEAD^"
+          elif [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then BASE="$PUSH_BEFORE"
+          else BASE="HEAD^"; fi
+          set +e; tools/visual/ci.sh "$BASE" "$RUNNER_TEMP/wizualny"; rc=$?; set -e
+          cat "$RUNNER_TEMP/wizualny/roznice/podsumowanie.md" >> "$GITHUB_STEP_SUMMARY" || true
+          if git log -1 --format=%B | grep -qF '[wygląd bez zmian]' && [ "$rc" != 0 ]; then echo "::error::Commit oznaczony [wygląd bez zmian], a wygląd się zmienił"; exit 1; fi
+          [ "$rc" = 1 ] && echo "::notice::Zmiany wyglądu względem bazy — zobacz artefakt „wizualny-roznice”" || true
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with: { name: wizualny-roznice, path: '${{ runner.temp }}/wizualny/roznice', if-no-files-found: ignore, retention-days: 14 }

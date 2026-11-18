@@ -10,6 +10,7 @@ import { careModel, upcomingChanges } from './care.js';
 
 const END_WARN_DAYS = 14;   // zapowiedź końca preparatów czasowych
 
+/** @param {any} state @param {{ today?: string, hour?: number, custom?: any[] }} [o] */
 export function attention(state, { today, hour = 12, custom = [] } = {}) {
   const out = [];
   const push = (id, level, text, href) => out.push({ id, level, text, href });

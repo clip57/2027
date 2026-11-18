@@ -43,7 +43,7 @@ export function progressRing(done, total, label = '') {
   svg.append(defs, mk('circle', { cx: 32, cy: 32, r, class: 'ring-bg' }),
     mk('circle', { cx: 32, cy: 32, r, class: 'ring-fg', stroke: `url(#${gid})`, 'stroke-dasharray': `${c * pct} ${c}`, transform: 'rotate(-90 32 32)' }));
   const t = document.createElementNS(NS, 'text');
-  Object.entries({ x: 32, y: 36, 'text-anchor': 'middle', class: 'ring-t' }).forEach(([k, v]) => t.setAttribute(k, v));
+  Object.entries({ x: 32, y: 36, 'text-anchor': 'middle', class: 'ring-t' }).forEach(([k, v]) => t.setAttribute(k, String(v)));
   t.textContent = `${Math.round(pct * 100)}%`;
   svg.append(t);
   return svg;
@@ -112,6 +112,7 @@ function dragToClose(d, head, close) {
 
 // Liczba-bohater: etykieta (ikona + słowo), wartość krojem Display z jednostką pomniejszoną, podpis, opcjonalnie mini-wykres i odnośnik.
 // Klasy dotychczasowych kafli (`stat`, `stat-l`, `stat-v`, `unit`, `stat-h`) zostają — testy i style P2 je znają.
+/** @param {{ label?: any, ic?: string, value?: any, unit?: string, hint?: any, chart?: any, href?: string, tone?: string, cls?: string, dom?: string }} o */
 export function metric({ label, ic, value, unit, hint, chart, href, tone, cls = '', dom }) {
   const body = [h('span', { class: 'stat-l' }, ic && icon(ic, { size: 14 }), label),
     h('strong', { class: 'stat-v' }, value, unit && h('span', { class: 'unit' }, ` ${unit}`)),

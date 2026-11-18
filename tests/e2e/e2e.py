@@ -1843,6 +1843,64 @@ async def run_d114(pw, name, url, mobile):
     ok(not errs, f'{tag} brak błędów JS {errs[:3]}')
     await b.close()
 
+
+async def run_d115(pw, name, url, mobile):
+    """D-115 (fundament jakości): CSP z Trusted Types i service worker (web), dziennik błędów w „Dane” (zapis, trwałość po przeładowaniu,
+    czyszczenie), błędy znalezione linterem i kontrolą typów: podgląd paragonu bez „false”, etykieta kategorii „Inne”."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-115]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 11, 18, 10, 40))
+    await pg.goto(url + '#/dzis'); await pg.wait_for_selector('main h1')
+    if url.startswith('http'):
+        csp = await pg.evaluate("document.querySelector('meta[http-equiv=\"Content-Security-Policy\"]')?.content || ''")
+        ok("require-trusted-types-for 'script'" in csp and 'trusted-types p2027' in csp, f'{tag} CSP: Trusted Types')
+        await pg.wait_for_timeout(500)
+        ok(await pg.evaluate("navigator.serviceWorker.getRegistration().then(r => !!r)"), f'{tag} Trusted Types: service worker zarejestrowany przez politykę p2027')
+    # Dziennik błędów: wyjątek i odrzucona obietnica → „Dane”; trwałość po przeładowaniu; „Wyczyść”
+    await pg.goto(url + '#/dane'); await pg.wait_for_selector('.dn-err')
+    ok('Brak zarejestrowanych błędów' in await pg.inner_text('.dn-err'), f'{tag} Dziennik błędów: pusty na starcie')
+    # queueMicrotask, nie setTimeout: zegar testu (clock.install) przechwytuje wyjątki z własnych minutników
+    await pg.evaluate("(() => { queueMicrotask(() => { throw new Error('test-D115-wyjątek') }); Promise.reject(new Error('test-D115-obietnica')); })()")
+    await pg.wait_for_timeout(800)
+    await pg.reload(); await pg.wait_for_selector('.dn-err')
+    t = await pg.inner_text('.dn-err')
+    ok('test-D115-wyjątek' in t and 'test-D115-obietnica' in t, f'{tag} Dziennik błędów: oba wpisy po przeładowaniu')
+    v = await axe_audit(pg); ok(not v, f'{tag} Dane z dziennikiem błędów: dostępność {v[:2]}')
+    await pg.locator('.dn-err').get_by_role('button', name='Wyczyść').click()
+    await wait_js(pg, "() => document.querySelector('.dn-err')?.textContent.includes('Brak zarejestrowanych błędów')")
+    await pg.reload(); await pg.wait_for_selector('.dn-err')
+    ok('Brak zarejestrowanych błędów' in await pg.inner_text('.dn-err'), f'{tag} Dziennik błędów: wyczyszczony trwale')
+    errs[:] = [e for e in errs if 'test-D115' not in e]
+    # Paragon: pozycje rozpoznane bez pominiętych — w podglądzie nie może pojawić się „false” (append(cond && x) → add())
+    await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv')
+    await pg.get_by_role('button', name='Paragon').click(); await pg.wait_for_selector('dialog[open] textarea')
+    await pg.fill('dialog[open] textarea', 'banan 1,2 kg'); await pg.locator('dialog[open]').get_by_role('button', name='Sprawdź').click()
+    await pg.wait_for_selector('dialog[open] .rc-list')
+    pv = await pg.inner_text('dialog[open] .rc-preview')
+    ok('false' not in pv.split(), f'{tag} Paragon: podgląd bez „false” ({pv[:60]!r})')
+    await pg.keyboard.press('Escape'); await pg.wait_for_timeout(200)
+    # Kategoria „Inne” w oknie nowej pozycji ma etykietę (wcześniej pusta opcja)
+    await pg.get_by_role('button', name='Dodaj').first.click(); await pg.wait_for_selector('dialog[open] select')
+    opts = await pg.evaluate("[...document.querySelectorAll('dialog[open] select option')].map(o => [o.value, o.textContent])")
+    inne = [o for o in opts if o[0] == 'Inne']
+    ok(inne and inne[0][1] == 'Inne', f'{tag} Nowa pozycja: kategoria „Inne” z etykietą ({inne})')
+    await pg.keyboard.press('Escape')
+    # T2 — stan interfejsu po kluczach: zapis wyniku testu kalibracyjnego (Meal Prep) przerysowuje widok; rozwinięta sekcja zostaje
+    # rozwinięta, a „Dlaczego tak” (zwinięta) — zwinięta
+    await pg.goto(url + '#/wiecej'); await pg.goto(url + '#/mealprep'); await pg.wait_for_selector('details.fold')
+    sec = pg.locator('details.fold', has=pg.locator('summary h2', has_text='Testy kalibracyjne'))
+    await sec.locator('summary').click(); await sec.get_by_role('button', name='Zdany').first.click()
+    await wait_js(pg, "() => document.querySelector('#toast')?.textContent.includes('Zapisano wynik testu')")
+    st = await pg.evaluate("""[...document.querySelectorAll('details.fold')].map(d => [d.querySelector('summary h2').textContent, d.open])""")
+    ok(dict(st).get('Testy kalibracyjne') is True and dict(st).get('Dlaczego tak') is False, f'{tag} T2: sekcja rozwinięta po przerysowaniu ({st})')
+    ok(not errs, f'{tag} brak błędów JS {errs[:3]}')
+    await b.close()
+
 async def run_d114b(pw, name, url, mobile):
     """D-114 etap 2: anatomia stron (nagłówek bez karty, pasek zakładek widoku), tryby skupienia Nauki (MPW) i gotowania (Meal Prep),
     gesty na listach odhaczanych, odczyt wartości na wykresie, własny pasek dolny, karty „Dziś”, Dane w dwóch kolumnach (komputer), dostępność."""
@@ -1968,9 +2026,12 @@ async def main():
         await run_d114(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d114b(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d114b(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d115(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d115(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
     srv.shutdown()
     bad = [m for c, m in results if not c]
     print(f'\nE2E: {len(results)} kontroli, zaliczonych: {len(results) - len(bad)}, błędów: {len(bad)}, pominiętych bloków: {len(skipped)}')
     sys.exit(1 if bad else 0)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
