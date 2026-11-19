@@ -52,7 +52,7 @@ na iPhonie (Safari i PWA) 1.11.2026 — wszystko działa. Nowe zapisy: wyłączn
 
 **D-115 (18.11.2026) — „Fundament jakości” (T2–T9 audytu 10.11):** linter i kontrola typów w CI, dziennik błędów (Dane), Trusted Types,
 budżety wydajności, testy w WebKit, strażnik wizualny w CI, zachowanie stanu sekcji po kluczach, `CLAUDE.md` odchudzony (historia —
-`docs/HISTORIA_STANU.md`, pułapki — `docs/PULAPKI.md`). `docs/RAPORT_D115.md`. Na gałęzi roboczej — publikacja na polecenie użytkownika.
+`docs/HISTORIA_STANU.md`, pułapki — `docs/PULAPKI.md`). `docs/RAPORT_D115.md`. **Opublikowane na `main` 19.11.2026** (polecenie użytkownika „Publikuj”).
 Sesje w chmurze: środowisko „2027” (dostęp do pobierania przeglądarek Playwright — WebKit).
 
 **Audyt 10.11.2026 („baza na dekadę” — `docs/RAPORT_AUDYT_2026-11-10.md`):** tylko audyt i plan, kod bez zmian. Najważniejsze: plan kończy się

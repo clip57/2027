@@ -7,7 +7,7 @@ przeglądarka na komputerze. Język interfejsu i dokumentacji: **polski**.
 
 **Stan (18.11.2026):** D-114 System 4.0 „Instrument” (etapy 1–2) opublikowany na `main` 18.11.2026 — kontrola na iPhonie do potwierdzenia
 przez użytkownika. D-115 „Fundament jakości” (T2–T9 z audytu 10.11: linter i typy, dziennik błędów, Trusted Types, budżety, WebKit,
-strażnik wizualny w CI, łatanie stanu po kluczach, ten plik) — na gałęzi roboczej; publikacja na `main` tylko na polecenie użytkownika.
+strażnik wizualny w CI, łatanie stanu po kluczach, ten plik) — **opublikowany na `main` 19.11.2026** (polecenie użytkownika „Publikuj”).
 **Otwarta decyzja użytkownika: D1** — popołudnie od 16.11 (bloki MPW 15:30–18:23 nakładają się na plan dnia). Decyzje nie-designowe
 audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-10.md` §11: silnik planów przed 28.03.2027, nowe rodzaje danych, powiadomienia,
 adres) — czekają na użytkownika.
