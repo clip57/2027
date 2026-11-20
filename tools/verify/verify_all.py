@@ -69,7 +69,7 @@ def js_string(value):
 
 
 def compare_csv(path, blocks, label):
-    with path.open(encoding="utf8-sig", newline="") as fh:
+    with path.open(encoding="utf-8-sig", newline="") as fh:
         rows = list(csv.DictReader(fh))
     columns = [k for k in (rows[0].keys() if rows else []) if any(k in b for b in blocks)]
     diffs = []
@@ -155,17 +155,18 @@ except (KeyError, TypeError, ValueError):
 check(phases_valid, "plan: spójny zakres kalendarza i faz")
 
 
-# CFA V44
+# CFA Level I 2027 (D-116)
 cfa = data("cfa.json")["D"]
 blocks = cfa["bloki"]
 dates = sorted({b["data"] for b in blocks})
 stat = cfa.get("stat", {})
-check(cfa.get("version") == "CFA_20261016_SCHWESER2026_V44_FINAL"
-      and len(blocks) == 313 and [b["nr"] for b in blocks] == list(range(1, 314))
-      and len(dates) == 27 and dates[0] == "2026-10-16" and dates[-1] == "2026-11-11"
-      and cfa.get("mockCFA") == ["2026-11-04", "2026-11-05", "2026-11-10"]
-      and stat.get("kat", {}).get("SchweserNotes") == 118 and stat.get("tryb", {}).get("PRACTICE") == 127
-      and stat.get("tryb", {}).get("MOCK") == 18 and stat.get("tryb", {}).get("ANALIZA BŁĘDÓW") == 12,
+check(cfa.get("version") == "CFA_L1_2027_451_20261120"
+      and len(blocks) == 451 and [b["nr"] for b in blocks] == list(range(1, 452))
+      and len(dates) == 151 and dates[0] == "2026-11-20" and dates[-1] == "2027-05-12"
+      and cfa.get("mockCFA") == ["2027-04-18", "2027-05-01", "2027-05-06", "2027-05-07"]
+      and stat.get("kat", {}).get("Curriculum") == 311 and stat.get("tryb", {}).get("PIERWSZE PODEJŚCIE") == 70
+      and stat.get("tryb", {}).get("SYMULACJA") == 18 and stat.get("tryb", {}).get("ANALIZA") == 12
+      and cfa.get("nightRecall") == [] and data("cfa.json").get("exam") is None,
       "CFA: wersja, numeracja, kalendarz i statystyki harmonogramu")
 
 
@@ -174,7 +175,7 @@ mpw = data("mpw.json")
 mb = mpw["D"]["bloki"]
 md = sorted({b["data"] for b in mb})
 check(len(mb) == 392 and [b["nr"] for b in mb] == list(range(1, 393))
-      and len(md) == 119 and md[0] == "2026-11-16" and md[-1] == "2027-03-20"
+      and len(md) == 119 and md[0] == "2026-11-20" and md[-1] == "2027-03-20"   # D-116: start 20.11, bloki także 24–27.12
       and mpw.get("exam") == "2027-03-21", "MPW: numeracja, kalendarz i data egzaminu")
 tpl = data("day_template.json")
 slots = tpl["slots"]
@@ -224,25 +225,18 @@ else:
         times = set(re.findall(r"\b(\d\d:\d\d)\b", text))
         check(all(dose["time"] in times for dose in doses), "suplementy: harmonogram zgodny ze wskazanym źródłem")
 
-    cp = source(os.environ.get("CFA_PLAN", "PLAN_CFA_FINAL_V44.html"))
-    if cp:
-        try:
-            source_cfa = html_data(cp)
-            check(source_cfa == cfa and len(source_cfa.get("bloki", [])) == 313,
-                  "CFA: HTML źródłowy zgodny z V44 w src/data/cfa.json")
-        except (OSError, ValueError, json.JSONDecodeError) as exc:
-            check(False, f"CFA: nie można odczytać HTML ({type(exc).__name__})")
-    cc = source(os.environ.get("CFA_CSV", "MASTER_CFA_FINAL_V44.csv"), required=False)
+    # D-116: plan CFA Level I 2027 — źródłem jest CSV (MASTER_SCHEDULE_CFA_451.csv); HTML planu (V44) już nie obowiązuje
+    cc = source(os.environ.get("CFA_CSV", "MASTER_SCHEDULE_CFA_451.csv"))
     if cc:
         compare_csv(cc, blocks, "CFA")
 
-    mp = source(os.environ.get("MPW_PLAN", "PLAN_NAUKI_MPW.html"))
+    mp = source(os.environ.get("MPW_PLAN", "PLAN_NAUKI_MPW.html"), required=False)   # D-116: źródłem planu MPW jest CSV
     if mp:
         try:
             check(html_data(mp) == mpw["D"], "MPW: HTML źródłowy zgodny z mpw.json")
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             check(False, f"MPW: nie można odczytać HTML ({type(exc).__name__})")
-    mc = source(os.environ.get("MPW_CSV", "MASTER_SCHEDULE_MPW.csv"), required=False)
+    mc = source(os.environ.get("MPW_CSV", "MASTER_SCHEDULE_MPW.csv"))
     if mc:
         compare_csv(mc, mb, "MPW")
 
