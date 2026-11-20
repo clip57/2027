@@ -3,15 +3,16 @@
 import { isValidDay } from '../dates.js';
 
 export const SCHEMA = 1;
-// Najwyższy dopuszczalny numer bloku CFA: 432 (plan D-086; v3: 416, v5 z D-087: 421, v7 z D-090: 409 bloków). Limitu nie zmniejszamy —
-// zdarzenia zapisane przy dłuższym planie nie mogą trafić do kwarantanny. Test: plan z cfa.json mieści się w limicie.
-export const CFA_BLOCKS = 432;
+// Najwyższy dopuszczalny numer bloku CFA: 451 (D-116: plan CFA Level I 2027; wcześniej 432 — plan D-086; v3: 416, v5 z D-087: 421, v7 z D-090: 409 bloków).
+// Limitu nie zmniejszamy — zdarzenia zapisane przy dłuższym planie nie mogą trafić do kwarantanny. Test: plan z cfa.json mieści się w limicie.
+export const CFA_BLOCKS = 451;
 // Wersja numeracji bloków CFA, do której należą odhaczenia (D-098: plan v13 liczony od zera, numery bloków nie są zgodne z v12).
 // D-099: plan v14 zachowywał numerację v13 dla bloków 1–192 (te same bloki), więc wersja znacznika zostawała 13.
 // D-101: plan CFA V3 (od 13.10, 326 bloków) ma nową numerację, a dni sprzed 12.10 są wykreślone z kalendarza — odhaczenia sprzed V3 (znacznik < 14) nie liczą się.
 // D-103: plan CFA V44 (od 16.10, 313 bloków, SchweserNotes 2026) ma nową numerację bloków (1–313) — odhaczenia z V3 (znacznik 14) nie liczą się.
+// D-116: nowy plan CFA Level I 2027 (od 20.11.2026, 451 bloków) — nowa numeracja, odhaczenia z V44 (znacznik 15) nie liczą się.
 // Nowe zdarzenia `cfa.done` niosą `plan`; zdarzenia bez pola (v12 i starsze) zostają w bazie i eksporcie, ale nie liczą się w stanie.
-export const CFA_PLAN_VERSION = 15;
+export const CFA_PLAN_VERSION = 16;
 // Plan MPW (D-095): 354 bloki; limit z zapasem na aktualizacje planu (tak jak CFA — nie zmniejszamy). Test: plan z mpw.json mieści się w limicie.
 export const MPW_BLOCKS = 400;
 // Meal Prep: górna granica klucza kroku w zdarzeniu `prep.step` — bez zmian od Etapu 4 (R3, audyt 23.10.2026: klucze kart mieszczą się w niej zawsze —

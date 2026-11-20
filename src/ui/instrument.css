@@ -321,3 +321,6 @@ html[data-domain="prep"] { --mod: var(--warning); } html[data-domain="care"] { -
 .set-card { display: inline-flex; align-items: center; gap: var(--s-2); min-height: 44px; }
 .set-card input { width: 20px; height: 20px; }
 @media (min-width: 700px) { .set-tabs { grid-template-columns: repeat(4, minmax(0, 9rem)); } }
+
+/* D-116: „Zadania bloku” (MPW i CFA) — cel dotykowy 44 px (WCAG 2.5.5; wcześniej 32 px w system.css) */
+.cf-task summary { min-height: 44px; }

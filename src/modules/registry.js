@@ -1,6 +1,7 @@
 // Rejestr modułów. group — grupa w bocznym panelu (Dzień / Trening / Dieta / Nauka / System; zgodna z domenami modułów),
 // icon — ikona Lucide, tab — sekcja głównego paska na telefonie (4 + „Więcej”). `stage` — etap, w którym moduł powstał.
-// tabUntil / tabFrom (D-095) — zakładka tylko w okresie: CFA do końca planu CFA (11.11.2026), od 12.11.2026 jej miejsce zajmuje MPW
+// tabUntil / tabFrom (D-095, D-116) — zakładka tylko w okresie: MPW 12.11.2026–21.03.2027 (egzamin), CFA do 11.11.2026 i od 22.03.2027 (po egzaminie MPW);
+// w okresie obu planów CFA jest w „Więcej” i w planie dnia (pasek dolny można zmienić w Ustawieniach)
 // (wcześniej MPW czeka w „Więcej”). Daty zgodne z planami (test w plan-mpw.test.mjs).
 export const GROUPS = ['Dzień', 'Trening', 'Dieta', 'Nauka', 'System'];
 export const MODULES = [
@@ -9,8 +10,8 @@ export const MODULES = [
   { id: 'pielegnacja', name: 'Pielęgnacja', group: 'Dzień', icon: 'sparkles', domain: 'care', stage: 7, ready: true },   // D-094
   { id: 'dieta', name: 'Dieta', group: 'Dieta', icon: 'utensils', domain: 'diet', tab: true, stage: 3, ready: true },
   { id: 'trening', name: 'Trening', group: 'Trening', icon: 'dumbbell', domain: 'train', tab: true, stage: 5, ready: true },
-  { id: 'cfa', name: 'CFA', group: 'Nauka', icon: 'graduation-cap', domain: 'cfa', tab: true, tabUntil: '2026-11-11', stage: 5, ready: true },
-  { id: 'mpw', name: 'MPW', group: 'Nauka', icon: 'landmark', domain: 'cfa', tab: true, tabFrom: '2026-11-12', stage: 7, ready: true },   // D-095
+  { id: 'cfa', name: 'CFA', group: 'Nauka', icon: 'graduation-cap', domain: 'cfa', tab: true, tabUntil: '2026-11-11', tabFrom: '2027-03-22', stage: 5, ready: true },
+  { id: 'mpw', name: 'MPW', group: 'Nauka', icon: 'landmark', domain: 'cfa', tab: true, tabFrom: '2026-11-12', tabUntil: '2027-03-21', stage: 7, ready: true },   // D-095
   { id: 'rekompozycja', name: 'Rekompozycja', group: 'Trening', icon: 'target', domain: 'train', stage: 6, ready: true },
   { id: 'suplementy', name: 'Suplementacja', group: 'Dieta', icon: 'pill', domain: 'diet', stage: 3, ready: true },
   { id: 'zapasy', name: 'Zapasy', group: 'Dieta', icon: 'package', domain: 'prep', stage: 4, ready: true },
@@ -21,7 +22,9 @@ export const MODULES = [
 export const byId = Object.fromEntries(MODULES.map(m => [m.id, m]));
 // Moduły w dniu `today`: zakładka wg okresu; w obrębie grupy moduły z zakładką na początku (od 12.11: MPW przed CFA),
 // pozostałe w kolejności rejestru — każda grupa zajmuje te same miejsca listy co w MODULES.
-export const isTab = (m, today) => !!m.tab && (!m.tabFrom || today >= m.tabFrom) && (!m.tabUntil || today <= m.tabUntil);
+// tabFrom > tabUntil — zakładka POZA oknem (CFA: do 11.11.2026 i od 22.03.2027, D-116)
+export const isTab = (m, today) => !!m.tab && (m.tabFrom && m.tabUntil && m.tabFrom > m.tabUntil ? today <= m.tabUntil || today >= m.tabFrom
+  : (!m.tabFrom || today >= m.tabFrom) && (!m.tabUntil || today <= m.tabUntil));
 export function modulesOn(today) {
   const list = MODULES.map(m => ({ ...m, tab: isTab(m, today) }));
   const queue = Object.fromEntries(GROUPS.map(g => { const l = list.filter(m => m.group === g); return [g, [...l.filter(m => m.tab), ...l.filter(m => !m.tab)]]; }));

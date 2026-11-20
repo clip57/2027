@@ -260,7 +260,7 @@
    "sauna": 0,
    "diet": "NT",
    "variant": null,
-   "note": "Boże Narodzenie: dzień całkowicie wolny — bez bloków, treningu i zakupów (dieta NT)"
+   "note": "Boże Narodzenie: bez treningu i zakupów (dieta NT); bloki MPW 15:30–18:23 wg planu (D-116)"
   },
   "2026-12-26": {
    "decision": "D-096",
@@ -269,7 +269,7 @@
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
-   "note": "Boże Narodzenie: dzień całkowicie wolny — bez bloków i treningu (dieta NT)",
+   "note": "Boże Narodzenie: bez treningu i zakupów (dieta NT); bloki MPW 15:30–18:23 wg planu (D-116)",
    "variant": null
   },
   "2026-12-27": {
@@ -279,7 +279,7 @@
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
-   "note": "Boże Narodzenie: dzień całkowicie wolny — bez bloków i treningu (dieta NT)",
+   "note": "Boże Narodzenie: bez treningu i zakupów (dieta NT); bloki MPW 15:30–18:23 wg planu (D-116)",
    "variant": null
   },
   "2026-12-31": {
@@ -341,10 +341,6 @@
    "decision": "D-097",
    "variant": "czwartek_st"
   },
-  "2027-03-25": {
-   "decision": "D-097",
-   "variant": "czwartek_st"
-  },
   "2027-03-27": {
    "decision": "D-096",
    "dayType": "free",
@@ -352,7 +348,7 @@
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
-   "note": "Wielkanoc: dzień całkowicie wolny — bez bloków i treningu (dieta NT)",
+   "note": "Wielkanoc: bez treningu (dieta NT); bloki CFA wg planu (D-116)",
    "variant": null
   },
   "2027-03-28": {
@@ -362,7 +358,7 @@
    "sessionName": "Bez treningu",
    "sauna": 0,
    "diet": "NT",
-   "note": "Wielkanoc: dzień całkowicie wolny — bez bloków i treningu (dieta NT)",
+   "note": "Wielkanoc: bez treningu (dieta NT); bloki CFA wg planu (D-116)",
    "variant": null
   }
  },
@@ -371,15 +367,15 @@
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 1",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd I",
+   "decision": "D-116"
   },
   "2026-11-15": {
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 1",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd I",
+   "decision": "D-116"
   },
   "2026-11-21": {
    "kind": "rozmowa",
@@ -396,32 +392,18 @@
    "decision": "D-096"
   },
   "2026-11-28": {
-   "kind": "rozmowa",
-   "title": "Przygotowywanie do rozmowy kwalifikacyjnej",
-   "short": "Rozmowa kwalifikacyjna 8:00–15:23",
-   "desc": "",
-   "decision": "D-096"
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd II (online)",
+   "decision": "D-116"
   },
   "2026-11-29": {
-   "kind": "rozmowa",
-   "title": "Przygotowywanie do rozmowy kwalifikacyjnej",
-   "short": "Rozmowa kwalifikacyjna 8:00–15:23",
-   "desc": "",
-   "decision": "D-096"
-  },
-  "2026-12-05": {
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 2",
-   "decision": "D-096"
-  },
-  "2026-12-06": {
-   "kind": "studia",
-   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
-   "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 2",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd II (online)",
+   "decision": "D-116"
   },
   "2026-12-12": {
    "kind": "praca",
@@ -455,21 +437,21 @@
    "kind": "wolne",
    "title": "Wolne",
    "short": "Boże Narodzenie — wolne",
-   "desc": "Boże Narodzenie — dzień całkowicie wolny",
+   "desc": "Boże Narodzenie — wolne przed południem; po południu nauka MPW wg planu (D-116)",
    "decision": "D-103"
   },
   "2026-12-26": {
    "kind": "wolne",
    "title": "Wolne",
    "short": "Boże Narodzenie — wolne",
-   "desc": "Boże Narodzenie — dzień całkowicie wolny",
+   "desc": "Boże Narodzenie — wolne przed południem; po południu nauka MPW wg planu (D-116)",
    "decision": "D-096"
   },
   "2026-12-27": {
    "kind": "wolne",
    "title": "Wolne",
    "short": "Boże Narodzenie — wolne",
-   "desc": "Boże Narodzenie — dzień całkowicie wolny",
+   "desc": "Boże Narodzenie — wolne przed południem; po południu nauka MPW wg planu (D-116)",
    "decision": "D-096"
   },
   "2027-01-02": {
@@ -490,15 +472,15 @@
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 3",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd III (online)",
+   "decision": "D-116"
   },
   "2027-01-10": {
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 3",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd III (online)",
+   "decision": "D-116"
   },
   "2027-01-16": {
    "kind": "praca",
@@ -546,15 +528,15 @@
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 4",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd IV",
+   "decision": "D-116"
   },
   "2027-02-07": {
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 4",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd IV",
+   "decision": "D-116"
   },
   "2027-02-13": {
    "kind": "praca",
@@ -574,15 +556,15 @@
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 5",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd V",
+   "decision": "D-116"
   },
   "2027-02-21": {
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
    "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd 5",
-   "decision": "D-096"
+   "desc": "Studia podyplomowe — zjazd V",
+   "decision": "D-116"
   },
   "2027-02-27": {
    "kind": "praca",
@@ -609,18 +591,95 @@
    "kind": "wolne",
    "title": "Wolne",
    "short": "Wielkanoc — wolne",
-   "desc": "Wielkanoc — dzień całkowicie wolny",
+   "desc": "Wielkanoc — wolne poza blokami nauki CFA (D-116)",
    "decision": "D-096"
   },
   "2027-03-28": {
    "kind": "wolne",
    "title": "Wolne",
    "short": "Wielkanoc — wolne",
-   "desc": "Wielkanoc — dzień całkowicie wolny",
+   "desc": "Wielkanoc — wolne poza blokami nauki CFA (D-116)",
    "decision": "D-096"
+  },
+  "2027-04-03": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd VII",
+   "decision": "D-116"
+  },
+  "2027-04-04": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd VII",
+   "decision": "D-116"
+  },
+  "2027-04-24": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd VIII (online)",
+   "decision": "D-116"
+  },
+  "2027-04-25": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd VIII (online)",
+   "decision": "D-116"
+  },
+  "2027-05-08": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd IX",
+   "decision": "D-116"
+  },
+  "2027-05-09": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd IX",
+   "decision": "D-116"
+  },
+  "2027-05-29": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd X",
+   "decision": "D-116"
+  },
+  "2027-05-30": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia 8:00–15:23",
+   "desc": "Studia podyplomowe — zjazd X",
+   "decision": "D-116"
+  },
+  "2027-06-05": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia — egzamin końcowy",
+   "desc": "Studia podyplomowe — egzamin końcowy (online)",
+   "decision": "D-116"
+  },
+  "2027-06-21": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia — obrony",
+   "desc": "Studia podyplomowe — obrony prac (online, 21 lub 22.06 wg przydziału)",
+   "decision": "D-116"
+  },
+  "2027-06-22": {
+   "kind": "studia",
+   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
+   "short": "Studia — obrony",
+   "desc": "Studia podyplomowe — obrony prac (online, 21 lub 22.06 wg przydziału)",
+   "decision": "D-116"
   }
  },
- "blocks_decision": "D-096: weekendy 8:00–15:23 w slotach A–G — studia (zjazdy, bez zakupów w sobotę), przygotowanie do rozmowy, praca magisterska; święta wolne; dni z blokami P1–P7 planu MPW i egzamin MPW bez pracy magisterskiej",
+ "blocks_decision": "D-096: weekendy 8:00–15:23 w slotach A–G — studia (zjazdy, bez zakupów w sobotę), przygotowanie do rozmowy, praca magisterska; święta wolne; dni z blokami P1–P7 planu MPW i egzamin MPW bez pracy magisterskiej; D-116: zjazdy wg harmonogramu (I–V, VII–X, egzamin 05.06, obrony 21–22.06), bez zjazdu VI i bez 05–06.12",
  "mpwShift": {
   "weekdays": [
    4

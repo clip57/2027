@@ -26,18 +26,15 @@ test('cfaPace: przed startem planu i po jego końcu', () => {
   assert.deepEqual([end.due, end.overdue.length, end.ahead], [6, 0, 0]);
 });
 
-test('cfaPace na prawdziwym harmonogramie: start CFA 16.10 — 9 bloków (A–I), od 17.10 po 11 (z M i J), 22.10/29.10 po 12 (z L), 23.10 11 (K, L), 25.10 9, od 03.11 po 13 (plan V44, D-103)', () => {
+test('cfaPace na prawdziwym harmonogramie (D-116): plan CFA 2027 od 20.11 — 3 bloki (E–G); w dni robocze od 04.01 blok J; po planie MPW H, I, blok dodatkowy i J; po 12.05 wszystkie zaległe', () => {
   const D = SRC.cfa.D, P = d => cfaPace(D.bloki, new Set(), d);
-  assert.deepEqual([P('2026-10-08').due, P('2026-10-08').today, P('2026-10-15').due, P('2026-10-15').today], [0, 0, 0, 0], 'dni przed 16.10: bez bloków CFA');
-  assert.deepEqual([P('2026-10-16').due, P('2026-10-16').today], [0, 9], '16.10 — A–I, bez J i M');
-  assert.deepEqual([P('2026-10-17').due, P('2026-10-17').today], [9, 11]);
-  assert.deepEqual([P('2026-10-18').due, P('2026-10-18').today], [20, 11]);
-  assert.equal(P('2026-10-22').today, 12, 'czwartek z blokiem L');
-  assert.equal(P('2026-10-23').today, 11, '23.10 — A–I, K, L (bez M i J)');
-  assert.equal(P('2026-10-23').due, 9 + 11 * 5 + 12, '16–22.10');
-  assert.equal(P('2026-10-25').today, 9, '25.10 — A–I (bez M i J)');
-  assert.equal(P('2026-11-04').today, 13, 'od 03.11 — A–I, K, L, M i J');
-  assert.equal(P('2026-11-12').due, D.bloki.length, 'po planie: wszystkie bloki zaległe');
+  assert.deepEqual([P('2026-11-19').due, P('2026-11-19').today], [0, 0], 'dni przed 20.11: bez bloków CFA');
+  assert.deepEqual([P('2026-11-20').due, P('2026-11-20').today], [0, 3], '20.11 — E, F, G');
+  assert.deepEqual([P('2026-11-21').due, P('2026-11-21').today], [3, 3]);
+  assert.equal(P('2027-01-04').today, 1, 'pierwszy dzień z blokiem J (sam J)');
+  assert.equal(P('2027-03-22').today, 4, 'po planie MPW: H, I, blok dodatkowy, J');
+  assert.equal(P('2027-05-13').due, D.bloki.length, 'po planie: wszystkie bloki zaległe');
+  assert.equal(P('2027-05-12').due + P('2027-05-12').today, D.bloki.length);
 });
 
 test('restSeconds: zapisy przerw z planu treningowego', () => {

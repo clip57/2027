@@ -201,4 +201,5 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 - Przerysowanie w miejscu i podmiana fragmentu zachowują rozwinięte sekcje i przesunięte paski (klucze: `id` › `data-key` › tekst nagłówka).
   Sekcja, która ma się zwijać po akcji, musi to robić jawnie (np. `ontoggle` + stan w module), nie przez przerysowanie.
 - Testy wyglądu także w WebKit (Safari): `npm run e2e:webkit`.
-
+- D-116: w okresie dwóch planów nauki (CFA i MPW) „Dziś” ma jeden kafel **„Nauka”** (suma bloków, podpowiedź „CFA a/b · MPW c/d”) i obie karty
+  planów; zakładka paska — plan „główny” w danym okresie (MPW 12.11–21.03, CFA poza tym oknem), drugi w „Więcej”. „Zadania bloku” — cel dotykowy 44 px.

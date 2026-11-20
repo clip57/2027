@@ -18,8 +18,14 @@ URL = (ROOT / 'dist/single/2027.html').as_uri()
 BLOCKS = CFA['bloki']; N = len(BLOCKS)
 BY_DAY = {}
 for b in BLOCKS: BY_DAY.setdefault(b['data'], []).append(b)
-NIGHT = set(CFA['nightDates'])
+NIGHT = set(CFA.get('nightDates') or [r['data'] for r in CFA['nightRecall']])   # plan CFA 2027 (D-116): bez recall
 MOCKS = CFA['mockCFA']
+SESSIONS = CFA.get('mockSessions', True) is not False   # D-116: dni mocka planu 2027 to zwykłe bloki (bez sesji S1/S2 w „Dziś”)
+WEEK = json.loads((ROOT / 'src/data/week.json').read_text(encoding='utf8'))
+FIXED = {d for d, v in WEEK['blocks'].items() if v['kind'] in ('studia', 'egzamin')}   # zjazd ma pierwszeństwo przed blokiem CFA (D-116)
+def visible(d):
+    """Bloki dnia widoczne w slotach „Dziś” (bez bloków w godzinach zjazdu — są w opisie slotu jako kolizja)."""
+    return [b for b in BY_DAY[d] if not (d in FIXED and b['godz'] < '15:23')]
 fails = []
 
 def ok(cond, msg):
@@ -36,8 +42,12 @@ def pick_days():
     sel = {'pierwszy dzień planu CFA': days[0], 'ostatni dzień planu CFA': days[-1]}
     if MOCKS: sel['dzień mocka'] = MOCKS[0]
     sel['dzień z największą liczbą bloków'] = max(days, key=lambda d: len(BY_DAY[d]))
-    late = [d for d in days if any(b['blok'] in 'KLMNOP' and b['blok'] not in ('S1', 'S2') for b in BY_DAY[d])]
-    if late: sel['dzień z blokami po południu (K–P)'] = late[0]
+    late = [d for d in days if any(b['blok'] in ('K', 'L', 'M', 'N', 'O', 'P', 'Dodatkowy') for b in BY_DAY[d])]
+    if late: sel['dzień z blokami po południu (K–P, dodatkowy)'] = late[0]
+    jd = [d for d in days if any(b['blok'] == 'J' for b in BY_DAY[d])]
+    if jd: sel['dzień z blokiem J'] = jd[0]
+    fixed = [d for d in days if d in FIXED]
+    if fixed: sel['dzień zjazdu studiów (kolizja)'] = fixed[0]
     thu = [d for d in days if dt.date.fromisoformat(d).isoweekday() == 4 and d not in MOCKS]
     if thu: sel['czwartek'] = thu[0]
     plain = [d for d in days if d not in MOCKS and d >= PHASES['start'] and dt.date.fromisoformat(d).isoweekday() in (1, 2, 3)]
@@ -79,10 +89,11 @@ async def main():
             titles = await pg.eval_on_selector_all('.slot-title', 'e => e.map(x => x.textContent.trim())')
             if d < PHASES['start']:
                 ok(await pg.locator('.dz-outside').count() == 1, f'{label} {d}: przed początkiem planu (od {PHASES["start"]}) „Dziś” = „Poza planem” (bloki CFA są w widoku CFA)')
-            elif d in MOCKS:
+            elif d in MOCKS and SESSIONS:
                 ok(any(t.startswith('Mock CFA') for t in titles), f'{label} {d}: „Dziś” pokazuje sesje mocka ({[t for t in titles if "Mock" in t]})')
             else:
-                want = sorted({b2['blok'] for b2 in BY_DAY[d]}); got = sorted(m.group(1) for t in titles if (m := re.match(r'CFA blok ([A-Z])', t)))   # tytuł bieżącego slotu ma dopisek „teraz”
+                want = sorted({b2['blok'] for b2 in visible(d)})
+                got = sorted(('Dodatkowy' if t.startswith('CFA — blok dodatkowy') else m.group(1)) for t in titles if t.startswith('CFA — blok dodatkowy') or (m := re.match(r'CFA blok ([A-Z])', t)))   # tytuł bieżącego slotu ma dopisek „teraz”
                 ok(want == got, f'{label} {d}: „Dziś” — bloki {got} = plan {want}')
             ok(not errs, f'{label} {d}: brak błędów JS ({errs[:2]})')
             await b.close()
@@ -126,8 +137,9 @@ async def main():
         # ---- 4. „Teraz” w środku każdego bloku (jeden blok na dzień planu) — wskazuje blok CFA albo posiłek (zamierzone nakładanie D-101)
         bad = []; meal_ok = 0; checked = 0
         for d2 in sorted(BY_DAY):
-            if d2 in MOCKS or d2 < PHASES['start']: continue   # dni poza planem nie mają karty „Teraz”
-            sample = [x for x in BY_DAY[d2] if x['blok'] not in ('S1', 'S2') and (x['blok'] in 'JKLMNOP' or x is BY_DAY[d2][0])]
+            if (d2 in MOCKS and SESSIONS) or d2 < PHASES['start']: continue   # dni poza planem nie mają karty „Teraz”
+            vis = visible(d2)
+            sample = [x for x in vis if x['blok'] not in ('S1', 'S2', 'Dodatkowy') and (x['blok'] in ('J', 'K', 'L', 'M', 'N', 'O', 'P') or x is vis[0])]   # blok dodatkowy w oknie treningowym — decyzja D1 otwarta
             for blk in sample:
                 f, t = blk['godz'].split('–'); mid = (int(f[:2]) * 60 + int(f[3:]) + int(t[:2]) * 60 + int(t[3:])) // 2
                 hm = f'{mid // 60:02d}:{mid % 60:02d}'

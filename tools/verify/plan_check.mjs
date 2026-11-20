@@ -30,26 +30,33 @@ const days = [...new Set(B.map(b => b.data))];
 eq(days.length, D.stat.dni, 'stat.dni vs liczba dni z blokami');
 for (const [k, n] of Object.entries(D.stat.kat)) eq(B.filter(b => b.kategoria === k).length, n, `stat.kat[${k}]`);
 for (const [k, n] of Object.entries(D.stat.tryb)) eq(B.filter(b => b.tryb === k).length, n, `stat.tryb[${k}]`);
-for (const m of D.mockCFA) { const n = B.filter(b => b.data === m && b.tryb === 'MOCK').length; if (!n) err(`dzień mocka ${m} nie ma bloków trybu MOCK`); }
-const mockDays = new Set(B.filter(b => b.tryb === 'MOCK').map(b => b.data));
-for (const d of mockDays) if (!D.mockCFA.includes(d)) err(`bloki MOCK w dniu ${d}, którego nie ma w mockCFA`);
-// recall
-eq(D.nightRecall.length + D.recallSessions.length, D.stat.recall, 'stat.recall vs nightRecall + recallSessions');
-eq(D.nightRecall.length, D.nightDates.length, 'nightRecall vs nightDates');
+// dni mocka: bloki trybu MOCK (plany V3/V44) albo SYMULACJA (plan CFA 2027, D-116)
+const MOCK = new Set(['MOCK', 'SYMULACJA']);
+for (const m of D.mockCFA) { const n = B.filter(b => b.data === m && MOCK.has(b.tryb)).length; if (!n) err(`dzień mocka ${m} nie ma bloków trybu MOCK/SYMULACJA`); }
+const mockDays = new Set(B.filter(b => MOCK.has(b.tryb)).map(b => b.data));
+for (const d of mockDays) if (!D.mockCFA.includes(d)) err(`bloki MOCK/SYMULACJA w dniu ${d}, którego nie ma w mockCFA`);
+// recall (plan CFA 2027 — bez sesji recall: nightRecall = [], bez nightDates / recallSessions)
+const nightDates = D.nightDates || D.nightRecall.map(r => r.data), recallSessions = D.recallSessions || [], noNight = D.noNightDates || [];
+eq(D.nightRecall.length + recallSessions.length, D.stat.recall, 'stat.recall vs nightRecall + recallSessions');
+eq(D.nightRecall.length, nightDates.length, 'nightRecall vs nightDates');
 for (const r of D.nightRecall) if (r.data < D.stat.start || r.data > D.stat.end) err(`recall ${r.data} poza zakresem planu`);
-for (const d of D.noNightDates) if (D.nightDates.includes(d)) err(`${d} jest jednocześnie w nightDates i noNightDates`);
-if (D.exam && SRC.cfa.exam && D.recallSessions.some(r => r.data > SRC.cfa.exam)) warn('sesje końcowe recall po dacie egzaminu');
-for (const r of D.recallSessions) if (r.data <= D.stat.end) warn(`sesja końcowa recall ${r.data} mieści się w okresie planu (widok dnia ją pominie lub zdubluje)`);
+for (const d of noNight) if (nightDates.includes(d)) err(`${d} jest jednocześnie w nightDates i noNightDates`);
+if (SRC.cfa.exam && recallSessions.some(r => r.data > SRC.cfa.exam)) warn('sesje końcowe recall po dacie egzaminu');
+for (const r of recallSessions) if (r.data <= D.stat.end) warn(`sesja końcowa recall ${r.data} mieści się w okresie planu (widok dnia ją pominie lub zdubluje)`);
+if (!SRC.cfa.exam) warn(`termin egzaminu CFA nieustalony (cfa.json: exam = null; ${SRC.cfa.examNote || ''})`);
 
 // ---------- 2. Resolver: każdy dzień planu projektu ----------
-const sets = { dayChecked: 0 }, overlaps = [], nowWarn = [], nowErr = [], okOverlap = [];
+const sets = { dayChecked: 0 }, overlaps = [], nowWarn = [], nowErr = [], okOverlap = [], clashList = [], d1 = [];
 for (let d = D.stat.start < PLAN_START ? D.stat.start : PLAN_START; d <= (PLAN_END < '2027-01-01' ? PLAN_END : D.stat.end); d = addDays(d, 1)) {
   if (d > D.stat.end) break;
   const r = resolveDay(d); sets.dayChecked++;
   const planned = (cfaByDay[d] || []);
   // blok w planie ⇒ dokładnie jeden slot, który go niesie (cfa[] zawiera blok), z zgodną godziną
   const carried = r.slots.flatMap(s => (s.cfa || []).map(b => ({ b, s })));
-  for (const b of planned) {
+  // D-116: zjazd studiów / egzamin (stałe zdarzenie weekendu) ma pierwszeństwo — blok CFA w jego godzinach jest tylko w opisie slotu („kolizja z planem CFA”)
+  const clashed = new Set(planned.filter(b => r.slots.some(s => s.block && (s.desc || '').includes('kolizja z planem CFA') && s.desc.includes(`blok ${b.blok} ${b.godz}`))).map(b => b.nr));
+  for (const b of planned.filter(x => clashed.has(x.nr))) clashList.push([`blok ${b.blok} ${b.godz} w godzinach zdarzenia „${r.blocks?.short}” (pierwszeństwo zdarzenia, opis kolizji w slocie)`, d]);
+  for (const b of planned.filter(x => !clashed.has(x.nr))) {
     const hits = carried.filter(x => x.b.nr === b.nr);
     if (hits.length !== 1) { err(`${d}: blok ${b.nr} (${b.blok} ${b.godz}) niesiony przez ${hits.length} slotów`); continue; }
     const { s } = hits[0], [f] = b.godz.split('–');
@@ -58,7 +65,7 @@ for (let d = D.stat.start < PLAN_START ? D.stat.start : PLAN_START; d <= (PLAN_E
   // brak „zjedzonych” bloków: liczba bloków w widoku = liczba w planie
   if (r.cfa.blocks.length !== planned.length) err(`${d}: resolveDay.cfa.blocks=${r.cfa.blocks.length}, plan=${planned.length}`);
   // recall: widok ⇔ harmonogram
-  const wantRecall = D.nightDates.includes(d);
+  const wantRecall = nightDates.includes(d);
   if (!!r.cfa.recall !== wantRecall) err(`${d}: recall w widoku=${!!r.cfa.recall}, w harmonogramie=${wantRecall}`);
   if (r.outside) continue;   // dni poza planem (D-103c: 16–17.10 mają tylko bloki CFA): widok „Dziś” pokazuje „Poza planem”, układ slotów i karty „Teraz” nie istnieją
   // sloty dnia: kolejność i nakładanie (poza snem, który przechodzi przez północ)
@@ -71,7 +78,9 @@ for (let d = D.stat.start < PLAN_START ? D.stat.start : PLAN_START; d <= (PLAN_E
     // Zamierzone (D-101, decyzja użytkownika): posiłek 20:15 zostaje w trakcie bloku M
     if (cfaSlot && other.role === 'meal' && other.domain === 'diet' && cfaSlot.cfa?.some(x => x.blok === 'M')) okOverlap.push([`nakładanie ${pair.slice(11)} (zamierzone, D-101: posiłek 20:15 w bloku M w dni bez treningu)`, d]);
     // Znane, 5-minutowe (D-101): „Zmywanie popołudniowe” 17:33–17:45 kończy się po starcie bloku K 17:40; karta „Teraz” wskazuje wtedy blok K (kolejność slotów)
-    else if (cfaSlot && other.title === 'Zmywanie popołudniowe' && cfaSlot.cfa?.some(x => x.blok === 'K')) okOverlap.push([`nakładanie ${pair.slice(11)} (5 min, znane od D-101)`, d]);
+    else if (cfaSlot && other.title === 'Zmywanie popołudniowe' && cfaSlot.cfa?.some(x => ['K', 'Dodatkowy'].includes(x.blok))) okOverlap.push([`nakładanie ${pair.slice(11)} (5 min, znane od D-101; D-116 — blok dodatkowy 17:40)`, d]);
+    // Znane, decyzja użytkownika D1 otwarta (D-116): blok dodatkowy CFA 17:40–18:33 nakłada się na okno treningowe/saunę od 17:45
+    else if (cfaSlot && cfaSlot.cfa?.some(x => x.blok === 'Dodatkowy') && other.domain === 'train') d1.push([`nakładanie ${pair.slice(11)} (decyzja D1 otwarta)`, d]);
     else if (!r.outside) overlaps.push(pair);
   }
   // „Teraz” (kopia currentSlot z src/modules/dzis.js — wygrywa OSTATNI pasujący slot): w każdej minucie bloku (poza sesjami mocka)
@@ -79,19 +88,23 @@ for (let d = D.stat.start < PLAN_START ? D.stat.start : PLAN_START; d <= (PLAN_E
   const cur = t => { let c = null; for (const s of r.slots) if (s.from <= t && (s.to > s.from ? t < s.to : true)) c = s; return c; };
   const hm = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
   const bad = {};
-  for (const b of planned.filter(b => !/^S\d$/.test(b.blok))) for (let m = toMin(b.godz.slice(0, 5)); m < toMin(b.godz.slice(6)); m++) {
+  for (const b of planned.filter(b => !/^S\d$/.test(b.blok) && !clashed.has(b.nr))) for (let m = toMin(b.godz.slice(0, 5)); m < toMin(b.godz.slice(6)); m++) {
     const c = cur(hm(m)); if (c && (c.cfa || []).includes(b)) continue;
-    const e = (bad[`${b.blok}|${c ? c.title : '—'}`] ||= { mins: [], meal: false }); e.mins.push(m); e.meal ||= c?.role === 'meal';
+    const e = (bad[`${b.blok}|${c ? c.title : '—'}`] ||= { mins: [], meal: false, d1: false }); e.mins.push(m); e.meal ||= c?.role === 'meal';
+    e.d1 ||= b.blok === 'Dodatkowy' && c?.domain === 'train';
   }
   for (const [k, e] of Object.entries(bad)) {
     const [blok, title] = k.split('|');
+    if (e.d1) continue;   // blok dodatkowy w oknie treningowym — jedno zbiorcze ostrzeżenie D1 niżej
     const msg = `„teraz” pokazuje „${title}” zamiast bloku ${blok} przez ${e.mins.length} min (od ${hm(e.mins[0])} do ${hm(e.mins[e.mins.length - 1] + 1)})`;
     (e.meal ? nowWarn : nowErr).push([msg + (e.meal ? ' — posiłek w bloku (D-101)' : ''), d]);
   }
 }
 const compress = ds => ds.length > 4 ? `${ds[0]} … ${ds[ds.length - 1]} (${ds.length} dni)` : ds.join(', ');
 const groupMsgs = (list, f) => { const g = {}; for (const [m, d] of list) (g[m] ||= []).push(d); for (const [m, ds] of Object.entries(g)) f(`${m} — ${compress(ds)}`); };
-groupMsgs(okOverlap, warn); groupMsgs(nowWarn, warn); groupMsgs(nowErr, err);
+groupMsgs(okOverlap, warn); groupMsgs(nowWarn, warn); groupMsgs(nowErr, err); groupMsgs(clashList, warn);
+const d1Days = [...new Set(d1.map(x => x[1]))];
+if (d1Days.length) warn(`blok dodatkowy CFA 17:40–18:33 nakłada się na okno treningowe (trening, sauna, basen; karta „Teraz” pokazuje wtedy trening) — decyzja D1 otwarta — ${compress(d1Days)}`);
 const grouped = {};
 for (const o of overlaps) { const k = o.slice(11); (grouped[k] ||= []).push(o.slice(0, 10)); }
 for (const [k, ds] of Object.entries(grouped)) err(`nakładanie slotów: ${k} — ${compress(ds)}`);

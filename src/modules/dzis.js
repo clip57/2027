@@ -282,7 +282,7 @@ export function renderDzis(root, ctx) {
   // Dzień sprzed startu planu (D-088): bez planu dnia — tylko informacja i przejście do pierwszego dnia planu
   const nav = (n, label, ic) => h('a', { class: 'btn dz-nav', href: `#/dzis?d=${addDays(date, n)}`, 'aria-label': label }, n < 0 && icon(ic, { size: 18 }), h('span', {}, label), n > 0 && icon(ic, { size: 18 }));
   // D14 (audyt 31.10.2026): widok „Dnia zero” (D-097) usunięty — po D-100 plan nie ma Dnia zero (`phases.zero`), resolver traktuje go ogólnie
-  // Dzień poza planem (D-088, D-097): przed Dniem zero albo po końcu planu (28.03.2027)
+  // Dzień poza planem (D-088, D-097): przed Dniem zero albo po końcu planu (30.06.2027, D-116)
   if (r.outside) {
     const target = r.after ? PLAN_END : PLAN_START;
     add(root, h('header', { class: 'dz-head' },
@@ -306,8 +306,8 @@ export function renderDzis(root, ctx) {
   const t = plan(r.dietVariant, r.phase ?? 0).total;
   const D = dayData(r, date, ctx.store, ctx.today);
   const cfaMin = r.cfa.blocks.length * 53;
-  // Od 12.11.2026 (koniec planu CFA) nauka w podsumowaniu = MPW (D-095)
-  const mpwNow = isTab(byId.mpw, date), MD = SRC.mpw.D;
+  // Od 12.11.2026 nauka w podsumowaniu = MPW (D-095); D-116: od 20.11.2026 także nowy plan CFA — w okresie obu planów kafel „Nauka” (suma) i obie karty planów
+  const mpwNow = isTab(byId.mpw, date), cfaNow = r.cfa.inPlan, both = mpwNow && cfaNow, MD = SRC.mpw.D;
   const slotIdx = now?.current ? r.slots.indexOf(now.current) : -1;
   const allDoses = r.slots.flatMap(s => s.doses);
   const dset = ctx.store?.state?.settings || {};
@@ -398,11 +398,17 @@ export function renderDzis(root, ctx) {
         kpi('Trening', 'dumbbell', 'train', D.planned ? `${D.done} / ${D.planned}` : (r.training?.length ? r.sessionLabel : 'Bez treningu'), null,
           D.planned ? `serii · ${r.sessionLabel}` : (r.sauna ? `sauna: ${r.sauna} ${r.sauna === 1 ? 'runda' : 'rundy'}` : r.sessionLabel),
           null, '', sparkline(D.trainSpark, { label: `Serie wykonane w ostatnich 14 dniach: ${D.trainSpark.map(v => v ?? 0).reduce((a, b) => a + b, 0)}` }), `#/trening?d=${date}`),
+        both ? kpi('Nauka', 'graduation-cap', 'cfa', `${D.cfaToday + D.mpwToday} / ${r.cfa.blocks.length + r.mpw.blocks.length}`, 'bloków',
+          `CFA ${D.cfaToday}/${r.cfa.blocks.length} · MPW ${D.mpwToday}/${r.mpw.blocks.length}`, null, '',
+          D.mpwSpark.days.length ? sparkline(D.mpwSpark.done, { max: D.mpwSpark.max, label: `Bloki MPW wykonane w ostatnich ${D.mpwSpark.days.length} dniach planu` }) : null,
+          r.cfa.blocks.length ? `#/cfa?v=dzien&d=${date}` : `#/mpw?v=dzien&d=${date}`) :
         mpwNow ? kpi('MPW', 'landmark', 'cfa', r.mpw.blocks.length ? `${D.mpwToday} / ${r.mpw.blocks.length}` : r.mpw.inPlan ? 'dzień wolny' : date < MD.stat.start ? `od ${shortDate(MD.stat.start)}` : 'po planie',
           r.mpw.blocks.length ? 'bloków' : null, r.mpw.blocks.length ? mpwHint(r.mpw.blocks) : null,
           null, '', D.mpwSpark.days.length ? sparkline(D.mpwSpark.done, { max: D.mpwSpark.max, label: `Bloki MPW wykonane w ostatnich ${D.mpwSpark.days.length} dniach planu` }) : null, `#/mpw?v=dzien&d=${date}`) :
-        kpi('CFA', 'graduation-cap', 'cfa', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length}` : 'poza planem', r.cfa.inPlan ? 'bloków' : null,
-          r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : ' · bez recall'}` : null,
+        kpi('CFA', 'graduation-cap', 'cfa', r.cfa.inPlan ? `${D.cfaToday} / ${r.cfa.blocks.length}` : date < SRC.cfa.D.stat.start ? `od ${shortDate(SRC.cfa.D.stat.start)}` : 'po planie',
+          r.cfa.inPlan ? 'bloków' : null,
+          // D-116: plan CFA 2027 bez sesji recall — bez dopisku „bez recall”
+          r.cfa.inPlan ? `${cfaMin} min${r.cfa.recall ? ` + 53 min recall${recallDone(ctx.store?.state?.settings, date) ? ' ✓' : ''}` : SRC.cfa.D.nightRecall?.length ? ' · bez recall' : ''}` : null,
           null, '', D.cfaSpark.days.length ? sparkline(D.cfaSpark.done, { max: D.cfaSpark.max, label: `Bloki CFA wykonane w ostatnich ${D.cfaSpark.days.length} dniach planu` }) : null, `#/cfa?v=dzien&d=${date}`),
         kpi('Zapasy', 'package', 'prep', D.inv ? (D.inv.known ? String(D.inv.critical.length) : 'brak stanów') : '—', D.inv?.known ? plural(D.inv.critical.length, 'pilna', 'pilne', 'pilnych') : null,
           D.inv ? `zakupy ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)} · ${D.inv.toBuy} ${plural(D.inv.toBuy, 'pozycja', 'pozycje', 'pozycji')}` : null, null,
@@ -422,10 +428,10 @@ export function renderDzis(root, ctx) {
           D.inv.critical.length ? h('ul', { class: 'dz-list' }, D.inv.critical.slice(0, 4).map(x => h('li', {}, h('span', { class: 'dz-flag' }, icon('triangle-alert', { size: 14 })), h('span', {}, x.it.name), statusBadge(x.info.code, x.info.label, { title: x.info.badge }))))
             : h('p', { class: 'muted' }, D.inv.known ? 'Brak pilnych braków.' : 'Wczytaj kopię zapasów w module Dane albo ustaw stany w Zapasach.'),
           h('p', { class: 'dz-foot' }, `Najbliższe zakupy: ${dayShort(D.inv.shop.date)} ${shortDate(D.inv.shop.date)}`)),
-        mpwNow ? card('Plan MPW', 'landmark', '#/mpw?v=plan',
+        mpwNow && card('Plan MPW', 'landmark', '#/mpw?v=plan',
           h('div', { class: 'dz-prog' }, h('strong', {}, `${Math.round((D.mpwAll / MD.bloki.length) * 100)}%`), h('span', { class: 'muted' }, `${D.mpwAll} z ${MD.bloki.length} bloków`)),
-          bar(D.mpwAll, MD.bloki.length, 'cfa'))
-        : card('Plan CFA', 'graduation-cap', '#/cfa?v=plan',
+          bar(D.mpwAll, MD.bloki.length, 'cfa')),
+        (cfaNow || !mpwNow) && card('Plan CFA', 'graduation-cap', '#/cfa?v=plan',
           h('div', { class: 'dz-prog' }, h('strong', {}, `${Math.round((D.cfaAll / SRC.cfa.D.bloki.length) * 100)}%`), h('span', { class: 'muted' }, `${D.cfaAll} z ${SRC.cfa.D.bloki.length} bloków`)),
           bar(D.cfaAll, SRC.cfa.D.bloki.length, 'cfa')),
         card('Aktywność treningowa', 'dumbbell', '#/trening?v=stat', activityGrid(ctx.store, ctx.today))),

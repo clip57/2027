@@ -11,6 +11,7 @@ import { MIN_ITERATIONS } from '../../src/core/sync/crypto.js';
 import { LOCAL, checkConfig, saveConfig, loadConfig, cloudStatus, signIn, unlock, signOut, resetDevice, syncNow,
   describeError, describeResult } from '../../src/core/sync/cloud-local.js';
 import { fakeSupabase } from './helpers/fake-supabase.mjs';
+import { CFA_PLAN_VERSION } from '../../src/core/storage/validate.js';
 
 const KEY = 'sb_publishable_TESTOWYklucz0000';                 // fikcyjny
 const PASS = 'fikcyjne hasło szyfrowania testu';
@@ -84,7 +85,7 @@ test('klucze i sesja przetrwają ponowne uruchomienie; hasło nie jest nigdzie z
   const srv = server();
   const A = await device(srv);
   await ready(srv, A, { first: true });
-  await A.store.record('cfa.done', { block: 3, done: true, plan: 15 });
+  await A.store.record('cfa.done', { block: 3, done: true, plan: CFA_PLAN_VERSION });
   // „ponowne uruchomienie”: nowy Store na tej samej bazie
   const again = await new Store(A.adapter).open();
   const st = await cloudStatus(again);

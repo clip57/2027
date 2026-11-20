@@ -3,20 +3,18 @@
 // (testy, narzędzia) dane są pełne. Test `plan-split.test.mjs`: żadne usuwane pole nie występuje w kodzie aplikacji (src/), a zadania tylko przez
 // `planTasks` — nowe użycie pola = usunięcie go z listy DROP.
 export const DROP = {
-  // Plan CFA V44 (D-103): analityka planu (katalog readingów, przydział banku pytań, strony, powiązania, mieszanie, mocki) i zadania bloków —
-  // widok CFA ich nie pokazuje (zadania tylko w MPW). Zostają m.in. `version`, `previousVersion`, `progressRequirements`, `finalization` (R2).
+  // Plan CFA Level I 2027 (D-116, MASTER_SCHEDULE_CFA_451.csv): kolumny analityczne planu (strony, bank pytań, powiązania, odsyłacze) bez użycia
+  // w widoku — w pliku danych zostają. Zadania bloków — część osobna (LAZY). `sekcje` i `egzamin` zostają w pakiecie (nazwy kolidują z tekstami w kodzie).
   cfa: {
-    plan: ['nightDates', 'nightExceptions', 'noNightDates', 'readingCatalog', 'fpLastSlot', 'fpLastTime', 'mockCov', 'mockDetail', 'mockAnalysis',
-      'recallSessions', 'practiceSummary', 'primaryPageRanges', 'supplementRanges', 'sourceLinks', 'questionBank', 'calendarChanges',
-      'videoReferences', 'progressReviewNeeded', 'auditChanges'],
-    block: ['zadania', 'bankAllocation', 'objetosc_zrodla', 'planStatus', 'topics', 'practiceReadingIds', 'prerequisiteIds', 'practiceType',
-      'readingKind', 'readingIds', 'questionTarget', 'sourceKey', 'corePageCount', 'pageStart', 'pageEnd', 'pageCount', 'pageLimit', 'bankNewCount',
-      'supplementRanges', 'defaultCurriculum', 'mix', 'mixPair', 'mixPart', 'mockId', 'mockSession', 'sessionPart', 'analysisStage'],
+    plan: [],
+    block: ['objetosc_zrodla', 'lm_2027', 'tom_i_rok', 'strony_pdf', 'strony_drukowane', 'liczba_stron', 'bank_2026', 'cwiczenia_2027', 'nowe_pytania',
+      'pytania_powtorkowe', 'liczba_powtorkowych', 'bloki_pierwszego_podejscia', 'pytania_mocka', 'minuty_egzaminacyjne', 'schweser',
+      'powiazane_bloki_mpw', 'odsylacze_do_materialow', 'dzial_cfa'],
   },
   mpw: { plan: ['mockCov', 'prac'], block: ['objetosc_zrodla', 'fid'] },
 };
-// Pole bloku wczytywane osobno (study.js — „Zadania bloku” w MPW)
-export const LAZY = { mpw: 'zadania' };
+// Pole bloku wczytywane osobno (study.js — „Zadania bloku” w MPW i CFA)
+export const LAZY = { mpw: 'zadania', cfa: 'zadania' };   // D-116: plan CFA 2027 ma zadania bloków
 export const PLAN_IDS = Object.keys(DROP);
 
 const omit = (o, keys) => Object.fromEntries(Object.entries(o).filter(([k]) => !keys.includes(k)));

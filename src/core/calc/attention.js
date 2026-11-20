@@ -32,11 +32,11 @@ export function attention(state, { today, hour = 12, custom = [] } = {}) {
   if (supp.length) push('supp', 'warn', `Suplementy do uzupełnienia: ${supp.length}`, '#/suplementy');
 
   // CFA: zaległe bloki i nieodhaczone sesje recall (do wczoraj) — do dnia egzaminu CFA; później bez znaczenia (D-095)
-  if (today < SRC.cfa.exam) {
+  if (SRC.cfa.exam ? today < SRC.cfa.exam : today <= SRC.cfa.D.stat.end) {   // D-116: termin egzaminu CFA 2027 jeszcze nieznany — do końca planu
     const pace = cfaPace(SRC.cfa.D.bloki, state.cfaDone || new Set(), today);
     if (pace.overdue.length) push('cfa', 'warn', `Zaległe bloki CFA: ${pace.overdue.length}`, '#/cfa?v=harmonogram&zal=1');
     const rs = recallStats(state.settings, today);
-    if (rs.due - rs.doneDue > 0) push('recall', 'info', `Nieodhaczone sesje recall: ${rs.due - rs.doneDue}`, '#/cfa?v=plan');
+    if (rs.total && rs.due - rs.doneDue > 0) push('recall', 'info', `Nieodhaczone sesje recall: ${rs.due - rs.doneDue}`, '#/cfa?v=plan');
   }
   // MPW (D-095): zaległe bloki planu MPW — do dnia egzaminu MPW
   if (today < SRC.mpw.exam) {
@@ -44,8 +44,10 @@ export function attention(state, { today, hour = 12, custom = [] } = {}) {
     if (pace.overdue.length) push('mpw', 'warn', `Zaległe bloki MPW: ${pace.overdue.length}`, '#/mpw?v=harmonogram&zal=1');
   }
 
-  // Koniec preparatów czasowych (D-015, D-087) w ciągu 14 dni
-  const ends = [...new Set(SRC.supplements.doses.filter(d => d.validity?.until).map(d => d.validity.until))];
+  // Koniec preparatów czasowych (D-015, D-087) w ciągu 14 dni — dzień ostatniej dawki preparatu, którego wszystkie dawki mają datę końca
+  // (zmiana godziny dawki — np. czwartki D-097 do 06.01 / do 18.03, D-116 — to nie koniec preparatu)
+  const bySupp = SRC.supplements.doses.reduce((m, d) => ((m[d.supp] ||= []).push(d), m), /** @type {Record<string, any[]>} */ ({}));
+  const ends = [...new Set(Object.values(bySupp).filter(l => l.every(d => d.validity?.until)).map(l => l.map(d => d.validity.until).sort().at(-1)))];
   for (const until of ends) {
     const left = diffDays(today, until);
     if (left >= 0 && left <= END_WARN_DAYS) push(`end-${until}`, 'info', `Koniec preparatów czasowych ${shortDate(until)} (za ${left} ${left === 1 ? 'dzień' : 'dni'})`, '#/suplementy');

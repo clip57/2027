@@ -31,16 +31,17 @@ test('Faza 1 i 2: owies/makaron/ryż/chleb rosną automatycznie (D-003)', () => 
   assert.deepEqual([f2.platki_owsiane, f2.penne, f2.ryz_parboiled, f2.chleb_zytni], [85, 100, 100, 70]);
 });
 
-test('suplementy czasowe 18.10.2026–28.03.2027 (162 dni planu; zapas 180 starcza z nadwyżką 18); dni poza planem (do 17.10 i po 28.03) — bez zużycia', () => {
+test('suplementy czasowe 18.10.2026–30.06.2027 (D-116: 256 dni planu; zapas z D-015 180 kapsułek nie wystarcza — do uzupełnienia); dni poza planem (do 17.10 i po 30.06) — bez zużycia', () => {
   for (const d of ['2026-09-29', '2026-10-08', '2026-10-12', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17']) { assert.equal(consumptionForDay(d).glukozamina, undefined, `${d}: dni przed 18.10 — historia, bez zużycia (D-102, D-103c)`); assert.deepEqual(consumptionForDay(d), {}, d); }
   assert.equal(consumptionForDay('2026-10-18').glukozamina, 1);
-  assert.equal(consumptionForDay('2027-03-28').glukozamina, 1);
-  assert.equal(consumptionForDay('2027-03-29').glukozamina, undefined);
-  assert.deepEqual(consumptionForDay('2027-03-29'), {}, 'po końcu planu');
-  const days = []; for (let d = '2026-10-18'; d <= '2027-03-28'; d = addDays(d, 1)) days.push(consumptionForDay(d));
-  assert.equal(days.length, 162);
-  assert.deepEqual(['boswellia', 'chondroityna', 'glukozamina'].map(k => days.reduce((a, c) => a + (c[k] || 0), 0)), [162, 324, 162],
-    '162 dni planu: 162 / 324 / 162 kapsułek (zapas 180 / 360 / 180)');
+  assert.equal(consumptionForDay('2027-03-29').glukozamina, 1, 'D-116: plan dalej po 28.03');
+  assert.equal(consumptionForDay('2027-06-30').glukozamina, 1);
+  assert.equal(consumptionForDay('2027-07-01').glukozamina, undefined);
+  assert.deepEqual(consumptionForDay('2027-07-01'), {}, 'po końcu planu');
+  const days = []; for (let d = '2026-10-18'; d <= '2027-06-30'; d = addDays(d, 1)) days.push(consumptionForDay(d));
+  assert.equal(days.length, 256);
+  assert.deepEqual(['boswellia', 'chondroityna', 'glukozamina'].map(k => days.reduce((a, c) => a + (c[k] || 0), 0)), [256, 512, 256],
+    '256 dni planu: 256 / 512 / 256 kapsułek (zapas z D-015: 180 / 360 / 180)');
 });
 
 test('D-102, D-103, D-103b, D-103c: od 18.10 zużycie wg diety dnia — 01.11 i 02.11 dni nietreningowe (NT), 15–17.10 poza planem; 03–11.11 i święta — dieta NT; 12–15.11 wg nominalnego tygodnia', () => {

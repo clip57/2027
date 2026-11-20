@@ -53,7 +53,8 @@ export function renderStudy(root, ctx, P) {
     if (!store) return err(new Error('Baza danych jest niedostępna.'));
     try { await store.record(P.types.done, { block: nr, done: value, ...P.doneExtra }); after([nr]); } catch (e) { err(e); }
   };
-  const toExam = diffDays(today, EXAM), toStart = diffDays(today, D.stat.start);
+  // D-116: termin egzaminu może być jeszcze nieznany (plan CFA 2027) — odliczanie do końca planu
+  const toExam = EXAM ? diffDays(today, EXAM) : null, toEnd = diffDays(today, D.stat.end), toStart = diffDays(today, D.stat.start);
   // D-114 etap 2: tryb skupienia — jeden blok naraz, minutnik 53 min (te same zapisy co widok dnia)
   if (view === 'fokus') return renderStudyFocus(root, ctx, P, { done: () => store?.state?.[P.fields.done] || new Set(), toggle });
   const toggleRecall = async (date, value) => {
@@ -65,7 +66,8 @@ export function renderStudy(root, ctx, P) {
   return h('section', { class: `hero-tr hero-cfa hero-${P.id}` },
     h('div', { class: 'hero-tr-main' },
       h('p', { class: 'eyebrow' }, P.eyebrow),
-      h('h1', {}, toExam > 0 ? `${toExam} ${plural(toExam, 'dzień', 'dni', 'dni')} do egzaminu` : toExam === 0 ? 'Egzamin dziś' : 'Po egzaminie'),
+      h('h1', {}, toExam == null ? (toEnd >= 0 ? `${toEnd} ${plural(toEnd, 'dzień', 'dni', 'dni')} do końca planu` : 'Po planie')
+        : toExam > 0 ? `${toExam} ${plural(toExam, 'dzień', 'dni', 'dni')} do egzaminu` : toExam === 0 ? 'Egzamin dziś' : 'Po egzaminie'),
       h('p', { class: 'muted' }, `${doneCount} / ${D.bloki.length} bloków · ${fmt(hoursDone, 1)} / ${fmt(D.stat.godziny, 2)} h netto`),
       // Plan jeszcze się nie zaczął (MPW przed 17.11): podgląd i odliczanie do startu
       toStart > 0 && h('div', { class: 'cf-pace' }, h('span', { class: 'chip cf-start' }, icon('calendar-clock', { size: 16 }),
@@ -199,7 +201,7 @@ export function renderStudy(root, ctx, P) {
 
   // ---------------- Kalendarz
   if (view === 'kalendarz') {
-    const months = [...new Set(Object.keys(P.byDay).map(d => d.slice(0, 7)).concat(EXAM.slice(0, 7)))].sort();
+    const months = [...new Set(Object.keys(P.byDay).map(d => d.slice(0, 7)).concat(EXAM ? [EXAM.slice(0, 7)] : []))].sort();
     add(root, h('div', { class: 'cal-legend' },
       h('span', { class: 'cl c-0' }, '0%'), h('span', { class: 'cl c-1' }, '1–99%'), h('span', { class: 'cl c-2' }, '100%'),
       h('span', { class: 'cl c-mock' }, P.mock.word.toLowerCase()), h('span', { class: 'cl c-exam' }, 'egzamin')));

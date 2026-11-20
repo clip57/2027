@@ -9,6 +9,7 @@ import { createCloudClient, CloudError } from '../../src/core/sync/cloud-api.js'
 import { setupKeys, syncOnce, forgetCloudState, META, PUSH_BATCH } from '../../src/core/sync/cloud.js';
 import { MIN_ITERATIONS } from '../../src/core/sync/crypto.js';
 import { fakeSupabase, memoryStorage } from './helpers/fake-supabase.mjs';
+import { CFA_PLAN_VERSION } from '../../src/core/storage/validate.js';
 
 const PASS = 'fikcyjne hasło szyfrowania testu';
 const EMAIL = 'test@example.invalid', PWD = 'fikcyjne-haslo-konta';
@@ -29,7 +30,7 @@ test('dwa urządzenia: zbieżność, idempotencja, brak duplikatów', async () =
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
   const A = await device(srv), B = await device(srv);
   await A.store.record('inv.count', { prod: 'banan', qty: 240, date: '2026-09-27' });
-  await A.store.record('cfa.done', { block: 1, done: true, plan: 15 });
+  await A.store.record('cfa.done', { block: 1, done: true, plan: CFA_PLAN_VERSION });
   await B.store.record('train.set', { date: '2026-09-28', ex: 'ex.pon.1', set: 1, done: true, kg: 40, reps: 8, rir: 2 });
   const a1 = await A.sync(), b1 = await B.sync(), a2 = await A.sync();
   assert.deepEqual([a1.pushed, b1.applied, b1.pushed, a2.applied], [2, 2, 1, 1]);
@@ -79,9 +80,9 @@ test('zapas kursora: wiersz zatwierdzony później z niższym numerem nie zostaj
   for (const [overlap, expectSeen] of [[1000, true], [0, false]]) {
     const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
     const A = await device(srv), B = await device(srv), C = await device(srv);
-    await A.store.record('cfa.done', { block: 2, done: true, plan: 15 });
+    await A.store.record('cfa.done', { block: 2, done: true, plan: CFA_PLAN_VERSION });
     srv.holdNextInsert(); await A.sync();                 // numer 1 nadany, transakcja jeszcze niewidoczna
-    await B.store.record('cfa.done', { block: 3, done: true, plan: 15 });
+    await B.store.record('cfa.done', { block: 3, done: true, plan: CFA_PLAN_VERSION });
     await B.sync();                                       // numer 2 widoczny
     await C.sync({ overlap });                            // C widzi tylko numer 2 → kursor 2
     srv.release();                                        // „spóźniona” transakcja A zatwierdzona
@@ -93,7 +94,7 @@ test('zapas kursora: wiersz zatwierdzony później z niższym numerem nie zostaj
 test('nowe urządzenie: błędne hasło szyfrowania odrzucone, poprawne pobiera wszystko', async () => {
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
   const A = await device(srv);
-  await A.store.record('cfa.done', { block: 5, done: true, plan: 15 }); await A.sync();
+  await A.store.record('cfa.done', { block: 5, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
   const client = createCloudClient({ url: srv.url, anonKey: srv.anonKey, fetch: srv.fetch, storage: memoryStorage() });
   await client.signIn(EMAIL, PWD);
   await assert.rejects(setupKeys(client, 'to nie jest to hasło', OPT), { code: 'bad-passphrase' });
@@ -127,7 +128,7 @@ test('logowanie i sesja: złe hasło konta, odświeżenie wygasłego tokenu, rot
 test('RLS: inny użytkownik nie widzi cudzych wierszy; klucz anon bez tokenu nie ma dostępu', async () => {
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD); srv.addUser('drugi@example.invalid', 'inne-fikcyjne-haslo');
   const A = await device(srv);
-  await A.store.record('cfa.done', { block: 7, done: true, plan: 15 }); await A.sync();
+  await A.store.record('cfa.done', { block: 7, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
   const other = createCloudClient({ url: srv.url, anonKey: srv.anonKey, fetch: srv.fetch, storage: memoryStorage() });
   await other.signIn('drugi@example.invalid', 'inne-fikcyjne-haslo');
   assert.deepEqual(await other.pullEvents(0, 100), []);
@@ -141,23 +142,23 @@ test('kopia przed pobraniem z chmury najwyżej raz dziennie; ręczny import nada
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
   const A = await device(srv), B = await device(srv);
   const day1 = () => new Date('2026-09-28T08:00:00Z'), day2 = () => new Date('2026-09-29T08:00:00Z');
-  await A.store.record('cfa.done', { block: 1, done: true, plan: 15 }); await A.sync();
+  await A.store.record('cfa.done', { block: 1, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
   assert.equal((await B.sync({ now: day1 })).backup, true);
-  await A.store.record('cfa.done', { block: 2, done: true, plan: 15 }); await A.sync();
+  await A.store.record('cfa.done', { block: 2, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
   assert.equal((await B.sync({ now: day1 })).backup, false);
-  await A.store.record('cfa.done', { block: 3, done: true, plan: 15 }); await A.sync();
+  await A.store.record('cfa.done', { block: 3, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
   assert.equal((await B.sync({ now: day2 })).backup, true);
   assert.equal((await B.store.adapter.getBackups()).length, 2);
   const before = (await B.store.adapter.getBackups()).length;
-  await B.store.appendMany([{ ...B.store.makeEvent('cfa.done', { block: 9, done: true, plan: 15 }) }], 'import pliku');
+  await B.store.appendMany([{ ...B.store.makeEvent('cfa.done', { block: 9, done: true, plan: CFA_PLAN_VERSION }) }], 'import pliku');
   assert.equal((await B.store.adapter.getBackups()).length, before + 1);
 });
 
 test('uszkodzony wiersz odrzucony i zgłoszony; pozostałe zastosowane; kursor przesunięty', async () => {
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
   const A = await device(srv), B = await device(srv);
-  await A.store.record('cfa.done', { block: 1, done: true, plan: 15 });
-  await A.store.record('cfa.done', { block: 2, done: true, plan: 15 });
+  await A.store.record('cfa.done', { block: 1, done: true, plan: CFA_PLAN_VERSION });
+  await A.store.record('cfa.done', { block: 2, done: true, plan: CFA_PLAN_VERSION });
   await A.sync();
   srv.events[0].blob = srv.events[0].blob.slice(0, -4) + 'AAAA';
   const r = await B.sync();
@@ -169,7 +170,7 @@ test('uszkodzony wiersz odrzucony i zgłoszony; pozostałe zastosowane; kursor p
 test('przerwana wysyłka wznawia się od miejsca przerwania (partie potwierdzone nie są wysyłane ponownie)', async () => {
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
   const A = await device(srv);
-  const many = [...Array(PUSH_BATCH + 10)].map((_, i) => A.store.makeEvent('cfa.done', { block: (i % 400) + 1, done: true, plan: 15 }));
+  const many = [...Array(PUSH_BATCH + 10)].map((_, i) => A.store.makeEvent('cfa.done', { block: (i % 400) + 1, done: true, plan: CFA_PLAN_VERSION }));
   await A.store.appendMany(many, 'test');
   let calls = 0;
   const failing = { ...A.client, pushEvents: async (...a) => { if (++calls === 2) throw new CloudError('Brak połączenia z chmurą', 'network'); return A.client.pushEvents(...a); } };
@@ -183,7 +184,7 @@ test('przerwana wysyłka wznawia się od miejsca przerwania (partie potwierdzone
 test('ręczna synchronizacja plikiem działa obok chmury; wyłączenie chmury czyści tylko jej stan', async () => {
   const srv = fakeSupabase(); srv.addUser(EMAIL, PWD);
   const A = await device(srv), B = await device(srv);
-  await A.store.record('cfa.done', { block: 4, done: true, plan: 15 }); await A.sync(); await B.sync();
+  await A.store.record('cfa.done', { block: 4, done: true, plan: CFA_PLAN_VERSION }); await A.sync(); await B.sync();
   const bundle = await exportBundle(B.store);
   assert.equal(bundle.format, '2027-sync');
   assert.ok(bundle.events.some(e => e.d?.block === 4));
@@ -208,13 +209,13 @@ test('R4 (audyt 23.10.2026): „raz dziennie” dla kopii przed pobraniem z chmu
     const A = await device(srv), B = await device(srv);
     // 28.09 23:30 i 29.09 00:30 czasu polskiego — w UTC oba to 28.09 (wcześniej druga kopia była pomijana)
     const late = () => new Date('2026-09-28T21:30:00Z'), midnight = () => new Date('2026-09-28T22:30:00Z'), later = () => new Date('2026-09-29T06:00:00Z');
-    await A.store.record('cfa.done', { block: 1, done: true, plan: 15 }); await A.sync();
+    await A.store.record('cfa.done', { block: 1, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
     assert.equal((await B.sync({ now: late })).backup, true);
     assert.equal(await B.store.adapter.getMeta(META.lastBackup), '2026-09-28');
-    await A.store.record('cfa.done', { block: 2, done: true, plan: 15 }); await A.sync();
+    await A.store.record('cfa.done', { block: 2, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
     assert.equal((await B.sync({ now: midnight })).backup, true, 'nowa doba lokalna — nowa kopia');
     assert.equal(await B.store.adapter.getMeta(META.lastBackup), '2026-09-29');
-    await A.store.record('cfa.done', { block: 3, done: true, plan: 15 }); await A.sync();
+    await A.store.record('cfa.done', { block: 3, done: true, plan: CFA_PLAN_VERSION }); await A.sync();
     assert.equal((await B.sync({ now: later })).backup, false, 'ta sama doba lokalna — bez kolejnej kopii');
   } finally { if (tz === undefined) delete process.env.TZ; else process.env.TZ = tz; }
 });
@@ -225,7 +226,7 @@ test('R1 (audyt 23.10.2026): wiersz z chmury, którego ta wersja nie przyjmuje, 
   // A — „nowsza wersja”: znany typ z treścią spoza walidacji tej wersji (numer bloku CFA ponad limit); zapis z pominięciem walidacji
   const wide = { ...A.store.makeEvent('cfa.done', { block: 500, done: true, plan: 16 }), id: 'cfa.done:nowsza-wersja' };
   A.store.events.set(wide.id, wide);
-  await A.store.record('cfa.done', { block: 3, done: true, plan: 15 });
+  await A.store.record('cfa.done', { block: 3, done: true, plan: CFA_PLAN_VERSION });
   await A.sync();
   const r = await B.sync();
   assert.deepEqual([r.applied, r.held, r.rejected.length, r.rejected[0].held], [1, 1, 1, true]);

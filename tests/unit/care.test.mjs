@@ -108,7 +108,7 @@ test('B9 (audyt 23.10.2026): sloty do przypięcia kroku — każdy raz, dni z ka
   for (const s of SRC.dayTemplate.slots) assert.ok(label(s.id), `slot szablonu ${s.id} na liście`);
   assert.equal(label('slot.0700'), '07:00 · Pobudka', 'slot codzienny bez opisu dni');
   assert.match(label('slot.1745z'), /^17:45 · Zakupy \(czw, 22\.10–29\.10\)$/);
-  assert.match(label('slot.1530j'), /\(czw, 07\.01–25\.03\)$/);
+  assert.match(label('slot.1530j'), /\(czw, 07\.01–18\.03\)$/, 'D-116: wariant czwartek_st do ostatniego czwartku planu MPW');
   assert.match(label('slot.2015n'), /\(nd, /);
   assert.match(label('slot.1905b'), /\(czw, 24\.12–31\.12\)$/, 'dni wariantu z kalendarza: 24.12 i 31.12 bez zakupów (D-103, D-109)');
   assert.equal(label('slot.1940c'), undefined, 'slot nieużywany w planie (wariant czwartek_k) — poza listą wyboru');

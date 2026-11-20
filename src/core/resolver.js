@@ -5,7 +5,10 @@ import { weekday, dayName, isValidDay } from './dates.js';
 
 const CFA_FIRST = SRC.cfa.D.stat.start, CFA_LAST = SRC.cfa.D.stat.end;
 const NIGHT_RECALL = new Set((SRC.cfa.D.nightRecall || []).map(r => r.data));   // D-101: dni sesji recall 22:00 z planu CFA
-const MOCKS = new Set(SRC.cfa.D.mockCFA);
+// D-116: plan z listą `nightRecall` (także pustą) wyznacza recall sam — plan CFA Level I 2027 nie ma sesji recall 22:00
+const RECALL_FROM_PLAN = Array.isArray(SRC.cfa.D.nightRecall);
+// Szablon dnia mocka (D-019: sesje S1/S2 w slotach A–E) — tylko w planach z blokami mocka oznaczonymi S1/S2; D-116: plan 2027 ma zwykłe litery (`mockSessions: false`)
+const MOCKS = new Set(SRC.cfa.D.mockSessions === false ? [] : SRC.cfa.D.mockCFA);
 // Plan MPW (D-095; v8 — D-096): 16.11.2026–20.03.2027 — bloki A–C 15:30–18:23 nie zmieniają szablonu godzin (osobna karta w „Dziś”);
 // bloki P1–P7 (powtórka całości, 8:00–15:23 w wybrane weekendy) zajmują sloty A–G o tych samych godzinach; w czwartki od 07.01
 // (D-097) bloki A–C są 30 min później i mają własne sloty wariantu „czwartek_st” (`mpwSlot`)
@@ -14,10 +17,12 @@ const mpwSlotBlocks = date => (mpwByDay[date] || []).filter(b => b.blok.startsWi
 // Weekendowe bloki 8:00–15:23 (D-096): studia, rozmowa, praca magisterska, święta, egzamin MPW — sloty A–G
 export const dayBlocks = date => SRC.week.blocks?.[date] || null;
 const BLOCKS_END = '15:23';
+// D-116: wydarzenia weekendu o stałym terminie (zajęcia, egzamin) mają pierwszeństwo przed blokami nauki w slocie; praca magisterska, rozmowa i święta — nie
+const FIXED = new Set(['studia', 'egzamin']);
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 18.10.2026–28.03.2027; plan CFA V44 ma własny zakres od 16.10 — `cfa.json`). Dni
+// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 18.10.2026–30.06.2027 — D-116; plan CFA ma własny zakres — `cfa.json`, 20.11.2026–12.05.2027). Dni
 // wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
@@ -62,9 +67,10 @@ export function dosesFor(date) {
     d.weekdays.includes(wd) && inValidity(d, date));
   return doses.map(d => ({ ...d, time: doseTime(d.time, date) }));   // D-099, D-103, D-103b
 }
-// Okres przyjmowania preparatów czasowych (D-015; `validity` w `supplements.json`, obecnie 18.10.2026–28.03.2027 — D-103c). `from` opcjonalne.
+// Okres przyjmowania preparatów czasowych (D-015; `validity` w `supplements.json`, obecnie 18.10.2026–30.06.2027 — D-116). `from` i `until` opcjonalne
+// (D-116: czwartkowe dawki 17:15 wracają od 19.03 bez daty końca).
 export function inValidity(d, date) {
-  return !d.validity || ((!d.validity.from || date >= d.validity.from) && date <= d.validity.until);
+  return !d.validity || ((!d.validity.from || date >= d.validity.from) && (!d.validity.until || date <= d.validity.until));
 }
 
 // Plan dnia tygodnia (D-018) z wyjątkami dla konkretnych dat (`week.json` → `exceptions`; D-087, D-096, D-103, D-103b: np. 01–02.11 i 03–11.11 bez treningu,
@@ -81,7 +87,7 @@ export function dayPlan(date) {
   const x = SRC.week.exceptions?.[date];
   let d = x ? { ...w, ...x } : w;
   // D-101: sesje recall 22:00 wg harmonogramu CFA (`nightRecall`: codziennie poza 23.10 i 25.10) zamiast reguły „bez pt i sob”
-  if (NIGHT_RECALL.size && date >= CFA_FIRST && date <= CFA_LAST) d = { ...d, recall: NIGHT_RECALL.has(date) };
+  if (RECALL_FROM_PLAN && date >= CFA_FIRST && date <= CFA_LAST) d = { ...d, recall: NIGHT_RECALL.has(date) };
   return date < DIET_START ? { ...d, noDiet: true } : d;   // D-100: dni planu przed startem diety (przy starcie diety = start planu — nigdy)
 }
 
@@ -228,20 +234,26 @@ export function resolveDay(date) {
     const out = { id: s.id, key: s.key ?? null, from: s.from, to: s.to, domain: s.domain, role: s.role, title: s.title_src, desc: '', items, shop: !!s.shop,
       doses: doses.filter(d => d.time >= s.from && (s.to < s.from || d.time < s.to)) };
     if (s.role === 'cfa') {
+      // D-116: plany CFA i MPW równolegle (20.11.2026–20.03.2027). Kolejność w slocie: stałe wydarzenie weekendu (studia, egzamin) → blok CFA →
+      // blok MPW w slocie (P1–P7, czwartek od 07.01) → pozostałe bloki weekendu (praca magisterska, rozmowa, święta — sloty bez nauki) →
+      // „Czas własny” albo „Nauka MPW” (bloki A–C w karcie MPW). Blok CFA zasłonięty stałym wydarzeniem — w opisie slotu (kolizja do decyzji).
       const letter = isMock && SRC.week.mock.replace[s.key] ? SRC.week.mock.replace[s.key] : s.key;
-      const bl = blocks.filter(b => b.blok === letter);
-      const pb = !inCfa && (s.mpwSlot ? mpwAll : mpwP).find(b => b.godz.startsWith(s.from));
-      if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G; D-097: czwartek
-      else if (s.mpwSlot) Object.assign(out, ownTime(s, mpwAll));
-      else if (!inCfa && wb && (wb.kind === 'wolne' || s.to <= BLOCKS_END)) Object.assign(out, { title: wb.title, desc: wb.desc, cfa: [], block: wb.kind });
-      else if (!inCfa) Object.assign(out, ownTime(s, mpwAll));
-      else if (!bl.length) Object.assign(out, { title: 'Wolne', desc: isMock ? 'Dzień mocka — brak bloku w planie (D-036)' : 'Brak bloku w planie CFA tego dnia', cfa: [] });
-      else if (isMock && letter.startsWith('S')) {
+      const bl = inCfa ? blocks.filter(b => b.blok === letter) : [];
+      const pb = (s.mpwSlot ? mpwAll : mpwP).find(b => b.godz.startsWith(s.from));
+      const inBlock = wb && (wb.kind === 'wolne' ? !mpwAll.some(b => !b.blok.startsWith('P') && overlaps(b.godz, s.from, s.to)) : s.to <= BLOCKS_END);
+      if (inBlock && FIXED.has(wb.kind)) Object.assign(out, { title: wb.title, cfa: [], block: wb.kind,
+        desc: bl.length ? `${wb.desc} · kolizja z planem CFA: ${bl.map(b => `blok ${b.blok} ${b.godz} — ${b.temat}`).join('; ')}` : wb.desc });
+      else if (bl.length && isMock && letter.startsWith('S')) {
         // Bloki sesji przypisane tylko do pierwszego slotu sesji (A lub C); drugi slot = kontynuacja.
         const first = Object.entries(SRC.week.mock.replace).find(([, v]) => v === letter)[0] === s.key;
         Object.assign(out, { title: `Mock CFA — sesja ${letter[1]}`, desc: first ? '' : `Kontynuacja sesji (${bl[0].godz})`, cfa: first ? bl : [] });
       }
-      else Object.assign(out, { title: `CFA blok ${s.key}`, cfa: bl });
+      else if (bl.length) Object.assign(out, { title: `CFA blok ${s.key}`, cfa: bl });
+      else if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G; D-097: czwartek
+      else if (s.mpwSlot) Object.assign(out, ownTime(s, mpwAll));
+      else if (inBlock) Object.assign(out, { title: wb.title, desc: wb.desc, cfa: [], block: wb.kind });
+      else if (isMock) Object.assign(out, { title: 'Wolne', desc: 'Dzień mocka — brak bloku w planie (D-036)', cfa: [] });
+      else Object.assign(out, ownTime(s, mpwAll));
     } else if (s.role === 'meal') {
       const m = p.meals.find(x => x.id === s.key);
       Object.assign(out, { meal: s.key, kcal: m && !noDiet ? m.total.kcal : null, mealName: mealName(s.key) });
@@ -253,8 +265,8 @@ export function resolveDay(date) {
       Object.assign(out, { title: 'Wolne', items: [] });
     } else if (s.role === 'recall') {
       const on = inCfa && w.recall;
-      Object.assign(out, { recall: on, title: on ? 'CFA Active Recall' : 'Wieczór wolny', own: !inCfa,   // U1: poza planem CFA — bez opisu „Poza okresem planu nauki”
-        desc: on ? 'Sesja active recall (53 min)' : (inCfa ? 'Brak sesji recall tego dnia (wg harmonogramu CFA)' : '') });
+      Object.assign(out, { recall: on, title: on ? 'CFA Active Recall' : 'Wieczór wolny', own: !inCfa || !NIGHT_RECALL.size,   // U1: poza planem CFA — bez opisu „Poza okresem planu nauki”
+        desc: on ? 'Sesja active recall (53 min)' : (inCfa && NIGHT_RECALL.size ? 'Brak sesji recall tego dnia (wg harmonogramu CFA)' : '') });
     }
     return out;
   });
@@ -269,7 +281,8 @@ export function resolveDay(date) {
     for (const [letter, list] of Object.entries(extra)) {
       const [from, to] = list[0].godz.split('–');
       const at = slots.findIndex(x => x.to > x.from && x.from >= from);   // przed pierwszym slotem zaczynającym się nie wcześniej niż blok
-      slots.splice(at < 0 ? slots.length : at, 0, { id: `slot.cfa.${letter}`, from, to, domain, role: 'cfa', title: `CFA blok ${letter}`, desc: '', items: [], shop: false, doses: [], cfa: list, extra: true });
+      const title = /^[A-Z]\d?$/.test(letter) ? `CFA blok ${letter}` : `CFA — blok ${letter.toLowerCase()}`;   // D-116: „Dodatkowy” 17:40–18:33
+      slots.splice(at < 0 ? slots.length : at, 0, { id: `slot.cfa.${letter}`, from, to, domain, role: 'cfa', title, desc: '', items: [], shop: false, doses: [], cfa: list, extra: true });
     }
   }
 

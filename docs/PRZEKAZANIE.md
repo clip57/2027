@@ -35,6 +35,14 @@ stan wdrożenia, niedokończone zadania i pliki spoza repozytorium. Kolejność 
 
 Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 
+## 3a. Stan 20.11.2026 (D-116)
+- D-114 i D-115 opublikowane na `main` (18–19.11.2026). D-116 (studia wg harmonogramu, MPW od 20.11, nowy plan CFA Level I 2027,
+  kalendarz do 30.06.2027) — na gałęzi `claude/eager-newton-j2309e`, publikacja po poleceniu „Publikuj” (`docs/RAPORT_D116.md`).
+- Plany nauki: skrypt decyzji `tools/extract/plan_d116.py <mpw.csv> <cfa.csv>` (pliki CSV ma tylko użytkownik) — uruchamiaj na danych z `main`
+  sprzed D-116 albo na bieżących (idempotentny). Kolejna wymiana planu CFA = nowa wartość `CFA_PLAN_VERSION` i `CFA_BLOCKS` (`validate.js`).
+- Do decyzji użytkownika: `docs/RAPORT_D116.md` §3 (termin egzaminu CFA, 08–09.05, blok dodatkowy × trening = D1, suplementy na 256 dni,
+  święta po 28.03, dzień obrony).
+
 ## 4. Otwarte sprawy — stan 1.11.2026 (po D-113)
 **Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
 obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,

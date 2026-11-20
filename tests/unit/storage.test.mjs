@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import { Store, StorageError } from '../../src/core/storage/store.js';
 import { MemoryAdapter } from '../../src/core/storage/adapter-memory.js';
 import { stockAt } from '../../src/core/calc/inventory.js';
+import { CFA_PLAN_VERSION } from '../../src/core/storage/validate.js';
 
 const open = async (a = new MemoryAdapter()) => new Store(a).open();
 
 test('zapis + weryfikacja + odczyt po ponownym otwarciu (trwałość)', async () => {
   const a = new MemoryAdapter();
   const s = await open(a);
-  await s.record('cfa.done', { block: 5, done: true, plan: 15 });
+  await s.record('cfa.done', { block: 5, done: true, plan: CFA_PLAN_VERSION });
   const s2 = await open(a);
   assert.ok(s2.state.cfaDone.has(5));
   assert.equal(s2.device, s.device, 'identyfikator urządzenia jest trwały');
@@ -19,12 +20,12 @@ test('błąd zapisu: wyjątek, stan „błąd”, brak zmiany danych, kolejne za
   const a = new MemoryAdapter();
   const s = await open(a);
   a.fail.write = true;
-  await assert.rejects(() => s.record('cfa.done', { block: 1, done: true, plan: 15 }), StorageError);
+  await assert.rejects(() => s.record('cfa.done', { block: 1, done: true, plan: CFA_PLAN_VERSION }), StorageError);
   assert.equal(s.health.ok, false);
   assert.match(s.health.error, /NIE zostały zapisane/);
   assert.equal(s.state.cfaDone.has(1), false);
   a.fail.write = false;
-  await assert.rejects(() => s.record('cfa.done', { block: 2, done: true, plan: 15 }), StorageError, 'po błędzie zapis zablokowany do odświeżenia');
+  await assert.rejects(() => s.record('cfa.done', { block: 2, done: true, plan: CFA_PLAN_VERSION }), StorageError, 'po błędzie zapis zablokowany do odświeżenia');
 });
 
 test('błąd weryfikacji odczytem jest wykrywany', async () => {
@@ -42,7 +43,7 @@ test('baza niedostępna: open() zgłasza błąd, zapis niemożliwy', async () =>
 test('uszkodzone zdarzenia trafiają do kwarantanny, reszta działa', async () => {
   const a = new MemoryAdapter();
   const s = await open(a);
-  await s.record('cfa.done', { block: 7, done: true, plan: 15 });
+  await s.record('cfa.done', { block: 7, done: true, plan: CFA_PLAN_VERSION });
   await a.putRaw([{ id: 'bad1', t: 'cfa.done', d: { block: 9999, done: true }, hlc: 'x', dev: 'd' }, { junk: true }]);
   const s2 = await open(a);
   assert.equal(s2.health.quarantined, 2);
@@ -61,8 +62,8 @@ test('walidacja odrzuca niepoprawne dane przed zapisem', async () => {
 
 test('LWW: późniejsza zmiana wygrywa, poprzednia zostaje w historii', async () => {
   const s = await open();
-  await s.record('cfa.done', { block: 3, done: true, plan: 15 });
-  await s.record('cfa.done', { block: 3, done: false, plan: 15 });
+  await s.record('cfa.done', { block: 3, done: true, plan: CFA_PLAN_VERSION });
+  await s.record('cfa.done', { block: 3, done: false, plan: CFA_PLAN_VERSION });
   assert.equal(s.state.cfaDone.has(3), false);
   assert.equal(s.state.superseded.length, 1);
 });

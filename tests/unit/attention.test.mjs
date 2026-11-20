@@ -13,20 +13,22 @@ test('Wymaga uwagi: zaległe CFA zgodne z modułem CFA, braki przed zakupami, su
   const s = await new Store(new MemoryAdapter()).open();
   await s.recordMany([['inv.count', { prod: 'banan', qty: 120, date: '2026-10-05' }], ['inv.count', { prod: 'kreatyna', qty: 5, date: '2026-10-05' }],
     ['inv.count', { prod: 'kefir', qty: 99999, date: '2026-10-05' }]]);
-  const a = attention(s.state, { today: '2026-10-20', hour: 10 });   // plan CFA V3 od 13.10 (D-101); wtorek F0 z dietą T — banan potrzebny do zakupów 22.10
+  const a = attention(s.state, { today: '2026-11-24', hour: 10 });   // plan CFA 2027 od 20.11 (D-116); wtorek z dietą T — banan potrzebny do zakupów 26.11
   const cfa = a.find(x => x.id === 'cfa');
-  assert.equal(cfa.text, `Zaległe bloki CFA: ${cfaPace(SRC.cfa.D.bloki, new Set(), '2026-10-20').overdue.length}`);
+  assert.ok(cfaPace(SRC.cfa.D.bloki, new Set(), '2026-11-24').overdue.length > 0);
+  assert.equal(cfa.text, `Zaległe bloki CFA: ${cfaPace(SRC.cfa.D.bloki, new Set(), '2026-11-24').overdue.length}`);
   assert.match(a.find(x => x.id === 'shop').text, /Banan/);
   assert.doesNotMatch(a.find(x => x.id === 'shop').text, /Kefir/);
   const supp = a.find(x => x.id === 'supp');
   assert.ok(supp && !/Kreatyna/i.test(supp.text), 'suplementy tylko liczbą');
-  assert.ok(ids(a).includes('recall'));
+  assert.ok(!ids(a).includes('recall'), 'plan CFA 2027 bez sesji recall (D-116)');
 });
 
 test('Wymaga uwagi: pusty dziennik przed startem CFA — brak ostrzeżeń; koniec preparatów czasowych 14 dni wcześniej', async () => {
   const s = await new Store(new MemoryAdapter()).open();
   assert.deepEqual(attention(s.state, { today: '2026-09-25' }), []);
-  const end = attention(s.state, { today: '2027-03-17' }).find(x => x.id.startsWith('end-'));
-  assert.match(end.text, /28\.03/);   // D-097: preparaty czasowe do 28.03.2027
-  assert.equal(attention(s.state, { today: '2027-03-08' }).find(x => x.id.startsWith('end-')), undefined);
+  const end = attention(s.state, { today: '2027-06-19' }).find(x => x.id.startsWith('end-'));
+  assert.match(end.text, /30\.06/);   // D-116: preparaty czasowe do 30.06.2027 (wcześniej D-097: do 28.03)
+  assert.equal(attention(s.state, { today: '2027-06-10' }).find(x => x.id.startsWith('end-')), undefined);
+  assert.equal(attention(s.state, { today: '2027-03-17' }).find(x => x.id.startsWith('end-')), undefined);
 });

@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_from": "PLAN_NAUKI_MPW.html (plan MPW 2027 v8, 392 bloki, 16.11.2026–20.03.2027) — obiekt D (D-095, D-096)",
+ "generated_from": "PLAN_NAUKI_MPW.html (plan MPW 2027 v8, 392 bloki) — obiekt D (D-095, D-096); D-116: daty z MASTER_SCHEDULE_MPW.csv — start 2026-11-20, bloki 24–27.12.2026",
  "exam": "2027-03-21",
  "examTime": "11:00",
  "D": {
@@ -18,11 +18,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L111a",
-    "data": "2026-11-16",
+    "data": "2026-11-20",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 1,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -37,11 +37,11 @@
     "knf": "4.1.1",
     "priorytet": "HIGH",
     "fid": "T001",
-    "data": "2026-11-16",
+    "data": "2026-11-20",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 2,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -56,11 +56,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L111b",
-    "data": "2026-11-16",
+    "data": "2026-11-20",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 3,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -75,11 +75,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L112",
-    "data": "2026-11-17",
+    "data": "2026-11-21",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 4,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -94,11 +94,11 @@
     "knf": "4.1.1",
     "priorytet": "HIGH",
     "fid": "T002",
-    "data": "2026-11-17",
+    "data": "2026-11-21",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 5,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -113,11 +113,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L113a",
-    "data": "2026-11-17",
+    "data": "2026-11-21",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 6,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -132,11 +132,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L113b",
-    "data": "2026-11-18",
+    "data": "2026-11-22",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 7,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -151,11 +151,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L114a",
-    "data": "2026-11-18",
+    "data": "2026-11-22",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 8,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -170,11 +170,11 @@
     "knf": "4.1.1–4.1.2",
     "priorytet": "HIGH",
     "fid": "T003",
-    "data": "2026-11-18",
+    "data": "2026-11-22",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 9,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -189,11 +189,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L114b",
-    "data": "2026-11-19",
+    "data": "2026-11-23",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 10,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -208,11 +208,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L115a",
-    "data": "2026-11-19",
+    "data": "2026-11-23",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 11,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -227,11 +227,11 @@
     "knf": "4.1.4, 4.2.1–4.2.4",
     "priorytet": "HIGH",
     "fid": "T004",
-    "data": "2026-11-19",
+    "data": "2026-11-23",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 12,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -246,11 +246,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L115b",
-    "data": "2026-11-20",
+    "data": "2026-11-24",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 13,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -265,11 +265,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L115c",
-    "data": "2026-11-20",
+    "data": "2026-11-24",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 14,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -284,11 +284,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L115d",
-    "data": "2026-11-20",
+    "data": "2026-11-24",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 15,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -303,11 +303,11 @@
     "knf": "1.1.1–1.1.13",
     "priorytet": "MEDIUM",
     "fid": "L115e",
-    "data": "2026-11-21",
+    "data": "2026-11-25",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 16,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -322,11 +322,11 @@
     "knf": "4.1.6, 4.2.2",
     "priorytet": "HIGH",
     "fid": "T005",
-    "data": "2026-11-21",
+    "data": "2026-11-25",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 17,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -341,11 +341,11 @@
     "knf": "1.2.1",
     "priorytet": "HIGH",
     "fid": "L083",
-    "data": "2026-11-21",
+    "data": "2026-11-25",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 18,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -360,11 +360,11 @@
     "knf": "1.2.2",
     "priorytet": "HIGH",
     "fid": "L084a",
-    "data": "2026-11-22",
+    "data": "2026-11-26",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 19,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -379,11 +379,11 @@
     "knf": "4.3.2",
     "priorytet": "HIGH",
     "fid": "T006",
-    "data": "2026-11-22",
+    "data": "2026-11-26",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 20,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -398,11 +398,11 @@
     "knf": "1.2.2",
     "priorytet": "HIGH",
     "fid": "L084b",
-    "data": "2026-11-22",
+    "data": "2026-11-26",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 21,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -417,11 +417,11 @@
     "knf": "1.2.3",
     "priorytet": "HIGH",
     "fid": "L085a",
-    "data": "2026-11-23",
+    "data": "2026-11-27",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 22,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -436,11 +436,11 @@
     "knf": "4.3.3",
     "priorytet": "HIGH",
     "fid": "T007",
-    "data": "2026-11-23",
+    "data": "2026-11-27",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 23,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -455,11 +455,11 @@
     "knf": "1.2.3",
     "priorytet": "HIGH",
     "fid": "L085b",
-    "data": "2026-11-23",
+    "data": "2026-11-27",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 24,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -474,11 +474,11 @@
     "knf": "1.2.3–1.2.4",
     "priorytet": "HIGH",
     "fid": "L086a",
-    "data": "2026-11-24",
+    "data": "2026-11-28",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 25,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -493,11 +493,11 @@
     "knf": "1.2.3–1.2.4",
     "priorytet": "HIGH",
     "fid": "L086b",
-    "data": "2026-11-24",
+    "data": "2026-11-28",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 26,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -512,11 +512,11 @@
     "knf": "4.3.1",
     "priorytet": "HIGH",
     "fid": "T008",
-    "data": "2026-11-24",
+    "data": "2026-11-28",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 27,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -531,11 +531,11 @@
     "knf": "1.2.4",
     "priorytet": "HIGH",
     "fid": "L087a",
-    "data": "2026-11-25",
+    "data": "2026-11-29",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 28,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -550,11 +550,11 @@
     "knf": "1.2.4",
     "priorytet": "HIGH",
     "fid": "L087b",
-    "data": "2026-11-25",
+    "data": "2026-11-29",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 29,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -569,11 +569,11 @@
     "knf": "1.2.4",
     "priorytet": "HIGH",
     "fid": "L088a",
-    "data": "2026-11-25",
+    "data": "2026-11-29",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 30,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -588,11 +588,11 @@
     "knf": "1.2.4",
     "priorytet": "HIGH",
     "fid": "L088b",
-    "data": "2026-11-26",
+    "data": "2026-11-30",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 31,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -607,11 +607,11 @@
     "knf": "4.4.5",
     "priorytet": "HIGH",
     "fid": "T009",
-    "data": "2026-11-26",
+    "data": "2026-11-30",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 32,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -626,11 +626,11 @@
     "knf": "1.2.5–1.2.7",
     "priorytet": "HIGH",
     "fid": "L089a",
-    "data": "2026-11-26",
+    "data": "2026-11-30",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 33,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -645,11 +645,11 @@
     "knf": "1.2.5–1.2.7",
     "priorytet": "HIGH",
     "fid": "L089b",
-    "data": "2026-11-27",
+    "data": "2026-12-01",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 34,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -664,11 +664,11 @@
     "knf": "4.4.1–4.4.4",
     "priorytet": "HIGH",
     "fid": "T010",
-    "data": "2026-11-27",
+    "data": "2026-12-01",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 35,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -683,11 +683,11 @@
     "knf": "1.2.5–1.2.7",
     "priorytet": "HIGH",
     "fid": "L089c",
-    "data": "2026-11-27",
+    "data": "2026-12-01",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 36,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -702,11 +702,11 @@
     "knf": "1.2.5–1.2.7",
     "priorytet": "HIGH",
     "fid": "L089d",
-    "data": "2026-11-28",
+    "data": "2026-12-02",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 37,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -721,11 +721,11 @@
     "knf": "3.1.1–3.1.4",
     "priorytet": "MEDIUM",
     "fid": "T011",
-    "data": "2026-11-28",
+    "data": "2026-12-02",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 38,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -736,15 +736,15 @@
     "zakres": "art. 1–4 · cz. 1/2 · s. 1–7 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Rozdział 1 Przepisy ogólne; Rozdział 2 Postępowanie z dokumentami informacyjnymi związanymi z ofertą; Oddział 1 Przepisy wspólne — cz. 1/2",
-    "zadania": "Przeczytaj art. 1–4 · cz. 1/2 — s. 1–7 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 1–4 · cz. 1/2 — s. 1–7 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L061a",
-    "data": "2026-11-28",
+    "data": "2026-12-02",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 39,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -755,15 +755,15 @@
     "zakres": "art. 4a–10 · cz. 2/2 · s. 8–14 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Rozdział 1 Przepisy ogólne; Rozdział 2 Postępowanie z dokumentami informacyjnymi związanymi z ofertą; Oddział 1 Przepisy wspólne — cz. 2/2",
-    "zadania": "Przeczytaj art. 4a–10 · cz. 2/2 — s. 8–14 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 4a–10 · cz. 2/2 — s. 8–14 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L061b",
-    "data": "2026-11-29",
+    "data": "2026-12-03",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 40,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -774,15 +774,15 @@
     "zakres": "art. 11a–18a · cz. 1/2 · s. 14–21 (8 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 1 Przepisy wspólne; Oddział 2 Zatwierdzenie i termin ważności prospektu — cz. 1/2",
-    "zadania": "Przeczytaj art. 11a–18a · cz. 1/2 — s. 14–21 (8 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 8 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 11a–18a · cz. 1/2 — s. 14–21 (8 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 8 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L062a",
-    "data": "2026-11-29",
+    "data": "2026-12-03",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 41,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -797,11 +797,11 @@
     "knf": "5.2",
     "priorytet": "MEDIUM",
     "fid": "T012",
-    "data": "2026-11-29",
+    "data": "2026-12-03",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 42,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -812,15 +812,15 @@
     "zakres": "art. 19c–27 · cz. 2/2 · s. 22–28 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 1 Przepisy wspólne; Oddział 2 Zatwierdzenie i termin ważności prospektu — cz. 2/2",
-    "zadania": "Przeczytaj art. 19c–27 · cz. 2/2 — s. 22–28 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 19c–27 · cz. 2/2 — s. 22–28 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L062b",
-    "data": "2026-11-30",
+    "data": "2026-12-04",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 43,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -831,15 +831,15 @@
     "zakres": "art. 30–38 · cz. 1/2 · s. 28–33 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 2 Zatwierdzenie i termin ważności prospektu; Oddział 2a Dokumenty informacyjne obowiązujące wyłącznie na terytorium; Oddział 3 (uchylony); Oddział 4 Udostępnianie informacji o papierach wartościowych w związku z ofertą — cz. 1/2",
-    "zadania": "Przeczytaj art. 30–38 · cz. 1/2 — s. 28–33 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 30–38 · cz. 1/2 — s. 28–33 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L063a",
-    "data": "2026-11-30",
+    "data": "2026-12-04",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 44,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -854,11 +854,11 @@
     "knf": "5.1, 5.4",
     "priorytet": "MEDIUM",
     "fid": "T013",
-    "data": "2026-11-30",
+    "data": "2026-12-04",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 45,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -869,15 +869,15 @@
     "zakres": "art. 40–51a · cz. 2/2 · s. 34–38 (5 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 2 Zatwierdzenie i termin ważności prospektu; Oddział 2a Dokumenty informacyjne obowiązujące wyłącznie na terytorium; Oddział 3 (uchylony); Oddział 4 Udostępnianie informacji o papierach wartościowych w związku z ofertą — cz. 2/2",
-    "zadania": "Przeczytaj art. 40–51a · cz. 2/2 — s. 34–38 (5 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 5 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 40–51a · cz. 2/2 — s. 34–38 (5 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 5 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L063b",
-    "data": "2026-12-01",
+    "data": "2026-12-05",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 46,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -888,15 +888,15 @@
     "zakres": "art. 53–56b · cz. 1/2 · s. 38–44 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 4 Udostępnianie informacji o papierach wartościowych w związku z ofertą; Rozdział 3 Obowiązki informacyjne emitentów — cz. 1/2",
-    "zadania": "Przeczytaj art. 53–56b · cz. 1/2 — s. 38–44 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 53–56b · cz. 1/2 — s. 38–44 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L064a",
-    "data": "2026-12-01",
+    "data": "2026-12-05",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 47,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -907,15 +907,15 @@
     "zakres": "art. 58–62a · cz. 2/2 · s. 45–50 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 4 Udostępnianie informacji o papierach wartościowych w związku z ofertą; Rozdział 3 Obowiązki informacyjne emitentów — cz. 2/2",
-    "zadania": "Przeczytaj art. 58–62a · cz. 2/2 — s. 45–50 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 58–62a · cz. 2/2 — s. 45–50 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L064b",
-    "data": "2026-12-01",
+    "data": "2026-12-05",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 48,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -926,15 +926,15 @@
     "zakres": "art. 68–69 · cz. 1/2 · s. 50–56 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Rozdział 3 Obowiązki informacyjne emitentów; Rozdział 4 Znaczne pakiety akcji spółek publicznych; Oddział 1 Ujawnianie stanu posiadania; Oddział 2 Wezwania — cz. 1/2",
-    "zadania": "Przeczytaj art. 68–69 · cz. 1/2 — s. 50–56 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 68–69 · cz. 1/2 — s. 50–56 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L065a",
-    "data": "2026-12-02",
+    "data": "2026-12-06",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 49,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -949,11 +949,11 @@
     "knf": "5.5",
     "priorytet": "MEDIUM",
     "fid": "T014",
-    "data": "2026-12-02",
+    "data": "2026-12-06",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 50,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -964,15 +964,15 @@
     "zakres": "art. 69–70a · cz. 2/2 · s. 57–62 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Rozdział 3 Obowiązki informacyjne emitentów; Rozdział 4 Znaczne pakiety akcji spółek publicznych; Oddział 1 Ujawnianie stanu posiadania; Oddział 2 Wezwania — cz. 2/2",
-    "zadania": "Przeczytaj art. 69–70a · cz. 2/2 — s. 57–62 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 69–70a · cz. 2/2 — s. 57–62 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L065b",
-    "data": "2026-12-02",
+    "data": "2026-12-06",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 51,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -983,15 +983,15 @@
     "zakres": "art. 72a–77c · cz. 1/2 · s. 62–68 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 1 Ujawnianie stanu posiadania; Oddział 2 Wezwania — cz. 1/2",
-    "zadania": "Przeczytaj art. 72a–77c · cz. 1/2 — s. 62–68 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 72a–77c · cz. 1/2 — s. 62–68 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L066a",
-    "data": "2026-12-03",
+    "data": "2026-12-07",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 52,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1006,11 +1006,11 @@
     "knf": "5.3.1",
     "priorytet": "MEDIUM",
     "fid": "T015",
-    "data": "2026-12-03",
+    "data": "2026-12-07",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 53,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1021,15 +1021,15 @@
     "zakres": "art. 77f–79 · cz. 2/2 · s. 69–74 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 1 Ujawnianie stanu posiadania; Oddział 2 Wezwania — cz. 2/2",
-    "zadania": "Przeczytaj art. 77f–79 · cz. 2/2 — s. 69–74 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 77f–79 · cz. 2/2 — s. 69–74 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L066b",
-    "data": "2026-12-03",
+    "data": "2026-12-07",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 54,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1040,15 +1040,15 @@
     "zakres": "art. 79a–80d · cz. 1/2 · s. 74–80 (7 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 2 Wezwania; Oddział 3 Szczególne uprawnienia i obowiązki akcjonariuszy spółki publicznej — cz. 1/2",
-    "zadania": "Przeczytaj art. 79a–80d · cz. 1/2 — s. 74–80 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 79a–80d · cz. 1/2 — s. 74–80 (7 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 7 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L067a",
-    "data": "2026-12-04",
+    "data": "2026-12-08",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 55,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1063,11 +1063,11 @@
     "knf": "5.2, 5.5.1",
     "priorytet": "MEDIUM",
     "fid": "T016",
-    "data": "2026-12-04",
+    "data": "2026-12-08",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 56,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1078,15 +1078,15 @@
     "zakres": "art. 82–84 · cz. 2/2 · s. 81–86 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 2 Wezwania; Oddział 3 Szczególne uprawnienia i obowiązki akcjonariuszy spółki publicznej — cz. 2/2",
-    "zadania": "Przeczytaj art. 82–84 · cz. 2/2 — s. 81–86 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 82–84 · cz. 2/2 — s. 81–86 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L067b",
-    "data": "2026-12-04",
+    "data": "2026-12-08",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 57,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1097,15 +1097,15 @@
     "zakres": "art. 85–89 · cz. 1/2 · s. 86–91 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 3 Szczególne uprawnienia i obowiązki akcjonariuszy spółki publicznej; Oddział 4 Przepisy szczególne; Rozdział 4a Polityka wynagrodzeń i sprawozdanie o wynagrodzeniach — cz. 1/2",
-    "zadania": "Przeczytaj art. 85–89 · cz. 1/2 — s. 86–91 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 85–89 · cz. 1/2 — s. 86–91 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L068a",
-    "data": "2026-12-05",
+    "data": "2026-12-09",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 58,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1116,15 +1116,15 @@
     "zakres": "art. 90–90b · cz. 2/2 · s. 92–97 (6 s.)",
     "objetosc_zrodla": "plik projektu: Ustawa_o_ofercie_publicznej.pdf",
     "temat": "Oddział 3 Szczególne uprawnienia i obowiązki akcjonariuszy spółki publicznej; Oddział 4 Przepisy szczególne; Rozdział 4a Polityka wynagrodzeń i sprawozdanie o wynagrodzeniach — cz. 2/2",
-    "zadania": "Przeczytaj art. 90–90b · cz. 2/2 — s. 92–97 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 21.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
+    "zadania": "Przeczytaj art. 90–90b · cz. 2/2 — s. 92–97 (6 s.). Wypisz do fiszek progi liczbowe, terminy, organy i wyjątki; na koniec odtwórz z pamięci 5 pytań bez tekstu. Tempo: 6 s./53 min. Punkty KNF: 1.5.1–1.5.10. Priorytet: HIGH. Stan prawny na 21.02.2027: nowela Dz.U. 2026 poz. 1034 (rozdział 4aa) jest w bloku luki 25.12; projekt UC137 wdrażający Listing Act sprawdza punkt kontrolny 22.02.2027.",
     "knf": "1.5.1–1.5.10",
     "priorytet": "HIGH",
     "fid": "L068b",
-    "data": "2026-12-05",
+    "data": "2026-12-09",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 59,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1139,11 +1139,11 @@
     "knf": "5.4.2–5.4.3",
     "priorytet": "MEDIUM",
     "fid": "T017",
-    "data": "2026-12-05",
+    "data": "2026-12-09",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 60,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1158,11 +1158,11 @@
     "knf": "1.5.9 · 9.1.21",
     "priorytet": "MEDIUM",
     "fid": "L069a",
-    "data": "2026-12-06",
+    "data": "2026-12-10",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 61,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1177,11 +1177,11 @@
     "knf": "1.5.9 · 9.1.21",
     "priorytet": "MEDIUM",
     "fid": "L069b",
-    "data": "2026-12-06",
+    "data": "2026-12-10",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 62,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1196,11 +1196,11 @@
     "knf": "6.2.1–6.2.2",
     "priorytet": "HIGH",
     "fid": "T018",
-    "data": "2026-12-06",
+    "data": "2026-12-10",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 63,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1215,11 +1215,11 @@
     "knf": "1.5.9 · 9.1.21",
     "priorytet": "MEDIUM",
     "fid": "L070a",
-    "data": "2026-12-07",
+    "data": "2026-12-11",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 64,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -1234,11 +1234,11 @@
     "knf": "1.5.9 · 9.1.21",
     "priorytet": "MEDIUM",
     "fid": "L070b",
-    "data": "2026-12-07",
+    "data": "2026-12-11",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 65,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -1253,11 +1253,11 @@
     "knf": "1.6.6",
     "priorytet": "HIGH",
     "fid": "L071a",
-    "data": "2026-12-07",
+    "data": "2026-12-11",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 66,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -1272,11 +1272,11 @@
     "knf": "1.6.6",
     "priorytet": "HIGH",
     "fid": "L071b",
-    "data": "2026-12-08",
+    "data": "2026-12-12",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 67,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -1291,11 +1291,11 @@
     "knf": "6.2.3–6.2.5",
     "priorytet": "HIGH",
     "fid": "T019",
-    "data": "2026-12-08",
+    "data": "2026-12-12",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 68,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -1310,11 +1310,11 @@
     "knf": "1.6.6",
     "priorytet": "HIGH",
     "fid": "L072",
-    "data": "2026-12-08",
+    "data": "2026-12-12",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 69,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -1329,11 +1329,11 @@
     "knf": "1.6.6",
     "priorytet": "HIGH",
     "fid": "L073",
-    "data": "2026-12-09",
+    "data": "2026-12-13",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 70,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -1348,11 +1348,11 @@
     "knf": "6.1.1–6.1.2",
     "priorytet": "HIGH",
     "fid": "T020",
-    "data": "2026-12-09",
+    "data": "2026-12-13",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 71,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -1367,11 +1367,11 @@
     "knf": "1.6.6",
     "priorytet": "HIGH",
     "fid": "L074",
-    "data": "2026-12-09",
+    "data": "2026-12-13",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 72,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -1386,11 +1386,11 @@
     "knf": "1.6.6",
     "priorytet": "HIGH",
     "fid": "L075",
-    "data": "2026-12-10",
+    "data": "2026-12-14",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 73,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1405,11 +1405,11 @@
     "knf": "6.1.2, 6.1.5",
     "priorytet": "HIGH",
     "fid": "T021",
-    "data": "2026-12-10",
+    "data": "2026-12-14",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 74,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1424,11 +1424,11 @@
     "knf": "1.8.1",
     "priorytet": "HIGH",
     "fid": "L076a",
-    "data": "2026-12-10",
+    "data": "2026-12-14",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 75,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1443,11 +1443,11 @@
     "knf": "1.8.1",
     "priorytet": "HIGH",
     "fid": "L076b",
-    "data": "2026-12-11",
+    "data": "2026-12-15",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 76,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1462,11 +1462,11 @@
     "knf": "1.8.1",
     "priorytet": "HIGH",
     "fid": "L076c",
-    "data": "2026-12-11",
+    "data": "2026-12-15",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 77,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1481,11 +1481,11 @@
     "knf": "6.1.5–6.1.6",
     "priorytet": "HIGH",
     "fid": "T022",
-    "data": "2026-12-11",
+    "data": "2026-12-15",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 78,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1500,11 +1500,11 @@
     "knf": "1.8.2",
     "priorytet": "HIGH",
     "fid": "L077a",
-    "data": "2026-12-12",
+    "data": "2026-12-16",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 79,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1519,11 +1519,11 @@
     "knf": "1.8.2",
     "priorytet": "HIGH",
     "fid": "L077b",
-    "data": "2026-12-12",
+    "data": "2026-12-16",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 80,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1538,11 +1538,11 @@
     "knf": "1.8.2–1.8.3",
     "priorytet": "HIGH",
     "fid": "L078a",
-    "data": "2026-12-12",
+    "data": "2026-12-16",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 81,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1557,11 +1557,11 @@
     "knf": "1.8.2–1.8.3",
     "priorytet": "HIGH",
     "fid": "L078b",
-    "data": "2026-12-13",
+    "data": "2026-12-17",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 82,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1576,11 +1576,11 @@
     "knf": "6.1.4",
     "priorytet": "HIGH",
     "fid": "T023",
-    "data": "2026-12-13",
+    "data": "2026-12-17",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 83,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1595,11 +1595,11 @@
     "knf": "1.8.2–1.8.3",
     "priorytet": "HIGH",
     "fid": "L078c",
-    "data": "2026-12-13",
+    "data": "2026-12-17",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 84,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1614,11 +1614,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079a",
-    "data": "2026-12-14",
+    "data": "2026-12-18",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 85,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -1633,11 +1633,11 @@
     "knf": "6.1.4",
     "priorytet": "HIGH",
     "fid": "T024",
-    "data": "2026-12-14",
+    "data": "2026-12-18",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 86,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -1652,11 +1652,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079b",
-    "data": "2026-12-14",
+    "data": "2026-12-18",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 87,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -1671,11 +1671,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079c",
-    "data": "2026-12-15",
+    "data": "2026-12-19",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 88,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -1690,11 +1690,11 @@
     "knf": "2.5.5",
     "priorytet": "HIGH",
     "fid": "T025",
-    "data": "2026-12-15",
+    "data": "2026-12-19",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 89,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -1709,11 +1709,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079d",
-    "data": "2026-12-15",
+    "data": "2026-12-19",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 90,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -1728,11 +1728,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079e",
-    "data": "2026-12-16",
+    "data": "2026-12-20",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 91,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -1747,11 +1747,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079f",
-    "data": "2026-12-16",
+    "data": "2026-12-20",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 92,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -1766,11 +1766,11 @@
     "knf": "2.2, 2.7.1–2.7.4",
     "priorytet": "HIGH",
     "fid": "T026",
-    "data": "2026-12-16",
+    "data": "2026-12-20",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 93,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -1785,11 +1785,11 @@
     "knf": "1.8.3",
     "priorytet": "HIGH",
     "fid": "L079g",
-    "data": "2026-12-17",
+    "data": "2026-12-21",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 94,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1804,11 +1804,11 @@
     "knf": "1.8.4",
     "priorytet": "HIGH",
     "fid": "L080a",
-    "data": "2026-12-17",
+    "data": "2026-12-21",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 95,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1823,11 +1823,11 @@
     "knf": "2.7.5",
     "priorytet": "HIGH",
     "fid": "T027",
-    "data": "2026-12-17",
+    "data": "2026-12-21",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 96,
-    "dzien": "czwartek"
+    "dzien": "poniedziałek"
    },
    {
     "egzamin": "MPW",
@@ -1842,11 +1842,11 @@
     "knf": "1.8.4",
     "priorytet": "HIGH",
     "fid": "L080b",
-    "data": "2026-12-18",
+    "data": "2026-12-22",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 97,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1861,11 +1861,11 @@
     "knf": "1.8.5",
     "priorytet": "HIGH",
     "fid": "L081a",
-    "data": "2026-12-18",
+    "data": "2026-12-22",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 98,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1880,11 +1880,11 @@
     "knf": "1.8.5",
     "priorytet": "HIGH",
     "fid": "L081b",
-    "data": "2026-12-18",
+    "data": "2026-12-22",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 99,
-    "dzien": "piątek"
+    "dzien": "wtorek"
    },
    {
     "egzamin": "MPW",
@@ -1899,11 +1899,11 @@
     "knf": "1.8.5",
     "priorytet": "HIGH",
     "fid": "L081c",
-    "data": "2026-12-19",
+    "data": "2026-12-23",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 100,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1918,11 +1918,11 @@
     "knf": "2.7.5",
     "priorytet": "HIGH",
     "fid": "T028",
-    "data": "2026-12-19",
+    "data": "2026-12-23",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 101,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1937,11 +1937,11 @@
     "knf": "1.8.5",
     "priorytet": "HIGH",
     "fid": "L081d",
-    "data": "2026-12-19",
+    "data": "2026-12-23",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 102,
-    "dzien": "sobota"
+    "dzien": "środa"
    },
    {
     "egzamin": "MPW",
@@ -1956,11 +1956,11 @@
     "knf": "1.5.2, 1.5.5",
     "priorytet": "HIGH",
     "fid": "G01",
-    "data": "2026-12-20",
+    "data": "2026-12-24",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 103,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1975,11 +1975,11 @@
     "knf": "1.5.5–1.5.8",
     "priorytet": "HIGH",
     "fid": "G02",
-    "data": "2026-12-20",
+    "data": "2026-12-24",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 104,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -1994,11 +1994,11 @@
     "knf": "1.5.11, 1.5.13",
     "priorytet": "HIGH",
     "fid": "G03",
-    "data": "2026-12-20",
+    "data": "2026-12-24",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 105,
-    "dzien": "niedziela"
+    "dzien": "czwartek"
    },
    {
     "egzamin": "MPW",
@@ -2013,11 +2013,11 @@
     "knf": "1.5.13, 1.5.9",
     "priorytet": "HIGH",
     "fid": "G04",
-    "data": "2026-12-21",
+    "data": "2026-12-25",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 106,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -2032,11 +2032,11 @@
     "knf": "1.7.6, 1.7.7, 1.7.9",
     "priorytet": "HIGH",
     "fid": "G05",
-    "data": "2026-12-21",
+    "data": "2026-12-25",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 107,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -2051,11 +2051,11 @@
     "knf": "1.8.3, 1.8.7, 1.8.8, 1.8.10",
     "priorytet": "HIGH",
     "fid": "G06",
-    "data": "2026-12-21",
+    "data": "2026-12-25",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 108,
-    "dzien": "poniedziałek"
+    "dzien": "piątek"
    },
    {
     "egzamin": "MPW",
@@ -2070,11 +2070,11 @@
     "knf": "2.12.1–2.12.2",
     "priorytet": "HIGH",
     "fid": "G07",
-    "data": "2026-12-22",
+    "data": "2026-12-26",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 109,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -2089,11 +2089,11 @@
     "knf": "6.1.2, 6.1.3.6, 6.1.3.7, 2.7.8",
     "priorytet": "HIGH",
     "fid": "G09",
-    "data": "2026-12-22",
+    "data": "2026-12-26",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 110,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -2108,11 +2108,11 @@
     "knf": "10.3.1–10.3.3, 10.3.5–10.3.6",
     "priorytet": "HIGH",
     "fid": "G08",
-    "data": "2026-12-22",
+    "data": "2026-12-26",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 111,
-    "dzien": "wtorek"
+    "dzien": "sobota"
    },
    {
     "egzamin": "MPW",
@@ -2127,11 +2127,11 @@
     "knf": "7.3.6.1",
     "priorytet": "HIGH",
     "fid": "G10",
-    "data": "2026-12-23",
+    "data": "2026-12-27",
     "blok": "A",
     "godz": "15:30–16:23",
     "nr": 112,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -2146,11 +2146,11 @@
     "knf": "6.2.2.5",
     "priorytet": "HIGH",
     "fid": "G11",
-    "data": "2026-12-23",
+    "data": "2026-12-27",
     "blok": "B",
     "godz": "16:30–17:23",
     "nr": 113,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -2165,11 +2165,11 @@
     "knf": "8.6.7",
     "priorytet": "HIGH",
     "fid": "G12",
-    "data": "2026-12-23",
+    "data": "2026-12-27",
     "blok": "C",
     "godz": "17:30–18:23",
     "nr": 114,
-    "dzien": "środa"
+    "dzien": "niedziela"
    },
    {
     "egzamin": "MPW",
@@ -7472,7 +7472,7 @@
     "AUDYT PRAWNY": 1,
     "POWTÓRKA CAŁOŚCI": 35
    },
-   "start": "2026-11-16",
+   "start": "2026-11-20",
    "end": "2027-03-20",
    "uklad": "114×3 + 5×10"
   },
@@ -7486,7 +7486,7 @@
   "fpEnd": "2027-02-18",
   "faza": {
    "f1": {
-    "od": "2026-11-16",
+    "od": "2026-11-20",
     "do": "2027-02-18",
     "dni": 91,
     "bl": 273
@@ -7518,31 +7518,31 @@
     "tytul": "KNF 1.1 — Prawo cywilne",
     "waga": "MEDIUM",
     "bloki": 12,
-    "start": "2026-11-16",
-    "koniecd": "2026-11-21"
+    "start": "2026-11-20",
+    "koniecd": "2026-11-25"
    },
    {
     "kol": 2,
     "tytul": "KNF 4 — Matematyka finansowa",
     "waga": "HIGH",
     "bloki": 10,
-    "start": "2026-11-16",
-    "koniecd": "2026-11-27"
+    "start": "2026-11-20",
+    "koniecd": "2026-12-01"
    },
    {
     "kol": 3,
     "tytul": "KNF 1.2 — Spółki handlowe (KSH)",
     "waga": "MEDIUM-HIGH",
     "bloki": 15,
-    "start": "2026-11-21",
-    "koniecd": "2026-11-28"
+    "start": "2026-11-25",
+    "koniecd": "2026-12-02"
    },
    {
     "kol": 4,
     "tytul": "KNF 1.5 — Oferta publiczna, spółki publiczne, informacje bieżące",
     "waga": "MEDIUM-HIGH",
     "bloki": 31,
-    "start": "2026-11-28",
+    "start": "2026-12-02",
     "koniecd": "2026-12-31"
    },
    {
@@ -7550,63 +7550,63 @@
     "tytul": "KNF 3 · 4 — Rynki i instrumenty, wartość pieniądza w czasie",
     "waga": "MEDIUM",
     "bloki": 1,
-    "start": "2026-11-28",
-    "koniecd": "2026-11-28"
+    "start": "2026-12-02",
+    "koniecd": "2026-12-02"
    },
    {
     "kol": 6,
     "tytul": "KNF 5 — Instrumenty dłużne",
     "waga": "MEDIUM-HIGH",
     "bloki": 3,
-    "start": "2026-11-29",
-    "koniecd": "2026-12-02"
+    "start": "2026-12-03",
+    "koniecd": "2026-12-06"
    },
    {
     "kol": 7,
     "tytul": "KNF 4 · 5 — Matematyka finansowa — bony, obligacje, NPV",
     "waga": "HIGH",
     "bloki": 2,
-    "start": "2026-12-03",
-    "koniecd": "2026-12-04"
+    "start": "2026-12-07",
+    "koniecd": "2026-12-08"
    },
    {
     "kol": 8,
     "tytul": "KNF 5 — Instrumenty dłużne — duration, krzywa",
     "waga": "MEDIUM-HIGH",
     "bloki": 1,
-    "start": "2026-12-05",
-    "koniecd": "2026-12-05"
+    "start": "2026-12-09",
+    "koniecd": "2026-12-09"
    },
    {
     "kol": 9,
     "tytul": "KNF 6 — Analiza akcji",
     "waga": "HIGH",
     "bloki": 2,
-    "start": "2026-12-06",
-    "koniecd": "2026-12-08"
+    "start": "2026-12-10",
+    "koniecd": "2026-12-12"
    },
    {
     "kol": 10,
     "tytul": "KNF 1.6.6 — MAR — nadużycia na rynku",
     "waga": "MEDIUM-HIGH",
     "bloki": 6,
-    "start": "2026-12-07",
-    "koniecd": "2026-12-10"
+    "start": "2026-12-11",
+    "koniecd": "2026-12-14"
    },
    {
     "kol": 11,
     "tytul": "KNF 6.1 — Analiza sprawozdań finansowych",
     "waga": "HIGH",
     "bloki": 4,
-    "start": "2026-12-09",
-    "koniecd": "2026-12-22"
+    "start": "2026-12-13",
+    "koniecd": "2026-12-26"
    },
    {
     "kol": 12,
     "tytul": "KNF 1.8 — Fundusze inwestycyjne",
     "waga": "MEDIUM-HIGH",
     "bloki": 37,
-    "start": "2026-12-10",
+    "start": "2026-12-14",
     "koniecd": "2027-01-05"
    },
    {
@@ -7614,15 +7614,15 @@
     "tytul": "KNF 6.1.4 — Dźwignie DOL/DFL/DTL",
     "waga": "HIGH",
     "bloki": 2,
-    "start": "2026-12-13",
-    "koniecd": "2026-12-14"
+    "start": "2026-12-17",
+    "koniecd": "2026-12-18"
    },
    {
     "kol": 14,
     "tytul": "KNF 2 — Sprawozdawczość finansowa (literatura)",
     "waga": "HIGH",
     "bloki": 8,
-    "start": "2026-12-15",
+    "start": "2026-12-19",
     "koniecd": "2027-01-07"
    },
    {
@@ -7630,7 +7630,7 @@
     "tytul": "KNF 1.4 · 1.7 — Papiery wartościowe, obligacje, nadzór KNF",
     "waga": "MEDIUM",
     "bloki": 18,
-    "start": "2026-12-21",
+    "start": "2026-12-25",
     "koniecd": "2027-01-13"
    },
    {
@@ -7638,7 +7638,7 @@
     "tytul": "KNF 2 — Rachunkowość — ustawa i rozporządzenia",
     "waga": "HIGH",
     "bloki": 23,
-    "start": "2026-12-22",
+    "start": "2026-12-26",
     "koniecd": "2027-02-16"
    },
    {
@@ -7646,7 +7646,7 @@
     "tytul": "KNF 10 · 1.3 · 1.9 · 1.11 — Etyka, AML, akty LOW",
     "waga": "MEDIUM/LOW",
     "bloki": 15,
-    "start": "2026-12-22",
+    "start": "2026-12-26",
     "koniecd": "2027-03-20"
    },
    {
@@ -7654,7 +7654,7 @@
     "tytul": "KNF 8.5–8.7 — Zarządzanie portfelem",
     "waga": "MEDIUM-HIGH",
     "bloki": 4,
-    "start": "2026-12-23",
+    "start": "2026-12-27",
     "koniecd": "2027-01-18"
    },
    {
@@ -7662,7 +7662,7 @@
     "tytul": "KNF 7.3 — Opcje — strategie, drzewa, greki",
     "waga": "MEDIUM-HIGH",
     "bloki": 3,
-    "start": "2026-12-23",
+    "start": "2026-12-27",
     "koniecd": "2027-01-25"
    },
    {
@@ -7670,7 +7670,7 @@
     "tytul": "KNF 6.2 — Wycena przedsiębiorstw, EVA",
     "waga": "HIGH",
     "bloki": 7,
-    "start": "2026-12-23",
+    "start": "2026-12-27",
     "koniecd": "2027-02-08"
    },
    {

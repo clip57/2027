@@ -45,24 +45,29 @@ test('U6: plan w pakiecie = pełny plan bez usuwanych pól (pozostałe pola i ko
     for (const k of DROP[id].plan) assert.ok(k in full.D, `${id}.D.${k} — pole z listy DROP istnieje w planie (lista aktualna)`);
     for (const k of DROP[id].block) assert.ok(full.D.bloki.some(b => k in b), `${id}: pole bloku ${k} istnieje w planie (lista aktualna)`);
     assert.deepEqual([core.exam, core.schema], [full.exam, full.schema]);
-    assert.ok(JSON.stringify(core).length < before.length * (id === 'cfa' ? 0.4 : 0.7), `${id}: pakiet mniejszy`);
+    assert.ok(JSON.stringify(core).length < before.length * (id === 'cfa' ? 0.45 : 0.7), `${id}: pakiet mniejszy`);
   }
-  // R2 korzysta z wersji planu i mapowania postępu poprzedniej wersji — muszą zostać w pakiecie
+  // R2 korzysta z wersji planu (D-116: plan CFA 2027 bez poprzedniej wersji — previousVersion null) — musi zostać w pakiecie
   const c = corePlan('cfa', raw('cfa')).D;
-  assert.ok(c.version && c.previousVersion && c.progressRequirements && c.finalization && c.bloki.every(b => Number.isInteger(b.previousVersionBlock)));
+  assert.ok(c.version && 'previousVersion' in c && c.previousVersion === null);
+  assert.ok(c.mockCFA && 'mockSessions' in c && 'nightRecall' in c && c.cfa.length === 10 && c.stat, 'dane widoku CFA i resolvera w pakiecie');
 });
 
-test('U6: zadania bloków MPW — osobna część (wszystkie bloki z zadaniami), ten sam interfejs w Node i w przeglądarce', async () => {
+test('U6, D-116: zadania bloków MPW i CFA — osobne części (wszystkie bloki z zadaniami), ten sam interfejs w Node i w przeglądarce', async () => {
   const full = raw('mpw'), part = lazyPart('mpw', full);
   assert.deepEqual([part.plan, part.field], ['mpw', 'zadania']);
   const withTasks = full.D.bloki.filter(b => b.zadania);
   assert.ok(withTasks.length > 300);
   assert.equal(Object.keys(part.values).length, withTasks.length);
   for (const b of withTasks) assert.equal(part.values[b.nr], b.zadania);
-  assert.equal(lazyPart('cfa', raw('cfa')), null, 'CFA: zadania nie są wyświetlane — nie ma części osobnej');
+  const cfa = raw('cfa'), cpart = lazyPart('cfa', cfa);
+  assert.deepEqual([cpart.plan, cpart.field, cpart.version], ['cfa', 'zadania', cfa.D.version]);
+  assert.equal(Object.keys(cpart.values).length, cfa.D.bloki.filter(b => b.zadania).length);
+  assert.equal(Object.keys(cpart.values).length, 451, 'plan CFA 2027: każdy blok ma zadania');
   assert.deepEqual(await loadPlanTasks('mpw'), part.values);
   assert.deepEqual(planTasks('mpw'), part.values);
-  assert.equal(planTasks('cfa'), null);
+  assert.deepEqual(await loadPlanTasks('cfa'), cpart.values);
+  assert.deepEqual(planTasks('cfa'), cpart.values);
   // wersja przeglądarkowa: identyczne nazwy eksportów
   const web = fs.readFileSync(path.join(ROOT, 'src/core/plan-tasks.web.js'), 'utf8');
   assert.match(web, /export const planTasks = /);

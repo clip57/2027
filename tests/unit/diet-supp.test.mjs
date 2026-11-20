@@ -50,12 +50,13 @@ test('różnice między fazami: tylko gramatury węglowodanów', () => {
 });
 
 test('plan suplementów: godziny, czwartek, niedziela, koniec zapasu', () => {
-  const mon = scheduleFor('2026-10-20');   // dzień treningowy z blokami M i J: kreatyna z posiłkiem potreningowym 19:15 (D-103), chondroityna z kolacją 20:50 (D-099); piątek 23.10 (bez J) — 21:00
-  assert.deepEqual(mon.map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '19:15', '20:50', '22:00']);
+  const mon = scheduleFor('2027-01-04');   // poniedziałek treningowy z blokiem J (plan CFA 2027, D-116): kreatyna z posiłkiem 20:15, chondroityna z kolacją 20:50 (D-099); piątek 23.10 (bez J) — 21:00
+  assert.deepEqual(mon.map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '20:15', '20:50', '22:00']);
+  assert.deepEqual(scheduleFor('2026-10-20').map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '20:15', '21:00', '22:00'], '20.10 — po D-116 bez bloków CFA (plan V44 zastąpiony)');
   assert.deepEqual(scheduleFor('2026-10-23').map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '20:15', '21:00', '22:00']);
   for (const d of ['2026-10-16', '2026-10-17']) assert.deepEqual(scheduleFor(d), [], `${d} — poza planem (D-103c): bez dawek`);
-  assert.deepEqual(scheduleFor('2026-10-18').map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '19:15', '20:50', '22:00'], 'niedziela z blokiem M: kreatyna 19:15 zamiast 19:30 (D-103)');
-  assert.ok(scheduleFor('2026-10-25').some(g => g.time === '19:30'), 'niedziela bez bloku M (25.10) — 19:30 jak dotąd');
+  assert.deepEqual(scheduleFor('2026-10-18').map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '19:30', '21:00', '22:00'], 'niedziela z basenem: kreatyna 19:30 (plan CFA 2027 bez bloku M — D-116)');
+  assert.ok(scheduleFor('2026-10-25').some(g => g.time === '19:30'), 'niedziela 25.10 — 19:30');
   assert.ok(scheduleFor('2026-10-22').some(g => g.time === '20:15'), 'czwartek bez sauny (D-103): kreatyna z posiłkiem 20:15');
   assert.deepEqual(mon[0].doses.map(d => d.name), ['Chondroityna']);
   assert.deepEqual(scheduleFor('2026-10-22')[0].doses.map(d => d.name), ['Chondroityna', 'Cynk'], 'czwartek: chondroityna + cynk');
@@ -63,9 +64,10 @@ test('plan suplementów: godziny, czwartek, niedziela, koniec zapasu', () => {
   for (const d of ['2026-10-07', '2026-10-08', '2026-10-12', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17']) assert.deepEqual(scheduleFor(d), [], `${d}: dni przed 18.10 — historia, bez dawek (D-102, D-103c)`);
   assert.deepEqual(scheduleFor('2026-10-18')[0].doses.map(d => d.name), ['Chondroityna', 'Cynk'], 'pierwszy dzień planu i suplementów (niedziela: chondroityna + cynk)');
   assert.ok(scheduleFor('2026-10-18').find(g => g.time === '17:15').doses.some(d => d.name === 'Tauryna'), 'D-014');
-  assert.deepEqual(scheduleFor('2026-11-01').map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '19:30', '20:50', '22:00'].map(t => t === '19:30' ? '20:15' : t), 'niedziela 01.11 bez treningu (D-103b): kreatyna z posiłkiem 20:15');
-  assert.ok(scheduleFor('2027-03-28').find(g => g.time === '07:00'), '28.03.2027 — ostatni dzień chondroityny (D-097)');
-  assert.deepEqual(scheduleFor('2027-03-29'), [], 'po końcu planu (28.03.2027) — brak dawek');
+  assert.deepEqual(scheduleFor('2026-11-01').map(g => g.time), ['07:00', '09:00', '10:30', '13:20', '17:15', '20:15', '21:00', '22:00'], 'niedziela 01.11 bez treningu (D-103b): kreatyna z posiłkiem 20:15');
+  assert.ok(scheduleFor('2027-06-30').find(g => g.time === '07:00'), '30.06.2027 — ostatni dzień chondroityny (D-116; wcześniej 28.03, D-097)');
+  assert.ok(scheduleFor('2027-03-29').length > 0, '29.03.2027 — plan przedłużony (D-116)');
+  assert.deepEqual(scheduleFor('2027-07-01'), [], 'po końcu planu (30.06.2027) — brak dawek');
 });
 
 test('D-097: w czwartki od 07.01.2027 suplementy przed sauną o 17:45 zamiast 17:15 (obiad i bloki MPW +30 min)', () => {
@@ -75,10 +77,14 @@ test('D-097: w czwartki od 07.01.2027 suplementy przed sauną o 17:45 zamiast 17
   assert.deepEqual(at('2026-12-31', '17:15'), at('2027-01-06', '17:15'), 'czwartek do 06.01 — 17:15');
   assert.deepEqual(at('2027-01-08', '17:15'), at('2027-01-06', '17:15'), 'piątek od 07.01 — 17:15');
   assert.deepEqual(at('2027-01-08', '17:45'), []);
+  // D-116: 17:45 tylko do ostatniego czwartku planu MPW (18.03); od 25.03 czwartek jak w tygodniu bazowym — 17:15
+  assert.deepEqual(at('2027-03-18', '17:45'), at('2027-01-06', '17:15'));
+  assert.deepEqual([at('2027-03-25', '17:45'), at('2027-03-25', '17:15')], [[], at('2027-01-06', '17:15')], '25.03 — 17:15');
+  assert.deepEqual([at('2027-06-24', '17:45'), at('2027-06-24', '17:15')], [[], at('2027-01-06', '17:15')], 'czerwiec — 17:15');
 });
 
 test('przegląd preparatów: częstotliwość, okres, śledzenie stanu', () => {
-  const o = supplementOverview('2026-11-12');   // czwartek bez bloku J (dzień egzaminu CFA)
+  const o = supplementOverview('2026-11-12');   // czwartek bez bloku J
   const cynk = o.find(x => x.id === 'cynk');
   assert.deepEqual(cynk.weekdays, [4, 7]);
   assert.equal(cynk.tracked, false); // D-016
@@ -86,12 +92,12 @@ test('przegląd preparatów: częstotliwość, okres, śledzenie stanu', () => {
   const chon = o.find(x => x.id === 'chondroityna');
   assert.equal(chon.daily, 2);
   assert.deepEqual(chon.times, ['07:00', '21:00']);
-  assert.deepEqual([chon.validity.from, chon.validity.until], ['2026-10-18', '2027-03-28']);
-  assert.deepEqual(supplementOverview('2026-10-20').find(x => x.id === 'chondroityna').times, ['07:00', '20:50'], 'dzień z blokiem J (D-099)');
+  assert.deepEqual([chon.validity.from, chon.validity.until], ['2026-10-18', '2027-06-30']);
+  assert.deepEqual(supplementOverview('2027-01-04').find(x => x.id === 'chondroityna').times, ['07:00', '20:50'], 'dzień z blokiem J (D-099)');
   assert.equal(supplementOverview('2026-10-14').find(x => x.id === 'chondroityna').active, false);
   assert.equal(supplementOverview('2026-10-14').find(x => x.id === 'chondroityna').daily, 0);
-  assert.equal(supplementOverview('2027-03-28').find(x => x.id === 'chondroityna').active, true);
-  assert.equal(supplementOverview('2027-03-29').find(x => x.id === 'chondroityna').active, false);
+  assert.equal(supplementOverview('2027-06-30').find(x => x.id === 'chondroityna').active, true);
+  assert.equal(supplementOverview('2027-07-01').find(x => x.id === 'chondroityna').active, false);
   // D-097: czwartkowa dawka 17:45 od 07.01 nie czyni tauryny preparatem czasowym; godziny bez powtórzeń
   const taur = o.find(x => x.id === 'tauryna');
   assert.deepEqual([taur.validity, taur.active, taur.times], [null, true, ['17:15']]);

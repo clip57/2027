@@ -19,6 +19,7 @@ function previousMap(D) {
   return req && Object.keys(req).length ? req : null;
 }
 
+/** @param {any} o @param {any} [D] */
 export function cfaProgressPlan(o, D = SRC.cfa.D) {
   const label = labelOf(o), saved = savedOn(o), n = D.bloki.length, made = D.finalization?.date || D.stat.start;
   if (label && label === D.version) return { status: 'current', label };
