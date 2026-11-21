@@ -37,7 +37,7 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 
 ## 3a. Stan 20.11.2026 (D-116)
 - D-114 i D-115 opublikowane na `main` (18–19.11.2026). D-116 (studia wg harmonogramu, MPW od 20.11, nowy plan CFA Level I 2027,
-  kalendarz do 30.06.2027) — na gałęzi `claude/eager-newton-j2309e`, publikacja po poleceniu „Publikuj” (`docs/RAPORT_D116.md`).
+  kalendarz do 30.06.2027) — opublikowane na `main` 21.11.2026 (fast-forward `d7678ad`, polecenie „Publikuj”; `docs/RAPORT_D116.md`).
 - Plany nauki: skrypt decyzji `tools/extract/plan_d116.py <mpw.csv> <cfa.csv>` (pliki CSV ma tylko użytkownik) — uruchamiaj na danych z `main`
   sprzed D-116 albo na bieżących (idempotentny). Kolejna wymiana planu CFA = nowa wartość `CFA_PLAN_VERSION` i `CFA_BLOCKS` (`validate.js`).
 - Do decyzji użytkownika: `docs/RAPORT_D116.md` §3 (termin egzaminu CFA, 08–09.05, blok dodatkowy × trening = D1, suplementy na 256 dni,
