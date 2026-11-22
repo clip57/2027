@@ -3,13 +3,17 @@
 // albo edycja tutaj (zdarzenia `care.def`); odhaczenia — `care.done`. W repozytorium nie ma treści planu (D-035).
 // Widoki: Dzień (lista kontrolna wg pór, licznik „odczekaj”), Tydzień, Produkty, Plan (edycja, eksport).
 import { h, clear, add, plural } from '../ui/dom.js';
-import { segmented, progressRing, sheet } from '../ui/components.js';
-import { signal, unlockAudio, timersChanged } from '../ui/signal.js';
+import { checkInput } from '../ui/check.js';
+import { segmented, sheet } from '../ui/components.js';
+import { segRing } from '../ui/rings.js';
+import { focusTop, focusScale, focusTimer, focusKeys } from '../ui/focus.js';
+import { swipeRow } from '../ui/gestures.js';
+import { signal, unlockAudio, timersChanged, sfx, startCountdown, countdown } from '../ui/signal.js';
 import { icon } from '../ui/icons.js';
 import { region } from '../ui/patch.js';
 import { SRC } from '../core/data.js';
 import { inPlan, PLAN_START, PLAN_END, templateFor } from '../core/resolver.js';
-import { addDays, longDate, shortDate, dayShort, weekday, range } from '../core/dates.js';
+import { addDays, longDate, shortDate, dayShort, weekday, range, diffDays } from '../core/dates.js';
 import { careModel, stepsFor, progress, byPora, isDone, ruleText, productUse, weekGrid, slotOptions, slotDefs, PORY, AREAS, STATUS, DAY_SHORT } from '../core/calc/care.js';
 
 const VIEWS = [{ value: 'dzien', label: 'Dzień' }, { value: 'tydzien', label: 'Tydzień' }, { value: 'produkty', label: 'Produkty' }, { value: 'plan', label: 'Plan' }];
@@ -23,6 +27,7 @@ const slotLabel = id => SLOTS().find(x => x[0] === id)?.[1] || (d => (d ? `${d.f
 
 // Licznik „odczekaj N min” — stan wyłącznie interfejsu (jak przerwa w Treningu, D-068): nie trafia do dziennika ani synchronizacji
 let timer = null;   // { label, start, sec }
+let rpos = null;    // tryb rutyny: { date, pora, id } — bieżący krok
 
 /** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
 export function renderPielegnacja(root, ctx) {
@@ -38,6 +43,7 @@ export function renderPielegnacja(root, ctx) {
   let done;
   const derive = () => { model = careModel(store.state.careDefs || []); done = store.state.careDone || {}; };
   derive();
+  if (view === 'fokus' && !model.empty) return routineView();
 
   add(root, h('header', { class: 'pg-head' }, h('h1', {}, 'Pielęgnacja'),
     h('div', { class: 'topline' },
@@ -101,27 +107,48 @@ export function renderPielegnacja(root, ctx) {
     if (!inPlan(date)) { add(root, nav, h('p', { class: 'panel pg-outside' }, date > PLAN_END ? `Poza planem — plan zakończył się ${longDate(PLAN_END)}.` : `Poza planem — plan zaczyna się ${longDate(PLAN_START)}.`)); return; }
     const list = stepsFor(model, date);
     const poras = byPora(list);
+    // D-119 (Instrument+): przyrząd — trzy pierścienie pór (łuk = krok wymagany, wypełniony = wykonany); bieżąca pora wg godziny (dziś)
+    const hr = new Date().getHours();
+    const curPora = date !== today ? null : hr < 12 ? 'rano' : hr < 18 ? 'dzien' : 'wieczor';
+    const req = x => x.steps.filter(st => !st.asNeeded);
     const hero = region(() => {
       const p = progress(list, done, date);
       const next = poras.find(x => progress(x.steps, done, date).done < progress(x.steps, done, date).total);
-      return h('section', { class: 'hero-tr pg-hero' },
-        h('div', { class: 'hero-tr-main' },
-          h('p', { class: 'eyebrow' }, `${dayShort(date)} ${longDate(date)}${date === today ? ' · dziś' : ''}`),
-          h('p', { class: 'pg-hero-t' }, p.total ? `${p.done} z ${p.total} ${plural(p.total, 'kroku', 'kroków', 'kroków')} wykonanych` : 'Brak kroków tego dnia'),
-          h('p', { class: 'muted' }, next ? `Następna pora: ${next.label} — ${progress(next.steps, done, date).total - progress(next.steps, done, date).done} do wykonania` : p.total ? '✓ Wszystkie kroki tego dnia wykonane' : ''),
-          nav),
-        h('div', { class: 'hero-tr-side' }, progressRing(p.done, p.total || 1, 'Wykonane kroki'), h('span', { class: 'muted' }, `${p.done} / ${p.total}`)));
+      const left = next ? progress(next.steps, done, date).total - progress(next.steps, done, date).done : 0;
+      return h('section', { class: 'pg-hero', 'aria-labelledby': 'pg-hero-h' },
+        h('div', { class: 'pg-hero-top' },
+          h('div', {},
+            h('p', { class: 'eyebrow', id: 'pg-hero-h' }, `${dayShort(date)} ${longDate(date)}${date === today ? ' · dziś' : ''}`),
+            h('p', { class: 'pg-hero-t' }, p.total ? `${p.done} z ${p.total} ${plural(p.total, 'kroku', 'kroków', 'kroków')} wykonanych` : 'Brak kroków tego dnia'),
+            h('p', { class: 'muted' }, next ? `Następna pora: ${next.label} — ${left} do wykonania` : p.total ? 'Wszystkie kroki tego dnia wykonane' : '')),
+          next && h('a', { class: 'btn primary pg-start', href: `#/pielegnacja?v=fokus&d=${date}&p=${next.id}` }, icon('play', { size: 18 }),
+            h('span', {}, `Rozpocznij rutynę: ${next.label.toLowerCase()}`))),
+        h('nav', { class: 'pg-rings', 'aria-label': 'Pory dnia' }, poras.map(x => {
+          const pr = progress(x.steps, done, date), st = req(x);
+          return h('a', { class: `pg-ring${x.id === curPora ? ' is-now' : ''}${pr.total && pr.done === pr.total ? ' is-done' : ''}`, href: `#pg-${x.id}`,
+            'aria-label': `${x.label}: ${pr.done} z ${pr.total} kroków`,
+            onclick: e => { e.preventDefault(); document.getElementById(`pg-${x.id}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } },
+            h('span', { class: 'pg-ring-d' },
+              segRing(st.length ? st.map(sx => ({ v: isDone(done, date, sx.id) ? 1 : 0, tone: isDone(done, date, sx.id) ? 'done' : x.id === curPora ? 'next' : 'todo' })) : [{ v: 0 }],
+                { size: 76, stroke: 7, gap: 5, label: '' }),
+              h('span', { class: 'pg-ring-c' }, icon(x.icon, { size: 18 }))),
+            h('span', { class: 'pg-ring-l' }, x.label), h('span', { class: 'pg-ring-n' }, `${pr.done}/${pr.total}`));
+        })),
+        nav);
     });
-    add(root, hero.el,
-      h('nav', { class: 'pg-jump', 'aria-label': 'Pory dnia' }, poras.map(p => h('a', { class: 'chip-b', href: `#pg-${p.id}` }, icon(p.icon, { size: 16 }), p.label))));
+    add(root, hero.el);
     const counts = {};
     for (const p of poras) {
       counts[p.id] = region(() => { const x = progress(p.steps, done, date); return h('span', { class: `pg-count${x.total && x.done === x.total ? ' is-done' : ''}` }, `${x.done} / ${x.total}`); });
-      add(root, h('section', { class: 'panel pg-pora', id: `pg-${p.id}`, 'aria-labelledby': `pg-h-${p.id}` },
-        h('div', { class: 'pg-pora-h' }, h('h2', { id: `pg-h-${p.id}` }, icon(p.icon, { size: 20 }), p.label), counts[p.id].el),
-        p.groups.map(g => h('div', { class: 'pg-group' },
+      const opt = p.steps.filter(st => st.asNeeded);
+      add(root, h('section', { class: `panel pg-pora${p.id === curPora ? ' is-now' : ''}`, id: `pg-${p.id}`, 'aria-labelledby': `pg-h-${p.id}` },
+        h('div', { class: 'pg-pora-h' }, h('h2', { id: `pg-h-${p.id}` }, icon(p.icon, { size: 20 }), p.label), counts[p.id].el,
+          req(p).length > 0 && h('a', { class: 'pg-go', href: `#/pielegnacja?v=fokus&d=${date}&p=${p.id}`, 'aria-label': `Tryb rutyny: ${p.label}` }, icon('play', { size: 16 }), h('span', {}, 'Rutyna'))),
+        p.groups.map(g => { const gs = g.steps.filter(st => !st.asNeeded); return gs.length > 0 && h('div', { class: 'pg-group' },
           g.name && h('h3', {}, g.name),
-          h('ul', { class: 'pg-list' }, g.steps.map(s => stepItem(s, p.id)))))));
+          h('ul', { class: 'pg-list' }, gs.map(st => stepItem(st, p.id)))); }),
+        // kroki doraźne — osobna, cichsza grupa (nie liczą się do postępu)
+        opt.length > 0 && h('div', { class: 'pg-group pg-opt' }, h('h3', {}, 'Doraźnie'), h('ul', { class: 'pg-list' }, opt.map(st => stepItem(st, p.id))))));
     }
     add(root, timerBox.el);
 
@@ -130,11 +157,11 @@ export function renderPielegnacja(root, ctx) {
       const li = h('li', { class: `pg-step${on ? ' is-done' : ''}${s.asNeeded ? ' is-opt' : ''}` });
       add(li,
         h('label', { class: 'pg-check' },
-          h('input', { type: 'checkbox', checked: on || null, onchange: e => toggle(s, e.target.checked, li, pora) }),
+          checkInput(h('input', { type: 'checkbox', checked: on || null, onchange: e => toggle(s, e.target.checked, li, pora) })),
           h('span', { class: 'pg-step-b' },
             h('span', { class: 'pg-step-t' }, s.text),
-            prod && h('span', { class: 'pg-prod' }, prod.name),
-            (s.asNeeded || (s.days?.length && s.days.length < 7) || s.from || s.until) && h('span', { class: 'pg-rule' }, ruleText(s)),
+            prod && h('span', { class: `pg-prod pg-st-${prod.status || 'uzywany'}` }, prod.name, prod.status && prod.status !== 'uzywany' && h('span', { class: 'pg-prod-s' }, ` · ${STATUS_LABEL[prod.status]}`)),
+            (s.asNeeded || (s.days?.length && s.days.length < 7) || s.from || s.until || s.cycle) && h('span', { class: 'pg-rule' }, weekDots(s, date), h('span', {}, ruleText(s))),
             s.note && h('span', { class: 'pg-note' }, s.note))),
         s.warn && h('p', { class: 'pg-warn' }, icon('triangle-alert', { size: 14 }), h('span', {}, s.warn)),
         s.wait > 0 && h('button', { class: 'pg-wait', 'aria-label': `Odczekaj ${s.wait} min: ${s.text}`, onclick: () => startTimer(s) },
@@ -150,25 +177,41 @@ export function renderPielegnacja(root, ctx) {
     }
   }
 
-  // ---------------- Tydzień: postęp dni i kroki, które nie są codzienne
+  // ---------------- Tydzień (D-119): macierz kroki × dni — kropka = krok w planie dnia, wypełniona = wykonany; nagłówek dnia = przejście
   function weekView() {
     const mon = addDays(date, 1 - weekday(date));
     const grid = weekGrid(model, done, mon);
     const wl = d => `#/pielegnacja?v=tydzien&d=${d}`;
+    const per = grid.map(d => new Set(inPlan(d.date) ? stepsFor(model, d.date).map(x => x.id) : []));
+    const rows = model.steps.filter(st => !st.asNeeded && per.some(x => x.has(st.id)));
+    const cellTxt = (st, d, i) => !per[i].has(st.id) ? 'nie w planie' : isDone(done, d.date, st.id) ? 'wykonany' : d.date < today ? 'niewykonany' : 'do wykonania';
     add(root, h('div', { class: 'row daynav' },
       h('a', { class: 'btn dz-nav', href: wl(addDays(mon, -7)), 'aria-label': 'Poprzedni tydzień' }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni tydzień')),
       h('a', { class: 'btn dz-nav', href: wl(addDays(mon, 7)), 'aria-label': 'Następny tydzień' }, h('span', {}, 'Następny tydzień'), icon('chevron-right', { size: 18 }))),
-    h('ol', { class: 'pg-week', 'aria-label': `Tydzień ${shortDate(mon)} – ${shortDate(addDays(mon, 6))}` }, grid.map(d => h('li', {},
-      h('a', { class: `pg-wday${d.date === today ? ' is-today' : ''}${!inPlan(d.date) ? ' is-out' : ''}`, href: `#/pielegnacja?d=${d.date}`,
-        'aria-label': `${DAY_SHORT[weekday(d.date) - 1]} ${shortDate(d.date)}: ${d.done} z ${d.total} kroków` },
-        h('span', { class: 'pg-wd' }, h('strong', {}, dayShort(d.date)), ` ${shortDate(d.date)}`, d.date === today && h('span', { class: 'now-tag' }, 'dziś')),
-        inPlan(d.date) ? [h('span', { class: 'pg-wprog' }, `${d.done} / ${d.total}`),
-          h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${d.total ? (d.done / d.total) * 100 : 0}%`, background: 'var(--care)' } })),
-          d.special.length > 0 && h('ul', { class: 'pg-wlist' }, d.special.map(s => h('li', {}, s.text, s.product && model.product[s.product] && h('span', { class: 'muted' }, ` · ${model.product[s.product].name}`))))]
-          : h('span', { class: 'muted' }, 'poza planem'))))));
+    h('section', { class: 'panel pg-mx', 'aria-label': `Tydzień ${shortDate(mon)} – ${shortDate(addDays(mon, 6))}` },
+      h('ol', { class: 'pg-week' }, grid.map(d => h('li', {},
+        h('a', { class: `pg-wday${d.date === today ? ' is-today' : ''}${!inPlan(d.date) ? ' is-out' : ''}`, href: `#/pielegnacja?d=${d.date}`,
+          'aria-label': `${DAY_SHORT[weekday(d.date) - 1]} ${shortDate(d.date)}: ${inPlan(d.date) ? `${d.done} z ${d.total} kroków` : 'poza planem'}` },
+          h('span', { class: 'pg-wd' }, h('strong', {}, dayShort(d.date)), h('span', {}, shortDate(d.date))),
+          inPlan(d.date) ? [h('span', { class: 'pg-wprog' }, `${d.done} / ${d.total}`),
+            h('span', { class: 'dz-bar', role: 'presentation' }, h('span', { style: { width: `${d.total ? (d.done / d.total) * 100 : 0}%`, background: 'var(--care)' } }))]
+            : h('span', { class: 'muted' }, 'poza planem'))))),
+      rows.length ? h('ul', { class: 'pg-mx-rows' }, rows.map(st => h('li', { class: 'pg-mx-r' },
+        h('span', { class: 'pg-mx-n' }, st.text),
+        h('span', { class: 'pg-mx-c', role: 'img', 'aria-label': `${st.text}: ${grid.map((d, i) => `${DAY_SHORT[i]} ${cellTxt(st, d, i)}`).join(', ')}` },
+          grid.map((d, i) => h('span', { class: `pg-mx-d${per[i].has(st.id) ? (isDone(done, d.date, st.id) ? ' is-done' : d.date < today ? ' is-miss' : ' is-due') : ''}${d.date === today ? ' is-today' : ''}` }))))))
+        : h('p', { class: 'muted' }, 'Brak kroków w tym tygodniu.'),
+      h('p', { class: 'pg-mx-key muted' }, h('span', { class: 'pg-mx-d is-done' }), 'wykonany', h('span', { class: 'pg-mx-d is-due' }), 'w planie', h('span', { class: 'pg-mx-d is-miss' }), 'niewykonany')));
   }
 
   // ---------------- Produkty: obszar, status, data otwarcia, gdzie i jak często używany
+  // D-119: użycie produktu z odhaczeń kroków (`care.done`) — liczba i data ostatniego użycia (bez nowych danych)
+  function usage(pid) {
+    const ids = new Set(model.steps.filter(x => x.product === pid).map(x => x.id));
+    let n = 0, last = '';
+    for (const [k, v] of Object.entries(done)) if (v === true && ids.has(k.slice(11))) { n++; if (k.slice(0, 10) > last) last = k.slice(0, 10); }
+    return { n, last };
+  }
   function productsView() {
     const f = ctx.params.get('s') || '';
     const list = model.products.filter(p => !f || (p.status || 'uzywany') === f);
@@ -185,6 +228,7 @@ export function renderPielegnacja(root, ctx) {
           return h('article', { class: `pg-prod-card st-${st}`, id: `pg-p-${p.id}` },
             h('div', { class: 'pg-prod-h' }, h('h3', {}, p.name), h('span', { class: `pill pg-st-${st}` }, STATUS_LABEL[st] || st)),
             p.opened && h('p', { class: 'muted' }, `Otwarty ${longDate(p.opened)}`),
+            (u => h('p', { class: 'pg-used' }, icon('history', { size: 14 }), h('span', {}, u.n ? `Użyty ${u.n}× · ostatnio ${dayShort(u.last)} ${shortDate(u.last)}` : 'Jeszcze bez odhaczeń')))(usage(p.id)),
             p.note && h('p', { class: 'pg-note' }, p.note),
             use.length ? h('ul', { class: 'pg-use' }, use.map(u => h('li', {}, h('strong', {}, u.pora), ` · ${u.step.text} · `, h('span', { class: 'muted' }, u.rule))))
               : h('p', { class: 'muted' }, 'Nieprzypisany do żadnego kroku.'),
@@ -203,6 +247,7 @@ export function renderPielegnacja(root, ctx) {
       h('a', { class: 'btn', href: '#/dane' }, icon('folder-open', { size: 18 }), h('span', {}, 'Import w Dane'))),
     h('p', { class: 'muted pg-priv' }, icon('lock', { size: 14 }), h('span', {}, 'Plan jest tylko w Twoich danych (urządzenie, plik synchronizacji, zaszyfrowana chmura) — nie ma go w kodzie aplikacji.')));
     if (model.empty) { add(root, emptyState()); return; }
+    add(root, periodsTimeline());
     for (const p of byPora(model.steps)) {
       add(root, h('section', { class: 'panel pg-pora', 'aria-labelledby': `pg-ph-${p.id}` },
         h('div', { class: 'pg-pora-h' }, h('h2', { id: `pg-ph-${p.id}` }, icon(p.icon, { size: 20 }), p.label), h('span', { class: 'pg-count' }, `${p.steps.length} ${plural(p.steps.length, 'krok', 'kroki', 'kroków')}`)),
@@ -217,6 +262,24 @@ export function renderPielegnacja(root, ctx) {
               s.slot && h('span', { class: 'muted' }, `plan dnia: ${slotLabel(s.slot)}`)),
             h('button', { class: 'pg-edit', 'aria-label': `Edytuj krok: ${s.text}`, onclick: () => stepDialog(s) }, icon('pencil', { size: 16 })))))))));
     }
+  }
+
+  // D-119: oś okresów — kroki z datą „od” lub „do” jako odcinki na osi czasu (co się kończy, co się zaczyna); znacznik „dziś”
+  function periodsTimeline() {
+    const st = model.steps.filter(x => x.from || x.until);
+    if (!st.length) return null;
+    const lo = [today, ...st.map(x => x.from).filter(Boolean)].sort()[0], hiRaw = [addDays(today, 14), ...st.map(x => x.until).filter(Boolean)].sort().at(-1);
+    const a = addDays(lo, -7), z = addDays(hiRaw, 7), span = Math.max(1, diffDays(a, z));
+    const pos = d => `${(diffDays(a, d) / span) * 100}%`;
+    return h('section', { class: 'panel pg-tl', 'aria-labelledby': 'pg-tl-h' },
+      h('h2', { id: 'pg-tl-h' }, icon('calendar-range', { size: 20 }), 'Okresy kroków'),
+      h('div', { class: 'pg-tl-axis', 'aria-hidden': 'true' }, h('span', {}, shortDate(a)), h('span', {}, shortDate(z))),
+      h('ul', { class: 'pg-tl-list', style: { '--today': pos(today) } }, st.map(x => h('li', { class: 'pg-tl-r' },
+        h('span', { class: 'pg-tl-n' }, x.text, h('span', { class: 'muted' }, ` · ${[x.from && `od ${shortDate(x.from)}`, x.until && `do ${shortDate(x.until)}`].filter(Boolean).join(' ')}`)),
+        h('span', { class: 'pg-tl-track', 'aria-hidden': 'true' },
+          h('span', { class: `pg-tl-bar${x.from ? '' : ' is-open-l'}${x.until ? '' : ' is-open-r'}${x.until && x.until < today ? ' is-past' : ''}`,
+            style: { left: pos(x.from || a), right: `calc(100% - ${pos(x.until || z)})` } }))))),
+      h('p', { class: 'muted pg-tl-key' }, 'Pionowa linia — dziś. Odcinek bez początku lub końca — krok bez daty „od” / „do”.'));
   }
 
   async function exportPlan() {
@@ -315,4 +378,73 @@ export function renderPielegnacja(root, ctx) {
           catch (e) { dlg.error(e); }
         } }, 'Usuń krok')));
   }
+
+  // ---------------- Tryb rutyny (D-119): jeden krok naraz, „Gotowe” zapisuje `care.done` (ten sam zapis co lista), krok z `wait` —
+  // odliczanie startuje samo (globalny minutnik: sygnał także po wyjściu z trybu), ekran nie gaśnie (app.js — trasa ?v=fokus)
+  function routineView() {
+    const P = PORY.find(x => x.id === ctx.params.get('p')) || PORY[0];
+    const steps = stepsFor(model, date).filter(x => x.pora === P.id && !x.asNeeded);
+    const exit = `#/pielegnacja?d=${date}`;
+    const wrap = h('div', { class: 'fx care-fx', style: { '--dc': 'var(--care)' } });
+    add(root, wrap);
+    if (!steps.length) {
+      add(wrap, focusTop({ exit, title: `Rutyna · ${P.label}` }), h('p', { class: 'fx-msg' }, `${dayShort(date)} ${shortDate(date)}: brak kroków tej pory.`),
+        h('a', { class: 'btn primary fx-wide', href: exit }, 'Wróć do planu'));
+      return;
+    }
+    const dn = x => isDone(done, date, x.id);
+    if (!rpos || rpos.date !== date || rpos.pora !== P.id || !steps.some(x => x.id === rpos.id)) rpos = { date, pora: P.id, id: (steps.find(x => !dn(x)) || steps[steps.length - 1]).id };
+    const cur = steps.find(x => x.id === rpos.id), i = steps.indexOf(cur), k = steps.filter(dn).length, prev = steps[i - 1], nx = steps[i + 1];
+    const goTo = d => { const n = steps[i + d]; if (!n) return; rpos.id = n.id; ctx.rerender(); };
+    const waitKey = x => `care|${date}|${x.id}`;
+    const set = async value => {
+      try { await store.record('care.done', { date, step: cur.id, done: value }); } catch (e) { err(e); return false; }
+      derive(); return true;
+    };
+    const complete = async () => {
+      sfx('check');
+      if (!await set(true)) return;
+      if (cur.wait > 0) { unlockAudio(); startCountdown(waitKey(cur), cur.wait * 60, `Odczekaj po: ${cur.text}`, l => ctx.flash(`${l} — czas minął.`, 'info')); }
+      const n = steps.slice(i + 1).find(x => !dn(x)) || steps.find(x => !dn(x));
+      if (n) rpos.id = n.id; else sfx('done');
+      ctx.rerender();
+    };
+    const undo = async () => { if (await set(false)) ctx.rerender(); };
+    const prod = cur.product && model.product[cur.product];
+    const card = h('section', { class: `fx-set${dn(cur) ? ' is-done' : ''}`, 'aria-labelledby': 'fx-set-h' },
+      h('div', { class: 'fx-set-h' },
+        h('button', { class: 'fx-nav', 'aria-label': 'Poprzedni krok', disabled: i === 0 || null, onclick: () => goTo(-1) }, icon('chevron-left', { size: 22 })),
+        h('h3', { id: 'fx-set-h' }, `Krok ${i + 1} z ${steps.length}`, dn(cur) && h('span', { class: 'fx-tag' }, icon('check', { size: 14 }), 'wykonany')),
+        h('button', { class: 'fx-nav', 'aria-label': 'Następny krok', disabled: i === steps.length - 1 || null, onclick: () => goTo(1) }, icon('chevron-right', { size: 22 }))),
+      h('div', { class: 'fx-ex fx-study' },
+        cur.group && h('p', { class: 'fx-k' }, cur.group),
+        h('h2', { class: 'fx-name' }, cur.text),
+        prod && h('p', { class: 'fx-plan' }, prod.name),
+        cur.note && h('p', { class: 'fx-plan' }, cur.note)),
+      cur.warn && h('p', { class: 'pg-warn' }, icon('triangle-alert', { size: 14 }), h('span', {}, cur.warn)),
+      cur.wait > 0 && !dn(cur) && h('p', { class: 'fx-plan care-wait' }, icon('timer', { size: 16 }), h('span', {}, `Po „Gotowe” odliczanie ${cur.wait} min ruszy samo.`)),
+      dn(cur)
+        ? h('button', { class: 'fx-undo', onclick: undo }, icon('undo-2', { size: 18 }), h('span', {}, 'Cofnij — krok niewykonany'))
+        : h('button', { class: 'primary fx-go', onclick: complete }, icon('check', { size: 22 }), h('span', {}, 'Gotowe')));
+    swipeRow(card, dn(cur) ? { left: { label: 'Cofnij', ic: 'undo-2', tone: 'neutral', run: undo } } : { right: { label: 'Gotowe', ic: 'check', run: complete } });
+    // odliczanie po poprzednim kroku (np. 10 min przed kolejnym) — nad bieżącym krokiem
+    const waiting = prev && prev.wait > 0 && countdown(waitKey(prev)) ? prev : null;
+    add(wrap,
+      focusTop({ exit, title: `Rutyna · ${P.label}`, sub: `${dayShort(date)} ${shortDate(date)} · ${k} / ${steps.length} ${plural(steps.length, 'krok', 'kroki', 'kroków')}` }),
+      focusScale([steps.map(x => ({ done: dn(x), cur: x === cur }))], `Kroki: ${k} z ${steps.length} wykonanych`),
+      msg,
+      waiting && h('p', { class: 'fx-next' }, h('span', { class: 'fx-l' }, 'Odczekaj'), `po: ${waiting.text}`),
+      waiting && focusTimer(waitKey(waiting), waiting.wait, `Odczekaj po: ${waiting.text}`, ctx.flash),
+      card,
+      nx && h('p', { class: 'fx-next' }, h('span', { class: 'fx-l' }, 'Następnie'), nx.text),
+      k === steps.length && h('a', { class: 'btn fx-wide', href: exit }, icon('check', { size: 18 }), h('span', {}, `${P.label}: wszystkie kroki wykonane — wróć`)));
+    focusKeys(wrap, { exit, primary: dn(cur) ? null : complete, nav: goTo });
+  }
+}
+
+// D-119: reguła dni jako 7 kropek tygodnia (PN…ND) — wypełniona = krok w tym dniu; dzień wyświetlany wyróżniony. Cykl i „doraźnie” — bez kropek.
+function weekDots(s, date) {
+  if (s.asNeeded || s.cycle?.on > 0 || !s.days?.length || s.days.length === 7) return null;
+  const wd = weekday(date);
+  return h('span', { class: 'pg-dots', 'aria-hidden': 'true' }, DAY_SHORT.map((l, i) => h('span', { class: `pg-dot${s.days.includes(i + 1) ? ' is-on' : ''}${i + 1 === wd ? ' is-cur' : ''}`, title: l })));
 }

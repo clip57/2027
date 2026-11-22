@@ -69,6 +69,8 @@
   --cfa: oklch(0.471 0.15 264.8); --train: oklch(0.5 0.139 35); --regen: oklch(0.47 0.17 305.2); --care: oklch(0.474 0.084 183.7);
   --p-col: oklch(0.48 0.15 255); --c-col: oklch(0.5019 0.1152 62.29); --f-col: oklch(0.469 0.16 299.9); --org: oklch(0.473 0.087 221.4);
   --warn-bg: oklch(0.959 0.04 84.6); --warn-ink: oklch(0.421 0.089 75.2); --err-bg: oklch(0.947 0.027 26.2); --ok-ink: oklch(0.451 0.111 149.8);
+  /* D-119: kolory preparatów (znak rozpoznawczy dawki w Suplementacji) — 8 odcieni, przypisanie stałe wg kolejności preparatów */
+  --sp-1: oklch(0.56 0.15 25); --sp-2: oklch(0.58 0.13 65); --sp-3: oklch(0.6 0.12 105); --sp-4: oklch(0.56 0.13 150); --sp-5: oklch(0.56 0.1 200); --sp-6: oklch(0.55 0.14 245); --sp-7: oklch(0.55 0.16 290); --sp-8: oklch(0.56 0.15 340);
 }
 /* ---- Motyw ciemny (ręcznie wybrany albo systemowy). Oba bloki niżej MUSZĄ być identyczne
    (pilnuje tego tests/unit/tokens.test.mjs, który sprawdza też kontrast par tokenów). D-114: kolory danych (domeny, stany) jaśniejsze
@@ -93,6 +95,7 @@
   --cfa: oklch(0.775 0.11 268); --train: oklch(0.77 0.135 40); --regen: oklch(0.78 0.132 305); --care: oklch(0.81 0.118 185);
   --p-col: oklch(0.779 0.101 255.7); --c-col: oklch(0.82 0.12 79.7); --f-col: oklch(0.791 0.109 305.1); --org: oklch(0.801 0.09 219.7);
   --warn-bg: oklch(0.269 0.05 79.5); --warn-ink: oklch(0.879 0.09 84.5); --err-bg: oklch(0.26 0.059 25.1); --ok-ink: oklch(0.819 0.12 155.2);
+  --sp-1: oklch(0.76 0.13 25); --sp-2: oklch(0.8 0.12 65); --sp-3: oklch(0.84 0.12 105); --sp-4: oklch(0.79 0.13 150); --sp-5: oklch(0.8 0.1 200); --sp-6: oklch(0.77 0.12 245); --sp-7: oklch(0.77 0.12 290); --sp-8: oklch(0.77 0.13 340);
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme]) {
   color-scheme: dark;
@@ -114,6 +117,7 @@
   --cfa: oklch(0.775 0.11 268); --train: oklch(0.77 0.135 40); --regen: oklch(0.78 0.132 305); --care: oklch(0.81 0.118 185);
   --p-col: oklch(0.779 0.101 255.7); --c-col: oklch(0.82 0.12 79.7); --f-col: oklch(0.791 0.109 305.1); --org: oklch(0.801 0.09 219.7);
   --warn-bg: oklch(0.269 0.05 79.5); --warn-ink: oklch(0.879 0.09 84.5); --err-bg: oklch(0.26 0.059 25.1); --ok-ink: oklch(0.819 0.12 155.2);
+  --sp-1: oklch(0.76 0.13 25); --sp-2: oklch(0.8 0.12 65); --sp-3: oklch(0.84 0.12 105); --sp-4: oklch(0.79 0.13 150); --sp-5: oklch(0.8 0.1 200); --sp-6: oklch(0.77 0.12 245); --sp-7: oklch(0.77 0.12 290); --sp-8: oklch(0.77 0.13 340);
 } }
 /* D-114: głęboka czerń (  --bg: oklch(0 0 0); --surface: oklch(0.165 0.005 265); --surface-2: oklch(0.195 0.007 265); --sunken: oklch(0 0 0);
   --border: oklch(0.24 0.006 265); --btn: oklch(0.195 0.006 265); --btn-hover: oklch(0.23 0.007 265); --rail: oklch(0.25 0.008 265);

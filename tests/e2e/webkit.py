@@ -74,7 +74,7 @@ async def run_interactions(pw, name, url, mobile):
     k0 = await pg.locator('.dose-ck[aria-pressed="true"]').count()
     await pg.locator('.dose-ck[aria-pressed="false"]').first.click()
     await wait_js(pg, "k => document.querySelectorAll('.dose-ck[aria-pressed=\"true\"]').length > k", k0)
-    await pg.reload(); await pg.wait_for_selector('.dose-ck')
+    await pg.reload(); await pg.wait_for_selector('.dose-ck', state='attached')   # D-119: przyjęta pora zwinięta
     ok(await pg.locator('.dose-ck[aria-pressed="true"]').count() == k0 + 1, f'{tag} IndexedDB: odhaczenie dawki po przeładowaniu')
     # Okno (arkusz): otwarcie i zamknięcie klawiszem Esc — po zamknięciu usunięte z DOM
     await pg.goto(url + '#/zapasy'); await pg.wait_for_selector('.inv')
@@ -93,7 +93,7 @@ async def run_interactions(pw, name, url, mobile):
     ok(not await pg.evaluate("document.documentElement.hasAttribute('data-focus')"), f'{tag} tryb skupienia: wyjście')
     if mobile:
         # Gest na liście (zdarzenia dotyku, D-112 / D-114): dawka w Suplementacji
-        await pg.goto(url + '#/wiecej'); await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list li')
+        await pg.goto(url + '#/wiecej'); await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list li', state='attached')
         has = await pg.evaluate("'ontouchstart' in window || navigator.maxTouchPoints > 0")
         if has:
             k1 = await pg.locator('.dose-ck[aria-pressed="true"]').count()

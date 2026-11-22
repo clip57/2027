@@ -2,10 +2,14 @@
 // Jeden kod dla obu planów — różnice (dane, typy zdarzeń, recall, widok „Plan”) opisuje konfiguracja `P` w cfa.js / mpw.js.
 // Daty lokalne (naprawa błędu UTC z v1/v2).
 import { h, clear, fmt, plural, add } from '../ui/dom.js';
-import { segmented, progressRing, section, timerChip } from '../ui/components.js';
+import { checkBtn } from '../ui/check.js';
+import { segmented, progressRing, section, timerChip, sheet } from '../ui/components.js';
+import { segRing } from '../ui/rings.js';
+import { completionDates, tempo } from '../core/calc/tempo.js';
 import { renderStudyFocus } from './study_focus.js';
 import { areaChart, heatmap } from '../ui/charts.js';
-import { cfaSourceLine } from '../core/resolver.js';
+import { cfaSourceLine, sourceText } from '../core/resolver.js';
+import { SRC } from '../core/data.js';
 import { addDays, diffDays, longDate, shortDate, dayShort, weekday, parse } from '../core/dates.js';
 import { previewEvents, apply } from '../core/sync/bundle.js';
 import { cfaErrorLogEvents } from '../core/migrate/cfa.js';
@@ -33,7 +37,7 @@ export function renderStudy(root, ctx, P) {
   const go = o => { const to = link(o); if (location.hash === to) ctx.rerender(); else location.hash = to; };
   // Stan pochodny z dziennika — zmienne (nie stałe): po punktowym odświeżeniu (P2) obsługa kliknięć w niezmienionych
   // fragmentach widoku czyta już bieżące wartości.
-  let done, pace, late, settings, rs;
+  let done, pace, late, settings, rs, tm;
   const derive = () => {
     done = store?.state?.[P.fields.done] || new Set();
     // Tempo względem harmonogramu (D-070): wyłącznie daty bloków z planu i dziennik postępu
@@ -42,6 +46,8 @@ export function renderStudy(root, ctx, P) {
     // Recall 22:00 (I11, tylko CFA): odhaczenie jako ustawienie `cfa.recall:<data>` (istniejący typ `setting`)
     settings = store?.state?.settings || {};
     rs = R ? R.stats(settings, today) : null;
+    // D-119: szacunek tempa — daty odhaczeń z dziennika zdarzeń (prawdziwe dane), oznaczany zawsze jako szacunek
+    tm = tempo({ dates: completionDates(store?.allEvents?.() || [], P.types.done, done), total: D.bloki.length, doneCount: done.size, today, planEnd: D.stat.end });
   };
   derive();
   // Po zapisie: widok dnia i harmonogramu odświeżają tylko zmienione fragmenty (P2); pozostałe widoki — pełne przerysowanie
@@ -62,6 +68,8 @@ export function renderStudy(root, ctx, P) {
     try { await store.record('setting', { key: R.key(date), value }); after([]); } catch (e) { err(e); }
   };
 
+  // D-119: dwa plany jednocześnie (D-116) — odnośnik do drugiego planu, gdy dziś trwa
+  const other = [{ id: 'cfa', name: 'CFA', D: SRC.cfa.D }, { id: 'mpw', name: 'MPW', D: SRC.mpw.D }].find(x => x.id !== P.id && today >= x.D.stat.start && today <= x.D.stat.end) || null;
   const hero = region(() => { const doneCount = done.size, hoursDone = Math.round(doneCount * 53 / 60 * 10) / 10;
   return h('section', { class: `hero-tr hero-cfa hero-${P.id}` },
     h('div', { class: 'hero-tr-main' },
@@ -77,20 +85,42 @@ export function renderStudy(root, ctx, P) {
           : h('span', { class: 'chip cf-ok' }, icon('circle-check', { size: 16 }), 'Na bieżąco z planem'),
         h('span', { class: 'chip' }, `Plan do wczoraj: ${pace.doneDue} / ${pace.due}`),
         pace.ahead > 0 && h('span', { class: 'chip' }, `Z wyprzedzeniem: ${pace.ahead}`),
-        rs?.due > 0 && h('span', { class: 'chip cf-recall-chip' }, `Recall: ${rs.doneDue} / ${rs.due}`))),
-    h('div', { class: 'hero-tr-side' }, progressRing(doneCount, D.bloki.length, 'Wykonane bloki'))); });
+        rs?.due > 0 && h('span', { class: 'chip cf-recall-chip' }, `Recall: ${rs.doneDue} / ${rs.due}`),
+        other && h('a', { class: 'chip cf-other', href: `#/${other.id}` }, icon(other.id === 'mpw' ? 'landmark' : 'graduation-cap', { size: 16 }), `Równolegle: ${other.name}`),
+        tm.ok && !tm.finished && h('span', { class: `chip cf-tempo${tm.delta > 0 ? ' is-late' : ''}`, title: 'Szacunek z tempa ostatnich dni (bloki odhaczone ÷ dni)' },
+          icon('activity', { size: 16 }), `Szacunek: koniec ok. ${shortDate(tm.end)}.${tm.end.slice(0, 4)}`))),
+    h('div', { class: 'hero-tr-side' }, progressRing(doneCount, D.bloki.length, 'Wykonane bloki')),
+    track()); });
+  // D-119: ścieżka planu — od startu do końca planu (egzaminu): wypełnienie = bloki wykonane, znacznik = ile wg planu do dziś
+  function track() {
+    const n = D.bloki.length, due = D.bloki.filter(b => b.data <= today).length, pct = x => `${Math.min(100, (x / n) * 100)}%`;
+    return h('div', { class: 'cf-track', role: 'img', 'aria-label': `Ścieżka planu: wykonane ${done.size} z ${n} bloków, wg planu do dziś ${due}` },
+      h('span', { class: 'cf-track-bar' }, h('span', { class: 'cf-track-f', style: { width: pct(done.size) } }), due > 0 && due < n && h('span', { class: 'cf-track-m', style: { left: pct(due) } })),
+      h('span', { class: 'cf-track-l' }, h('span', {}, `${dayShort(D.stat.start)} ${shortDate(D.stat.start)}`),
+        due > 0 && due < n && h('span', { class: 'cf-track-d' }, `wg planu: ${due}`), h('span', {}, `${EXAM ? 'egzamin' : 'koniec'} ${shortDate(EXAM || D.stat.end)}`)));
+  }
   add(root, hero.el,
   msg,
   h('div', { class: 'controls' }, segmented('Widok', VIEWS, view, v => go({ v }))),
   // U6: zadania bloków nie wczytały się (np. brak połączenia przy pierwszym otwarciu wariantu web) — reszta planu działa
   P.tasks && !P.tasksReady() && h('p', { class: 'banner warn cf-task-na' }, 'Zadania bloków są chwilowo niedostępne — połącz się z internetem i otwórz moduł ponownie. Harmonogram i odhaczanie działają.'));
 
+  // D-119: karta „Teraz / Następny” — blok trwający (wg godzin z planu) albo najbliższy; liczone przy rysowaniu
+  const nowKick = b => {
+    const [a, z] = (b.godz.match(/\d{1,2}:\d{2}/g) || []).map(t => t.split(':').map(Number)).map(([x, y]) => x * 60 + y);
+    const n = new Date(), m = n.getHours() * 60 + n.getMinutes();
+    if (a == null) return 'Następny blok';
+    if (m >= a && (z == null || m < z)) return `Teraz · zostało ${z - m} min`;
+    return m < a ? `Następny · za ${a - m < 60 ? `${a - m} min` : `${Math.floor((a - m) / 60)} h ${(a - m) % 60} min`}` : 'Następny blok';
+  };
   const blockRow = (b, next = false) => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}${next ? ' is-next' : ''}` },
-    h('button', { class: 'set-toggle', 'aria-pressed': String(done.has(b.nr)), 'aria-label': `Blok ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`,
-      onclick: () => toggle(b.nr, !done.has(b.nr)) }, done.has(b.nr) ? '✓' : b.blok),
+    checkBtn({ key: `${P.id}|${b.nr}`, on: done.has(b.nr), label: b.blok, aria: `Blok ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`,
+      onclick: () => toggle(b.nr, !done.has(b.nr)) }),
     h('div', { class: 'cfa-body' },
-      h('p', { class: 'cfa-src' }, cfaSourceLine(b)),
+      next && b.data === today && h('p', { class: 'cf-kick' }, nowKick(b)),
+      // D-119: tytuł = temat, pod nim źródło jako informacja (tom, dział, strony) — pełna nazwa pliku w podpowiedzi
       h('p', { class: 'cfa-topic' }, b.temat),
+      h('p', { class: 'cfa-src', title: cfaSourceLine(b) }, sourceText(b)),
       h('p', { class: 'cfa-meta' }, h('span', { class: `mode ${P.modeClass[b.tryb] || ''}` }, b.tryb), h('span', { class: 'muted' }, `${b.godz} · nr ${b.nr}`),
         P.meta?.(b)),
       // F-N2 (D-113): licznik bloku 53 min przy następnym bloku dnia (stan interfejsu, sygnał na koniec — bez zapisu w dzienniku)
@@ -110,11 +140,24 @@ export function renderStudy(root, ctx, P) {
       try { await store.recordMany(blocks.filter(b => done.has(b.nr) !== value).map(b => [P.types.done, { block: b.nr, done: value, ...P.doneExtra }])); after(); } catch (e) { err(e); }
     };
     // Zaległe z poprzednich dni i panel dnia — odświeżane po odhaczeniu (P2)
+    // D-119: zaległe jako jeden pasek — liczba, najstarszy dzień, 3 najstarsze bloki; pełna lista w arkuszu „Plan nadrabiania”
+    const sheetRows = new Map();
+    const catchUp = () => {
+      sheetRows.clear();
+      const byD = pace.overdue.reduce((m, b) => ((m[b.data] ||= []).push(b), m), {});
+      sheet(`Plan nadrabiania · ${late} ${plural(late, 'blok', 'bloki', 'bloków')}`,
+        h('p', { class: 'muted' }, `Od najstarszych. Przy obecnym planie ${tm.ok && !tm.finished ? `i tempie (${fmt(tm.rate, 1)} bloku dziennie) ` : ''}każdy odhaczony blok zmniejsza zaległość.`),
+        Object.entries(byD).map(([d, bl]) => h('section', { class: 'cf-cu-day' }, h('h3', {}, `${dayShort(d)} ${shortDate(d)}`),
+          h('div', { class: 'cfa-list' }, bl.map(b => { const el = blockRow(b); sheetRows.set(b.nr, el); return el; })))));
+    };
     const backlog = region(() => date === today && late > 0 && h('section', { class: 'panel cf-backlog', 'aria-labelledby': 'cf-bl-h' },
-        h('h2', { id: 'cf-bl-h' }, icon('calendar-clock', { size: 20 }), `Zaległe z poprzednich dni: ${late}`),
-        h('p', { class: 'muted' }, 'Bloki zaplanowane przed dzisiaj i jeszcze nieodhaczone. Pokazano najstarsze.'),
-        h('div', { class: 'cfa-list' }, pace.overdue.slice(0, 5).map(b => blockRow(b))),
-        late > 5 && h('a', { class: 'btn', href: `#/${P.id}?v=harmonogram&zal=1` }, `Wszystkie zaległe (${late})`)));
+        h('div', { class: 'cf-bl-top' },
+          h('h2', { id: 'cf-bl-h' }, icon('calendar-clock', { size: 20 }), `Zaległe z poprzednich dni: ${late}`),
+          h('button', { class: 'cf-bl-open', onclick: catchUp }, icon('list-todo', { size: 16 }), h('span', {}, 'Plan nadrabiania'))),
+        h('span', { class: 'cf-bl-bar', role: 'img', 'aria-label': `Plan do wczoraj: wykonane ${pace.doneDue} z ${pace.due}, zaległe ${late}` },
+          h('span', { class: 'cf-bl-f', style: { width: `${pace.due ? (pace.doneDue / pace.due) * 100 : 0}%` } })),
+        h('p', { class: 'muted' }, `Najstarszy: ${dayShort(pace.overdue[0].data)} ${shortDate(pace.overdue[0].data)} · plan do wczoraj ${pace.doneDue} / ${pace.due}. Najstarsze bloki:`),
+        h('div', { class: 'cfa-list' }, pace.overdue.slice(0, 3).map(b => blockRow(b)))));
     const panel = region(() => {
       const dDone = blocks.filter(b => done.has(b.nr)).length;
       const rDone = recall && R.done(settings, date);
@@ -125,13 +168,14 @@ export function renderStudy(root, ctx, P) {
             h('p', { class: 'muted' }, `${blocks.length ? `${dDone} / ${blocks.length} bloków` : 'bez bloków'}${isMock ? ` · ${P.mock.day(date)}` : ''}${R ? (recall ? ' · recall 22:00' : ' · bez recall') : ''}`),
             nextBlock && h('p', { class: 'cf-next' }, `Następny: blok ${nextBlock.blok} · ${nextBlock.godz} · ${nextBlock.temat}`)),
           // D6 (audyt 31.10): dzień bez bloków — znacznik „wolne” zamiast pierścienia 0 / 1 (0 %)
-          blocks.length ? progressRing(dDone, blocks.length, 'Bloki dnia')
+          blocks.length ? h('span', { class: 'cf-dayring' }, segRing(blocks.map(b => ({ v: done.has(b.nr) ? 1 : 0, tone: done.has(b.nr) ? 'done' : b === nextBlock ? 'next' : 'todo' })),
+            { size: 64, stroke: 7, gap: 4, label: `Bloki dnia: ${dDone} z ${blocks.length}` }), h('span', { class: 'cf-dayring-n', 'aria-hidden': 'true' }, `${dDone}/${blocks.length}`))
             : h('span', { class: 'cf-free' }, date > first && date < last ? 'wolne' : 'poza planem')),
         blocks.length ? h('div', { class: 'cfa-list' }, blocks.map(b => blockRow(b, b === nextBlock)))
           : h('p', {}, date > first && date < last ? 'Dzień wolny w planie — brak bloków.' : 'Brak bloków w tym dniu (poza planem).'),
         recall && h('div', { class: `cfa-row cf-recall${rDone ? ' is-done' : ''}` },
-          h('button', { class: 'set-toggle', 'aria-pressed': String(rDone), 'aria-label': `Recall 22:00 ${rDone ? 'wykonany' : 'do wykonania'}`,
-            onclick: () => toggleRecall(date, !R.done(settings, date)) }, rDone ? '✓' : 'R'),
+          checkBtn({ key: `recall|${date}`, on: rDone, label: 'R', aria: `Recall 22:00 ${rDone ? 'wykonany' : 'do wykonania'}`,
+            onclick: () => toggleRecall(date, !R.done(settings, date)) }),
           h('div', { class: 'cfa-body' }, h('p', { class: 'cfa-topic' }, 'CFA Active Recall — sesja 53 min'),
             h('p', { class: 'cfa-meta' }, h('span', { class: 'mode m-ar' }, 'ACTIVE RECALL'), h('span', { class: 'muted' }, '22:00–22:53')))),
         blocks.length > 0 && h('div', { class: 'row' },
@@ -139,7 +183,8 @@ export function renderStudy(root, ctx, P) {
           h('button', { onclick: markAll(true) }, 'Oznacz cały dzień'),
           h('button', { onclick: markAll(false) }, 'Wyczyść dzień')));
     });
-    update = () => { hero.refresh(); backlog.refresh(); panel.refresh(); };
+    update = nrs => { hero.refresh(); backlog.refresh(); panel.refresh();
+      for (const nr of nrs || []) { const el = sheetRows.get(nr), b = D.bloki.find(x => x.nr === nr); if (el?.isConnected && b) sheetRows.set(nr, swap(el, blockRow(b))); } };
     add(root, h('div', { class: 'row daynav' },
       date > first && h('a', { class: 'btn dz-nav', href: link({ d: addDays(date, -1) }) }, icon('chevron-left', { size: 18 }), h('span', {}, 'Poprzedni dzień')),
       date !== today && today >= first && today <= last && h('a', { class: 'btn dz-nav', href: link({ d: today }) }, 'Dziś'),
@@ -187,14 +232,25 @@ export function renderStudy(root, ctx, P) {
         if (e.target.open && !box.firstChild) add(box, past.map(dayPanel));
       } }, h('summary', {}, pastHead.el), box));
     }
-    add(root, days.filter(x => !past.includes(x)).map(dayPanel));
+    // D-119: ścieżka — nagłówki tygodni (zakres dat i wykonanie tygodnia) między dniami
+    let wk = '';
+    const weekOf = d => addDays(d, 1 - weekday(d)), weekHead = new Map();
+    add(root, days.filter(x => !past.includes(x)).flatMap(x => {
+      const w = weekOf(x[0]), out = [];
+      if (w !== wk && !q && !zal) { wk = w;
+        const head = region(() => { const wb = D.bloki.filter(b => b.data >= w && b.data <= addDays(w, 6));
+          return h('h2', { class: 'cf-week' }, h('span', {}, `Tydzień ${shortDate(w)}–${shortDate(addDays(w, 6))}`), h('span', { class: 'muted' }, `${wb.filter(b => done.has(b.nr)).length} / ${wb.length} bloków`)); });
+        weekHead.set(w, head); out.push(head.el); }
+      out.push(dayPanel(x));
+      return out;
+    }));
     // Filtry „tylko niewykonane” / „tylko zaległe” zmieniają skład listy — wtedy pełne przerysowanie (jak dotąd)
     if (!todo && !zal) update = nrs => {
       hero.refresh(); lateLabel.refresh(); if (past.length) pastHead.refresh();
       for (const nr of nrs || []) {
         const b = D.bloki.find(x => x.nr === nr), el = rowOf.get(nr);
         if (el?.isConnected) rowOf.set(nr, swap(el, blockRow(b)));
-        if (b) headOf.get(b.data)?.refresh();
+        if (b) { headOf.get(b.data)?.refresh(); weekHead.get(weekOf(b.data))?.refresh(); }
       }
     };
   }
@@ -203,7 +259,7 @@ export function renderStudy(root, ctx, P) {
   if (view === 'kalendarz') {
     const months = [...new Set(Object.keys(P.byDay).map(d => d.slice(0, 7)).concat(EXAM ? [EXAM.slice(0, 7)] : []))].sort();
     add(root, h('div', { class: 'cal-legend' },
-      h('span', { class: 'cl c-0' }, '0%'), h('span', { class: 'cl c-1' }, '1–99%'), h('span', { class: 'cl c-2' }, '100%'),
+      h('span', { class: 'cl c-0' }, '0%'), h('span', { class: 'cl c-1' }, 'część'), h('span', { class: 'cl c-2' }, '100%'),
       h('span', { class: 'cl c-mock' }, P.mock.word.toLowerCase()), h('span', { class: 'cl c-exam' }, 'egzamin')));
     for (const ym of months) {
       const [y, m] = ym.split('-').map(Number);
@@ -214,8 +270,10 @@ export function renderStudy(root, ctx, P) {
         const k = bl.filter(b => done.has(b.nr)).length;
         const cls = d === EXAM ? 'c-exam' : !bl.length ? 'c-none' : D.mockCFA.includes(d) ? 'c-mock' : k === bl.length ? 'c-2' : k > 0 ? 'c-1' : 'c-0';
         cells.push(bl.length || d === EXAM
-          ? h('a', { class: `cal-d ${cls}${d === today ? ' is-today' : ''}`, href: `#/${P.id}?v=dzien&d=${d}`, 'aria-label': `${longDate(d)}: ${k}/${bl.length}` },
-            h('span', {}, String(i)), bl.length ? h('small', {}, `${k}/${bl.length}`) : h('small', {}, 'egz.'))
+          ? h('a', { class: `cal-d ${cls}${d === today ? ' is-today' : ''}${d < today && bl.length && k < bl.length ? ' is-late' : ''}`, href: `#/${P.id}?v=dzien&d=${d}`,
+            'aria-label': `${longDate(d)}: ${k}/${bl.length}`, style: { '--v': bl.length ? String(k / bl.length) : '0' } },
+            // D-119: nasycenie koloru = część bloków dnia wykonana (zamiast „0/3” w każdej komórce); kropki = liczba bloków
+            h('span', {}, String(i)), bl.length ? h('small', { class: 'cal-dots', 'aria-hidden': 'true' }, bl.map(b => h('i', { class: done.has(b.nr) ? 'is-on' : null }))) : h('small', {}, 'egz.'))
           : h('span', { class: 'cal-d c-none' }, h('span', {}, String(i))));
       }
       add(root, section(`cal-${ym}`, parse(first).toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' }),
@@ -291,7 +349,29 @@ export function renderStudy(root, ctx, P) {
   }
 
   // ---------------- Plan (działy / obszary, mocki / symulacje, statystyki) — zależny od planu
-  if (view === 'plan') { add(root, progressPanel()); P.plan(root, { done, pace, late, rs }); }
+  if (view === 'plan') { add(root, tempoPanel(), progressPanel()); P.plan(root, { done, pace, late, rs }); }
+
+  // D-119: szacunek tempa — bloki dziennie z ostatnich dni (daty odhaczeń), tempo wymagane do końca planu i przewidywany koniec
+  function tempoPanel() {
+    const end = D.stat.end, endTxt = `${dayShort(end)} ${shortDate(end)}.${end.slice(0, 4)}`;
+    const body = tm.finished ? [h('p', { class: 'cf-tempo-v' }, 'Wszystkie bloki wykonane')]
+      : !tm.ok ? [h('p', { class: 'cf-tempo-v' }, 'Szacunek jeszcze niedostępny'),
+        h('p', { class: 'muted' }, tm.reason === 'short' ? `Potrzeba co najmniej 7 dni od pierwszego odhaczenia (jeszcze ${tm.wait} ${plural(tm.wait, 'dzień', 'dni', 'dni')}).`
+          : tm.reason === 'zero' ? 'W ostatnich dniach nie odhaczono żadnego bloku.' : 'Szacunek pojawi się po pierwszych odhaczonych blokach.')]
+      : [h('p', { class: 'cf-tempo-v' }, `Przy obecnym tempie koniec ok. ${dayShort(tm.end)} ${shortDate(tm.end)}.${tm.end.slice(0, 4)}`),
+        h('p', { class: `cf-tempo-d${tm.delta > 0 ? ' is-late' : ''}` }, tm.delta > 0 ? `${tm.delta} ${plural(tm.delta, 'dzień', 'dni', 'dni')} po końcu planu (${endTxt})`
+          : tm.delta < 0 ? `${-tm.delta} ${plural(-tm.delta, 'dzień', 'dni', 'dni')} przed końcem planu (${endTxt})` : `w dniu końca planu (${endTxt})`)];
+    const meter = (label, v, max, cls) => h('div', { class: `cf-tm-row ${cls}` }, h('span', { class: 'cf-tm-l' }, label),
+      h('span', { class: 'cf-tm-bar' }, h('span', { style: { width: `${max ? Math.min(100, (v / max) * 100) : 0}%` } })), h('strong', {}, fmt(v, 1)));
+    const max = Math.max(tm.rate || 0, tm.need || 0, 0.1);
+    return h('section', { class: 'panel cf-tempo-p', 'aria-labelledby': 'cf-tm-h' },
+      h('h2', { id: 'cf-tm-h' }, icon('activity', { size: 20 }), 'Tempo', h('span', { class: 'cf-est' }, 'szacunek')),
+      ...body,
+      h('div', { class: 'cf-tm' },
+        tm.ok && !tm.finished && meter(`Obecne (${tm.span} dni)`, tm.rate, max, 'is-now'),
+        !tm.finished && meter('Wymagane do końca planu', tm.need, max, 'is-need'),
+        h('p', { class: 'muted small' }, 'Bloki dziennie. Obecne tempo — z dat odhaczeń zapisanych w aplikacji (dni kalendarzowe, łącznie z wolnymi); to prognoza, nie wynik.')));
+  }
 
   // F-N1 / F-N3 (D-113): postęp względem planu — bloki wykonane (wg dnia bloku w planie) narastająco na tle planu, z kreską „dziś”,
   // i mapa wykonania dni (tygodnie × dni). Wyłącznie z planu i dziennika postępu.

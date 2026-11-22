@@ -246,7 +246,7 @@ async function render(keepFocus = false) {
   const { id, params } = route();
   renderedDay = today(); tick = null;
   // D-114: tryb skupienia (Trening, Nauka, Meal Prep) — pełny ekran bez paneli nawigacji, ekran nie gaśnie; każda inna trasa kończy tryb
-  const focus = ['trening', 'cfa', 'mpw', 'mealprep'].includes(id) && params.get('v') === 'fokus';
+  const focus = ['trening', 'cfa', 'mpw', 'mealprep', 'pielegnacja'].includes(id) && params.get('v') === 'fokus';
   document.documentElement.toggleAttribute('data-focus', focus);
   keepAwake(focus);
   setCustomItems(ctx.store?.state?.catalogUser || []);

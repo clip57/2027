@@ -5,6 +5,7 @@ import { metric, statusBadge } from '../ui/components.js';
 import { dayDial, dayEnd } from '../ui/dial.js';
 import { swipeRow } from '../ui/gestures.js';
 import { play, onChange } from '../ui/motion.js';
+import { checkBtn, markToggled } from '../ui/check.js';
 import { sfx } from '../ui/signal.js';
 import { hiddenCards } from '../ui/prefs.js';
 import { sparkline, donut } from '../ui/charts.js';
@@ -67,13 +68,11 @@ function slotView(s, now, care) {
           d.note && h('span', { class: 'muted' }, ` · ${d.note}`))))))));
 }
 // F-D4 (D-113): odhaczanie dawek w planie dnia (ten sam zapis `setting` co w Suplementacji); kontekst ustawiany przy renderze „Dziś”
-let doseCtx = null, justDose = null;
+let doseCtx = null;
 const doseBtn = d => { const on = doseCtx.done(d);
-  const b = h('button', { class: 'set-toggle dose-ck', 'aria-pressed': String(on), 'aria-label': `${suppName(d.supp)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
-    onclick: () => doseCtx.mark(d, !on) }, on ? '✓' : '');
-  // D-114: ruch jako odpowiedź — tylko dawka zmieniona przed chwilą (po przerysowaniu) dostaje animację zatwierdzenia
-  if (justDose === doseCtx.key(d)) { justDose = null; requestAnimationFrame(() => play(b, on ? 'pop' : 'flip')); }
-  return b; };
+  // D-119: wspólny przycisk odhaczenia — animacja tylko dawki zmienionej przed chwilą (także po przerysowaniu)
+  return checkBtn({ key: doseCtx.key(d), on, cls: 'dose-ck', aria: `${suppName(d.supp)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
+    onclick: () => doseCtx.mark(d, !on) }); };
 // D-114: gest — przesunięcie wiersza dawki w prawo = przyjęte, w lewo = cofnięcie (odpowiednik: przycisk w wierszu)
 const doseRow = (d, li) => (!doseCtx ? li : swipeRow(li, doseCtx.done(d)
   ? { left: { label: 'Cofnij', ic: 'undo-2', tone: 'neutral', run: () => doseCtx.mark(d, false) } }
@@ -141,8 +140,8 @@ function mpwCard(r, ctx) {
       h('span', { class: 'muted' }, `${bl[0].godz.slice(0, 5)}–${bl[bl.length - 1].godz.slice(-5)} · ${k} / ${bl.length} bloków`),
       h('a', { class: 'dz-more', href: `#/mpw?v=dzien&d=${r.date}`, 'aria-label': 'Nauka MPW — otwórz moduł' }, icon('chevron-right', { size: 18 }))),
     h('div', { class: 'cfa-list' }, bl.map(b => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}` },
-      h('button', { class: 'set-toggle', 'aria-pressed': String(done.has(b.nr)), disabled: !ctx.store || null,
-        'aria-label': `Blok MPW ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`, onclick: () => toggle(b, !done.has(b.nr)) }, done.has(b.nr) ? '✓' : b.blok),
+      checkBtn({ key: `mpw|${b.nr}`, on: done.has(b.nr), label: b.blok, disabled: !ctx.store,
+        aria: `Blok MPW ${b.nr} ${done.has(b.nr) ? 'wykonany' : 'do wykonania'}`, onclick: () => toggle(b, !done.has(b.nr)) }),
       h('div', { class: 'cfa-body' },
         h('p', { class: 'cfa-src' }, cfaSourceLine(b)),
         h('p', { class: 'cfa-topic' }, b.temat),
@@ -312,8 +311,8 @@ export function renderDzis(root, ctx) {
   const allDoses = r.slots.flatMap(s => s.doses);
   const dset = ctx.store?.state?.settings || {};
   doseCtx = ctx.store && date <= ctx.today && allDoses.length ? { done: d => doseDone(dset, date, d), key: d => doseKey(date, d),
-    mark: async (d, v) => { justDose = doseKey(date, d); if (v) sfx('check');
-      try { await ctx.store.record('setting', { key: doseKey(date, d), value: v }); ctx.rerender(); } catch (e) { justDose = null; ctx.flash(e.message || String(e)); } } } : null;
+    mark: async (d, v) => { markToggled(doseKey(date, d)); if (v) sfx('check');
+      try { await ctx.store.record('setting', { key: doseKey(date, d), value: v }); ctx.rerender(); } catch (e) { ctx.flash(e.message || String(e)); } } } : null;
   const taken = doseCtx ? allDoses.filter(d => doseCtx.done(d)).length : 0;
   const nextDose = () => allDoses.find(x => x.time >= hhmm);
   // Kafel KPI (D-110): ikona i pasek w kolorze domeny, liczba z jednostką pomniejszoną (tekst kafla bez zmian — „0 / 11 bloków”)

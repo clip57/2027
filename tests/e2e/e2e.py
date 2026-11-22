@@ -327,7 +327,8 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/cfa?v=dzien&d=2026-11-20'); await pg.wait_for_selector('.cfa-row')
     ok(await pg.locator('.cfa-row:not(.cf-recall)').count() == 3, f'{tag} CFA: pierwszy dzień planu 2027 — 3 bloki (E–G)')
     ok(await pg.locator('a:has-text("Poprzedni dzień")').count() == 0, f'{tag} CFA: 20.11 to pierwszy dzień CFA')
-    ok('CFA Level I 2027 Vol 1' in await pg.inner_text('main'), f'{tag} CFA: źródło i szczegóły bloku (Curriculum 2027)')
+    ok('Vol 1 · Quantitative Methods · s. ' in await pg.inner_text('main') and await pg.locator('.cfa-src[title^="CFA Level I 2027 Vol 1"]').count() == 3,
+       f'{tag} CFA: źródło bloku (D-119: tom, dział i strony; pełna nazwa pliku w podpowiedzi)')
     await pg.locator('.cfa-row .set-toggle').first.click(); await pg.wait_for_timeout(400)
     await pg.reload(); await pg.wait_for_selector('.cfa-row')
     ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 451' in await pg.inner_text('.hero-cfa'),
@@ -636,7 +637,7 @@ async def run_features(pw, name, url, mobile):
     await pg.goto(url + '#/cfa'); await pg.wait_for_selector('.cfa-row')
     hero = await pg.inner_text('.hero-cfa')
     ok(f'Zaległe: {blk(len(due))}' in hero and f'Plan do wczoraj: 0 / {len(due)}' in hero, f'{tag} CFA: tempo i zaległe z planu ({len(due)})')
-    ok(await pg.locator('.cf-backlog .cfa-row').count() == 5 and 'Następny: blok E' in await pg.inner_text('.cfa-dayhead'), f'{tag} CFA: panel zaległych (5 najstarszych) i następny blok dnia')
+    ok(await pg.locator('.cf-backlog .cfa-row').count() == min(3, len(due)) and 'Następny: blok E' in await pg.inner_text('.cfa-dayhead'), f'{tag} CFA: panel zaległych (D-119: 3 najstarsze, reszta w „Plan nadrabiania”) i następny blok dnia')
     await pg.locator('.cf-backlog .set-toggle').first.click(); await pg.wait_for_timeout(500)
     ok(f'Zaległe: {blk(len(due) - 1)}' in await pg.inner_text('.hero-cfa') and f'Plan do wczoraj: 1 / {len(due)}' in await pg.inner_text('.hero-cfa'),
        f'{tag} CFA: odhaczenie zaległego bloku zmniejsza zaległości')
@@ -1057,7 +1058,18 @@ async def run_care(pw, name, url, mobile):
     # Tydzień, Produkty (filtr, edycja), Plan (dodanie, usunięcie, eksport)
     await pg.goto(url + '#/pielegnacja?v=tydzien&d=2026-10-19'); await pg.wait_for_selector('.pg-wday')
     days = await pg.eval_on_selector_all('.pg-wday', 'e => e.map(x => x.textContent)')
-    ok(len(days) == 7 and '1 / 6' in days[0] and 'krok niedzielny' in days[6], f'{tag} Tydzień: 7 dni, postęp i kroki nie codzienne')
+    sun = await pg.eval_on_selector(".pg-mx-r:has-text('krok niedzielny') .pg-mx-c", "e => [...e.children].map(c => c.classList.contains('is-due') || c.classList.contains('is-done') || c.classList.contains('is-miss'))")
+    ok(len(days) == 7 and '1 / 6' in days[0] and sun == [False] * 6 + [True], f'{tag} Tydzień (D-119): 7 dni, postęp, macierz — krok niedzielny tylko w niedzielę')
+    await pg.goto(url + '#/pielegnacja?v=fokus&p=rano&d=2026-10-19'); await pg.wait_for_selector('.care-fx .fx-go')
+    ok('Krok 2 z 3' in await pg.inner_text('.fx-set-h'), f'{tag} Tryb rutyny (D-119): pierwszy niewykonany krok pory')
+    await pg.locator('.care-fx .fx-go').click(); await wait_js(pg, "() => document.querySelector('.care-fx .fx-timer') && document.querySelector('.fx-set-h')?.textContent.includes('Krok 3 z 3')")
+    tt = await pg.inner_text('.care-fx .fx-timer')
+    ok('trwa' in tt.lower() and 'zatrzymaj' in tt.lower(), f'{tag} Tryb rutyny: „Gotowe” zapisuje krok i uruchamia odliczanie 10 min ({" ".join(tt.split())})')
+    v = await axe_audit(pg); ok(not v, f'{tag} Tryb rutyny: dostępność {v[:2]}')
+    await pg.locator('.care-fx .fx-timer .fx-tbtn').click()
+    await pg.goto(url + '#/pielegnacja?d=2026-10-19'); await pg.wait_for_selector('.pg-pora')
+    ok(await pg.locator('.pg-step.is-done').count() == 2, f'{tag} Tryb rutyny: ten sam zapis co lista (2 kroki wykonane)')
+    await pg.locator('#pg-rano .pg-step.is-done input').nth(1).uncheck(); await pg.wait_for_timeout(400)
     await pg.goto(url + '#/pielegnacja?v=produkty'); await pg.wait_for_selector('.pg-prod-card')
     ok(await pg.locator('.pg-prod-card').count() == 5 and 'Nieprzypisany' in await pg.inner_text('#pg-p-p\\.t5'), f'{tag} Produkty: 5 produktów, użycie w krokach')
     await pg.get_by_role('button', name='W zapasie').click(); await pg.wait_for_timeout(300)
@@ -1532,7 +1544,7 @@ async def run_d113(pw, name, url, mobile):
     ok('Zużycie wg planu' in await pg.inner_text('.zp-hist'), f'{tag} Zapasy: szczegóły — stan w czasie i zużycie')
     # Suplementacja ↔ Dziś: te same odhaczenia dawek
     await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-list')
-    await pg.locator('.dose-ck').first.click(); await pg.wait_for_selector('.dose-ck[aria-pressed=true]')
+    await pg.locator('.dose-ck').first.click(); await pg.wait_for_selector('.dose-ck[aria-pressed=true]', state='attached')   # D-119: przyjęta pora zwija się
     ok('przyjęte 1 / ' in await pg.inner_text('.sp-taken'), f'{tag} Suplementacja: odhaczenie dawki')
     await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     ok(await pg.locator('.slot-supps .dose-ck[aria-pressed=true]').count() == 1 and '1 / ' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: dawka odhaczona w Suplementacji')
@@ -1554,6 +1566,58 @@ async def run_d113(pw, name, url, mobile):
         ok(await pg.evaluate('location.hash') == '#/dzis?d=2026-12-24', f'{tag} ⌘K: data → przejście do dnia')
         ok(await pg.locator('.topbar .sync-chip').count() == 1 and await pg.locator('.topbar .tb-search').count() == 1, f'{tag} Pasek górny: wyszukiwanie i stan synchronizacji')
     ok(errs == [], f'{tag} brak błędów JS {errs[:2]}')
+    await b.close()
+
+
+async def run_d119(pw, name, url, mobile):
+    """D-119 (Instrument+): przyciski odhaczenia (okrąg, znacznik SVG, animacja tylko przełączonego), Suplementacja (pierścień pór, „Przyjmij”,
+    zwinięta pora, regularność), Nauka (szacunek tempa z dat odhaczeń, „Plan nadrabiania”, linia źródła), bez błędów i z dostępnością."""
+    vp = {'width': 390, 'height': 844} if mobile else {'width': 1280, 'height': 800}
+    tag = f'{name} {vp["width"]}px [D-119]'
+    b = await pw.chromium.launch()
+    ctx = await b.new_context(viewport=vp, is_mobile=mobile, has_touch=mobile, locale='pl-PL', timezone_id='Europe/Warsaw')
+    pg = await ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
+    await pg.clock.install(time=at(2026, 11, 24, 13, 0))
+    await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.sp-hero')
+    ok('13:20' in await pg.inner_text('.sp-hero') and await pg.locator('.sp-hero .rg').count() == 1, f'{tag} Suplementacja: przyrząd — następna pora 13:20 i pierścień pór')
+    ck = pg.locator('.dose-ck').first
+    ok(await ck.locator('.ck-svg').count() == 1 and await ck.evaluate("e => getComputedStyle(e).borderRadius") in ('999px', '50%'), f'{tag} przycisk odhaczenia: okrąg ze znacznikiem SVG')
+    await pg.locator('.sp-take').click(); await wait_js(pg, "() => document.querySelector('#sp-1320 details.sp-fold')")
+    ok(await pg.locator('#sp-1320 .dose-ck[aria-pressed="true"]').count() == 2 and 'przyjęte 2 / ' in await pg.inner_text('.sp-taken'),
+       f'{tag} Suplementacja: „Przyjmij 13:20” — wszystkie dawki pory, pora zwinięta do jednej linii')
+    ok(await pg.locator('.sp-reg .sp-reg-map li').count() >= 2, f'{tag} Suplementacja: regularność z odhaczeń')
+    v = await axe_audit(pg); ok(not v, f'{tag} Suplementacja: dostępność {v[:2]}')
+    await pg.locator('#sp-1320 .sp-fold summary').click()
+    await pg.locator('#sp-1320 .dose-ck').first.click(); await wait_js(pg, "() => !document.querySelector('#sp-1320 details.sp-fold')")
+    ok(await pg.locator('#sp-1320 .dose-ck[aria-pressed="true"]').count() == 1, f'{tag} Suplementacja: cofnięcie dawki z rozwiniętej pory')
+    # Nauka: linia źródła i szacunek tempa z prawdziwych odhaczeń w kolejnych dniach (zegar), „Plan nadrabiania”
+    await pg.goto(url + '#/cfa?v=dzien'); await pg.wait_for_selector('.cfa-dayhead')
+    src = await pg.inner_text('.cfa-row.is-next .cfa-src')
+    ok(src.startswith('Vol 1 · Quantitative Methods · s. ') and '.pdf' not in src and 'teraz' in (await pg.inner_text('.cf-kick')).lower(), f'{tag} CFA: „Teraz” i linia źródła bez nazwy pliku ({src})')
+    await pg.goto(url + '#/mpw?v=plan'); await pg.wait_for_selector('.cf-tempo-p')
+    ok('niedostępny' in await pg.inner_text('.cf-tempo-p'), f'{tag} MPW: bez odhaczeń — szacunek tempa niedostępny')
+    for i in range(8):
+        await pg.clock.set_system_time(at(2026, 11, 20 + i, 19, 0)); await pg.goto(url + '#/dane')
+        await pg.goto(url + f'#/mpw?v=dzien&d=2026-11-{20 + i}'); await pg.wait_for_selector('.cfa-dayhead')
+        await pg.locator('.panel:not(.cf-backlog) .cfa-list .set-toggle[aria-pressed="false"]').first.click(); await pg.wait_for_timeout(250)
+    await pg.goto(url + '#/dane'); await pg.goto(url + '#/mpw?v=plan'); await pg.wait_for_selector('.cf-tempo-p')
+    t = await pg.inner_text('.cf-tempo-p')
+    ok('Przy obecnym tempie koniec ok.' in t and 'po końcu planu' in t and 'szacunek' in t.lower(), f'{tag} MPW: szacunek tempa z 8 dni odhaczeń (1 blok dziennie — po końcu planu)')
+    ok('Szacunek: koniec ok.' in await pg.inner_text('.hero-mpw'), f'{tag} MPW: szacunek w nagłówku modułu')
+    v = await axe_audit(pg); ok(not v, f'{tag} MPW Plan: dostępność {v[:2]}')
+    await pg.goto(url + '#/mpw?v=dzien'); await pg.wait_for_selector('.cf-backlog')
+    await pg.locator('.cf-bl-open').click(); await pg.wait_for_selector('dialog[open] .cfa-row')
+    n0 = await pg.locator('dialog[open] .cfa-row').count()
+    await pg.locator('dialog[open] .set-toggle[aria-pressed="false"]').first.click()
+    await wait_js(pg, "() => document.querySelectorAll('dialog[open] .set-toggle[aria-pressed=\"true\"]').length === 1")
+    ok(n0 > 3, f'{tag} MPW: „Plan nadrabiania” — pełna lista zaległych ({n0}) i odhaczenie w arkuszu')
+    v = await axe_audit(pg); ok(not v, f'{tag} MPW: arkusz nadrabiania — dostępność {v[:2]}')
+    await pg.keyboard.press('Escape')
+    await pg.goto(url + '#/mpw?v=kalendarz'); await pg.wait_for_selector('.cal-d')
+    ok(await pg.locator('.cal-d small.cal-dots').count() > 50 and '0/3' not in await pg.inner_text('main'), f'{tag} Kalendarz: nasycenie i kropki zamiast „0/3”')
+    ok(not errs, f'{tag} brak błędów JS ({errs[:2]})')
     await b.close()
 
 
@@ -1975,7 +2039,9 @@ async def run_d114b(pw, name, url, mobile):
             ok(await pg.locator(on).count() == k0 + 1, f'{tag} Gest na liście {route}: przesunięcie w prawo odhacza')
     # --- Wykres interaktywny: postęp planu MPW (odczyt wartości pod kursorem / palcem)
     await pg.goto(url + '#/mpw?v=plan'); await pg.wait_for_selector('.cf-prog-chart svg')
-    svg = pg.locator('.cf-prog-chart svg').first; box = await svg.bounding_box()
+    svg = pg.locator('.cf-prog-chart svg').first
+    await svg.evaluate("e => e.scrollIntoView({ block: 'center' })"); await pg.wait_for_timeout(150)   # D-119: nad wykresem panel tempa
+    box = await svg.bounding_box()
     if mobile: await pg.touchscreen.tap(box['x'] + box['width'] * 0.3, box['y'] + box['height'] * 0.5)
     else: await pg.mouse.move(box['x'] + box['width'] * 0.3, box['y'] + box['height'] * 0.5)
     await pg.wait_for_timeout(150)
@@ -2036,6 +2102,8 @@ async def main():
         await run_d110(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d113(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d113(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
+        await run_d119(pw, 'web', 'http://localhost:8765/index.html', True)
+        await run_d119(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d114(pw, 'web', 'http://localhost:8765/index.html', True)
         await run_d114(pw, 'single', (ROOT / 'dist/single/2027.html').as_uri(), False)
         await run_d114b(pw, 'web', 'http://localhost:8765/index.html', True)

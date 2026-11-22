@@ -6,15 +6,15 @@ Jeden użytkownik, urządzenia: MacBook, iPhone (Safari **i** aplikacja z ekranu
 przeglądarka na komputerze. Język interfejsu i dokumentacji: **polski**.
 
 **Stan (22.11.2026):** D-114 „Instrument” i D-115 „Fundament jakości” — opublikowane na `main` (18–19.11.2026). **D-116** (studia wg harmonogramu,
-plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (`0371a91`). **D-118** (drobne z audytu 10.11: M5–M7, T10, T1) — na gałęzi roboczej, czeka na „Publikuj”. **Plan przebudowy Pielęgnacji, Suplementacji, MPW i CFA** (research, propozycja) — `docs/PLAN_PRZEBUDOWY_MODULOW_2026-11-22.md`, czeka na decyzje użytkownika (§9).
+plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (`0371a91`). **D-118** (drobne z audytu 10.11: M5–M7, T10, T1) i **D-119** („Instrument+”: przebudowa Suplementacji, Pielęgnacji i Nauki, nowe przyciski odznaczania, tryb rutyny, szacunek tempa — `docs/RAPORT_D119.md`) — na gałęzi roboczej, czekają na „Publikuj”. Następny krok: nowe typy danych (pominięte dawki, powtórki error logu, data ważności produktów) — do decyzji użytkownika.
 **Otwarte decyzje użytkownika:** D1 — popołudnie (bloki MPW 15:30–18:23 i blok dodatkowy CFA 17:40–18:33 nakładają się na okno treningowe);
 z D-116/D-117 (`docs/RAPORT_D116.md` §3, `RAPORT_D117.md`): święta po 28.03.2027 (do końca roku — bez wyjątków), dzień obrony.
 Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-10.md` §11) — czekają na użytkownika.
 
 **Czytaj w razie potrzeby (nie wczytuj wszystkiego na start):**
 - `docs/PRZEKAZANIE.md` — stan, zasady współpracy, niedokończone zadania, pliki spoza repozytorium (**najpierw**, przy większej pracy);
-- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-118 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
-  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-118) i raporty `docs/RAPORT_D0xx.md`;
+- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-119 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
+  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-119) i raporty `docs/RAPORT_D0xx.md`;
 - `docs/PULAPKI.md` — tabela pułapek, które już wystąpiły (część pilnują teraz linter i testy) — **przed zmianą UI, testów lub buildu**;
 - wygląd: `docs/REDESIGN-STATUS.md` → `REDESIGN-SPEC.md` → `REDESIGN-DECISIONS.md` → `REDESIGN-TESTING.md` (klasy używane przez testy).
 
@@ -29,7 +29,7 @@ Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-1
   i zadania bloków MPW i CFA tylko przez `planTasks`/`loadPlanTasks`. Nawigacja zawsze przez `modulesOn(today)` / `tabModules()`.
 - **Zapisy:** `ctx.store.record(type, data)` (typ z `EventType` — `src/core/types.d.ts`), zbiorcze `store.recordMany()`; **nowe ustawienia
   i odhaczenia wyłącznie przez `setting`** (`src/core/calc/checks.js`: `supp.dose:…`, `zapasy.shop:…`, `cfa.recall:…`); Zapasy — operacje przez
-  `manyOp` (stos „Cofnij”). Okna zawsze `sheet()` z `components.js`; komunikaty po akcji `ctx.flash()`; przerysowanie w tle `softRender()`.
+  `manyOp` (stos „Cofnij”). Przycisk odhaczenia zawsze `checkBtn`/`checkInput` (`src/ui/check.js`, D-119); okna zawsze `sheet()` z `components.js`; komunikaty po akcji `ctx.flash()`; przerysowanie w tle `softRender()`.
 - **Pielęgnacja (D-094):** plan wyłącznie w danych użytkownika — **nigdy nie dodawaj treści planu (produkty, leki, kroki) do repozytorium,
   testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. **Imię i nazwisko użytkownika nie mogą pojawić się nigdzie**
   (także w plikach prywatnych).

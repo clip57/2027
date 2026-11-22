@@ -97,7 +97,7 @@ async def dom_and_tap(pw, url):
             worst = max(worst, (n, r))
         check(f'{label} (najwięcej: {worst[1]})', worst[0], limit, 'węzłów')
     # Czas reakcji: dotknięcie dawki w Suplementacji → zmiana aria-pressed widoczna w następnej klatce (mediana z 5)
-    await pg.goto(url + '#/wiecej'); await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-ck')
+    await pg.goto(url + '#/wiecej'); await pg.goto(url + '#/suplementy'); await pg.wait_for_selector('.dose-ck', state='attached')
     taps = []
     for i in range(5):
         ms = await pg.evaluate("""async i => {

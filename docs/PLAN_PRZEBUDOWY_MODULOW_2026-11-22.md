@@ -3,7 +3,7 @@
 Polecenie użytkownika (22.11.2026): „Zaplanuj poprawę wyglądu modułów jak Pielęgnacja, Suplementacja, MPW i CFA, bo uważam, że nie są nowoczesne
 i wręcz przestarzałe. Zrób dokładny research, który pozwoli to zdecydowanie unowocześnić i zrobić bardziej interaktywnym na poziomie najlepszych stron.”
 
-**Status: propozycja do akceptacji — nic z tego planu nie jest jeszcze wdrożone.** Decyzje do podjęcia — §9.
+**Status (22.11.2026): wdrożony jako D-119** — decyzje §9: „Instrument+” we wszystkich 4 modułach, bez prototypu, **bez haptyki**, szacunek tempa — tak, nowe typy danych — po przebudowie. Szczegóły i odstępstwa: `docs/RAPORT_D119.md`.
 Podstawa: zrzuty obecnych widoków (24.11.2026, 390 i 1280 px, motyw ciemny, dane syntetyczne w Pielęgnacji), przegląd kodu modułów
 (`pielegnacja.js`, `suplementy.js`, `study.js`, `cfa.js`, `mpw.js`, `study_focus.js`) i research źródeł zewnętrznych (§10).
 

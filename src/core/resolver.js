@@ -297,3 +297,12 @@ export function resolveDay(date) {
 
 // Linia źródła bloku CFA (D-039), np. „Curriculum 2026 Vol 1 (QM), s. 3–13 (11 s.)”.
 export const cfaSourceLine = b => `${b.zrodlo}, ${b.do_przeczytania}`;
+// D-119: linia źródła do wyświetlania (informacja zamiast nazwy pliku): „CFA Level I 2027 Vol 1. Quantitative Methods.pdf” + „PDF 157–168 · druk 147–158”
+// → „Vol 1 · Quantitative Methods · s. 147–158 (12 s.)”. Strony drukowane (jak w książce); inne źródła (MPW) — bez zmian, rozdzielone kropką.
+export function sourceText(b) {
+  const z = String(b.zrodlo || '').replace(/\.pdf$/i, '').replace(/^CFA Level I \d{4} (Vol \d+)\.\s*/, '$1 · ');
+  const r = String(b.do_przeczytania || '');
+  const m = r.match(/^PDF\s+\d+(?:[–-]\d+)?\s*·\s*druk\s+(\d+)(?:[–-](\d+))?$/);
+  const pages = m ? (m[2] ? `s. ${m[1]}–${m[2]} (${Number(m[2]) - Number(m[1]) + 1} s.)` : `s. ${m[1]}`) : r;
+  return [z, pages].filter(Boolean).join(' · ');
+}

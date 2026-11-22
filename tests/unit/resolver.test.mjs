@@ -200,7 +200,7 @@ test('trening: liczba serii wg fazy', () => {
 });
 
 // --- Poprawki po teście akceptacyjnym (D-038, D-039, D-040, D-001)
-import { cfaSourceLine } from '../../src/core/resolver.js';
+import { cfaSourceLine, sourceText } from '../../src/core/resolver.js';
 const SUPP_WORDS = /chondroityn|cynk|boswelli|d3|omega|askorbinian|witamina c|l-teanin|glukozamin|kolagen|tauryn|kreatyn|glicyn|magnez|melatonin/i;
 
 test('D-001: żaden widoczny podpunkt slotu nie powtarza suplementów (wszystkie dni)', () => {
@@ -344,4 +344,10 @@ test('U1 (audyt 23.10.2026): poza planem CFA sloty nauki bez bloku to „Czas w�
   // D-116: sloty bez bloku (ani CFA, ani MPW, ani zdarzenia) to „Czas własny” także w okresie planu CFA
   assert.ok(resolveDay('2026-11-11').slots.filter(s => s.role === 'cfa').every(s => s.own));
   assert.ok(resolveDay('2026-11-24').slots.filter(s => s.role === 'cfa' && s.from < '12:20').every(s => s.own));
+});
+
+test('D-119: sourceText — tom, dział i strony drukowane zamiast nazwy pliku; inne źródła bez zmian', () => {
+  assert.equal(sourceText({ zrodlo: 'CFA Level I 2027 Vol 1. Quantitative Methods.pdf', do_przeczytania: 'PDF 157–168 · druk 147–158' }), 'Vol 1 · Quantitative Methods · s. 147–158 (12 s.)');
+  assert.equal(sourceText({ zrodlo: 'Kodeks cywilny', do_przeczytania: 'art. 56–81 · s. 14–23 (10 s.)' }), 'Kodeks cywilny · art. 56–81 · s. 14–23 (10 s.)');
+  assert.equal(sourceText({ zrodlo: 'Dziennik błędów i rozwiązane mocki', do_przeczytania: '' }), 'Dziennik błędów i rozwiązane mocki');
 });

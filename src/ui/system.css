@@ -536,11 +536,8 @@ body.kbd .toast { bottom: var(--s-3); }
 .counters .counter.c-shop { grid-column: 1 / -1; justify-content: center; }
 
 /* ---------- Pielęgnacja (D-094) — przedrostek pg-; kolor modułu --care (kontrast w tokens.test.mjs) ---------- */
-.pg-hero .ring { --ring: var(--care); }
 .pg-hero-t { margin: .1rem 0 .2rem; font-size: var(--fs-lg); font-weight: 700; max-width: none; }
 .pg-hero .daynav { margin-top: var(--s-3); }
-.pg-jump { display: flex; gap: var(--s-2); overflow-x: auto; padding-bottom: var(--s-1); margin: 0 0 var(--s-3); }
-.pg-jump .chip-b { flex: 0 0 auto; display: inline-flex; align-items: center; gap: var(--s-1); min-height: 44px; padding: 0 var(--s-4); text-decoration: none; color: var(--text); }
 .pg-pora, .pg-prod-card { border-left: 4px solid var(--care); }
 .pg-pora { scroll-margin-top: var(--s-4); }
 .pg-pora-h { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
@@ -550,7 +547,7 @@ body.kbd .toast { bottom: var(--s-3); }
 .pg-count { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-2); white-space: nowrap; }
 .pg-count.is-done { color: var(--ok-ink); }
 .pg-group h3 { font-size: var(--fs-xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-2); margin: var(--s-4) 0 var(--s-2); }
-.pg-list, .pg-plan, .pg-use, .pg-wlist { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.pg-list, .pg-plan, .pg-use { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
 .pg-step { padding: var(--s-2) var(--s-3); border-radius: var(--r-md); background: var(--sunken); border: 1px solid transparent; }
 .pg-step.is-opt { background: transparent; border: 1px dashed var(--border-strong); }
 .pg-check { display: flex; gap: var(--s-3); align-items: flex-start; min-height: 44px; cursor: pointer; }
@@ -592,7 +589,6 @@ body.kbd .toast { bottom: var(--s-3); }
 .pg-wd { font-size: var(--fs-sm); }
 .pg-wd .now-tag { margin-left: var(--s-2); }
 .pg-wprog { font-weight: 700; font-variant-numeric: tabular-nums; }
-.pg-wlist li { font-size: var(--fs-sm); color: var(--text-2); overflow-wrap: anywhere; }
 .pg-days { display: flex; flex-wrap: wrap; gap: var(--s-2); border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--s-2) var(--s-3); margin: 0 0 var(--s-3); }
 .pg-days legend { font-size: var(--fs-sm); font-weight: 600; padding: 0 var(--s-1); }
 .pg-day { min-height: 44px; display: inline-flex; align-items: center; gap: var(--s-1); }
@@ -826,7 +822,7 @@ body.kbd .pg-timer { display: none; }
 @property --fade-l { syntax: "<length>"; inherits: false; initial-value: 0px; }
 @property --fade-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
 @supports (animation-timeline: scroll()) {
-  .seg, .quicklinks, .pills, .day-strip, .dt-nav, .mp-jump, .pg-jump, .dz-aside {
+  .seg, .quicklinks, .pills, .day-strip, .dt-nav, .mp-jump, .dz-aside {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
     mask-image: linear-gradient(90deg, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
     animation: edge-fade linear both; animation-timeline: scroll(self inline); }

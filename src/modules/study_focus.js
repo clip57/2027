@@ -6,7 +6,7 @@ import { icon } from '../ui/icons.js';
 import { swipeRow } from '../ui/gestures.js';
 import { sfx } from '../ui/signal.js';
 import { focusTop, focusScale, focusTimer, focusKeys } from '../ui/focus.js';
-import { cfaSourceLine } from '../core/resolver.js';
+import { cfaSourceLine, sourceText } from '../core/resolver.js';
 import { dayShort, shortDate } from '../core/dates.js';
 
 let pos = null;   // { id, date, nr }
@@ -50,7 +50,7 @@ export function renderStudyFocus(root, ctx, P, { done, toggle }) {
     h('div', { class: 'fx-ex fx-study' },
       h('p', { class: 'fx-k' }, `${cur.tryb} · nr ${cur.nr}`),
       h('h2', { class: 'fx-name' }, cur.temat),
-      h('p', { class: 'fx-plan' }, cfaSourceLine(cur))),
+      h('p', { class: 'fx-plan', title: cfaSourceLine(cur) }, sourceText(cur))),
     P.tasks && P.taskOf?.(cur) && h('details', { class: 'cf-task fx-task' }, h('summary', {}, 'Zadania bloku'), h('p', {}, P.taskOf(cur))),
     isDone(cur)
       ? h('button', { class: 'fx-undo', onclick: undo }, icon('undo-2', { size: 18 }), h('span', {}, 'Cofnij — blok niewykonany'))

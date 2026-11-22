@@ -2,6 +2,7 @@
 // dziennik serii (wykonana, ciężar, powtórzenia, RIR) zapisywany trwale zdarzeniami train.set (D-008),
 // mapa mięśni z free-exercise-db (domena publiczna).
 import { h, clear, add, fmt, plural, numberOf } from '../ui/dom.js';
+import { checkBtn } from '../ui/check.js';
 import { progressRing, segmented, section, statGrid, stat, sheet } from '../ui/components.js';
 import { unlockAudio, timersChanged } from '../ui/signal.js';
 import { restNow, setRest, restStale, restSignal } from '../ui/live.js';
@@ -284,7 +285,8 @@ function renderSession(root, ctx) {
       h('p', { class: 'opt-note' }, icon('triangle-alert', { size: 16 }), ` To ćwiczenie nie jest elementem Fazy ${phase}. Zapis serii jest opcjonalny i oznaczany w statystykach.`),
       rows.length > 0 && h('div', { class: 'sets' }, h('div', { class: 'set set-h' }, h('span', {}, 'Seria'), h('span', {}, 'kg'), h('span', {}, 'powt.'), h('span', {}, 'RIR'), h('span', {})),
         rows.map(v => h('div', { class: `set${v.done ? ' is-done' : ''}` },
-          h('button', { class: 'set-toggle', 'aria-pressed': String(!!v.done), onclick: () => save(e.id, v.set, { done: !v.done, opt: true }, true) }, v.done ? '✓' : String(v.set)),
+          checkBtn({ key: `${date}|${e.id}|${v.set}`, on: !!v.done, label: String(v.set), aria: `${e.name}, seria opcjonalna ${v.set} ${v.done ? 'wykonana' : 'do wykonania'}`,
+            onclick: () => save(e.id, v.set, { done: !v.done, opt: true }, true) }),
           ...['kg', 'reps', 'rir'].map(field => h('input', { type: 'number', inputmode: 'decimal', step: field === 'kg' ? '0.5' : '1', min: '0',
             placeholder: field === 'kg' ? 'kg' : field === 'reps' ? 'powt.' : 'RIR', value: v[field] ?? '', 'aria-label': `${e.name}, seria opcjonalna ${v.set}: ${field}`,
             onchange: ev => { const x = numberOf(ev.target); if (Number.isNaN(x)) return badNum(ev.target, v[field], msg); if (x === null || Number.isFinite(x)) save(e.id, v.set, { [field]: x, opt: true }); } })),
@@ -311,13 +313,13 @@ function renderSession(root, ctx) {
         'aria-label': `${e.name}, seria ${s}: ${ph}`,
         onchange: ev => { const x = numberOf(ev.target); if (Number.isNaN(x)) return badNum(ev.target, v[field], msg); if (x === null || Number.isFinite(x)) save(e.id, s, { [field]: x }); } });
       return h('div', { class: `set${v.done ? ' is-done' : ''}` },
-        h('button', { class: 'set-toggle', 'aria-pressed': String(!!v.done), 'aria-label': `Seria ${s} ${v.done ? 'wykonana' : 'do wykonania'}`,
+        checkBtn({ key: `${date}|${e.id}|${s}`, on: !!v.done, label: String(s), aria: `Seria ${s} ${v.done ? 'wykonana' : 'do wykonania'}`,
           onclick: () => {
             const key = `${date}|${e.id}|${s}`;
             if (!v.done && date === ctx.today) startRest(e, s, n, date, nextSet(plan, { ...store?.state?.train, [key]: { done: true } }, date));
             else if (v.done && restNow()?.key === key) setRest(null);
             save(e.id, s, { done: !v.done }, 'point');
-          } }, v.done ? '✓' : String(s)),
+          } }),
         num('kg', 'kg', '0.5'), num('reps', 'powt.', '1'), num('rir', 'RIR', '1'),
         s > 1 && prev && (prev.kg != null || prev.reps != null) && !v.kg && !v.reps
           ? h('button', { class: 'set-copy', title: 'Skopiuj z poprzedniej serii', 'aria-label': `Skopiuj wartości serii ${s - 1}`,
