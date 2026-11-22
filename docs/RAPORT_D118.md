@@ -28,6 +28,21 @@ Nowe: `docs/PLAN_PRZEBUDOWY_MODULOW_2026-11-22.md`, `docs/RAPORT_D118.md`, `src/
 Zmienione: `public/manifest.webmanifest`, `tools/build.mjs`, `src/modules/{dieta,zapasy,suplementy,rekompozycja,bezpieczenstwo}.js`,
 `src/core/search.js`, `src/ui/search.js`, `src/core/calc/diagnostics.js`, `src/globals.d.ts`, `src/ui/{styles,system,precision}.css`, `tools/visual/snap.py`.
 
-## 3. Testy
+## 3. Testy (22.11.2026, lokalnie)
 
-Wyniki — §4 (uzupełniane po regresji).
+| Zestaw | Wynik |
+|---|---|
+| `npm run lint`, `npm run typecheck` | bez błędów |
+| `npm test` | 287 / 287 (nowe: `module-data.test.mjs` 3, `styles-guard.test.mjs` 4) |
+| `node tools/verify/plan_check.mjs`, `verify_all.py --data-only` | 0 błędów (2 znane ostrzeżenia D1) · 13 kontroli, 0 błędów |
+| `npm run e2e` | 1716 / 1716 |
+| `npm run a11y` | 0 naruszeń |
+| `npm run e2e:webkit` | 249 / 249 |
+| `python3 tests/e2e/cfa_smoke.py`, `npm run e2e:trening` | 0 błędów |
+| `npm run e2e:sync` | 23 / 23 (service worker z nową listą SHELL) |
+| `npm run e2e:cloud` | 100 / 100 |
+| `npm run budget` | 9 / 9 — pakiet JS 1002 KB (gzip 238 KB, wcześniej 293 KB), start przy 50 tys. zdarzeń 870 ms (wcześniej 1120 ms) |
+| Strażnik wizualny (120 zrzutów przed/po usunięciu martwych reguł CSS) | 0 różnic w wyglądzie (jedyna różnica — losowy identyfikator urządzenia w „Dane”) |
+
+Ograniczenia: obrazów startowych i skrótów manifestu nie da się sprawdzić bez iPhone'a / Chrome — do kontroli na urządzeniu
+(ikonę trzeba usunąć i dodać ponownie z Safari).
