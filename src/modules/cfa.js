@@ -16,7 +16,7 @@ const MODE_CLASS = { 'FIRST PASS': 'm-fp', CZYTANIE: 'm-fp', LEKTURA: 'm-fp', CO
   'ANALIZA BŁĘDÓW': 'm-an', ANALIZA: 'm-an', PRACTICE: 'm-pr', 'PIERWSZE PODEJŚCIE': 'm-pr', 'ACTIVE RECALL': 'm-ar' };
 const FIRST_PASS = new Set(['CZYTANIE', 'LEKTURA']);   // pierwsze przejście działu (pole `topic`)
 const HAS_RECALL = (D.nightRecall?.length ?? 1) > 0;   // D-116: plan 2027 bez sesji recall 22:00
-const EXAM_TXT = SRC.cfa.exam ? longDate(SRC.cfa.exam) : (SRC.cfa.examNote || 'termin do uzupełnienia');
+const EXAM_TXT = SRC.cfa.exam ? longDate(SRC.cfa.exam) : (/** @type {any} */ (SRC.cfa).examNote || 'termin do uzupełnienia');
 
 // Widok „Plan”: działy (pierwsze przejście), mocki, statystyki
 // D-103: w planie V44 pierwsze przejście to bloki CZYTANIE (SchweserNotes i Curriculum) przypisane do działu polem `topic`; starsze plany: Curriculum z kodem działu w źródle

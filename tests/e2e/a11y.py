@@ -13,7 +13,7 @@ ROUTES = ['#/dzis', '#/kalendarz', '#/kalendarz?m=2027-01', '#/dzis?d=2026-09-29
   '#/mpw', '#/mpw?v=harmonogram', '#/mpw?v=kalendarz', '#/mpw?v=log', '#/mpw?v=plan', '#/dzis?d=2026-11-24', '#/dzis?d=2027-03-06',   # MPW (D-095, v8 — D-096; D-116 — z blokami CFA)
   '#/dzis?d=2026-11-14', '#/dzis?d=2026-12-26', '#/dzis?v=tydzien&d=2026-11-14',   # weekendy (D-096)
   '#/dzis?d=2026-10-17', '#/dzis?d=2026-10-18', '#/dzis?d=2026-10-22', '#/dzis?d=2026-10-23', '#/dzis?d=2026-11-03', '#/dzis?d=2026-12-24', '#/dzis?d=2026-12-25',   # D-103: czwartek bez sauny, święta (historia)
-  '#/dzis?d=2027-03-22', '#/dzis?d=2027-05-08', '#/dzis?d=2027-06-30', '#/cfa?v=plan', '#/cfa?v=kalendarz']   # D-116: blok dodatkowy i J, kolizja ze zjazdem, koniec planu
+  '#/dzis?d=2027-03-22', '#/dzis?d=2027-05-08', '#/dzis?d=2027-06-30', '#/dzis?d=2027-12-31', '#/kalendarz?m=2027-12', '#/cfa?v=plan', '#/cfa?v=kalendarz']   # D-116, D-117: blok dodatkowy i J, 08.05 (bez zjazdu IX), koniec planu
 # Stany niewidoczne po samym wejściu na trasę (odhaczone elementy, rozwinięte sekcje, otwarte okno) — wcześniej poza audytem.
 OPEN_ALL = "document.querySelectorAll('details').forEach(d => d.open = true)"
 STATES = [('#/trening?d=2026-10-19', "document.querySelector('.set:not(.set-h) .set-toggle').click()", 'odhaczona seria'),

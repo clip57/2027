@@ -1,8 +1,7 @@
 {
  "schema": 1,
- "generated_from": "MASTER_SCHEDULE_CFA_451.csv (plan CFA Level I 2027, 451 bloków, 2026-11-20–2027-05-12) — D-116",
- "exam": null,
- "examNote": "termin egzaminu do uzupełnienia (plan kończy się 2027-05-12)",
+ "generated_from": "MASTER_SCHEDULE_CFA_451.csv (plan CFA Level I 2027, 451 bloków, 2026-11-20–2027-05-12) — D-116, egzamin 13.05.2027 — D-117",
+ "exam": "2027-05-13",
  "D": {
   "version": "CFA_L1_2027_451_20261120",
   "previousVersion": null,

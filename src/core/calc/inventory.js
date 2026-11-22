@@ -162,7 +162,7 @@ export const status = (item, stock, fc) => statusInfo(item, stock, fc).code;
 
 // Najbliższe zakupy wg planu dnia (slot z `shop`; D-097: czwartki po saunie 19:05–20:35, od 07.01.2027 15:30–16:00) —
 // dziś, dopóki slot zakupów się nie skończył. Tydzień bez zakupów (np. 28.09–04.10.2026) i święta są pomijane.
-// Poza planem (po 30.06.2027) — najbliższy czwartek. Bez dat zakodowanych na sztywno (W-12).
+// Poza planem (po 31.12.2027) — najbliższy czwartek. Bez dat zakodowanych na sztywno (W-12).
 export function nextShopping(todayStr, hour, minute = 0) {
   const now = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   for (let i = 0; i < 35; i++) {

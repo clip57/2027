@@ -1,5 +1,5 @@
 // Spójność planu (D-116, 20.11.2026): plan CFA Level I 2027 (451 bloków, 20.11.2026–12.05.2027 — lektura Curriculum 2027, bank pytań, powtórki, 2 mocki)
-// równolegle z planem MPW (do 20.03.2027), kalendarz 18.10.2026–30.06.2027 (Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12), zakupy w czwartki,
+// równolegle z planem MPW (do 20.03.2027), kalendarz 18.10.2026–31.12.2027 (D-117; Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12), zakupy w czwartki,
 // święta, niedziela z basenem. Plan CFA sam ze sobą (numeracja, litery = sloty szablonu dnia, statystyki, działy, mocki), z planem MPW (bez nakładania się),
 // z szablonem dnia (warianty: „basen”, „czwartek”, „czwartek_zl”, „czwartek_bz”, „czwartek_st”), z fazami, wyjątkami dat i suplementacją.
 // Plany CFA V44 (D-103) i starsze nie są już w danych — ich testy zastąpione (raport D-116).
@@ -16,8 +16,8 @@ import { resolveDay, templateFor, dayPlan, hasJ, phaseFor, mTrainDay } from '../
 import { consumptionForDay } from '../../src/core/calc/consumption.js';
 
 const D = SRC.cfa.D, B = D.bloki;
-// PLAN0 — początek CAŁEGO planu (18.10.2026, D-103c); PLAN_END — koniec kalendarza (D-116: 30.06.2027); CFA_START / END — zakres planu CFA 2027
-const PLAN0 = '2026-10-18', TRAIN0 = '2026-10-18', CFA_START = '2026-11-20', END = '2027-05-12', PLAN_END = '2027-06-30';
+// PLAN0 — początek CAŁEGO planu (18.10.2026, D-103c); PLAN_END — koniec kalendarza (D-117: 31.12.2027; wcześniej D-116: 30.06.2027); CFA_START / END — zakres planu CFA 2027
+const PLAN0 = '2026-10-18', TRAIN0 = '2026-10-18', CFA_START = '2026-11-20', END = '2027-05-12', PLAN_END = '2027-12-31';
 const TIMES = { B: '09:10–10:03', C: '10:10–11:03', D: '11:20–12:13', E: '12:20–13:13', F: '13:30–14:23', G: '14:30–15:23', H: '15:30–16:23', I: '16:40–17:33', Dodatkowy: '17:40–18:33', J: '21:00–21:53' };
 const byDay = B.reduce((m, b) => ((m[b.data] ||= []).push(b), m), {});
 const count = (list, key) => list.reduce((m, b) => ((m[b[key]] = (m[b[key]] || 0) + 1), m), {});
@@ -33,8 +33,8 @@ test('CFA 2027 (D-116): 451 bloków 1–451, 151 dni 20.11.2026–12.05.2027, na
   assert.ok(B.every(b => b.egzamin === 'CFA Level I'));
   assert.equal(D.version, 'CFA_L1_2027_451_20261120');
   assert.equal(D.previousVersion, null, 'nowy plan — bez mapowania postępu z V44');
-  assert.equal(SRC.cfa.exam, null, 'termin egzaminu do uzupełnienia');
-  assert.match(SRC.cfa.examNote, /2027-05-12/);
+  assert.equal(SRC.cfa.exam, '2027-05-13', 'D-117: egzamin CFA 13.05.2027 (dzień po ostatnim bloku planu)');
+  assert.equal(SRC.cfa.examNote, undefined);
 });
 
 test('CFA 2027: litery bloków B–I = sloty szablonu dnia (te same godziny), J 21:00–21:53, „Dodatkowy” 17:40–18:33; bez nakładania się z planem MPW; bez sesji mocka S1/S2', () => {
@@ -88,7 +88,7 @@ test('CFA 2027: mocki 18.04, 01.05, 06.05 i 07.05 (sesje 1 i 2 po 9 bloków + an
   }
 });
 
-test('Początek i koniec całego planu: 18.10.2026 (niedziela, basen) – 30.06.2027 (D-116: przedłużenie z dotychczasowymi schematami); Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12 do końca', () => {
+test('Początek i koniec całego planu: 18.10.2026 (niedziela, basen) – 31.12.2027 (D-116, D-117: przedłużenie z dotychczasowymi schematami); Faza 0 do 11.11, Faza 1 12.11–10.12, Faza 2 od 11.12 do końca', () => {
   assert.deepEqual([SRC.phases.start, SRC.phases.realStart, SRC.phases.dietStart, SRC.phases.trainStart, SRC.phases.zero, SRC.phases.end], [PLAN0, PLAN0, PLAN0, TRAIN0, undefined, PLAN_END]);
   assert.deepEqual(SRC.phases.phases, [{ phase: 0, from: PLAN0 }, { phase: 1, from: '2026-11-12' }, { phase: 2, from: '2026-12-11' }]);
   for (const d of range('2026-09-25', '2026-10-17')) {
@@ -96,13 +96,14 @@ test('Początek i koniec całego planu: 18.10.2026 (niedziela, basen) – 30.06.
     assert.deepEqual([x.outside, x.zero, x.noDiet, x.training, x.doses.length, x.cfa.blocks.length, x.cfa.recall, x.sessionLabel], [true, false, false, null, 0, 0, false, 'Poza planem'], d);
     assert.deepEqual(consumptionForDay(d), {}, d);
   }
-  assert.deepEqual([resolveDay('2027-07-01').outside, resolveDay('2027-07-01').after], [true, true]);
+  assert.deepEqual([resolveDay('2028-01-01').outside, resolveDay('2028-01-01').after], [true, true]);
+  assert.equal(resolveDay('2027-07-01').outside, false, '01.07.2027 w planie (D-117)');
   assert.equal(resolveDay(PLAN_END).outside, false);
   assert.equal(resolveDay('2027-03-29').outside, false, '29.03.2027 już w planie (D-116)');
   // po dotychczasowym końcu (28.03) — ten sam tydzień bazowy: Faza 2, trening wg dnia tygodnia, dieta T/NT, dawki
   assert.deepEqual(['2027-04-05', '2027-04-06', '2027-04-07', '2027-04-08', '2027-04-09', '2027-04-10', '2027-04-11'].map(d => resolveDay(d).sessionLabel),
     ['UPPER 1 + sauna', 'LOWER 1', 'Rower + ABS + sauna', 'Bez treningu, 2 × sauna', 'UPPER 2', 'LOWER 2 + sauna', 'Basen']);
-  assert.ok(['2027-04-05', '2027-06-30'].every(d => resolveDay(d).phase === 2 && resolveDay(d).doses.length > 0 && resolveDay(d).kcal > 0));
+  assert.ok(['2027-04-05', '2027-06-30', '2027-09-15', '2027-12-31'].every(d => resolveDay(d).phase === 2 && resolveDay(d).doses.length > 0 && resolveDay(d).kcal > 0));
   const a = resolveDay(PLAN0);
   assert.deepEqual([a.outside, a.phase, a.noDiet, a.preStart, a.dietVariant, a.kcal > 0, a.sessionLabel, a.dayType, a.cfa.inPlan, a.cfa.blocks.length, a.cfa.recall],
     [false, 0, false, false, 'T', true, 'Basen', 'swim', false, 0, false]);
@@ -168,19 +169,19 @@ test('D-098, D-103, D-116: start od zera — odhaczenia z v12 (bez pola plan), V
   assert.match(fs.readFileSync(new URL('../../src/modules/cfa.js', import.meta.url), 'utf8'), /doneExtra: \{ plan: CFA_PLAN_VERSION \}/);
 });
 
-test('Suplementy czasowe 18.10.2026–30.06.2027 (D-116: dotychczasowy schemat do końca planu, 256 dni); zapotrzebowanie wg planu a zapas z D-015', async () => {
+test('Suplementy czasowe 18.10.2026–31.12.2027 (D-117: dotychczasowy schemat do końca planu, 440 dni); zapotrzebowanie wg planu', async () => {
   for (const id of ['chondroityna', 'boswellia', 'glukozamina']) {
     const doses = SRC.supplements.doses.filter(d => d.supp === id);
     assert.ok(doses.length > 0 && doses.every(d => d.validity?.from === PLAN0 && d.validity?.until === PLAN_END), id);
   }
   const days = [...range(PLAN0, PLAN_END)].length;
-  assert.equal(days, 256);
+  assert.equal(days, 440);
   for (const c of SRC.seeds.counts) {
-    const need = [...range('2026-09-23', '2027-07-31')].reduce((a, d) => a + (consumptionForDay(d)[c.prod] || 0), 0);
-    assert.equal(need, c.qty * days / 180, `${c.prod}: potrzeba ${need} (zapas z D-015: ${c.qty} — wystarcza na 180 dni)`);
+    const need = [...range('2026-09-23', '2028-01-31')].reduce((a, d) => a + (consumptionForDay(d)[c.prod] || 0), 0);
+    assert.equal(need, c.qty * days / 180, `${c.prod}: potrzeba ${need} (zapas — wg użytkownika wystarczający, D-117)`);
     assert.equal(consumptionForDay('2026-10-17')[c.prod], undefined, `${c.prod}: do 17.10 poza planem`);
-    assert.ok(consumptionForDay(PLAN0)[c.prod] > 0 && consumptionForDay(PLAN_END)[c.prod] > 0, `${c.prod}: od 18.10 do 30.06`);
-    assert.equal(consumptionForDay('2027-07-01')[c.prod], undefined, `${c.prod}: po końcu planu`);
+    assert.ok(consumptionForDay(PLAN0)[c.prod] > 0 && consumptionForDay(PLAN_END)[c.prod] > 0, `${c.prod}: od 18.10.2026 do 31.12.2027`);
+    assert.equal(consumptionForDay('2028-01-01')[c.prod], undefined, `${c.prod}: po końcu planu`);
   }
 });
 
@@ -254,7 +255,7 @@ test('Wyjątki dat (D-096…D-109, D-116): dni bez treningu z dietą NT, święt
   const row = d => { const r = resolveDay(d); return [r.dayType, r.sessionLabel, r.dietVariant, r.sauna, r.training ? r.training.length > 0 : null]; };
   assert.deepEqual(row('2026-10-18'), ['swim', 'Basen', 'T', 0, null]);
   for (const d of ['2026-10-22', '2026-10-23', '2026-10-29', '2026-11-01', '2026-11-02', ...range('2026-11-03', '2026-11-11')]) assert.deepEqual(row(d), ['free', 'Bez treningu', 'NT', 0, null], d);
-  assert.deepEqual(['2026-10-14', '2026-10-17', '2026-10-18', '2026-11-11', '2026-11-12', '2026-12-10', '2026-12-11', '2027-03-28', '2027-06-30'].map(phaseFor), [null, null, 0, 0, 1, 1, 2, 2, 2]);
+  assert.deepEqual(['2026-10-14', '2026-10-17', '2026-10-18', '2026-11-11', '2026-11-12', '2026-12-10', '2026-12-11', '2027-03-28', '2027-06-30', '2027-12-31'].map(phaseFor), [null, null, 0, 0, 1, 1, 2, 2, 2, 2]);
   assert.deepEqual(row('2026-11-19').slice(1, 3), ['Bez treningu, 2 × sauna', 'NT']);
   // Święta: bez treningu (dieta NT); D-116 — w 25–27.12 bloki MPW 15:30–18:23, w 27–28.03 bloki CFA (sloty nauki w miejscu „Wolne”)
   for (const d of ['2026-12-25', '2026-12-26', '2026-12-27']) {
@@ -282,22 +283,23 @@ test('Wyjątki dat (D-096…D-109, D-116): dni bez treningu z dietą NT, święt
   assert.ok([...range('2027-03-29', PLAN_END)].every(d => !SRC.week.exceptions[d]), 'od 29.03 tydzień bazowy');
 });
 
-test('D-116: studia podyplomowe — zjazdy I–V i VII–X wg harmonogramu (8:00–15:23), bez zjazdu VI (20–21.03) i bez dawnego 05–06.12; egzamin 05.06, obrony 21–22.06; zjazd ma pierwszeństwo przed blokiem CFA (kolizja w opisie)', () => {
+test('D-116, D-117: studia podyplomowe — zjazdy I–V, VII, VIII i X wg harmonogramu (8:00–15:23), bez zjazdu VI (20–21.03), IX (08–09.05 — bloki CFA) i dawnego 05–06.12; egzamin 05.06, obrony 21–22.06', () => {
   const st = Object.entries(SRC.week.blocks).filter(([, b]) => b.kind === 'studia').map(([d, b]) => [d, b.desc.replace('Studia podyplomowe — ', '')]);
   assert.deepEqual(st, [['2026-11-14', 'zjazd I'], ['2026-11-15', 'zjazd I'], ['2026-11-28', 'zjazd II (online)'], ['2026-11-29', 'zjazd II (online)'],
     ['2027-01-09', 'zjazd III (online)'], ['2027-01-10', 'zjazd III (online)'], ['2027-02-06', 'zjazd IV'], ['2027-02-07', 'zjazd IV'], ['2027-02-20', 'zjazd V'], ['2027-02-21', 'zjazd V'],
-    ['2027-04-03', 'zjazd VII'], ['2027-04-04', 'zjazd VII'], ['2027-04-24', 'zjazd VIII (online)'], ['2027-04-25', 'zjazd VIII (online)'], ['2027-05-08', 'zjazd IX'], ['2027-05-09', 'zjazd IX'],
+    ['2027-04-03', 'zjazd VII'], ['2027-04-04', 'zjazd VII'], ['2027-04-24', 'zjazd VIII (online)'], ['2027-04-25', 'zjazd VIII (online)'],
     ['2027-05-29', 'zjazd X'], ['2027-05-30', 'zjazd X'], ['2027-06-05', 'egzamin końcowy (online)'], ['2027-06-21', 'obrony prac (online, 21 lub 22.06 wg przydziału)'], ['2027-06-22', 'obrony prac (online, 21 lub 22.06 wg przydziału)']]);
   assert.ok(Object.values(SRC.week.blocks).filter(b => b.kind === 'studia').every(b => b.title === 'Wycena przedsiębiorstwa i modelowanie finansowe - studia'));
   assert.equal(SRC.week.blocks['2026-12-05'], undefined);
   assert.equal(SRC.week.blocks['2027-03-20'], undefined, '20.03 — powtórka MPW, bez zjazdu VI');
   assert.equal(SRC.week.blocks['2027-03-21'].kind, 'egzamin');
   assert.deepEqual(['2026-11-21', '2026-11-22'].map(d => SRC.week.blocks[d].kind), ['rozmowa', 'rozmowa'], '21–22.11 rozmowa bez zmian');
+  // D-117: bez zjazdu IX — 08.05 wszystkie bloki CFA w swoich slotach
   const r = resolveDay('2027-05-08');
-  const study = r.slots.filter(s => s.block === 'studia');
-  assert.equal(study.length, 7, 'sloty A–G — studia');
-  assert.match(study[1].desc, /kolizja z planem CFA: blok B 09:10–10:03/);
-  assert.deepEqual(r.slots.filter(s => s.cfa?.length).map(s => s.title), ['CFA blok H', 'CFA blok I', 'CFA — blok dodatkowy']);
+  assert.equal(r.slots.filter(s => s.block === 'studia').length, 0);
+  assert.deepEqual(r.slots.filter(s => s.cfa?.length).map(s => s.title), ['CFA blok B', 'CFA blok C', 'CFA blok D', 'CFA blok E', 'CFA blok F', 'CFA blok G', 'CFA blok H', 'CFA blok I', 'CFA — blok dodatkowy']);
+  // zjazd ma pierwszeństwo przed blokiem CFA (opis kolizji) — mechanizm sprawdzony na zjeździe VII (03.04: bez bloków CFA w godzinach zjazdu)
+  assert.ok(resolveDay('2027-04-03').slots.filter(s => s.block === 'studia').length === 7);
   // praca magisterska (12.12): bloki CFA E–G w swoich slotach, praca magisterska w slotach A–D
   const w = resolveDay('2026-12-12');
   assert.deepEqual(w.slots.filter(s => s.role === 'cfa' && s.from < '15:23').map(s => s.title),

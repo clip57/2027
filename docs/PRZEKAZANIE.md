@@ -43,6 +43,12 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 - Do decyzji użytkownika: `docs/RAPORT_D116.md` §3 (termin egzaminu CFA, 08–09.05, blok dodatkowy × trening = D1, suplementy na 256 dni,
   święta po 28.03, dzień obrony).
 
+## 3b. Stan 22.11.2026 (D-117)
+- D-117 (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do 31.12.2027) — na gałęzi roboczej, publikacja po „Publikuj” (`docs/RAPORT_D117.md`).
+  Skrypt `tools/extract/plan_d117.py` uruchamiaj po `plan_d116.py`.
+- Odpowiedzi użytkownika z 22.11: egzamin CFA 13.05; zjazd IX — nieobecność (bloki CFA zostają); suplementy czasowe — zapas wystarczający.
+  Pozostałe pytania z D-116 (blok dodatkowy × trening = D1, święta, dzień obrony) — użytkownik odpowie później.
+
 ## 4. Otwarte sprawy — stan 1.11.2026 (po D-113)
 **Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
 obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,

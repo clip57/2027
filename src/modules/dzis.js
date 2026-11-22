@@ -282,7 +282,7 @@ export function renderDzis(root, ctx) {
   // Dzień sprzed startu planu (D-088): bez planu dnia — tylko informacja i przejście do pierwszego dnia planu
   const nav = (n, label, ic) => h('a', { class: 'btn dz-nav', href: `#/dzis?d=${addDays(date, n)}`, 'aria-label': label }, n < 0 && icon(ic, { size: 18 }), h('span', {}, label), n > 0 && icon(ic, { size: 18 }));
   // D14 (audyt 31.10.2026): widok „Dnia zero” (D-097) usunięty — po D-100 plan nie ma Dnia zero (`phases.zero`), resolver traktuje go ogólnie
-  // Dzień poza planem (D-088, D-097): przed Dniem zero albo po końcu planu (30.06.2027, D-116)
+  // Dzień poza planem (D-088, D-097): przed Dniem zero albo po końcu planu (31.12.2027, D-117)
   if (r.outside) {
     const target = r.after ? PLAN_END : PLAN_START;
     add(root, h('header', { class: 'dz-head' },

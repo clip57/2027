@@ -97,7 +97,7 @@ test('Zakładka (D-095, D-116): CFA do 11.11.2026, MPW 12.11.2026–21.03.2027 (
   assert.deepEqual(tabs('2026-11-12'), ['dzis', 'dieta', 'trening', 'mpw']);
   assert.deepEqual(tabs('2027-03-21'), ['dzis', 'dieta', 'trening', 'mpw']);
   assert.deepEqual(tabs('2027-03-22'), ['dzis', 'dieta', 'trening', 'cfa']);
-  assert.deepEqual(tabs('2027-06-30'), ['dzis', 'dieta', 'trening', 'cfa']);
+  assert.deepEqual(tabs('2027-12-31'), ['dzis', 'dieta', 'trening', 'cfa']);
   assert.deepEqual([nauka('2026-10-01'), nauka('2026-11-20'), nauka('2027-04-01')], [['cfa', 'mpw'], ['mpw', 'cfa'], ['cfa', 'mpw']]);
   assert.equal(modulesOn('2026-11-20').length, 13, 'z modułem Kalendarz (D-097)');
   assert.ok(!isTab(byId.mpw, '2026-11-11') && isTab(byId.mpw, '2026-11-12') && !isTab(byId.mpw, '2027-03-22'));

@@ -629,20 +629,6 @@
    "desc": "Studia podyplomowe — zjazd VIII (online)",
    "decision": "D-116"
   },
-  "2027-05-08": {
-   "kind": "studia",
-   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
-   "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd IX",
-   "decision": "D-116"
-  },
-  "2027-05-09": {
-   "kind": "studia",
-   "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
-   "short": "Studia 8:00–15:23",
-   "desc": "Studia podyplomowe — zjazd IX",
-   "decision": "D-116"
-  },
   "2027-05-29": {
    "kind": "studia",
    "title": "Wycena przedsiębiorstwa i modelowanie finansowe - studia",
@@ -679,7 +665,7 @@
    "decision": "D-116"
   }
  },
- "blocks_decision": "D-096: weekendy 8:00–15:23 w slotach A–G — studia (zjazdy, bez zakupów w sobotę), przygotowanie do rozmowy, praca magisterska; święta wolne; dni z blokami P1–P7 planu MPW i egzamin MPW bez pracy magisterskiej; D-116: zjazdy wg harmonogramu (I–V, VII–X, egzamin 05.06, obrony 21–22.06), bez zjazdu VI i bez 05–06.12",
+ "blocks_decision": "D-096: weekendy 8:00–15:23 w slotach A–G — studia (zjazdy, bez zakupów w sobotę), przygotowanie do rozmowy, praca magisterska; święta wolne; dni z blokami P1–P7 planu MPW i egzamin MPW bez pracy magisterskiej; D-116: zjazdy wg harmonogramu (I–V, VII–X, egzamin 05.06, obrony 21–22.06), bez zjazdu VI i bez 05–06.12; D-117: bez zjazdu IX (08–09.05.2027 — bloki CFA w planie)",
  "mpwShift": {
   "weekdays": [
    4

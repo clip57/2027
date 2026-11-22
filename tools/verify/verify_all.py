@@ -166,7 +166,7 @@ check(cfa.get("version") == "CFA_L1_2027_451_20261120"
       and cfa.get("mockCFA") == ["2027-04-18", "2027-05-01", "2027-05-06", "2027-05-07"]
       and stat.get("kat", {}).get("Curriculum") == 311 and stat.get("tryb", {}).get("PIERWSZE PODEJŚCIE") == 70
       and stat.get("tryb", {}).get("SYMULACJA") == 18 and stat.get("tryb", {}).get("ANALIZA") == 12
-      and cfa.get("nightRecall") == [] and data("cfa.json").get("exam") is None,
+      and cfa.get("nightRecall") == [] and data("cfa.json").get("exam") == "2027-05-13",   # D-117
       "CFA: wersja, numeracja, kalendarz i statystyki harmonogramu")
 
 

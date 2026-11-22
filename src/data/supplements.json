@@ -97,8 +97,8 @@
    "note": "na czczo",
    "validity": {
     "from": "2026-10-18",
-    "until": "2027-06-30",
-    "decision": "D-015, D-116"
+    "until": "2027-12-31",
+    "decision": "D-015, D-116, D-117"
    }
   },
   {
@@ -132,8 +132,8 @@
    "src": "SUPL:09:00/boswellia",
    "validity": {
     "from": "2026-10-18",
-    "until": "2027-06-30",
-    "decision": "D-015, D-116"
+    "until": "2027-12-31",
+    "decision": "D-015, D-116, D-117"
    }
   },
   {
@@ -222,8 +222,8 @@
    "src": "SUPL:13:20/glukozamina",
    "validity": {
     "from": "2026-10-18",
-    "until": "2027-06-30",
-    "decision": "D-015, D-116"
+    "until": "2027-12-31",
+    "decision": "D-015, D-116, D-117"
    }
   },
   {
@@ -488,8 +488,8 @@
    "src": "SUPL:21:00/chondroityna",
    "validity": {
     "from": "2026-10-18",
-    "until": "2027-06-30",
-    "decision": "D-015, D-116"
+    "until": "2027-12-31",
+    "decision": "D-015, D-116, D-117"
    }
   },
   {

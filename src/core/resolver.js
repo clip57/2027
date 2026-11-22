@@ -22,7 +22,7 @@ const FIXED = new Set(['studia', 'egzamin']);
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 18.10.2026–30.06.2027 — D-116; plan CFA ma własny zakres — `cfa.json`, 20.11.2026–12.05.2027). Dni
+// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 18.10.2026–31.12.2027 — D-117; plan CFA ma własny zakres — `cfa.json`, 20.11.2026–12.05.2027). Dni
 // wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
@@ -67,7 +67,7 @@ export function dosesFor(date) {
     d.weekdays.includes(wd) && inValidity(d, date));
   return doses.map(d => ({ ...d, time: doseTime(d.time, date) }));   // D-099, D-103, D-103b
 }
-// Okres przyjmowania preparatów czasowych (D-015; `validity` w `supplements.json`, obecnie 18.10.2026–30.06.2027 — D-116). `from` i `until` opcjonalne
+// Okres przyjmowania preparatów czasowych (D-015; `validity` w `supplements.json`, obecnie 18.10.2026–31.12.2027 — D-117). `from` i `until` opcjonalne
 // (D-116: czwartkowe dawki 17:15 wracają od 19.03 bez daty końca).
 export function inValidity(d, date) {
   return !d.validity || ((!d.validity.from || date >= d.validity.from) && (!d.validity.until || date <= d.validity.until));

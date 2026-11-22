@@ -141,8 +141,8 @@ async def run_variant(pw, name, url, mobile):
            f'{tag} {d}: poza planem, bez planu dnia (D-103c)')
     await pg.locator('.dz-outside a').click(); await pg.wait_for_selector('.dz-plan-h')
     ok(f'd={first_day}' in await pg.evaluate('location.hash'), f'{tag} poza planem: przejście do początku kalendarza {first_day}')
-    await pg.goto(url + '#/dzis?d=2027-07-01'); await pg.wait_for_selector('.dz-outside')
-    ok(await pg.locator('.slot').count() == 0, f'{tag} 01.07.2027: po końcu planu (30.06, D-116) — bez planu dnia')
+    await pg.goto(url + '#/dzis?d=2028-01-01'); await pg.wait_for_selector('.dz-outside')
+    ok(await pg.locator('.slot').count() == 0, f'{tag} 01.01.2028: po końcu planu (31.12.2027, D-117) — bez planu dnia')
     # (U-a) w dniu bieżącym minione punkty planu są zwinięte — przed odczytem treści dnia sekcja jest rozwijana
     # --- Redesign (Faza 3–4): motyw, nawigacja, dashboard
     th = await pg.evaluate("document.documentElement.getAttribute('data-theme')")
@@ -223,7 +223,7 @@ async def run_variant(pw, name, url, mobile):
     ok('Przyprawy' in txt and 'Zamienniki' in txt, f'{tag} Dieta: przyprawy i zamienniki')
     await pg.goto(url + '#/suplementy?d=2026-10-19'); await pg.wait_for_selector('.dose-list')
     txt = await pg.inner_text('main')
-    ok('Tauryna' in txt and 'od 18.10.2026 do 30.06.2027' in txt and '21.03.2027' not in txt,
+    ok('Tauryna' in txt and 'od 18.10.2026 do 31.12.2027' in txt and '21.03.2027' not in txt,
        f'{tag} Suplementacja: tauryna i okres preparatów czasowych (D-103c, D-116)')
     ok('Stan i prognoza pochodz' not in txt and 'Potem nie są kontynuowane' not in txt, f'{tag} Suplementacja: bez usuniętych podpisów')
     # najbliższy wtorek (test niezależny od dnia uruchomienia)
@@ -344,7 +344,7 @@ async def run_variant(pw, name, url, mobile):
     ok('12 bloków' in await pg.inner_text('.filters') and await pg.locator('.cfa-row .mode.m-an').count() == 12,
        f'{tag} CFA: filtr ANALIZA (12 bloków analizy mocków, D-116)')
     await pg.goto(url + '#/cfa?v=kalendarz'); await pg.wait_for_selector('.cal')
-    ok(await pg.locator('.cal-d.c-mock').count() == 4 and await pg.locator('.cal-d.c-exam').count() == 0, f'{tag} CFA: kalendarz z 4 dniami mocków, bez daty egzaminu (do uzupełnienia, D-116)')
+    ok(await pg.locator('.cal-d.c-mock').count() == 4 and await pg.locator('.cal-d.c-exam').count() == 1, f'{tag} CFA: kalendarz z 4 dniami mocków i egzaminem 13.05 (D-117)')
     await pg.goto(url + '#/cfa?v=log'); await pg.wait_for_selector('.form-grid')
     await pg.fill('.form-grid input:not([type=date])', 'FI — duration')
     await pg.select_option('.form-grid select', 'pośpiech')
@@ -366,14 +366,14 @@ async def run_variant(pw, name, url, mobile):
     await pg.goto(url + '#/cfa?v=plan'); await pg.wait_for_selector('.topic')
     ok(await pg.locator('.topic').count() == 10, f'{tag} CFA: 10 działów w planie')
     kv = await pg.inner_text('.kv')
-    ok('451 (151 dni' in kv and '398,38 h' in kv and 'recall' not in kv.lower() and 'do uzupełnienia' in kv,
-       f'{tag} CFA: statystyki planu 2027 (451 bloków, 151 dni, bez recall, termin egzaminu do uzupełnienia)')
+    ok('451 (151 dni' in kv and '398,38 h' in kv and 'recall' not in kv.lower() and '13 maja 2027' in kv,
+       f'{tag} CFA: statystyki planu 2027 (451 bloków, 151 dni, bez recall, egzamin 13.05.2027 — D-117)')
     await pg.goto(url + '#/dieta'); await pg.wait_for_selector('.meal')
     ok('od 18.10' in await pg.inner_text('main') and 'od 12.11' in await pg.inner_text('main')
        and 'od 11.12' in await pg.inner_text('main'), f'{tag} Dieta: fazy według D-103c/D-103')
     await pg.goto(url + '#/rekompozycja'); await pg.wait_for_selector('.rk-sec')
     ok('18 października 2026' in await pg.eval_on_selector('main .eyebrow', 'e => e.textContent'), f'{tag} Rekompozycja: realny początek planu 18.10.2026 (D-103c)')
-    for d in ('2026-10-17', '2026-10-16', '2027-07-01'):
+    for d in ('2026-10-17', '2026-10-16', '2028-01-01'):
         await pg.goto(url + f'#/trening?d={d}'); await pg.wait_for_selector('h1')
         ok(await pg.locator('.ex').count() == 0 and 'Poza planem' in await pg.inner_text('main'), f'{tag} Trening: {d} poza planem (D-103c)')
     await pg.goto(url + '#/suplementy?d=2026-10-17'); await pg.wait_for_selector('h1')

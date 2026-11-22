@@ -1,4 +1,4 @@
-// Moduł „Kalendarz” (D-097, D-101): miesiące planu (zakres z `phases.json`, obecnie 18.10.2026 – 30.06.2027, D-116) z podsumowaniem każdego dnia z resolvera
+// Moduł „Kalendarz” (D-097, D-101): miesiące planu (zakres z `phases.json`, obecnie 18.10.2026 – 31.12.2027, D-117) z podsumowaniem każdego dnia z resolvera
 // (trening, nauka CFA / MPW, weekendowe bloki, zakupy, święta, egzaminy). Kliknięcie dnia otwiera plan dnia w „Dziś”.
 // Tylko odczyt — bez nowych danych; na telefonie znaczniki kropkami, na komputerze krótkie opisy.
 import { h, add, plural } from '../ui/dom.js';

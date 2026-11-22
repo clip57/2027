@@ -5,10 +5,10 @@ import { weekSummary, mondayOf } from '../../src/core/calc/week.js';
 import { resolveDay } from '../../src/core/resolver.js';
 import { addDays } from '../../src/core/dates.js';
 
-test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (41 tygodni — do końca planu 30.06.2027, D-116)', () => {
+test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (67 tygodni — do końca planu 31.12.2027, D-117)', () => {
   let monday = mondayOf('2026-09-25');
   assert.equal(monday, '2026-09-21');
-  for (let w = 0; w < 41; w++, monday = addDays(monday, 7)) {   // do 04.07.2027 (koniec planu 30.06 — D-116)
+  for (let w = 0; w < 67; w++, monday = addDays(monday, 7)) {   // do 02.01.2028 (koniec planu 31.12.2027 — D-117)
     const week = weekSummary(addDays(monday, 3));
     assert.equal(week.length, 7);
     week.forEach((x, i) => {
@@ -35,5 +35,6 @@ test('Tydzień = 7 dni od poniedziałku, każdy dzień zgodny z resolveDay (41 t
   const last = weekSummary('2027-03-28');
   assert.deepEqual(last.map(x => x.outside), [false, false, false, false, false, false, false], '22–28.03 w planie');
   assert.ok(weekSummary('2027-03-29').every(x => !x.outside), 'od 29.03 dalej w planie (D-116)');
-  assert.deepEqual(weekSummary('2027-06-30').map(x => x.outside), [false, false, false, true, true, true, true], 'koniec planu 30.06.2027 (D-116)');
+  assert.ok(weekSummary('2027-06-30').every(x => !x.outside), 'lipiec 2027 w planie (D-117)');
+  assert.deepEqual(weekSummary('2027-12-31').map(x => x.outside), [false, false, false, false, false, true, true], 'koniec planu 31.12.2027 (D-117)');
 });
