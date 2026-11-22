@@ -36,7 +36,20 @@ zamiast nazwy pliku. Testy zaktualizowane w tym samym kroku. Klasy z `docs/REDES
 
 ## 3. Testy (22.11.2026, lokalnie)
 
-WYNIKI_TESTOW
+| Zestaw | Wynik |
+|---|---|
+| `npm run lint`, `npm run typecheck` | bez błędów |
+| `npm test` | 292 / 292 (nowe: `tempo.test.mjs` 4, `sourceText` w `resolver.test.mjs`) |
+| `node tools/verify/plan_check.mjs`, `verify_all.py --data-only` | 0 błędów (2 znane ostrzeżenia D1) · 13 kontroli, 0 błędów |
+| `npm run e2e` | 1754 / 1754 (nowe: `run_d119`, tryb rutyny, macierz tygodnia) |
+| `npm run a11y` | 0 naruszeń (pierścienie bez etykiety — ozdobne, `aria-hidden`) |
+| `npm run e2e:webkit` | 249 / 249 |
+| `python3 tests/e2e/cfa_smoke.py`, `npm run e2e:trening` | 0 błędów |
+| `npm run e2e:sync` / `npm run e2e:cloud` | 23 / 23 · 100 / 100 |
+| `npm run budget` | 9 / 9 — pakiet JS 1023 KB (gzip 246 KB), start przy 50 tys. zdarzeń ok. 880 ms, harmonogram MPW 7250 węzłów (limit 8500) |
+
+Wygląd sprawdzony zrzutami (390 i 1280 px, ciemny i jasny): Suplementacja, Pielęgnacja (dzień, tydzień, plan, tryb rutyny), Nauka (dzień, kalendarz,
+plan), Trening i „Dziś” (nowe przyciski).
 
 ## 4. Ograniczenia i dalej
 
