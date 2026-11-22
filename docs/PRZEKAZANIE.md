@@ -49,6 +49,12 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
 - Odpowiedzi użytkownika z 22.11: egzamin CFA 13.05; zjazd IX — nieobecność (bloki CFA zostają); suplementy czasowe — zapas wystarczający.
   Pozostałe pytania z D-116 (blok dodatkowy × trening = D1, święta, dzień obrony) — użytkownik odpowie później.
 
+## 3c. Stan 22.11.2026 (D-118 i plan przebudowy modułów)
+- D-118 (drobne z audytu 10.11: M5–M7, T10, T1) — na gałęzi roboczej, publikacja po „Publikuj” (`docs/RAPORT_D118.md`).
+- **Plan przebudowy Pielęgnacji, Suplementacji, MPW i CFA** (research + propozycja, etapy, decyzje §9): `docs/PLAN_PRZEBUDOWY_MODULOW_2026-11-22.md`.
+  Wdrażać dopiero po decyzjach użytkownika; proces jak w D-114 (fundament → prototyp do akceptacji na iPhonie → reszta).
+- Obrazy startowe iOS: po zmianie znaku aplikacji `python3 tools/splash.py` (Playwright + Pillow); użytkownik musi dodać ikonę ponownie.
+
 ## 4. Otwarte sprawy — stan 1.11.2026 (po D-113)
 **Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
 obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,

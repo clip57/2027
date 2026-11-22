@@ -185,8 +185,6 @@ table.data td { font-size: .88rem; }
 .dash { display: grid; }
 .dash-box { border: 1px solid var(--line); display: grid; }
 .dash-box p { margin: 0; max-width: none; }
-.dash-dots { display: flex; gap: var(--s-2); font-size: var(--fs-xs); font-weight: 700; }
-.dot.d-CRITICAL { color: var(--bad); } .dot.d-WARNING { color: var(--warn); } .dot.d-OK { color: var(--ok); }
 .daycard { border: 1px solid var(--line); border-left: 4px solid var(--prep); margin-bottom: var(--s-2); display: grid; }
 .daycard p { margin: 0; max-width: none; }
 .actions button, .actions .btn { flex: 1 1 8rem; min-height: 46px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
@@ -424,13 +422,6 @@ dialog.sheet { width: min(560px, calc(100vw - 1.5rem)); max-height: 85vh; paddin
 /* --- Trening: schemat ruchu, czas, serie opcjonalne, statystyki --- */
 .mv { display: grid; gap: var(--s-2); padding: var(--s-3); border-radius: var(--r-1); background: color-mix(in srgb, var(--train) 6%, transparent); }
 .mv-stage { padding: var(--s-2); }
-.mv-svg { display: block; width: 100%; max-width: 360px; margin: 0 auto; }
-.mv-svg .vr { fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.mv-svg .vr.b { stroke: var(--ink); } .mv-svg .vr.d { stroke-dasharray: 2.5 3; } .mv-svg .vr.f { fill: var(--ink-2); }
-.mv-svg .vm { fill: none; stroke: var(--train); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; opacity: .55; }
-.mv-svg .va, .mv-svg .vh { fill: var(--train); }
-.mv-svg .vs { fill: var(--surface); stroke: var(--train); stroke-width: 1.4; }
-.mv-svg .vdot { fill: var(--train); stroke: var(--surface); stroke-width: 1.2; }
 .mv-ctrl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-2) var(--s-2); align-items: center; }
 .mv-ctrl input[type="range"] { width: 100%; accent-color: var(--train); }
 .mv-phase { grid-column: 1 / -1; font-size: var(--fs-sm); font-weight: 600; color: var(--train); }

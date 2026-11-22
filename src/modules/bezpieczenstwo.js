@@ -3,11 +3,8 @@
 import { h, add, plural } from '../ui/dom.js';
 import { segmented } from '../ui/components.js';
 import { icon } from '../ui/icons.js';
-import { SRC } from '../core/data.js';
-import guide from '../data/guide.json' with { type: 'json' };
+import { loadModuleData } from '../core/module-data.js';   // T10: tabela i poradnik wczytywane przy wejściu do modułu
 
-const S = SRC.safety;
-const SECTIONS = [...new Set(S.rows.map(r => r.section))];
 const SHORT = s => s.split(' — ')[0];
 const EVID = { WYS: ['wysokie', 'ev-hi'], UMI: ['umiarkowane', 'ev-mid'], NIS: ['niskie', 'ev-lo'], PRX: ['przybliżenie', 'ev-px'] };
 const PREP = { '✔': ['nadaje się do meal prepu', 'ok'], '~': ['meal prep z zastrzeżeniami', 'mid'], '✘': ['nie do meal prepu', 'no'] };
@@ -22,7 +19,11 @@ function splitLimit(txt) {
 const val = v => (v && v !== '—' ? v : null);
 
 /** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
-export function renderBezpieczenstwo(root, ctx) {
+export async function renderBezpieczenstwo(root, ctx) {
+  const mode0 = ctx.params.get('m') || 'karty';
+  const [S, guide] = await Promise.all([loadModuleData('safety'), mode0 === 'poradnik' ? loadModuleData('guide') : null]);
+  if (!S || (mode0 === 'poradnik' && !guide)) { add(root, h('div', { class: 'banner err' }, 'Nie udało się wczytać danych bezpieczeństwa żywności.')); return; }
+  const SECTIONS = [...new Set(S.rows.map(r => r.section))];
   const q = (ctx.params.get('q') || '').toLowerCase();
   const sec = ctx.params.get('s') || '';
   const mode = ctx.params.get('m') || 'karty';
@@ -48,7 +49,7 @@ export function renderBezpieczenstwo(root, ctx) {
     h('div', { class: 'sf-count' }, h('p', { class: 'muted' }, `${rows.length} ${plural(rows.length, 'pozycja', 'pozycje', 'pozycji')}${link ? ` · odesłanie: ${link}` : ''}`),
       filtered && mode !== 'poradnik' && h('button', { class: 'ghost', onclick: () => go({ q: '', s: '', p: '' }) }, icon('x', { size: 16 }), 'Wyczyść filtry')));
 
-  if (mode === 'poradnik') { renderGuide(root, ctx); return; }
+  if (mode === 'poradnik') { renderGuide(root, ctx, guide); return; }
   if (mode === 'tabela') {
     add(root, h('div', { class: 'scroll-x' }, h('table', { class: 'data safety-table' },
       h('thead', {}, h('tr', {}, S.columns.map(c => h('th', {}, c)))),
@@ -109,7 +110,8 @@ function gblock(b) {
   }
 }
 
-function renderGuide(root, ctx) {
+/** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx @param {any} guide */
+function renderGuide(root, ctx, guide) {
   const open = ctx.params.get('g');
   add(root,
     h('section', { class: 'panel gd-intro' }, guide.intro.map(gblock)),

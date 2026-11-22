@@ -203,3 +203,5 @@ Zmienia kierunek z D-073 w części „unikaj” (szkło, gradienty) — w grani
 - Testy wyglądu także w WebKit (Safari): `npm run e2e:webkit`.
 - D-116: w okresie dwóch planów nauki (CFA i MPW) „Dziś” ma jeden kafel **„Nauka”** (suma bloków, podpowiedź „CFA a/b · MPW c/d”) i obie karty
   planów; zakładka paska — plan „główny” w danym okresie (MPW 12.11–21.03, CFA poza tym oknem), drugi w „Więcej”. „Zadania bloku” — cel dotykowy 44 px.
+- D-118: dzień poza planem — Dieta bez „obowiązuje dziś” i „Następnego posiłku” (notatka „Dziś poza planem”), Zapasy z chipem „poza planem” zamiast fazy;
+  ekran startowy iOS w kolorze tła motywu ciemnego ze znakiem aplikacji. Plan przebudowy 4 modułów („Instrument+”) — propozycja w `docs/PLAN_PRZEBUDOWY_MODULOW_2026-11-22.md`.

@@ -16,7 +16,7 @@ import { SRC, catalogById } from '../core/data.js';
 // Nazwy z Tabeli bezpieczeństwa — link „Przechowywanie” tylko przy identycznej nazwie (bez zgadywania powiązań)
 const SAFE = new Set(SRC.safety.rows.map(r => r.Produkt));
 import { addDays, dayShort, longDate, shortDate, diffDays } from '../core/dates.js';
-import { resolveDay } from '../core/resolver.js';
+import { resolveDay, inPlan, PLAN_START, PLAN_END } from '../core/resolver.js';
 import { region, holdFocus } from '../ui/patch.js';
 
 const CATS = ['Wszystko', 'Śniadanie', 'Lunch', 'Przekąska', 'Po treningu', 'Obiad', 'Kolacja', 'Napoje', 'Suplementy'];
@@ -73,6 +73,8 @@ export function renderZapasy(root, ctx) {
   const items = [...allItems(), ...(store.state.catalogUser || [])];
   const day = resolveDay(today);
   const shop = nextShopping(today, new Date().getHours(), new Date().getMinutes());
+  const shopOutside = !inPlan(shop.date);
+  const shopOutsideText = today > PLAN_END ? `plan zakończył się ${longDate(PLAN_END)}` : today < PLAN_START ? `plan zaczyna się ${longDate(PLAN_START)}` : `w planie nie ma już zakupów (koniec planu ${longDate(PLAN_END)})`;
   // B3: po końcu slotu zakupów najbliższe zakupy przesuwają się — prognozy „przed zakupami” liczone od nowa (przerysowanie w tle)
   ctx.tick?.(() => { const x = new Date(); if (nextShopping(today, x.getHours(), x.getMinutes()).date !== shop.date) ctx.soft?.(); });
   const undoable = () => store.allEvents().filter(e => INV_TYPES.includes(e.t)).sort((a, b) => (a.hlc < b.hlc ? -1 : 1));
@@ -116,7 +118,9 @@ export function renderZapasy(root, ctx) {
   // ---------- nagłówek
   add(root, h('header', { class: 'zp-head' }, h('h1', {}, 'Zapasy'),
     h('div', { class: 'topline' }, h('span', { class: 'date' }, `${dayShort(today)} ${longDate(today)}`),
-      h('span', { class: 'chip' }, `Faza ${day.phase ?? 0}`), h('span', { class: 'chip' }, day.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy'))), msg);
+      // M5 (audyt 10.11): poza planem bez fazy i rodzaju dnia (zużycie z planu = 0)
+      day.outside ? h('span', { class: 'chip zp-outside' }, 'poza planem')
+        : [h('span', { class: 'chip' }, `Faza ${day.phase ?? 0}`), h('span', { class: 'chip' }, day.dietVariant === 'T' ? 'dzień treningowy' : 'dzień nietreningowy')])), msg);
 
   // ---------- przegląd: zdrowie magazynu (pasek z liczników statusów) i najbliższe zakupy (D-072)
   const seg = k => (counts[k] || 0) / (rows.length || 1) * 100;
@@ -130,9 +134,11 @@ export function renderZapasy(root, ctx) {
           h('span', {}, h('span', { class: `dot-s s-${k}`, 'aria-hidden': 'true' }), `${counts[k]} ${l}`))),
       soonest && h('p', { class: 'muted' }, `Najbliższy brak: ${soonest.it.name} (${dayShort(soonest.fc.runOut)} ${shortDate(soonest.fc.runOut)})`)),
     // D-113: liczby przeglądu — najbliższe zakupy i braki teraz (stan 0, K1) — z tych samych obliczeń co lista
+    // M5: zakupy poza planem (po jego końcu) — bez daty „najbliższych zakupów” (w planie ich nie ma)
     h('div', { class: 'dash-box zp-next' }, h('p', { class: 'dash-l' }, 'Najbliższe zakupy'),
-      h('p', { class: 'dash-v zp-big' }, `${dayShort(shop.date)} ${shortDate(shop.date)}`),
-      h('p', { class: 'muted' }, `${shop.inDays === 0 ? 'dzisiaj' : `za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}`} · ${list.length} ${plural(list.length, 'pozycja', 'pozycje', 'pozycji')} · ${packs} ${plural(packs, 'opakowanie', 'opakowania', 'opakowań')}`)),
+      shopOutside ? [h('p', { class: 'dash-v zp-big' }, 'poza planem'), h('p', { class: 'muted' }, shopOutsideText)]
+        : [h('p', { class: 'dash-v zp-big' }, `${dayShort(shop.date)} ${shortDate(shop.date)}`),
+          h('p', { class: 'muted' }, `${shop.inDays === 0 ? 'dzisiaj' : `za ${shop.inDays} ${plural(shop.inDays, 'dzień', 'dni', 'dni')}`} · ${list.length} ${plural(list.length, 'pozycja', 'pozycje', 'pozycji')} · ${packs} ${plural(packs, 'opakowanie', 'opakowania', 'opakowań')}`)]),
     h('div', { class: `dash-box zp-out${outNow ? ' is-alert' : ''}` }, h('p', { class: 'dash-l' }, 'Brak teraz'),
       h('p', { class: 'dash-v zp-big' }, String(outNow), h('span', { class: 'unit' }, ` ${plural(outNow, 'pozycja', 'pozycje', 'pozycji')}`)),
       h('p', { class: 'muted' }, outNow ? (oldest.si?.shortSince ? `najdłużej: ${oldest.it.name} (od ${dayShort(oldest.si.shortSince)} ${shortDate(oldest.si.shortSince)})` : `m.in. ${oldest.it.name}`) : 'wszystkie śledzone pozycje są na stanie'))));

@@ -6,7 +6,7 @@ import { donut } from '../ui/charts.js';
 import { icon } from '../ui/icons.js';
 import { dietSummary, phaseDiff, mealTimes, nextMeal } from '../core/calc/diet.js';
 import { stockAt, forecast, statusInfo } from '../core/calc/inventory.js';
-import { resolveDay, phaseFor, TRAIN_START } from '../core/resolver.js';
+import { resolveDay, phaseFor, TRAIN_START, PLAN_START, PLAN_END } from '../core/resolver.js';
 import { catalogById, SRC } from '../core/data.js';
 import { longDate, shortDate, dayShort } from '../core/dates.js';
 
@@ -42,7 +42,8 @@ export function renderDieta(root, ctx) {
   const variant = ctx.params.get('w') || refDiet || dayNow.dietVariant || 'T';
   const go = (f, w) => { location.hash = `#/dieta?f=${f}&w=${w}`; };
   const s = dietSummary(phase, variant);
-  const isToday = phase === (phaseFor(ctx.today) ?? 0) && variant === dayNow.dietVariant;
+  // M5 (audyt 10.11): dzień poza planem (przed początkiem albo po końcu) nie ma jadłospisu „na dziś” — bez „obowiązuje dziś” i „Następnego posiłku”
+  const isToday = !dayNow.outside && phase === (phaseFor(ctx.today) ?? 0) && variant === dayNow.dietVariant;
   const forRef = ref !== ctx.today && refDiet && phase === (phaseFor(ref) ?? 0) && variant === refDiet;
   const times = mealTimes(dayNow.slots);
   const d = new Date();
@@ -77,7 +78,10 @@ export function renderDieta(root, ctx) {
       h('div', { class: 'topline' }, h('span', { class: 'date' }, s.header),
         isToday ? h('span', { class: 'chip' }, `obowiązuje dziś · ${longDate(ctx.today)}`)
           : forRef ? h('span', { class: 'chip dt-ref' }, `obowiązuje ${dayShort(ref)} ${longDate(ref)}`) : null,
-        !isToday && h('a', { class: 'chip dt-today', href: '#/dieta' }, icon('calendar', { size: 14 }), 'Pokaż plan na dziś')),
+        !isToday && !dayNow.outside && h('a', { class: 'chip dt-today', href: '#/dieta' }, icon('calendar', { size: 14 }), 'Pokaż plan na dziś')),
+      !dRaw && dayNow.outside && h('p', { class: 'muted dt-nodiet dt-outside', role: 'note' }, ctx.today > PLAN_END
+        ? `Dziś poza planem — plan zakończył się ${longDate(PLAN_END)}. Poniżej jadłospis wybrany przełącznikami.`
+        : `Dziś poza planem — plan zaczyna się ${longDate(PLAN_START)}. Poniżej jadłospis wybrany przełącznikami.`),
       dRaw && !refDiet && h('p', { class: 'muted dt-nodiet', role: 'note' }, ref === dRaw
         ? `${dayShort(ref)} ${longDate(ref)} — ${dayRef.outside ? 'dzień poza planem' : 'dzień bez diety'}; poniżej plan wybrany przełącznikami.`
         : 'Nieczytelna data w adresie — poniżej plan na dziś.')),

@@ -17,9 +17,9 @@ DAY = os.environ.get('DAY', '2026-11-18')
 ROUTES = [('dzis', '#/dzis'), ('tydzien', '#/dzis?v=tydzien'), ('kalendarz', '#/kalendarz'), ('pielegnacja', '#/pielegnacja'),
   ('dieta', '#/dieta'), ('suplementy', '#/suplementy'), ('zapasy', '#/zapasy'), ('mealprep', '#/mealprep'),
   ('trening', '#/trening?d=2026-11-16'), ('trening-stat', '#/trening?v=stat'), ('trening-hist', '#/trening?v=historia'), ('rekompozycja', '#/rekompozycja'),
-  ('cfa', '#/cfa'), ('cfa-dzien', '#/cfa?v=dzien&d=2026-10-19'), ('mpw', '#/mpw'), ('mpw-dzien', '#/mpw?v=dzien&d=2026-11-17'),
+  ('cfa', '#/cfa'), ('cfa-dzien', '#/cfa?v=dzien&d=2026-11-24'), ('mpw', '#/mpw'), ('mpw-dzien', '#/mpw?v=dzien&d=2026-11-24'),
   ('bezp', '#/bezpieczenstwo'), ('bezp-por', '#/bezpieczenstwo?m=poradnik'), ('dane', '#/dane'), ('wiecej', '#/wiecej'), ('ustawienia', '#/ustawienia'),
-  ('dzis-past', '#/dzis?d=2026-11-16'), ('fokus', '#/trening?v=fokus&d=2026-11-18'), ('fokus-past', '#/trening?v=fokus&d=2026-11-16'), ('fx-mpw', '#/mpw?v=fokus&d=2026-11-18'), ('fx-prep', '#/mealprep?v=fokus')]
+  ('dzis-past', '#/dzis?d=2026-11-16'), ('fokus', '#/trening?v=fokus&d=2026-11-18'), ('fokus-past', '#/trening?v=fokus&d=2026-11-16'), ('fx-mpw', '#/mpw?v=fokus&d=2026-11-24'), ('fx-prep', '#/mealprep?v=fokus')]
 STATES = [('sheet', '#/trening?d=2026-11-16', "document.querySelector('.ex-tech').click()"),
   ('fokus-rest', '#/trening?v=fokus&d=2026-11-18', "document.querySelector('.fx-go').click()"),
   ('live', '#/zapasy', "location.hash = '#/trening?d=2026-11-18'; setTimeout(() => { document.querySelector('.set:not(.set-h) .set-toggle').click(); setTimeout(() => { location.hash = '#/zapasy'; }, 300); }, 300)"),

@@ -70,7 +70,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color:
 /* ---------- Karty i panele: jedna skala promieni i głębi; krawędź światła (--rim) na górze ---------- */
 .panel, .stat, .hero, .hero-tr, .meal, .ex, .prep-card, .sf-card, .rk-sec, .dash-box, .daycard, .tl-card, .gd-card, .rule, .mv-stage {
   background: var(--surface); border-color: var(--border); border-radius: var(--r-lg); }
-.slot, .inv-item, .log-item, .hist-item, .safe-card { background: var(--surface); border-radius: var(--r-md); }
+.slot, .inv-item, .log-item, .hist-item { background: var(--surface); border-radius: var(--r-md); }
 /* Sygnatury modułów (lewa krawędź 4 px z styles.css) — przywrócone po wspólnym border-color kart powyżej */
 .meal { border-left-color: var(--ac); }
 .daycard, .gd-day { border-left-color: var(--prep); }
@@ -270,7 +270,6 @@ body.kbd .tabs { transform: translateY(calc(100% + var(--dock-b) + var(--s-4)));
 .dz-now { --hc: var(--dc, var(--accent)); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; margin: 0; }
 .dz-now-main { display: grid; gap: var(--s-1); min-width: 0; }
 .dz-now .btn { justify-self: start; margin-top: var(--s-2); display: inline-flex; align-items: center; text-decoration: none; }
-.dz-now-side { display: grid; justify-items: center; gap: var(--s-1); }
 .dz-now .ring { --ring: var(--hc); }
 /* postęp bieżącego punktu w czasie (od–do) i pozostały czas — z planu dnia i zegara */
 .dz-now-prog { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s-3); margin: var(--s-2) 0 var(--s-1); max-width: 28rem; }
@@ -287,8 +286,6 @@ body.kbd .tabs { transform: translateY(calc(100% + var(--dock-b) + var(--s-4)));
 .dz-kpi.is-alert .stat-v { color: var(--danger); }
 .dz-bar { display: block; border-radius: var(--r-full); background: color-mix(in srgb, var(--text) 9%, transparent); overflow: hidden; margin-top: auto; }
 .dz-bar > span { display: block; height: 100%; border-radius: var(--r-full); transition: width var(--dur-3) var(--ease-out); }
-.dz-macro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: auto; }
-.dz-macro .dz-bar { margin: 0; }
 
 .dz-aside { display: grid; gap: var(--s-3); align-content: start; }
 .dz-card { background: var(--surface); border: 1px solid var(--border); display: grid; align-content: start; }
@@ -341,7 +338,6 @@ body.kbd .tabs { transform: translateY(calc(100% + var(--dock-b) + var(--s-4)));
   .dz-head .dz-nav[aria-label] > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .quicklinks { margin-inline: calc(-1 * var(--s-4)); padding: 2px var(--s-4); }
   .dz-now { grid-template-columns: minmax(0, 1fr) auto; }
-  .dz-now-side .muted { white-space: nowrap; }
   /* podsumowania: przewijany pas kart (plan dnia bliżej góry ekranu) */
   .dz-aside { grid-auto-flow: column; grid-auto-columns: min(78%, 300px); align-items: start; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
     margin-inline: calc(-1 * var(--s-4)); padding: 2px var(--s-4) var(--s-2); scroll-padding-inline: var(--s-4); overscroll-behavior-x: contain; }
@@ -678,14 +674,6 @@ body.kbd .pg-timer { display: none; }
   .kl-dots { display: none; }
   .kl-lines { display: grid; gap: 2px; }
 }
-/* Dzień zero (D-097) */
-.dz-zero { display: grid; gap: var(--s-3); border-left: 4px solid var(--accent);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface) 60%); }
-.dz-zero h2, .dz-zero p { margin: 0; }
-.dz-zero .eyebrow { color: var(--text-2); }
-.dz-zero-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
-.dz-zero-list li { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-sm); }
-.dz-zero-list .ico { color: var(--accent); flex: none; }
 
 /* U8: Dane → Kopie automatyczne — wiersz kopii z przyciskami; podgląd przywrócenia stanów Zapasów */
 .dn-bk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }

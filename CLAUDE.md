@@ -5,16 +5,16 @@ meal prep, trening, nauka (CFA do 11.11.2026, MPW 16.11.2026–20.03.2027), bezp
 Jeden użytkownik, urządzenia: MacBook, iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych),
 przeglądarka na komputerze. Język interfejsu i dokumentacji: **polski**.
 
-**Stan (20.11.2026):** D-114 „Instrument” i D-115 „Fundament jakości” — opublikowane na `main` (18–19.11.2026). **D-116** (studia wg harmonogramu,
-plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (polecenie „Publikuj”, `0371a91`).
+**Stan (22.11.2026):** D-114 „Instrument” i D-115 „Fundament jakości” — opublikowane na `main` (18–19.11.2026). **D-116** (studia wg harmonogramu,
+plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (`0371a91`). **D-118** (drobne z audytu 10.11: M5–M7, T10, T1) — na gałęzi roboczej, czeka na „Publikuj”. **Plan przebudowy Pielęgnacji, Suplementacji, MPW i CFA** (research, propozycja) — `docs/PLAN_PRZEBUDOWY_MODULOW_2026-11-22.md`, czeka na decyzje użytkownika (§9).
 **Otwarte decyzje użytkownika:** D1 — popołudnie (bloki MPW 15:30–18:23 i blok dodatkowy CFA 17:40–18:33 nakładają się na okno treningowe);
 z D-116/D-117 (`docs/RAPORT_D116.md` §3, `RAPORT_D117.md`): święta po 28.03.2027 (do końca roku — bez wyjątków), dzień obrony.
 Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-10.md` §11) — czekają na użytkownika.
 
 **Czytaj w razie potrzeby (nie wczytuj wszystkiego na start):**
 - `docs/PRZEKAZANIE.md` — stan, zasady współpracy, niedokończone zadania, pliki spoza repozytorium (**najpierw**, przy większej pracy);
-- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-117 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
-  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-117) i raporty `docs/RAPORT_D0xx.md`;
+- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-118 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
+  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-118) i raporty `docs/RAPORT_D0xx.md`;
 - `docs/PULAPKI.md` — tabela pułapek, które już wystąpiły (część pilnują teraz linter i testy) — **przed zmianą UI, testów lub buildu**;
 - wygląd: `docs/REDESIGN-STATUS.md` → `REDESIGN-SPEC.md` → `REDESIGN-DECISIONS.md` → `REDESIGN-TESTING.md` (klasy używane przez testy).
 
@@ -51,8 +51,8 @@ Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-1
 | UI — komponenty | `src/ui/components.js`, `icons.js`, `prefs.js`, `charts.js`, `signal.js`, `settings.js`, `search.js`, `bodymap.js`, `figure.js`, `movement.js`, D-114: `dial.js`, `live.js`, `gestures.js`, `motion.js`, `wakelock.js` | `segmented, stat, statGrid, section, macroChips, progressRing, metric, statusBadge, timerChip`; wykresy SVG (`sparkline, areaChart, donut, heatmap, stockAxis` oraz starsze `barChart, lineChart`); ikony Lucide `icon(name,{size,label})`; preferencje per urządzenie (`prefs.js`: motyw, akcent, gęstość, rozmiar tekstu, dźwięk, ekran startowy); sygnał odliczania (`signal.js`); strona Ustawienia (`settings.js`); paleta ⌘K z poleceniami (`search.js`) |
 | Style | `@layer legacy` (`src/ui/tokens.css` → `styles.css` → `system.css` → `precision.css`), `@layer instrument` (`src/ui/instrument.css`) | sklejane i minifikowane przez `tools/build.mjs` (D-113, warstwy D-114). **Tokeny tylko w `tokens.css`; nowe reguły tylko w `instrument.css`** |
 | Dane źródłowe | `src/data/*.json` | generowane skryptami `tools/extract/*` z plików źródłowych użytkownika (NIE w repozytorium); traktuj jako tylko do odczytu |
-| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js, cloud-auto.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js`, `errlog.js` (dziennik błędów, D-115), `types.d.ts` (typy zdarzeń i kontekstu modułu) |
-| Build | `tools/build.mjs` | esbuild → `dist/web/` (index + `app.<hash>.js/css` + `fonts/` + `sw.js` + manifest) i `dist/single/2027.html` (wszystko wbudowane) |
+| Rdzeń | `src/core/` | `resolver.js` (data → plan dnia), `calc/*` (zużycie, zapasy, dieta, suplementy, trening), `storage/*` (dziennik zdarzeń), `sync/bundle.js` (plik), `sync/crypto.js, cloud-api.js, cloud.js, cloud-local.js, cloud-auto.js` (chmura), `migrate/*`, `dates.js`, `ids.js` (HLC), `hash.js`, `errlog.js` (dziennik błędów, D-115), `types.d.ts` (typy zdarzeń i kontekstu modułu), `data-split.js` + `module-data.js` (dane widoków doładowywane — D-118: pełne dane Rekompozycji i Bezpieczeństwa tylko przez `loadModuleData`) |
+| Build | `tools/build.mjs` | esbuild → `dist/web/` (index + `app.<hash>.js/css` + `fonts/` + `sw.js` + manifest + `splash/` — obrazy startowe iOS z `tools/splash.py` + pliki `plan-*`/`data-*.json`) i `dist/single/2027.html` (wszystko wbudowane) |
 | Ikony | `tools/icons.mjs` → `src/ui/icons.js` | plik wygenerowany i wersjonowany; regeneracja: `node tools/icons.mjs` (wymaga devDependency `lucide-static`) |
 | Fonty | `public/fonts/inter-latin*.woff2`, `inter-display.woff2` (D-113) | podzbiór Inter (OFL) ze skryptu `python3 tools/fonts.py` (D-111; opis i znaki przy foncie systemowym — `tools/fonts.json`) |
 

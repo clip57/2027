@@ -6,6 +6,7 @@ import { dayPlan, PLAN_START } from './resolver.js';
 import { addDays, shortDate, dayShort } from './dates.js';
 import { MODULES } from '../modules/registry.js';
 import rekomp from '../data/rekomp.json' with { type: 'json' };
+import { moduleData } from './module-data.js';
 
 export const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
 const KIND = { mod: 'Moduł', inv: 'Zapasy', supp: 'Suplementy', ex: 'Trening', cfa: 'CFA', mpw: 'MPW', err: 'Error log', mpwerr: 'Error log MPW', safe: 'Bezpieczeństwo', rek: 'Rekompozycja', care: 'Pielęgnacja' };
@@ -41,7 +42,8 @@ export function buildIndex(state, today) {
     if (d.kind === 'product' && d.name) add('care', d.name, 'Produkt pielęgnacji', '#/pielegnacja?v=produkty', d.note || '');
     else if (d.kind === 'step' && d.text) add('care', d.text, `Krok pielęgnacji${d.group ? ` · ${d.group}` : ''}`, '#/pielegnacja?v=plan', d.note || '');
   }
-  for (const s of rekomp.sections) add('rek', `${s.num}. ${s.title}`, 'Rekompozycja', `#/rekompozycja?s=${s.id}`, JSON.stringify(s.blocks || []).slice(0, 4000));
+  // T10: w pakiecie aplikacji tylko spis sekcji; pełna treść (wyszukiwanie w tekście) — gdy wczytana (ui/search.js wczytuje ją przy otwarciu palety)
+  for (const s of (moduleData('rekomp') || rekomp).sections) add('rek', `${s.num}. ${s.title}`, 'Rekompozycja', `#/rekompozycja?s=${s.id}`, JSON.stringify(s.blocks || []).slice(0, 4000));
   return out;
 }
 

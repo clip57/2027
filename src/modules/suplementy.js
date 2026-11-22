@@ -73,7 +73,8 @@ export function renderSuplementy(root, ctx) {
       h('span', { class: 'chip' }, `${groups.reduce((n, g) => n + g.doses.length, 0)} dawek w ${groups.length} porach`),
       canCheck && h('span', { class: 'chip sp-taken' }, `przyjęte ${taken} / ${allDoses.length}`),
       nextTime && h('span', { class: 'chip sp-now' }, icon('clock', { size: 14 }), `następna pora: ${nextTime}`),
-      low.length > 0 && h('a', { class: 'chip sp-low-link', href: '#sp-stock-h' }, icon('package', { size: 14 }), `do uzupełnienia: ${low.length}`))),
+      // M5 (audyt 10.11): „do uzupełnienia” tylko w dniu planu (poza planem dawek nie ma)
+      low.length > 0 && inPlan(date) && h('a', { class: 'chip sp-low-link', href: '#sp-stock-h' }, icon('package', { size: 14 }), `do uzupełnienia: ${low.length}`))),
     msg,
     h('div', { class: 'controls sp-days' }, segmented('Dzień', week, date, go)));
 

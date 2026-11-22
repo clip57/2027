@@ -4,7 +4,7 @@ import { h, add, plural } from '../ui/dom.js';
 import { PLAN_REAL_START } from '../core/resolver.js';
 import { longDate } from '../core/dates.js';
 import { icon } from '../ui/icons.js';
-import rekomp from '../data/rekomp.json' with { type: 'json' };
+import { loadModuleData } from '../core/module-data.js';   // T10: treść planu wczytywana przy wejściu do modułu
 
 // M4 (D-114): ikony Lucide zamiast emoji
 const BOX = { key: ['target', 'Najważniejsze'], cal: ['calendar', 'Harmonogram'], stop: ['triangle-alert', 'Uwaga'], go: ['circle-check', 'Tak działaj'] };
@@ -52,7 +52,9 @@ function privateSection(id, pack) {
 }
 
 /** @param {HTMLElement} root @param {import('../core/types').Ctx} ctx */
-export function renderRekompozycja(root, ctx) {
+export async function renderRekompozycja(root, ctx) {
+  const rekomp = await loadModuleData('rekomp');
+  if (!rekomp) { add(root, h('div', { class: 'banner err' }, 'Nie udało się wczytać treści planu rekompozycji.')); return; }
   const pack = ctx.store?.state?.privatePack || null;
   const open = ctx.params.get('s');
   // Szukanie w planie (D-076): sekcje z trafieniem rozwinięte, pozostałe ukryte — tylko widok, treść bez zmian

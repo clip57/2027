@@ -3,14 +3,15 @@ import { h, clear } from './dom.js';
 import { sheet } from './components.js';
 import { icon } from './icons.js';
 import { buildIndex, search, kindLabel } from '../core/search.js';
+import { moduleData, loadModuleData } from '../core/module-data.js';
 import { today, longDate, dayShort } from '../core/dates.js';
 import { PLAN_START, PLAN_END } from '../core/resolver.js';
 import { modulesOn, byId } from '../modules/registry.js';
 
-let cache = { state: undefined, day: '', index: null };
+let cache = { state: undefined, day: '', rek: false, index: null };
 const indexFor = state => {
-  const d = today();
-  if (cache.state !== state || cache.day !== d) cache = { state, day: d, index: buildIndex(state, d) };
+  const d = today(), rek = !!moduleData('rekomp');   // T10: indeks przebudowany, gdy doczyta się treść Rekompozycji
+  if (cache.state !== state || cache.day !== d || cache.rek !== rek) cache = { state, day: d, rek, index: buildIndex(state, d) };
   return cache.index;
 };
 
@@ -72,6 +73,8 @@ export function openSearch(getState, initial = '') {
     info.textContent = !input.value.trim() ? 'Polecenia — albo wpisz frazę (produkt, ćwiczenie, temat) lub datę, np. 12.11.' : hits.length ? `Wyniki: ${hits.length}${hits.length >= 40 ? ' (pierwsze 40)' : ''}` : cmds.length ? 'Brak wyników wyszukiwania — pasujące polecenia powyżej.' : 'Brak wyników.';
   };
   input.addEventListener('input', run);
+  // T10: pełna treść Rekompozycji do wyszukiwania w tekście — doczytywana przy otwarciu palety (z pamięci podręcznej / ze strony)
+  if (!moduleData('rekomp')) loadModuleData('rekomp').then(() => { if (dlg.el.isConnected) run(); }).catch(() => {});
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') { const a = list.querySelector('a'); if (a) { e.preventDefault(); a.click(); } }
     if (e.key === 'ArrowDown') { e.preventDefault(); list.querySelector('a')?.focus(); }

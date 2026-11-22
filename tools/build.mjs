@@ -7,6 +7,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { corePlan, lazyPart, PLAN_IDS } from '../src/core/plan-split.js';
+import { SPLIT_DATA, DATA_IDS } from '../src/core/data-split.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const P = (...a) => path.join(ROOT, ...a);
@@ -22,13 +23,30 @@ const plans = { name: 'plany-nauki', setup(b) {
   b.onLoad({ filter: /[\\/]src[\\/]data[\\/](cfa|mpw)\.json$/ }, a => ({ contents: JSON.stringify(corePlan(path.basename(a.path, '.json'), PLAN_SRC[path.basename(a.path, '.json')])), loader: 'json' }));
   b.onResolve({ filter: /(^|[\\/])plan-tasks\.js$/ }, () => ({ path: P('src/core/plan-tasks.web.js') }));
 } };
+// T10 (audyt 10.11.2026): dane widoków (src/core/data-split.js) — w pakiecie tylko rdzeń, pełny plik osobno (jak zadania bloków):
+// wariant web — data-<id>.<skrót>.json (lista SHELL), 2027.html — <script type="application/json" id="data-<id>">
+const DATA_SRC = Object.fromEntries(DATA_IDS.map(id => [id, JSON.parse(fs.readFileSync(P(`src/data/${id}.json`), 'utf8'))]));
+const DATA_LAZY = Object.fromEntries(DATA_IDS.map(id => [id, JSON.stringify(DATA_SRC[id])]));
+const DATA_FILES = Object.fromEntries(DATA_IDS.map(id => [id, `data-${id}.${hash(DATA_LAZY[id])}.json`]));
+const dataRe = new RegExp(`[\\\\/]src[\\\\/]data[\\\\/](${DATA_IDS.join('|')})\\.json$`);
+const viewData = { name: 'dane-widokow', setup(b) {
+  b.onLoad({ filter: dataRe }, a => { const id = path.basename(a.path, '.json'); return { contents: JSON.stringify(SPLIT_DATA[id](DATA_SRC[id])), loader: 'json' }; });
+  b.onResolve({ filter: /(^|[\\/])module-data\.js$/ }, () => ({ path: P('src/core/module-data.web.js') }));
+} };
 
 const res = await build({ entryPoints: [P('src/app.js')], bundle: true, format: 'iife', minify: true, write: false,
   target: ['safari16', 'chrome110', 'firefox115'], legalComments: 'none', charset: 'utf8',
-  plugins: [plans], define: { __PLAN_FILES__: JSON.stringify(LAZY_FILES) } });
+  plugins: [plans, viewData], define: { __PLAN_FILES__: JSON.stringify(LAZY_FILES), __DATA_FILES__: JSON.stringify(DATA_FILES) } });
 const js = res.outputFiles[0].text;
 for (const id of PLAN_IDS) if (!js.includes(PLAN_SRC[id].D.bloki[0].temat)) throw new Error(`Plan ${id} nie trafił do pakietu`);
 for (const [id, t] of Object.entries(LAZY)) if (js.includes(JSON.parse(t).values[Object.keys(JSON.parse(t).values)[0]].slice(0, 60))) throw new Error(`Zadania planu ${id} trafiły do pakietu`);
+// T10: rdzeń danych widoków jest w pakiecie, pełna treść — nie (próbki tekstu spoza rdzenia)
+if (!js.includes(JSON.stringify(DATA_SRC.rekomp.sections[0].title).slice(1, -1))) throw new Error('Spis sekcji Rekompozycji nie trafił do pakietu');
+for (const [id, sample] of [['rekomp', DATA_SRC.rekomp.sections.flatMap(x => x.blocks || []).find(x => x.text?.length > 40)?.text], ['guide', DATA_SRC.guide.intro.find(x => x.text)?.text],
+  ['safety', DATA_SRC.safety.rows[0][DATA_SRC.safety.columns.find(c => !['Produkt', 'section'].includes(c) && String(DATA_SRC.safety.rows[0][c] || '').length > 20)]]]) {
+  if (!sample || sample.length < 20) throw new Error(`Brak próbki treści ${id} do kontroli pakietu`);
+  if (js.includes(JSON.stringify(sample).slice(1, 41))) throw new Error(`Pełne dane ${id} trafiły do pakietu`);
+}
 // Arkusz = tokeny (jedyne źródło wartości) + style modułów + warstwa komponentów systemu projektowego
 // D-113: warstwa System 3.0 „Precision” (precision.css) na końcu; arkusz minifikowany (F-G6) — fonty wariantu jednoplikowego osadzane
 // PRZED minifikacją (esbuild może zdjąć cudzysłowy z url(), a podstawienie szuka dokładnego tekstu `url("fonts/…")`)
@@ -44,7 +62,7 @@ const minCss = async t => (await transform(t, { loader: 'css', minify: true, tar
 const css = await minCss(cssRaw);
 const FONTS = fs.readdirSync(P('public/fonts')).filter(f => f.endsWith('.woff2'));
 const tpl = fs.readFileSync(P('src/index.html'), 'utf8');
-const version = `${pkg.version}+${hash(js + css + Object.values(LAZY).join(''))}${process.env.BUILD_TAG ? `-${process.env.BUILD_TAG}` : ''}`;
+const version = `${pkg.version}+${hash(js + css + Object.values(LAZY).join('') + Object.values(DATA_LAZY).join(''))}${process.env.BUILD_TAG ? `-${process.env.BUILD_TAG}` : ''}`;
 // D16 (audyt 31.10.2026): data budowy (strefa Europe/Warsaw) — czytelna wersja w „Dane” obok skrótu; `app-version` bez zmian (aktualizacja, SW)
 const built = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Warsaw' }).format(process.env.SOURCE_DATE_EPOCH ? new Date(Number(process.env.SOURCE_DATE_EPOCH) * 1000) : new Date());
 const stamp = `<meta name="app-version" content="${version}">\n<meta name="app-built" content="${built}">`;
@@ -61,7 +79,14 @@ for (const f of fs.readdirSync(P('public/icons'))) fs.copyFileSync(P('public/ico
 fs.mkdirSync(P('dist/web/fonts'), { recursive: true });
 for (const f of fs.readdirSync(P('public/fonts'))) fs.copyFileSync(P('public/fonts', f), P('dist/web/fonts', f));
 fs.copyFileSync(P('public/manifest.webmanifest'), P('dist/web/manifest.webmanifest'));
+// M7 (audyt 10.11): obrazy startowe iOS (`apple-touch-startup-image`) — generowane `python3 tools/splash.py`, tylko wariant web
+// (aplikacja z ekranu początkowego); w SHELL jak ikony (ok. 12 KB na plik)
+const SPLASH = JSON.parse(fs.readFileSync(P('public/splash/splash.json'), 'utf8'));
+fs.mkdirSync(P('dist/web/splash'), { recursive: true });
+for (const s of SPLASH) fs.copyFileSync(P('public/splash', s.file), P('dist/web/splash', s.file));
+const splashLinks = SPLASH.map(s => `<link rel="apple-touch-startup-image" media="${s.media}" href="splash/${s.file}">`).join('\n');
 for (const [id, t] of Object.entries(LAZY)) fs.writeFileSync(P('dist/web', LAZY_FILES[id]), t);
+for (const [id, t] of Object.entries(DATA_LAZY)) fs.writeFileSync(P('dist/web', DATA_FILES[id]), t);
 // Uwaga: podstawiamy funkcją, bo treść może zawierać wzorce $&, $` itp. (String.replace by je zinterpretował).
 const put = (text, mark, value) => text.replace(mark, () => value);
 // S1: Content-Security-Policy (tylko wariant web; w 2027.html cały kod jest wbudowany). Skrypt motywu w <head> — przez skrót
@@ -76,9 +101,10 @@ const csp = ["default-src 'self'", `script-src 'self' 'sha256-${crypto.createHas
   // D-115 (T8): Trusted Types — kod nie używa innerHTML; jedyne miejsce wymagające typu zaufanego to adres service workera (polityka p2027 w app.js)
   "require-trusted-types-for 'script'", 'trusted-types p2027'].join('; ');
 fs.writeFileSync(P('dist/web/index.html'), put(put(put(tpl, '<meta charset="utf-8">', `<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="${csp}">`), '<!--HEAD-->',
-  `${stamp}\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n<link rel="icon" href="icons/icon-192.png">\n<link rel="stylesheet" href="${cssName}">`),
+  `${stamp}\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n${splashLinks}\n<link rel="icon" href="icons/icon-192.png">\n<link rel="stylesheet" href="${cssName}">`),
   '<!--BODY-->', `<script src="${jsName}" defer></script>`));
-const shell = ['./', 'index.html', jsName, cssName, ...Object.values(LAZY_FILES), ...FONTS.map(f => `fonts/${f}`), 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
+const shell = ['./', 'index.html', jsName, cssName, ...Object.values(LAZY_FILES), ...Object.values(DATA_FILES), ...FONTS.map(f => `fonts/${f}`), 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
+  ...SPLASH.map(s => `splash/${s.file}`)];
 fs.writeFileSync(P('dist/web/sw.js'), `// Wygenerowane przez tools/build.mjs — wersja ${version}
 // Aktualizacja KODU aplikacji (nie danych). Nowa wersja czeka na zgodę użytkownika („Nowa wersja — odśwież”).
 const CACHE = 'p2027-v2-${hash(version)}';
@@ -111,11 +137,12 @@ const cssSingle = await minCss(FONTS.reduce((c, f) => c.split(`url("fonts/${f}")
 if (/url\(["']?fonts\//.test(cssSingle)) throw new Error('Wariant jednoplikowy: font nieosadzony');
 // U6: zadania bloków MPW wbudowane jako dane (bez wykonywania); „<” jako \u003c — tekst nie może zamknąć elementu <script>
 const inlinePlans = Object.entries(LAZY).map(([id, t]) => `<script type="application/json" id="plan-${id}">${t.replace(/</g, '\\u003c')}</script>`).join('\n');
+const inlineData = Object.entries(DATA_LAZY).map(([id, t]) => `<script type="application/json" id="data-${id}">${t.replace(/</g, '\\u003c')}</script>`).join('\n');
 const single = put(put(tpl, '<!--HEAD-->', `${stamp}\n<link rel="apple-touch-icon" href="${icon}">\n<style>${cssSingle}</style>`),
-  '<!--BODY-->', `<script>window.__SINGLE__=true;</script>\n${inlinePlans}\n<script>${inlineJs}</script>`);
+  '<!--BODY-->', `<script>window.__SINGLE__=true;</script>\n${inlinePlans}\n${inlineData}\n<script>${inlineJs}</script>`);
 // Kontrola: wbudowany skrypt i arkusz muszą być kompletne (wcześniej wzorzec $& obcinał kod).
-if (!single.includes(inlineJs) || !single.includes(cssSingle) || !single.includes(inlinePlans)) throw new Error('Budowa wariantu jednoplikowego uszkodziła wbudowany kod');
+if (!single.includes(inlineJs) || !single.includes(cssSingle) || !single.includes(inlinePlans) || !single.includes(inlineData)) throw new Error('Budowa wariantu jednoplikowego uszkodziła wbudowany kod');
 fs.writeFileSync(P('dist/single/2027.html'), single);
 
 const size = f => (fs.statSync(f).size / 1024).toFixed(0) + ' KB';
-console.log(`wersja ${version}\n dist/web: ${jsName} ${size(P('dist/web', jsName))}, ${cssName}${Object.values(LAZY_FILES).map(f => `, ${f} ${size(P('dist/web', f))}`).join('')}\n dist/single/2027.html ${size(P('dist/single/2027.html'))}`);
+console.log(`wersja ${version}\n dist/web: ${jsName} ${size(P('dist/web', jsName))}, ${cssName}${[...Object.values(LAZY_FILES), ...Object.values(DATA_FILES)].map(f => `, ${f} ${size(P('dist/web', f))}`).join('')}\n dist/single/2027.html ${size(P('dist/single/2027.html'))}`);

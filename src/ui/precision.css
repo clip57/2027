@@ -11,7 +11,7 @@
 /* ---------- Typografia: krój tytułowy (Inter Display) dla nagłówków i dużych liczb, cyfry tabelaryczne ---------- */
 h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.028em; line-height: 1.05; }
 h2 { letter-spacing: -.015em; }
-.stat-v, .nowcard-t, .dz-prog strong, .dash-v, .hero-kcal strong, .tr-rest-t, .pg-timer-t, .dz-now .nowcard-t, .cf-hero-v, .zp-big {
+.stat-v, .nowcard-t, .dz-prog strong, .dash-v, .hero-kcal strong, .tr-rest-t, .pg-timer-t, .dz-now .nowcard-t, .zp-big {
   font-family: var(--font-display); font-variant-numeric: tabular-nums; }
 .ico { stroke-width: 1.85; }
 
@@ -28,10 +28,10 @@ button:active:not(:disabled), .btn:active { transform: scale(.98); }
 
 /* ---------- Powierzchnie: ramka 1 px zamiast cienia; w jasnym motywie ledwie widoczny cień ---------- */
 .panel, .stat, .hero, .hero-tr, .meal, .ex, .prep-card, .sf-card, .rk-sec, .dash-box, .daycard, .tl-card, .gd-card, .rule, .mv-stage,
-.slot, .inv-item, .log-item, .hist-item, .safe-card, .dz-card, .more-list {
+.slot, .inv-item, .log-item, .hist-item, .dz-card, .more-list {
   box-shadow: var(--e1); }   /* ramki i kolorowe krawędzie (sygnatury modułów, stan pozycji) — bez zmian ze styles.css/system.css */
-:root[data-theme="dark"] :is(.panel, .stat, .hero, .hero-tr, .meal, .ex, .prep-card, .sf-card, .rk-sec, .dash-box, .daycard, .tl-card, .gd-card, .rule, .mv-stage, .slot, .inv-item, .log-item, .hist-item, .safe-card, .dz-card, .more-list) { box-shadow: none; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) :is(.panel, .stat, .hero, .hero-tr, .meal, .ex, .prep-card, .sf-card, .rk-sec, .dash-box, .daycard, .tl-card, .gd-card, .rule, .mv-stage, .slot, .inv-item, .log-item, .hist-item, .safe-card, .dz-card, .more-list) { box-shadow: none; } }
+:root[data-theme="dark"] :is(.panel, .stat, .hero, .hero-tr, .meal, .ex, .prep-card, .sf-card, .rk-sec, .dash-box, .daycard, .tl-card, .gd-card, .rule, .mv-stage, .slot, .inv-item, .log-item, .hist-item, .dz-card, .more-list) { box-shadow: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) :is(.panel, .stat, .hero, .hero-tr, .meal, .ex, .prep-card, .sf-card, .rk-sec, .dash-box, .daycard, .tl-card, .gd-card, .rule, .mv-stage, .slot, .inv-item, .log-item, .hist-item, .dz-card, .more-list) { box-shadow: none; } }
 
 /* ---------- Plakietki w nagłówkach stron: zamiast „chipów” jedna linia metadanych rozdzielona kropkami (V2) ---------- */
 .topline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 0; }
@@ -201,7 +201,6 @@ button:active:not(:disabled), .btn:active { transform: scale(.98); }
 .dz-now-bar > span { background: var(--hc); box-shadow: none; }
 .dz-now-left { font-weight: 600; color: var(--text-2); }
 .dz-now .btn { min-height: 44px; background: transparent; }
-.dz-now-side .muted { font-size: var(--fs-xs); }
 .dz-now .ring { width: 76px; height: 76px; }
 @media (max-width: 599px) {
   .dz-now { padding: var(--s-4); gap: var(--s-3); }

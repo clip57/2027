@@ -57,7 +57,7 @@ export function diagnose(state, { today, custom = [], quarantined = 0, health = 
   if (pre) push('pre-start', 'info', `Wpisy treningowe sprzed startu planu: ${pre}`, `Zachowane w dzienniku i w synchronizacji; statystyki i historia liczone od ${TRAIN_START} (D-088, D-100).`);
 
   // Pakiet prywatny (D-091): czy pasuje do danych aplikacji (znaczniki) i do bieżącej wersji planu
-  const pk = packStatus(state.privatePack, { start: PLAN_START, markers: { 'rek-priv': markersIn(rekomp), 'mp-why': markersIn(SRC.mealprep) } });
+  const pk = packStatus(state.privatePack, { start: PLAN_START, markers: { 'rek-priv': /** @type {any} */ (rekomp).markers ?? markersIn(rekomp), 'mp-why': markersIn(SRC.mealprep) } });
   if (!pk.imported) push('private', 'info', 'Pakiet prywatny nie jest zaimportowany', 'Część treści Rekompozycji i Meal Prep jest ukryta — zaimportuj plik 2027-prywatne.json w tym module.');
   else if (!pk.ok) push('private', 'warn', 'Pakiet prywatny nie pasuje do danych aplikacji',
     [pk.missingSections.length && `brak sekcji: ${pk.missingSections.join(', ')}`, ...Object.entries(pk.missing).map(([id, l]) => `${id}: brak fragmentów ${l.join(', ')}`)]
