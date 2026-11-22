@@ -245,6 +245,7 @@ async def run_variant(pw, name, url, mobile):
     await pg.reload(); await pg.wait_for_selector('.ex')
     ok(await pg.locator(SETS).first.locator('.set-toggle').get_attribute('aria-pressed') == 'true' and await pg.locator(SETS).first.locator('input[placeholder=kg]').input_value() == '45',
        f'{tag} Trening: seria i ciężar zapisane trwale')
+    await wait_js(pg, "s => { const e = document.querySelector(s); return e && e.getAnimations({ subtree: true }).length === 0; }", '.set:not(.set-h) .set-toggle')   # D-119: kontrast po przejściu koloru
     c = await pg.locator(SETS).first.locator('.set-toggle').evaluate(CONTRAST)
     ok(c >= 4.5, f'{tag} Trening: kontrast odhaczonej serii ≥ 4,5:1 ({c:.2f})')
     ok('1 / 10 serii' in await pg.inner_text('.hero-tr'), f'{tag} Trening: pierścień postępu sesji')
@@ -333,6 +334,7 @@ async def run_variant(pw, name, url, mobile):
     await pg.reload(); await pg.wait_for_selector('.cfa-row')
     ok(await pg.locator('.cfa-row .set-toggle').first.get_attribute('aria-pressed') == 'true' and '1 / 451' in await pg.inner_text('.hero-cfa'),
        f'{tag} CFA: postęp zapisany trwale')
+    await wait_js(pg, "s => { const e = document.querySelector(s); return e && e.getAnimations({ subtree: true }).length === 0; }", '.cfa-row .set-toggle')   # D-119: kontrast po przejściu koloru
     c = await pg.locator('.cfa-row .set-toggle').first.evaluate(CONTRAST)
     ok(c >= 4.5, f'{tag} CFA: kontrast odhaczonego bloku ≥ 4,5:1 ({c:.2f})')
     await pg.goto(url + '#/cfa?v=harmonogram&kat=Curriculum'); await pg.wait_for_selector('.filters')
