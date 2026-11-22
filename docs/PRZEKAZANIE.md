@@ -44,7 +44,7 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
   święta po 28.03, dzień obrony).
 
 ## 3b. Stan 22.11.2026 (D-117)
-- D-117 (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do 31.12.2027) — na gałęzi roboczej, publikacja po „Publikuj” (`docs/RAPORT_D117.md`).
+- D-117 (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do 31.12.2027) — opublikowane na `main` 22.11.2026 (fast-forward `0371a91`, polecenie „Publikuj”; `docs/RAPORT_D117.md`).
   Skrypt `tools/extract/plan_d117.py` uruchamiaj po `plan_d116.py`.
 - Odpowiedzi użytkownika z 22.11: egzamin CFA 13.05; zjazd IX — nieobecność (bloki CFA zostają); suplementy czasowe — zapas wystarczający.
   Pozostałe pytania z D-116 (blok dodatkowy × trening = D1, święta, dzień obrony) — użytkownik odpowie później.

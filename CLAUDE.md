@@ -6,7 +6,7 @@ Jeden użytkownik, urządzenia: MacBook, iPhone (Safari **i** aplikacja z ekranu
 przeglądarka na komputerze. Język interfejsu i dokumentacji: **polski**.
 
 **Stan (20.11.2026):** D-114 „Instrument” i D-115 „Fundament jakości” — opublikowane na `main` (18–19.11.2026). **D-116** (studia wg harmonogramu,
-plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — na gałęzi roboczej, czeka na „Publikuj”.
+plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (polecenie „Publikuj”, `0371a91`).
 **Otwarte decyzje użytkownika:** D1 — popołudnie (bloki MPW 15:30–18:23 i blok dodatkowy CFA 17:40–18:33 nakładają się na okno treningowe);
 z D-116/D-117 (`docs/RAPORT_D116.md` §3, `RAPORT_D117.md`): święta po 28.03.2027 (do końca roku — bez wyjątków), dzień obrony.
 Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-10.md` §11) — czekają na użytkownika.
