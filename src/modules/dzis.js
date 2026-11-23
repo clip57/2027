@@ -137,7 +137,7 @@ function mpwCard(r, ctx) {
   return h('section', { class: 'panel dz-mpw', 'aria-labelledby': 'dz-mpw-h' },
     h('div', { class: 'dz-mpw-h' },
       h('h2', { id: 'dz-mpw-h' }, icon('landmark', { size: 20 }), r.mpw.isSim ? (bl.length > 3 ? 'Nauka MPW i symulacja egzaminu' : 'Symulacja egzaminu MPW') : 'Nauka MPW'),
-      h('span', { class: 'muted' }, `${bl[0].godz.slice(0, 5)}–${bl[bl.length - 1].godz.slice(-5)} · ${k} / ${bl.length} bloków`),
+      h('span', { class: 'muted' }, `${bl.map(b => b.godz.slice(0, 5)).sort()[0]}–${bl.map(b => b.godz.slice(-5)).sort().at(-1)} · ${k} / ${bl.length} bloków`),   // D-120: bloki nie muszą iść po kolei
       h('a', { class: 'dz-more', href: `#/mpw?v=dzien&d=${r.date}`, 'aria-label': 'Nauka MPW — otwórz moduł' }, icon('chevron-right', { size: 18 }))),
     h('div', { class: 'cfa-list' }, bl.map(b => h('div', { class: `cfa-row${done.has(b.nr) ? ' is-done' : ''}` },
       checkBtn({ key: `mpw|${b.nr}`, on: done.has(b.nr), label: b.blok, disabled: !ctx.store,

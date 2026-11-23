@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveDay, phaseFor, templateFor, dayPlan, mTrainDay } from '../../src/core/resolver.js';
+import { resolveDay, phaseFor, templateFor, dayPlan, mTrainDay, block21 } from '../../src/core/resolver.js';
 import { SRC, mpwByDay } from '../../src/core/data.js';
 import { range } from '../../src/core/dates.js';
 
@@ -10,7 +10,7 @@ const PLAN0 = '2026-10-18', END = '2027-12-31';
 const EXC = SRC.week.exceptions;
 // Liczba slotów wg wariantu dnia: zwykły 34, niedziela „basen” 32, czwartek „czwartek” 30 (sauna i zakupy), „czwartek_k” 31 (wariant nieużywany od D-103b — dawniej 15.10), „czwartek_zl” 29 (22/29.10: bez sauny, zakupy 17:45–18:40,
 // D-103), „czwartek_bz” 30 (24.12 bez zakupów, D-103), 07.01–18.03 „czwartek_st” 32 (D-094, D-097, D-116); plan CFA 2027 bez bloków K/L/M (D-116)
-const SLOTS = { basen: 32, czwartek: 30, czwartek_k: 31, czwartek_zl: 29, czwartek_bz: 30, czwartek_st: 32 };
+const SLOTS = { basen: 32, czwartek: 30, czwartek_k: 31, czwartek_zl: 29, czwartek_bz: 30, czwartek_st: 32, d120_sym: 33, d120_2102: 30, d120_2702: 32, d120_1703: 30, d120_2003: 30 };   // D-120: dni symulacji MPW i bez treningu
 // dni bez treningu z blokiem dodatkowym 17:40–18:33 w oknie treningowym (Wielkanoc 27–28.03, D-116): okno „Wolne” pomniejszone o blok — liczba slotów zależy od dnia
 const KL = ['2027-03-27', '2027-03-28'];
 
@@ -32,9 +32,11 @@ test('każdy dzień 21.09.2026–05.07.2027: sloty z godzinami szablonu — 34, 
     const r = resolveDay(d), v = dayPlan(d).variant;
     if (r.outside) assert.equal(v, null, d);
     assert.equal(mTrainDay(d), false, `${d}: plan CFA 2027 bez bloku M`);
-    if (!KL.includes(d)) assert.equal(r.slots.filter(s => !s.extra).length, SLOTS[v] || 34, d);   // bez dodatkowych slotów bloków (D-099)
-    if (!r.outside) assert.equal(v || null, { 4: EXC[d] && 'variant' in EXC[d] ? EXC[d].variant : 'czwartek', 7: EXC[d] && 'variant' in EXC[d] ? EXC[d].variant : 'basen' }[r.weekday] || null, d);
-    assert.equal(r.slots.filter(s => !s.extra).map(s => `${s.from}-${s.to}`).join(), templateFor(d).map(s => `${s.from}-${s.to}`).join(), d);
+    // D-120: slot „Wieczór wolny” zastąpiony blokiem nauki o 22:00 (slot dodatkowy) liczy się do szablonu
+    const tpl = templateFor(d), gone = tpl.filter(t => t.role === 'recall' && r.slots.some(x => x.extra && x.from < t.to && x.to > t.from));
+    if (!KL.includes(d)) assert.equal(r.slots.filter(s => !s.extra).length + gone.length, SLOTS[v] || 34, d);   // bez dodatkowych slotów bloków (D-099)
+    if (!r.outside && !String(v).startsWith('d120_')) assert.equal(v || null, { 4: EXC[d] && 'variant' in EXC[d] ? EXC[d].variant : 'czwartek', 7: EXC[d] && 'variant' in EXC[d] ? EXC[d].variant : 'basen' }[r.weekday] || null, d);
+    assert.equal(r.slots.filter(s => !s.extra).map(s => `${s.from}-${s.to}`).join(), tpl.filter(t => !gone.includes(t)).map(s => `${s.from}-${s.to}`).join(), d);
   }
 });
 
@@ -102,7 +104,7 @@ test('posiłek potreningowy: 20:15 (plan CFA 2027 bez bloku M — D-116); czwart
   const thu2 = resolveDay('2026-11-19').slots.find(s => s.id === 'slot.1905c').items.find(i => i.kind === 'meal');   // pozostałe czwartki: w slocie zakupów
   assert.deepEqual([thu2.text, thu2.kcal], ['Posiłek po saunie (20:15)', 114]);
   const thu3 = resolveDay('2026-10-22').slots.find(s => s.id === 'slot.2015z').items.find(i => i.kind === 'meal');   // 22/29.10 (D-103): posiłek 20:15 w slocie 20:15–20:35, bez sauny
-  assert.deepEqual([thu3.text, thu3.kcal], ['Posiłek po saunie (20:15)', 114]);
+  assert.deepEqual([thu3.text, thu3.kcal], ['Białko (dieta NT) (20:15)', 114], 'D-120: dieta NT w dzień bez sauny — „po treningu” to białko');
   assert.equal(post('2027-01-07').mealName, 'Posiłek po saunie');
   assert.equal(post('2027-01-07').kcal, 114);
   assert.equal(post('2026-11-17').kcal, 230);
@@ -143,19 +145,21 @@ test('suplementy przypięte do slotów wg godziny', () => {
 test('CFA 2027 (D-116): bloki B–I w slotach szablonu, J i „blok dodatkowy” jako dodatkowe sloty wg planu (D-099); zjazd studiów ma pierwszeństwo (kolizja w opisie); czwartki 07.01–18.03 — sloty MPW', () => {
   const CFA0 = SRC.cfa.D.stat.start, CFA_END = SRC.cfa.D.stat.end;
   const AG = ['08:00', '09:10', '10:10', '11:20', '12:20', '13:30', '14:30'];
-  const LETTER = { '08:00': 'A', '09:10': 'B', '10:10': 'C', '11:20': 'D', '12:20': 'E', '13:30': 'F', '14:30': 'G', '15:30': 'H', '16:40': 'I' };
+  const title = l => (l === 'Dodatkowy' ? 'CFA — blok dodatkowy' : `CFA blok ${l}`);
   for (const d of ALL) {
-    const r = resolveDay(d), fixed = ['studia', 'egzamin'].includes(r.blocks?.kind);
+    const r = resolveDay(d), fixed = ['studia', 'egzamin'].includes(r.blocks?.kind), v = String(dayPlan(d).variant);
     const cfaSlots = r.slots.filter(s => s.role === 'cfa' && !s.extra), extraSlots = r.slots.filter(s => s.extra);
-    assert.deepEqual(cfaSlots.map(s => s.from), dayPlan(d).variant === 'czwartek_st' ? [...AG, '16:00', '17:00', '18:00'] : [...AG, '15:30', '16:40'], d);
+    if (!v.startsWith('d120_')) assert.deepEqual(cfaSlots.map(s => s.from), v === 'czwartek_st' ? [...AG, '16:00', '17:00', '18:00'] : [...AG, '15:30', '16:40'], d);
     const n = [...cfaSlots, ...extraSlots].reduce((a, s) => a + s.cfa.length, 0), plan = SRC.cfa.D.bloki.filter(b => b.data === d);
     const lost = fixed ? plan.filter(b => b.godz < '15:23').length : 0;   // bloki w godzinach zjazdu — w opisie slotu (kolizja)
     assert.equal(n, plan.length - lost, d);
     if (d < CFA0 || d > CFA_END) assert.equal(n, 0, d);
-    const extraLetters = [...new Set(r.cfa.blocks.filter(b => !/^[A-I]$/.test(b.blok)).sort((a, b) => a.godz.localeCompare(b.godz)).map(b => b.blok))];
-    assert.deepEqual(extraSlots.map(s => s.title), extraLetters.map(l => (l === 'Dodatkowy' ? 'CFA — blok dodatkowy' : `CFA blok ${l}`)), d);
+    // D-120: blok w slocie szablonu o swojej godzinie początku; bloki o godzinach spoza szablonu (21:00, 22:00) — sloty dodatkowe
+    const tplFrom = new Set(cfaSlots.map(s => s.from));
+    const expExtra = r.cfa.blocks.filter(b => !tplFrom.has(b.godz.slice(0, 5)) && !(fixed && b.godz < '15:23')).sort((a, b) => a.godz.localeCompare(b.godz)).map(b => title(b.blok));
+    assert.deepEqual(extraSlots.filter(s => s.cfa.length).map(s => s.title), expExtra, d);
     if (d < CFA0 && !r.mpw.inPlan && !r.blocks) assert.ok(cfaSlots.every(s => s.title === 'Czas własny' && s.own), d);   // U1 (audyt 23.10.2026)
-    for (const s of cfaSlots) if (s.cfa.length) assert.equal(s.title, `CFA blok ${LETTER[s.from]}`, `${d} ${s.from}`);
+    for (const s of [...cfaSlots, ...extraSlots]) if (s.cfa.length) assert.deepEqual([s.title, s.cfa[0].godz.slice(0, 5)], [title(s.cfa[0].blok), s.from], `${d} ${s.from}`);
     if (fixed) for (const s of cfaSlots.filter(x => x.to <= '15:23')) {
       const hit = plan.find(b => b.godz === `${s.from}–${s.to}`);
       if (hit) assert.match(s.desc, new RegExp(`kolizja z planem CFA: blok ${hit.blok}`), `${d} ${s.from}`);
@@ -224,7 +228,7 @@ test('D-040: nazwa treningu w nagłówku dnia', () => {
 test('D-039: linia źródła bloku CFA (plan 2027: plik Curriculum i zakres stron)', () => {
   const a = resolveDay('2026-11-20').slots.find(s => s.id === 'slot.1220').cfa[0];   // pierwszy blok planu CFA 2027: 20.11, 12:20 (D-116)
   assert.equal(cfaSourceLine(a), 'CFA Level I 2027 Vol 1. Quantitative Methods.pdf, PDF 13–24 · druk 3–14');
-  const p = resolveDay('2027-01-04').slots.find(s => s.id === 'slot.cfa.J').cfa[0];
+  const p = resolveDay('2027-01-04').slots.find(s => s.cfa?.some(b => b.blok === 'J')).cfa[0];
   assert.equal(cfaSourceLine(p), 'CFA Level I 2027 Vol 5. Equities.pdf, PDF 181–192 · druk 171–182');
 });
 
@@ -271,42 +275,45 @@ test('D-102, D-103, D-103c: pierwszy tydzień planu 18–24.10.2026 — począte
 });
 
 // Dodatkowe sloty bloków wypełniają „dziury” w szablonie: slot może kończyć się tam, gdzie zaczyna się następny, albo tuż przed blokami, które ten odstęp zajmują (D-099, D-116)
-const extraBlocks = d => SRC.cfa.D.bloki.filter(b => b.data === d && !/^[A-I]$/.test(b.blok)).map(b => b.godz.split('–'));
+// D-120: luki szablonu wypełniają bloki CFA i MPW o godzinach spoza szablonu (21:00, 22:00 …)
+const extraBlocks = d => [...SRC.cfa.D.bloki.filter(b => b.data === d), ...(mpwByDay[d] || [])].map(b => b.godz.split('–'));
 const filled = (d, from, to) => { const ex = extraBlocks(d); let at = from; for (let moved = true; moved && at < to;) { moved = false; for (const [f, e] of ex) if (f <= at && e > at) { at = e; moved = true; } } return at >= to; };
 
 test('D-099, D-116: blok J 21:00–21:53 i blok dodatkowy 17:40–18:33 — dodatkowe sloty; wieczór w dni z J: kolacja 20:50–21:00 (z chondroityną), blok J, przygotowanie 21:53–22:00; bez J — wieczór jak dotąd', () => {
-  const ev = r => r.slots.filter(s => s.from >= '20:35' && s.from < '22:00').map(s => `${s.from}–${s.to} ${s.title}`);
+  // D-120: w dni z CFA J i MPW C — MPW C 21:00, CFA J 22:00 (w miejscu „Wieczoru wolnego”); wieczór wg bloku o 21:00 (kolacja 20:50–21:00, D-099)
+  const ev = r => r.slots.filter(s => s.from >= '20:35' && s.from < '23:00').map(s => `${s.from}–${s.to} ${s.title}`);
   const mon = resolveDay('2027-01-04');   // pierwszy dzień z blokiem J
-  assert.deepEqual(ev(mon), ['20:35–20:50 Przygotowywanie kolacji i zmywanie', '20:50–21:00 Kolacja', '21:00–21:53 CFA blok J', '21:53–22:00 Przygotowywanie posiłków, melisy i wieczorna pielęgnacja']);
+  assert.deepEqual(ev(mon), ['20:35–20:50 Przygotowywanie kolacji i zmywanie', '20:50–21:00 Kolacja', '21:00–21:53 Nauka MPW',
+    '21:53–22:00 Przygotowywanie posiłków, melisy i wieczorna pielęgnacja', '22:00–22:53 CFA blok J', '22:53–23:00 Wieczorna toaleta']);
   const sup = mon.slots.find(s => s.id === 'slot.2100');
   assert.deepEqual([sup.items.find(i => i.kind === 'meal').text, sup.items.find(i => i.kind === 'meal').kcal > 0, sup.doses.map(d => `${d.time} ${d.supp}`)], ['Kolacja (20:50)', true, ['20:50 chondroityna']]);
-  const j = mon.slots.find(s => s.id === 'slot.cfa.J');
-  assert.deepEqual([j.from, j.to, j.role, j.extra, j.title, j.cfa.length, j.cfa[0].blok, j.doses.length], ['21:00', '21:53', 'cfa', true, 'CFA blok J', 1, 'J', 0]);
-  // wszystkie dni z J (88): sloty szablonu bez luk i nakładania, kolacja 20:50–21:00, blok J między kolacją a przygotowaniem posiłków
+  const j = mon.slots.find(s => s.cfa?.some(b => b.blok === 'J'));
+  assert.deepEqual([j.id, j.from, j.to, j.role, j.extra, j.title, j.cfa.length, j.doses.length], ['slot.cfa.J.2200', '22:00', '22:53', 'cfa', true, 'CFA blok J', 1, 3]);
+  // wszystkie dni z J (88): sloty bez luk i nakładania; J o 21:00 tylko bez MPW C, bloku dodatkowego i czwartku z zakupami
   const days = [...new Set(SRC.cfa.D.bloki.filter(b => b.blok === 'J').map(b => b.data))];
   assert.equal(days.length, 88);
-  const letters = d => [...new Set(SRC.cfa.D.bloki.filter(b => b.data === d && !/^[A-I]$/.test(b.blok)).map(b => b.blok))];
   for (const d of days) {
-    const r = resolveDay(d), base = r.slots.filter(s => !s.extra);
+    const r = resolveDay(d), base = r.slots.filter(s => !s.extra), jb = r.cfa.blocks.find(b => b.blok === 'J');
     base.forEach((s, i) => { const next = base[(i + 1) % base.length].from; assert.ok(s.to === next || filled(d, s.to, next), `${d} ${s.id}: ${s.to} → ${next}`); });
-    assert.deepEqual([r.slots.find(s => s.id === 'slot.2100').from, r.slots.find(s => s.id === 'slot.2100').to, r.slots.find(s => s.id === 'slot.2145').from], ['20:50', '21:00', '21:53'], d);
-    assert.equal(r.slots.filter(s => s.extra).length, letters(d).length, d);
-    assert.ok(r.slots.some(s => s.id === 'slot.cfa.J'), d);
-    assert.equal(r.doses.every(x => x.time !== '21:00'), true, `${d}: chondroityna z kolacją 20:50`);
+    const thu = dayPlan(d).variant === 'czwartek_st', moved = thu || r.cfa.blocks.some(b => b.blok === 'Dodatkowy') || r.mpw.blocks.some(b => b.blok === 'C');
+    assert.equal(jb.godz.slice(0, 5), moved ? '22:00' : '21:00', d);
+    const sp = r.slots.find(s => s.id === 'slot.2100'), tail = r.slots.find(s => s.id === 'slot.2145');
+    assert.deepEqual([sp.from, sp.to, tail.from], block21(d) ? ['20:50', '21:00', '21:53'] : ['21:00', '21:53', '21:53'], d);   // czwartek: relaks z kolacją 21:00–21:53
+    assert.equal(r.doses.some(x => x.time === '21:00'), !block21(d), `${d}: chondroityna z kolacją`);
   }
-  // dni bez J — wieczór jak dotąd (21:00–21:45 kolacja, 21:45–22:00 przygotowanie)
+  // dni bez bloku o 21:00 i 22:00 — wieczór jak dotąd (21:00–21:45 kolacja, 21:45–22:00 przygotowanie)
   for (const d of ['2026-10-15', '2026-10-16', '2026-10-23', '2026-10-25', '2026-10-07', '2026-11-12', '2026-11-17', '2026-11-20', '2027-06-30', '2027-12-31']) {
     const r = resolveDay(d);
-    assert.equal(r.slots.some(s => s.id === 'slot.cfa.J'), false, d);
+    assert.equal(r.slots.some(s => /^slot\.(cfa|mpw)\./.test(s.id)), false, d);
     assert.deepEqual([r.slots.find(s => s.id === 'slot.2100').from, r.slots.find(s => s.id === 'slot.2100').to, r.slots.find(s => s.id === 'slot.2145').from], ['21:00', '21:45', '21:45'], d);
     if (!r.outside) assert.ok(r.doses.some(x => x.supp === 'chondroityna' && x.time === '21:00'), d);
   }
-  // blok dodatkowy 17:40–18:33 — osobny slot między zmywaniem (17:33) a oknem treningowym (kolejność chronologiczna)
-  const ext = d => resolveDay(d).slots.filter(s => s.extra).map(s => `${s.id.replace('slot.cfa.', '')} ${s.from}–${s.to}`).join();
-  assert.equal(ext('2027-03-22'), 'Dodatkowy 17:40–18:33,J 21:00–21:53');
+  // D-120: blok dodatkowy 21:00–21:53 (ciągłość materiału), J 22:00 — okno treningowe wolne od bloków
+  const ext = d => resolveDay(d).slots.filter(s => s.extra).map(s => `${(s.cfa[0] || s.mpw).blok} ${s.from}–${s.to}`).join();
+  assert.equal(ext('2027-03-22'), 'Dodatkowy 21:00–21:53,J 22:00–22:53');
   assert.equal(ext('2026-11-20'), '');
-  const m = resolveDay('2027-03-22').slots.map(s => s.id), order = ['slot.1733', 'slot.cfa.Dodatkowy', 'slot.1815'].map(id => m.indexOf(id));
-  assert.ok(order[0] >= 0 && order[0] < order[1] && order[1] < order[2], 'blok dodatkowy 17:40 między zmywaniem a oknem treningowym');
+  const m = resolveDay('2027-03-22').slots.map(s => s.id), order = ['slot.1815', 'slot.cfa.Dodatkowy.2100', 'slot.cfa.J.2200'].map(id => m.indexOf(id));
+  assert.ok(order[0] >= 0 && order[0] < order[1] && order[1] < order[2], 'trening, potem blok dodatkowy 21:00 i J 22:00');
   for (const k of ['K', 'L', 'M']) assert.ok(!SRC.cfa.D.bloki.some(b => b.blok === k), `plan CFA 2027 bez bloku ${k}`);
 });
 
@@ -323,9 +330,11 @@ test('U1 (audyt 23.10.2026): poza planem CFA sloty nauki bez bloku to „Czas w�
   for (const d of range('2026-11-12', END)) {
     const r = resolveDay(d), slots = r.slots.filter(s => s.role === 'cfa');
     assert.ok(slots.every(s => s.title !== 'Brak bloku CFA' && s.desc !== 'Poza okresem planu nauki'), d);
-    const ac = (mpwByDay[d] || []).filter(b => !b.blok.startsWith('P'));
+    const ac = (mpwByDay[d] || []).filter(b => !b.blok.startsWith('P') || !r.slots.some(s => s.mpw === b && !s.extra));   // D-120: P7 o 22:00 — slot „Nauka MPW”
     for (const s of slots) {
-      if (s.own) { own++; assert.deepEqual([s.title, s.desc, s.cfa.length], ['Czas własny', '', 0], `${d} ${s.from}`); }
+      if (s.own) { own++; assert.deepEqual([s.title, s.desc, s.cfa.length], [s.work ? 'Praca' : 'Czas własny', '', 0], `${d} ${s.from}`); }
+      // D-120: „Praca” — dni robocze od 2027 poza świętami, 08:00–15:23
+      if (s.work) assert.ok(d >= '2027-01-01' && new Date(`${d}T12:00`).getDay() % 6 !== 0 && !SRC.week.work.holidays.includes(d) && s.from >= '08:00' && s.to <= '15:23', `${d} ${s.from}`);
       if (s.title === 'Nauka MPW') {
         mpw++;
         const inSlot = ac.filter(b => b.godz.slice(0, 5) < s.to && b.godz.slice(6) > s.from);

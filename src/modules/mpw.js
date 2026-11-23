@@ -6,7 +6,7 @@ import { section } from '../ui/components.js';
 import { SRC, mpwByDay, mpwBloki } from '../core/data.js';
 import { longDate, shortDate, dayShort, weekday } from '../core/dates.js';
 import { renderStudy, modeStats } from './study.js';
-import { mpwSources, mpwFreeDays } from '../core/calc/mpw.js';
+import { mpwSources, mpwFreeDays, mpwDaySpan } from '../core/calc/mpw.js';
 import { planTasks, loadPlanTasks } from '../core/plan-tasks.js';
 
 const D = { ...SRC.mpw.D, bloki: mpwBloki };   // godziny wg decyzji (D-097: czwartki od 07.01 +30 min)
@@ -37,14 +37,15 @@ function plan(root, { done, pace, late }) {
   section('h-knf', 'Obszary KNF — kolejność pierwszego przejścia',
     h('ol', { class: 'tech-list mw-areas' }, D.cfa.map(t => h('li', {},
       h('strong', {}, t.tytul), ` — ${t.waga} · ${t.bloki} ${plural(t.bloki, 'blok', 'bloki', 'bloków')} · ${shortDate(t.start)}–${shortDate(t.koniecd)}`)))),
-  section('h-mocks', 'Symulacje egzaminu (180 min, 15:30–18:30)', h('ul', { class: 'tech-list' }, D.mockCFA.map((d, i) => h('li', {},
-    h('a', { href: `#/mpw?v=dzien&d=${d}` }, `Symulacja ${i + 1}: ${dayShort(d)} ${shortDate(d)}`),
+  section('h-mocks', 'Symulacje egzaminu (180 min)', h('ul', { class: 'tech-list' }, D.mockCFA.map((d, i) => h('li', {},
+    h('a', { href: `#/mpw?v=dzien&d=${d}` }, `Symulacja ${i + 1}: ${dayShort(d)} ${shortDate(d)}${(x => (x ? `, ${x.from}–${x.to}` : ''))(mpwDaySpan(mpwByDay[d] || []).sim)}`),   // D-120: godziny symulacji wg dnia
     ` — test KNF z ${D.simTest[d]} · ${blocksOf(done, mpwByDay[d] || [])} bloków`)))),
   section('h-phases', 'Fazy', h('dl', { class: 'kv' },
     Object.entries(D.faza).map(([k, f], i) => [h('dt', {}, `Faza ${i + 1}`),
       h('dd', {}, `${shortDate(f.od)}–${longDate(f.do)} · ${f.dni} dni · ${f.bl} bloków · wykonane ${blocksOf(done, D.bloki.filter(b => b.data >= f.od && b.data <= f.do))}${k === 'f1' ? ` · koniec pierwszego przejścia ${longDate(D.fpEnd)}` : ''}`)]))),
   section('h-stat', 'Statystyki planu', h('dl', { class: 'kv' },
-    h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad}; A 15:30, B 16:30, C 17:30${shiftNote}${long.length ? `; ${long.map(shortDate).join(', ')} także P1–P7 8:00–15:23` : ''})`),
+    // D-120: godziny wg decyzji — dni robocze A 15:30, B 16:40, C 22:00 (21:00 w dni z CFA J), weekendy o jeden slot wcześniej
+    h('dt', {}, 'Bloki'), h('dd', {}, `${D.stat.bloki} (${D.stat.dni} dni: ${D.stat.uklad}; dni robocze A 15:30, B 16:40, C 22:00 albo 21:00 (gdy jest blok CFA J — wtedy J o 22:00), weekendy A 14:30, B 15:30, C 16:40${shiftNote}${long.length ? `; ${long.map(shortDate).join(', ')} także P1–P7 8:00–15:23` : ''})`),
     h('dt', {}, 'Godziny netto'), h('dd', {}, `${fmt(D.stat.godziny, 2)} h`),
     h('dt', {}, 'Dni wolne'), h('dd', {}, free.map(r => (r[0] === r[1] ? shortDate(r[0]) : `${shortDate(r[0])}–${shortDate(r[1])}`)).join(', ') || 'brak'),
     h('dt', {}, 'Egzamin'), h('dd', {}, `${dayShort(SRC.mpw.exam)} ${longDate(SRC.mpw.exam)}, godz. ${SRC.mpw.examTime}`),

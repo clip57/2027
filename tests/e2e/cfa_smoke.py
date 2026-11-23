@@ -15,7 +15,14 @@ CFA = json.loads((ROOT / 'src/data/cfa.json').read_text(encoding='utf8'))['D']
 PHASES = json.loads((ROOT / 'src/data/phases.json').read_text(encoding='utf8'))
 TZ = ZoneInfo('Europe/Warsaw')
 URL = (ROOT / 'dist/single/2027.html').as_uri()
-BLOCKS = CFA['bloki']; N = len(BLOCKS)
+WEEK0 = json.loads((ROOT / 'src/data/week.json').read_text(encoding='utf8'))
+def _moved(b):
+    """D-120: blok z datą i godziną wg decyzji (`week.studyMoves` — jak w src/core/data.js)."""
+    mv = WEEK0.get('studyMoves', {}).get('cfa', {}).get(str(b['nr']))
+    if not mv: return b
+    d, t = mv.split(' '); a, z = b['godz'].split('–'); n = (int(z[:2]) * 60 + int(z[3:])) - (int(a[:2]) * 60 + int(a[3:])); e = int(t[:2]) * 60 + int(t[3:]) + n
+    return {**b, 'data': d, 'godz': f"{t}–{e // 60:02d}:{e % 60:02d}"}
+BLOCKS = [_moved(b) for b in CFA['bloki']]; N = len(BLOCKS)
 BY_DAY = {}
 for b in BLOCKS: BY_DAY.setdefault(b['data'], []).append(b)
 NIGHT = set(CFA.get('nightDates') or [r['data'] for r in CFA['nightRecall']])   # plan CFA 2027 (D-116): bez recall

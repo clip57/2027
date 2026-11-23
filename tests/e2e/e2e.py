@@ -1164,7 +1164,7 @@ async def run_mpw(pw, name, url, mobile):
     # Dzień z MPW i CFA (24.11, 16:00): karta „Nauka MPW”, godziny planu dnia bez zmian, kafel „Nauka” (oba plany, D-116) i karty planów
     await pg.clock.set_system_time(at(2026, 11, 24, 16)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-mpw')
     card = await pg.inner_text('.dz-mpw')
-    ok(await pg.locator('.dz-mpw .cfa-row').count() == 3 and '15:30–18:23 · 0 / 3 bloków' in card and 'Kodeks cywilny' in card, f'{tag} Dziś: karta „Nauka MPW” (3 bloki, 15:30–18:23)')
+    ok(await pg.locator('.dz-mpw .cfa-row').count() == 3 and '15:30–22:53 · 0 / 3 bloków' in card and 'Kodeks cywilny' in card, f'{tag} Dziś: karta „Nauka MPW” (3 bloki, 15:30–22:53 — D-120: C o 22:00)')
     kp = ' '.join((await pg.inner_text('.dz-kpis')).split())
     ok('0 / 6 bloków' in kp and 'CFA 0/3 · MPW 0/3' in kp and 'Plan MPW' in await pg.inner_text('.dz-aside'), f'{tag} Dziś: kafel „Nauka” (CFA + MPW) i karta „Plan MPW” ({kp[-60:]})')
     await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
@@ -1218,7 +1218,8 @@ async def run_mpw(pw, name, url, mobile):
     ok('Wycena przedsiębiorstwa i modelowanie finansowe - studia' in await pg.inner_text('#slot\\.1220') and await pg.locator('#slot\\.1213z').count() == 0
        and 'Studia 8:00–15:23' in await pg.inner_text('.dz-head'), f'{tag} Dziś: sobota zjazdu — studia w slotach A–G, bez zakupów')
     await pg.goto(url + '#/dzis?d=2026-12-12'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
-    ok('Pisanie pracy magisterskiej' in await pg.inner_text('#slot\\.0800') and await pg.locator('#slot\\.1213z').count() == 0, f'{tag} Dziś: sobota z pracą magisterską, bez zakupów (D-097)')
+    ok('Pisanie pracy dyplomowej' in await pg.inner_text('#slot\\.0800') and 'CFA blok E' in await pg.inner_text('#slot\\.1120') and await pg.locator('#slot\\.1213z').count() == 0,
+       f'{tag} Dziś: sobota z pracą dyplomową 08:00–11:03 (D-120), CFA od 11:20, bez zakupów (D-097)')
     await pg.goto(url + '#/dzis?d=2026-12-26'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     ok('Boże Narodzenie' in await pg.inner_text('#slot\\.0800') and 'Bez treningu' in await pg.inner_text('.dz-head') and 'NT' in await pg.inner_text('.dz-head')
        and await pg.locator('.dz-mpw .cfa-row').count() == 3, f'{tag} Dziś: święta bez treningu, po południu bloki MPW (D-096, D-116)')
@@ -1444,7 +1445,7 @@ async def run_d108(pw, name, url, mobile):
     await pg.clock.set_system_time(at(2026, 11, 24, 10, 30)); await pg.goto(url + '#/dane'); await pg.goto(url + '#/dzis'); await pg.wait_for_selector('.dz-plan-h')
     await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
     own = await pg.locator('.dz-plan .slot.is-own').count()
-    ok(own == 5 and await pg.inner_text('.nowcard-t') == 'Czas własny' and 'Brak bloku CFA' not in await pg.inner_text('main'), f'{tag} U1: „Czas własny” w {own} slotach (A–D i wieczór 22:00), „Teraz” o 10:30')
+    ok(own == 4 and await pg.inner_text('.nowcard-t') == 'Czas własny' and 'Brak bloku CFA' not in await pg.inner_text('main'), f'{tag} U1: „Czas własny” w {own} slotach (A–D; D-120: o 22:00 blok MPW C), „Teraz” o 10:30')
     h1530 = await pg.inner_text('#slot\\.1530')
     ok('Nauka MPW' in h1530 and 'Blok A 15:30–16:23' in h1530 and 'is-own' not in await pg.get_attribute('#slot\\.1530', 'class'), f'{tag} U1: slot 15:30 — blok MPW A')
     v = await axe_audit(pg); ok(not v, f'{tag} U1: Dziś z „Czasem własnym” — dostępność {v[:2]}')
@@ -1615,6 +1616,13 @@ async def run_d119(pw, name, url, mobile):
     ok(n0 > 3, f'{tag} MPW: „Plan nadrabiania” — pełna lista zaległych ({n0}) i odhaczenie w arkuszu')
     v = await axe_audit(pg); ok(not v, f'{tag} MPW: arkusz nadrabiania — dostępność {v[:2]}')
     await pg.keyboard.press('Escape')
+    # D-120: godziny nauki w planie dnia — 06.03 (symulacja 13:30–16:30, P6 17:00, siłownia 18:00, P7 22:00), dzień roboczy 2027 z „Pracą” i J o 22:00
+    await pg.goto(url + '#/dzis?d=2027-03-06'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('P6' in await pg.inner_text('#slot\\.1700\\.v120') and 'LOWER 2' in await pg.inner_text('#slot\\.1830\\.v120') and '08:00–22:53' in await pg.inner_text('.dz-mpw'),
+       f'{tag} D-120: 06.03 — symulacja 13:30, P6 17:00, trening 18:30, P7 22:00 (karta MPW 08:00–22:53)')
+    await pg.goto(url + '#/dzis?d=2027-01-05'); await pg.wait_for_selector('.dz-plan-h'); await pg.evaluate("document.querySelectorAll('details.dz-past').forEach(d => d.open = true)")
+    ok('Praca' in await pg.inner_text('#slot\\.0800') and 'CFA blok J' in await pg.inner_text('#slot\\.cfa\\.J\\.2200') and 'Kolacja' in await pg.inner_text('#slot\\.2100'),
+       f'{tag} D-120: 05.01 — „Praca” 08:00, MPW C 21:00, CFA J 22:00, kolacja 20:50')
     await pg.goto(url + '#/mpw?v=kalendarz'); await pg.wait_for_selector('.cal-d')
     ok(await pg.locator('.cal-d small.cal-dots').count() > 50 and '0/3' not in await pg.inner_text('main'), f'{tag} Kalendarz: nasycenie i kropki zamiast „0/3”')
     ok(not errs, f'{tag} brak błędów JS ({errs[:2]})')

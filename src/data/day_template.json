@@ -1289,6 +1289,736 @@
      "decision": "D-103"
     }
    ]
+  },
+  "d120_sym": {
+   "decision": "D-120",
+   "replaces": [
+    "slot.1330",
+    "slot.1423",
+    "slot.1430",
+    "slot.1523",
+    "slot.1530",
+    "slot.1623",
+    "slot.1640",
+    "slot.1733",
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015",
+    "slot.2035",
+    "slot.2045",
+    "slot.2100",
+    "slot.2145"
+   ],
+   "slots": [
+    {
+     "id": "slot.1330.s120",
+     "from": "13:30",
+     "to": "14:30",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1430.s120",
+     "from": "14:30",
+     "to": "15:30",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1530.s120",
+     "from": "15:30",
+     "to": "16:30",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1630.v120",
+     "from": "16:30",
+     "to": "16:45",
+     "domain": "prep",
+     "title_src": "Przygotowywanie obiadu",
+     "badges_src": [
+      "Kuchnia"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1645.v120",
+     "from": "16:45",
+     "to": "17:00",
+     "domain": "diet",
+     "title_src": "Przerwa obiadowa",
+     "badges_src": [
+      "563 kcal"
+     ],
+     "desc_src": "· Obiad (16:23)",
+     "role": "meal",
+     "key": "dinner",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Obiad (16:23)",
+       "text": "Obiad (16:23)",
+       "meal": "dinner",
+       "time": "16:45"
+      }
+     ],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1700.v120",
+     "from": "17:00",
+     "to": "17:53",
+     "domain": "cfa",
+     "title_src": "Nauka MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1753.v120",
+     "from": "17:53",
+     "to": "18:00",
+     "domain": "prep",
+     "title_src": "Zmywanie popołudniowe",
+     "badges_src": [
+      "Zmywanie"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1800.v120",
+     "from": "18:00",
+     "to": "18:20",
+     "domain": "train",
+     "title_src": "Transport na siłownię i przebieranie",
+     "badges_src": [
+      "Dojazd / Szatnia"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1820.v120",
+     "from": "18:20",
+     "to": "18:30",
+     "domain": "train",
+     "title_src": "Rozgrzewka",
+     "badges_src": [
+      "Warm-up"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "warmup",
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1830.v120",
+     "from": "18:30",
+     "to": "19:50",
+     "domain": "train",
+     "title_src": "Trening Siłowy / Cardio / Sauna",
+     "badges_src": [
+      "Trening"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "main",
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1950.v120",
+     "from": "19:50",
+     "to": "20:00",
+     "domain": "train",
+     "title_src": "Prysznic",
+     "badges_src": [
+      "Higiena"
+     ],
+     "desc_src": "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha.",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha.",
+       "text": "Ciepły prysznic z żelem całego ciała, dokładne wytarcie skóry do sucha."
+      }
+     ],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2000.v120",
+     "from": "20:00",
+     "to": "20:20",
+     "domain": "train",
+     "title_src": "Sauna",
+     "badges_src": [
+      "SAUNA"
+     ],
+     "desc_src": "",
+     "role": "activity",
+     "key": "sauna",
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2020.v120",
+     "from": "20:20",
+     "to": "20:30",
+     "domain": "train",
+     "title_src": "Chłodzenie i przebieranie",
+     "badges_src": [
+      "Wychłodzenie"
+     ],
+     "desc_src": "10 min wychłodzenia w spoczynku, letni prysznic bez żelu. Wypicie 1 bidonu wody z sodem. Przebranie się w ubranie wyjściowe.",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "10 min wychłodzenia w spoczynku, letni prysznic bez żelu.",
+       "text": "10 min wychłodzenia w spoczynku, letni prysznic bez żelu."
+      },
+      {
+       "kind": "task",
+       "src": "Wypicie 1 bidonu wody z sodem.",
+       "text": "Wypicie 1 bidonu wody z sodem."
+      },
+      {
+       "kind": "task",
+       "src": "Przebranie się w ubranie wyjściowe.",
+       "text": "Przebranie się w ubranie wyjściowe."
+      }
+     ],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2030.v120",
+     "from": "20:30",
+     "to": "20:40",
+     "domain": "diet",
+     "title_src": "Powrót do domu",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "desc_src": "· Posiłek potreningowy (20:15)",
+     "role": "meal",
+     "key": "post",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:30"
+      }
+     ],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2040.v120",
+     "from": "20:40",
+     "to": "20:45",
+     "domain": "regen",
+     "title_src": "Wieczorne mycie głowy i suszenie",
+     "badges_src": [
+      "Higiena"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2045.v120",
+     "from": "20:45",
+     "to": "21:00",
+     "domain": "prep",
+     "title_src": "Przygotowywanie kolacji i zmywanie",
+     "badges_src": [
+      "Zmywanie",
+      "Meal Prep"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2100.v120",
+     "from": "21:00",
+     "to": "21:53",
+     "domain": "diet",
+     "title_src": "Relaks",
+     "badges_src": [
+      "Regeneracja",
+      "438 kcal"
+     ],
+     "desc_src": "· Kolacja (21:00) · Siarczan chondroityny",
+     "role": "meal",
+     "key": "supper",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Kolacja (21:00)",
+       "text": "Kolacja (21:00)",
+       "meal": "supper",
+       "time": "21:00"
+      }
+     ],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2153.v120",
+     "from": "21:53",
+     "to": "22:00",
+     "domain": "prep",
+     "title_src": "Przygotowywanie posiłków, melisy i wieczorna pielęgnacja",
+     "badges_src": [
+      "Meal Prep"
+     ],
+     "desc_src": "1. Przygotowanie melisy 2. Wieczorna pielęgnacja 3. Rozmrażanie & overnight oats",
+     "role": "static",
+     "key": null,
+     "items": [
+      {
+       "kind": "task",
+       "src": "1. Przygotowanie melisy",
+       "text": "Przygotowanie melisy"
+      },
+      {
+       "kind": "task",
+       "src": "2. Wieczorna pielęgnacja",
+       "text": "Wieczorna pielęgnacja"
+      },
+      {
+       "kind": "task",
+       "src": "3. Rozmrażanie & overnight oats",
+       "text": "Rozmrażanie i overnight oats"
+      }
+     ],
+     "decision": "D-120"
+    }
+   ]
+  },
+  "d120_2102": {
+   "decision": "D-120",
+   "replaces": [
+    "slot.1640",
+    "slot.1733",
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015",
+    "slot.2035"
+   ],
+   "slots": [
+    {
+     "id": "slot.1640.s120",
+     "from": "16:40",
+     "to": "17:40",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1740.s120",
+     "from": "17:40",
+     "to": "18:40",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1840.s120",
+     "from": "18:40",
+     "to": "19:40",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1940.v120",
+     "from": "19:40",
+     "to": "19:52",
+     "domain": "prep",
+     "title_src": "Zmywanie popołudniowe",
+     "badges_src": [
+      "Zmywanie"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "desc_src": "",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (19:30)",
+       "text": "Posiłek potreningowy (19:30)",
+       "meal": "post",
+       "time": "19:52",
+       "decision": "D-094"
+      }
+     ],
+     "key": "post",
+     "decision": "D-120",
+     "id": "slot.1952.v120",
+     "from": "19:52",
+     "to": "20:15",
+     "domain": "diet",
+     "title_src": "Relaks · białko (dieta NT)",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "role": "meal"
+    },
+    {
+     "desc_src": "",
+     "items": [
+      {
+       "kind": "task",
+       "src": "Prysznic całego ciała i pielęgnacja ciała (moduł Pielęgnacja)",
+       "text": "Prysznic całego ciała i pielęgnacja ciała (moduł Pielęgnacja)",
+       "decision": "D-094"
+      }
+     ],
+     "key": null,
+     "decision": "D-120",
+     "id": "slot.2015n.v120",
+     "from": "20:15",
+     "to": "20:45",
+     "domain": "regen",
+     "title_src": "Prysznic całego ciała",
+     "badges_src": [
+      "Higiena"
+     ],
+     "role": "static"
+    }
+   ]
+  },
+  "d120_2702": {
+   "decision": "D-120",
+   "replaces": [
+    "slot.1120",
+    "slot.1213",
+    "slot.1220",
+    "slot.1313",
+    "slot.1330",
+    "slot.1423"
+   ],
+   "slots": [
+    {
+     "id": "slot.1120.s120",
+     "from": "11:20",
+     "to": "12:20",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1220.s120",
+     "from": "12:20",
+     "to": "13:20",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1320.s120",
+     "from": "13:20",
+     "to": "14:20",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1420.v120",
+     "from": "14:20",
+     "to": "14:30",
+     "domain": "diet",
+     "title_src": "Przerwa na lunch",
+     "badges_src": [
+      "465 kcal"
+     ],
+     "desc_src": "· Lunch (13:20) · Siarczan glukozaminy",
+     "role": "meal",
+     "key": "lunch",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Lunch (13:20)",
+       "text": "Lunch (13:20)",
+       "meal": "lunch",
+       "time": "14:20"
+      }
+     ],
+     "decision": "D-120"
+    }
+   ]
+  },
+  "d120_1703": {
+   "decision": "D-120",
+   "replaces": [
+    "slot.1640",
+    "slot.1733",
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015"
+   ],
+   "slots": [
+    {
+     "id": "slot.1640.s120",
+     "from": "16:40",
+     "to": "17:40",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1740.s120",
+     "from": "17:40",
+     "to": "18:40",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1840.s120",
+     "from": "18:40",
+     "to": "19:40",
+     "domain": "cfa",
+     "title_src": "Symulacja MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": true,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1940.v120",
+     "from": "19:40",
+     "to": "19:52",
+     "domain": "prep",
+     "title_src": "Zmywanie popołudniowe",
+     "badges_src": [
+      "Zmywanie"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1952.v120",
+     "from": "19:52",
+     "to": "20:35",
+     "domain": "diet",
+     "title_src": "Czas wolny · białko (dieta NT)",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "desc_src": "· Posiłek potreningowy (20:15)",
+     "role": "meal",
+     "key": "post",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:15"
+      }
+     ],
+     "decision": "D-120"
+    }
+   ]
+  },
+  "d120_2003": {
+   "decision": "D-120",
+   "replaces": [
+    "slot.1733",
+    "slot.1745",
+    "slot.1805",
+    "slot.1815",
+    "slot.1935",
+    "slot.1945",
+    "slot.2005",
+    "slot.2015"
+   ],
+   "slots": [
+    {
+     "id": "slot.1733.v120",
+     "from": "17:33",
+     "to": "17:40",
+     "domain": "prep",
+     "title_src": "Zmywanie popołudniowe",
+     "badges_src": [
+      "Zmywanie"
+     ],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1740.v120",
+     "from": "17:40",
+     "to": "18:33",
+     "domain": "cfa",
+     "title_src": "Nauka MPW",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "cfa",
+     "key": null,
+     "items": [],
+     "mpwSlot": false,
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.1833.v120",
+     "from": "18:33",
+     "to": "20:15",
+     "domain": "regen",
+     "title_src": "Czas wolny",
+     "badges_src": [],
+     "desc_src": "",
+     "role": "static",
+     "key": null,
+     "items": [],
+     "decision": "D-120"
+    },
+    {
+     "id": "slot.2015.v120",
+     "from": "20:15",
+     "to": "20:35",
+     "domain": "diet",
+     "title_src": "Białko (dieta NT)",
+     "badges_src": [
+      "230 kcal"
+     ],
+     "desc_src": "· Posiłek potreningowy (20:15)",
+     "role": "meal",
+     "key": "post",
+     "items": [
+      {
+       "kind": "meal",
+       "src": "Posiłek potreningowy (20:15)",
+       "text": "Posiłek potreningowy (20:15)",
+       "meal": "post",
+       "time": "20:15"
+      }
+     ],
+     "decision": "D-120"
+    }
+   ]
   }
  },
  "note": "Pola *_src to tekst źródłowy (w slotach z polem decision — tekst po zmianie D-086). Wartości kcal, suplementy i bloki CFA są wyliczane (resolver).",

@@ -24,11 +24,13 @@ test('struktura: VCALENDAR, VTIMEZONE Europe/Warsaw z regułami DST, CRLF, linie
 });
 
 test('treść: dawki, bloki CFA (plan 2027, D-116), trening 18:15–19:15, zakupy w czwartek (D-097, D-099, D-103); godziny lokalne także po zmianie czasu 25.10.2026', () => {
-  const mon = unfold(planEvents('2027-03-22', ALL, NOW).join('\r\n'));   // poniedziałek po planie MPW: bloki CFA H, I, dodatkowy (17:40–18:33) i J
+  const mon = unfold(planEvents('2027-03-22', ALL, NOW).join('\r\n'));   // poniedziałek po planie MPW: bloki CFA H, I, dodatkowy (D-120: 21:00–21:53) i J (22:00)
   assert.equal((mon.match(/SUMMARY:CFA (blok|— blok)/g) || []).length, 4);
   assert.match(mon, /SUMMARY:CFA blok H: /);
   assert.match(mon, /SUMMARY:CFA — blok dodatkowy: /);
-  assert.match(mon, /DTSTART;TZID=Europe\/Warsaw:20270322T174000/);
+  assert.match(mon, /DTSTART;TZID=Europe\/Warsaw:20270322T210000/);
+  assert.match(mon, /DTSTART;TZID=Europe\/Warsaw:20270322T220000/);
+  assert.ok(!/T174000/.test(mon), 'D-120: bez bloku 17:40 w oknie treningowym');
   assert.match(mon, /SUMMARY:CFA blok J: /);
   assert.equal((unfold(planEvents('2026-11-20', ALL, NOW).join('\r\n')).match(/SUMMARY:CFA blok/g) || []).length, 3, '20.11 — pierwszy dzień planu CFA 2027: E, F, G');
   for (const d of ['2026-10-16', '2026-10-17']) assert.deepEqual(planEvents(d, ALL, NOW), [], `${d} — poza planem (D-103c): bez wydarzeń`);

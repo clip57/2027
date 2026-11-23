@@ -44,6 +44,9 @@ export function phaseFor(date) {
 
 // Dzień z blokiem J (plan CFA v14, D-099: 21:00–21:53 w dni poza pt i sob) — wieczór układany inaczej (kolacja przed blokiem).
 export const hasJ = date => (cfaByDay[date] || []).some(b => b.blok === 'J');
+// D-120: wieczór układany wg godziny bloku nauki (CFA albo MPW): blok o 21:00 → kolacja 20:50–21:00 (dawniej: dzień z blokiem J)
+const startsAt = (date, t) => [...(cfaByDay[date] || []), ...(mpwByDay[date] || [])].some(b => b.godz.startsWith(t));
+export const block21 = date => startsAt(date, '21:00');
 const hasLetter = (date, ...l) => (cfaByDay[date] || []).some(b => l.includes(b.blok));
 const SUPPER_J = '20:50';   // kolacja 20:50–21:00 w dni z blokiem J (D-099); chondroityna idzie z kolacją
 const POST_M = '19:15';     // posiłek potreningowy 19:15 (zamiast 20:15 / 19:30 w niedzielę) w dni treningowe z blokiem M (D-103)
@@ -56,9 +59,9 @@ export const mTrainDay = date => {
 };
 // Godzina dawki w danym dniu (D-099, D-103: kreatyna z posiłkiem potreningowym 19:15; D-103b: w niedzielę bez treningu — bez basenu — kreatyna 19:30 idzie z posiłkiem 20:15,
 // bo w dni z blokami L/M slot na 19:30 nie niesie dawek i dawka znikała z widoku dnia)
-export const doseTime = (time, date) => (time === '21:00' && hasJ(date) ? SUPPER_J
+export const doseTime = (time, date) => (dayPlan(date).doseTimes?.[time] ?? (time === '21:00' && block21(date) ? SUPPER_J
   : (time === '20:15' || time === '19:30') && mTrainDay(date) ? POST_M
-    : time === '19:30' && dayPlan(date).dayType === 'free' ? '20:15' : time);
+    : time === '19:30' && dayPlan(date).dayType === 'free' ? '20:15' : time));
 
 export function dosesFor(date) {
   if (!inPlan(date) || isZero(date)) return [];   // suplementacja od dnia 1 planu (D-088, D-097)
@@ -95,9 +98,9 @@ export function dayPlan(date) {
 // od 07.01 „czwartek_st” — zakupy 15:30 i bloki MPW 30 min później (D-097). Soboty bez zakupów (plan CFA v12, D-097).
 export function templateFor(date, isMock = MOCKS.has(date)) {
   const base = baseTemplate(date, isMock);
-  if (mTrainDay(date)) return trainingBeforeM(hasJ(date) ? jEvening(base) : base, date);   // D-103: najpierw wieczór z J, potem układ z blokiem M
+  if (mTrainDay(date)) return trainingBeforeM(block21(date) ? jEvening(base) : base, date);   // D-103: najpierw wieczór z J, potem układ z blokiem M
   const t = mycieBeforeM(base, date);
-  return trimTrainWindow(hasJ(date) ? jEvening(t) : t, date);
+  return trimTrainWindow(block21(date) ? jEvening(t) : relaxBefore22(t, date), date);
 }
 
 function baseTemplate(date, isMock) {
@@ -174,9 +177,11 @@ function jEvening(list) {
   const post = list.findIndex(s => s.items.some(i => i.kind === 'meal' && i.meal === 'post'));
   const sup = list.findIndex(s => s.id === 'slot.2100'), tail = list.findIndex(s => s.id === 'slot.2145');
   if (post < 0 || sup <= post || tail <= sup) return list;
+  // D-120: niedziela z basenem — 10 min oddaje „Relaks” po powrocie (posiłek po basenie bez zmian), nie slot z posiłkiem
+  const donor = list[post + 1]?.id === 'slot.1945n' ? post + 1 : post;
   return list.map((s, i) => {
-    if (i === post) return { ...s, to: earlier(s.to), decision: 'D-099' };
-    if (i > post && i < sup) return { ...s, from: earlier(s.from), to: earlier(s.to), decision: 'D-099' };
+    if (i === donor) return { ...s, to: earlier(s.to), decision: 'D-099' };
+    if (i > donor && i < sup) return { ...s, from: earlier(s.from), to: earlier(s.to), decision: 'D-099' };
     if (i === sup) return { ...s, from: SUPPER_J, to: '21:00', title_src: 'Kolacja', decision: 'D-099',
       items: s.items.map(it => (it.kind === 'meal' && it.meal === 'supper' ? { ...it, time: SUPPER_J } : it)) };
     if (i === tail) return { ...s, from: '21:53', decision: 'D-099' };
@@ -184,13 +189,25 @@ function jEvening(list) {
   });
 }
 
+// D-120: czwartek z blokiem CFA J o 22:00 (bez bloku o 21:00) — relaks z kolacją 21:00–21:53, przygotowanie melisy i pielęgnacja 21:53–22:00
+function relaxBefore22(list, date) {
+  if (!String(dayPlan(date).variant || '').startsWith('czwartek') || !(cfaByDay[date] || []).some(b => b.blok === 'J' && b.godz.startsWith('22:00'))) return list;
+  return list.map(s => (s.id === 'slot.2100' ? { ...s, to: '21:53', decision: 'D-120' } : s.id === 'slot.2145' ? { ...s, from: '21:53', decision: 'D-120' } : s));
+}
+
 // U1 (audyt 23.10.2026): slot nauki bez bloku poza okresem planu CFA (od 12.11 przez 4,5 miesiąca — 9 slotów dziennie z tekstem „Brak bloku CFA —
 // Poza okresem planu nauki”) to „Czas własny” (`own` — „Dziś” pokazuje go lżej). Slot, w którego czasie wypadają bloki MPW A–C (plan MPW ma osobną
 // kartę „Nauka MPW”, a szablon godzin dnia się nie zmienia — D-095), nazywa je wprost z godzinami bloków. Godziny slotów bez zmian.
+// Nazwa slotu bloku CFA: „CFA blok E”, a dla bloków bez litery slotu — „CFA — blok dodatkowy” (D-116)
+const cfaTitle = letter => (/^[A-Z]\d?$/.test(letter) ? `CFA blok ${letter}` : `CFA — blok ${letter.toLowerCase()}`);
 const overlaps = (godz, from, to) => { const [f, t] = godz.split('–'); return f < to && t > from; };
-function ownTime(s, mpw) {
+const WORK = /** @type {any} */ (SRC.week).work;
+// D-120: dni robocze od 2027 (poza świętami z `week.work.holidays`) — „Czas własny” 08:00–15:23 to „Praca”
+const workSlot = (date, s) => !!WORK && date >= WORK.from && weekday(date) <= 5 && !WORK.holidays.includes(date) && s.from >= WORK.slotFrom && s.to <= WORK.slotTo
+  && !dayPlan(date).outside && dayBlocks(date)?.kind !== 'wolne';
+function ownTime(s, mpw, date) {
   const list = mpw.filter(b => !b.blok.startsWith('P') && overlaps(b.godz, s.from, s.to));
-  if (!list.length) return { title: 'Czas własny', desc: '', cfa: [], own: true };
+  if (!list.length) return workSlot(date, s) ? { title: 'Praca', desc: '', cfa: [], own: true, work: true } : { title: 'Czas własny', desc: '', cfa: [], own: true };
   return { title: 'Nauka MPW', desc: `${list.length === 1 ? 'Blok' : 'Bloki'} ${list.map(b => `${b.blok} ${b.godz}`).join(', ')} — w karcie „Nauka MPW”`, cfa: [] };
 }
 
@@ -219,7 +236,8 @@ export function resolveDay(date) {
   const exercises = w.session && SRC.training.days[w.session]; // basen (nd) nie ma listy ćwiczeń w TRENING
   const session = exercises ? exercises.map(e => ({ ...e, seriesToday: e.series[String(effPhase)] })) : null;
 
-  const mealName = key => (key === 'post' && w.diet === 'NT' ? 'Posiłek po saunie' : MEAL_NAMES[key]); // D-018
+  // D-018; D-120: dieta NT w dzień bez sauny i treningu (święta, dni bez treningu) — posiłek „po treningu” z planu diety NT to białko
+  const mealName = key => (key === 'post' && w.diet === 'NT' ? (w.sauna ? 'Posiłek po saunie' : 'Białko (dieta NT)') : MEAL_NAMES[key]);
   const mTrain = mTrainDay(date), sauna = mTrain ? 0 : w.sauna;   // D-103: w dni treningowe z blokiem M nie ma sauny (po treningu od razu dom, prysznic i blok M)
   const note = w.note || (mTrain && w.sauna ? 'Bez sauny: blok M o 19:40, trening do 19:15 (D-103)' : null);
   const sessionLabel = sauna === 1 ? `${w.sessionName} + sauna` : w.sessionName; // D-040
@@ -238,9 +256,10 @@ export function resolveDay(date) {
       // blok MPW w slocie (P1–P7, czwartek od 07.01) → pozostałe bloki weekendu (praca magisterska, rozmowa, święta — sloty bez nauki) →
       // „Czas własny” albo „Nauka MPW” (bloki A–C w karcie MPW). Blok CFA zasłonięty stałym wydarzeniem — w opisie slotu (kolizja do decyzji).
       const letter = isMock && SRC.week.mock.replace[s.key] ? SRC.week.mock.replace[s.key] : s.key;
-      const bl = inCfa ? blocks.filter(b => b.blok === letter) : [];
+      // D-120: blok CFA w slocie wg godziny początku (godziny bloków przesunięte decyzją — litera nie wskazuje już slotu); dni mocka z sesjami S1/S2 — wg litery
+      const bl = !inCfa ? [] : isMock ? blocks.filter(b => b.blok === letter) : blocks.filter(b => b.godz.startsWith(s.from));
       const pb = (s.mpwSlot ? mpwAll : mpwP).find(b => b.godz.startsWith(s.from));
-      const inBlock = wb && (wb.kind === 'wolne' ? !mpwAll.some(b => !b.blok.startsWith('P') && overlaps(b.godz, s.from, s.to)) : s.to <= BLOCKS_END);
+      const inBlock = wb && (wb.kind === 'wolne' ? !mpwAll.some(b => !b.blok.startsWith('P') && overlaps(b.godz, s.from, s.to)) : s.to <= (wb.until || BLOCKS_END));   // D-120: praca dyplomowa do 11:03
       if (inBlock && FIXED.has(wb.kind)) Object.assign(out, { title: wb.title, cfa: [], block: wb.kind,
         desc: bl.length ? `${wb.desc} · kolizja z planem CFA: ${bl.map(b => `blok ${b.blok} ${b.godz} — ${b.temat}`).join('; ')}` : wb.desc });
       else if (bl.length && isMock && letter.startsWith('S')) {
@@ -248,12 +267,12 @@ export function resolveDay(date) {
         const first = Object.entries(SRC.week.mock.replace).find(([, v]) => v === letter)[0] === s.key;
         Object.assign(out, { title: `Mock CFA — sesja ${letter[1]}`, desc: first ? '' : `Kontynuacja sesji (${bl[0].godz})`, cfa: first ? bl : [] });
       }
-      else if (bl.length) Object.assign(out, { title: `CFA blok ${s.key}`, cfa: bl });
+      else if (bl.length) Object.assign(out, { title: cfaTitle(bl[0].blok), cfa: bl });
       else if (pb) Object.assign(out, { title: `MPW blok ${pb.blok}`, desc: pb.temat, cfa: [], mpw: pb });   // D-096: P1–P7 w slotach A–G; D-097: czwartek
-      else if (s.mpwSlot) Object.assign(out, ownTime(s, mpwAll));
+      else if (s.mpwSlot) Object.assign(out, ownTime(s, mpwAll, date));
       else if (inBlock) Object.assign(out, { title: wb.title, desc: wb.desc, cfa: [], block: wb.kind });
       else if (isMock) Object.assign(out, { title: 'Wolne', desc: 'Dzień mocka — brak bloku w planie (D-036)', cfa: [] });
-      else Object.assign(out, ownTime(s, mpwAll));
+      else Object.assign(out, ownTime(s, mpwAll, date));
     } else if (s.role === 'meal') {
       const m = p.meals.find(x => x.id === s.key);
       Object.assign(out, { meal: s.key, kcal: m && !noDiet ? m.total.kcal : null, mealName: mealName(s.key) });
@@ -271,19 +290,26 @@ export function resolveDay(date) {
     return out;
   });
 
-  // D-099: blok o literze bez slotu w szablonie (plan v14: J 21:00–21:53 poza pt/sob) — własny slot „CFA blok J” między kolacją (20:50–21:00) a przygotowaniem posiłków (21:53–22:00);
-  // wieczór w dni z J układa `jEvening`. Eksport ICS i licznik bloków dostają slot automatycznie.
-  if (inCfa) {
-    const letters = new Set(tpl.filter(t => t.role === 'cfa').map(t => (isMock && SRC.week.mock.replace[t.key]) || t.key));
-    const extra = {};
-    for (const b of blocks) if (!letters.has(b.blok)) (extra[b.blok] ||= []).push(b);
-    const domain = slots.find(x => x.role === 'cfa')?.domain;
-    for (const [letter, list] of Object.entries(extra)) {
-      const [from, to] = list[0].godz.split('–');
-      const at = slots.findIndex(x => x.to > x.from && x.from >= from);   // przed pierwszym slotem zaczynającym się nie wcześniej niż blok
-      const title = /^[A-Z]\d?$/.test(letter) ? `CFA blok ${letter}` : `CFA — blok ${letter.toLowerCase()}`;   // D-116: „Dodatkowy” 17:40–18:33
-      slots.splice(at < 0 ? slots.length : at, 0, { id: `slot.cfa.${letter}`, from, to, domain, role: 'cfa', title, desc: '', items: [], shop: false, doses: [], cfa: list, extra: true });
-    }
+  // Bloki bez slotu nauki w swoich godzinach (D-099: J 21:00; D-116: blok dodatkowy; D-120: bloki CFA i MPW o 21:00 i 22:00, MPW C 17:40 itd.) — własny slot
+  // w miejscu godziny bloku. Slot „Wieczór wolny” (recall) w tym czasie znika — jego zadania (melisa) i dawki przechodzą do slotu bloku. Eksport ICS i licznik
+  // bloków dostają slot automatycznie.
+  const carried = new Set(slots.flatMap(x => (x.cfa || []).map(b => b.nr)));
+  const covered = b => slots.some(x => x.role === 'cfa' && !x.block && (x.mpw === b || (!x.mpw && !(x.cfa || []).length && overlaps(b.godz, x.from, x.to))));
+  const extra = [...(inCfa ? blocks.filter(b => !carried.has(b.nr)).map(b => ({ b, plan: 'cfa' })) : []),
+    ...mpwAll.filter(b => !covered(b)).map(b => ({ b, plan: 'mpw' }))].sort((x, y) => (x.b.godz < y.b.godz ? -1 : 1));
+  const domain = SRC.dayTemplate.slots.find(x => x.role === 'cfa')?.domain;
+  for (const { b, plan } of extra) {
+    const [from, to] = b.godz.split('–');
+    const gone = slots.filter(x => x.role === 'recall' && x.from < to && x.to > from);
+    for (const g of gone) slots.splice(slots.indexOf(g), 1);
+    const at = slots.findIndex(x => x.to > x.from && x.from >= from);   // przed pierwszym slotem zaczynającym się nie wcześniej niż blok
+    const letter = b.blok;
+    const base = { from, to, domain, role: 'cfa', items: gone.flatMap(g => g.items.filter(i => i.kind === 'task')), shop: false,
+      doses: doses.filter(d => d.time >= from && d.time < to), extra: true, decision: 'D-120' };
+    const add = plan === 'cfa'
+      ? { ...base, id: `slot.cfa.${letter}.${from.replace(":", "")}`, title: cfaTitle(letter), desc: '', cfa: [b] }
+      : { ...base, id: `slot.mpw.${letter}.${from.replace(":", "")}`, title: 'Nauka MPW', desc: `Blok ${letter} ${b.godz} — w karcie „Nauka MPW”`, cfa: [], mpw: b };
+    slots.splice(at < 0 ? slots.length : at, 0, add);
   }
 
   return {

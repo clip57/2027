@@ -31,6 +31,7 @@ jobs:
       - name: Kontrola planu i danych (bez plików użytkownika)
         run: |
           node tools/verify/plan_check.mjs
+          node tools/verify/day_check.mjs
           python3 tools/verify/verify_all.py --data-only
       - name: Budowa
         run: npm run build

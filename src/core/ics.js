@@ -58,13 +58,14 @@ export function planEvents(date, kinds, now = new Date()) {
     if (kinds.includes('shop') && s.shop)
       ev.push(event({ uid: `${date}-${s.id}`, date, from: s.from, to: s.to, now, alarm: '-PT15M', summary: 'Zakupy', desc: 'Lista „Do kupienia” w module Zapasy.' }));
   }
-  // MPW (D-095): bloki wg godzin z planu MPW (poza szablonem planu dnia); symulacja jako jedno wydarzenie 15:30–18:30
+  // MPW (D-095): bloki wg godzin z planu MPW; symulacja (3 bloki po 60 min) jako jedno wydarzenie; D-120: pozostałe bloki dnia osobno
+  // (np. P1–P7 i P7 o 22:00 obok symulacji), a gdy litera powtarza się w dniu (blok przeniesiony z soboty) — numer bloku w identyfikatorze
   if (kinds.includes('mpw') && r.mpw.blocks.length) {
-    const bl = r.mpw.blocks;
-    if (r.mpw.isSim) ev.push(event({ uid: `${date}-mpw-sim`, date, from: bl[0].godz.slice(0, 5), to: bl[bl.length - 1].godz.slice(-5), now, alarm: '-PT15M',
-      summary: 'Symulacja egzaminu MPW', desc: bl[0].temat }));
-    else for (const b of bl) ev.push(event({ uid: `${date}-mpw-${b.blok}`, date, from: b.godz.slice(0, 5), to: b.godz.slice(-5), now, alarm: '-PT2M',
-      summary: `MPW blok ${b.blok}: ${b.temat}`, desc: `${b.temat}\n${cfaSourceLine(b)}` }));
+    const bl = r.mpw.blocks, sim = r.mpw.isSim ? bl.filter(b => b.tryb === 'SYMULACJA') : [];
+    if (sim.length) ev.push(event({ uid: `${date}-mpw-sim`, date, from: sim.map(b => b.godz.slice(0, 5)).sort()[0], to: sim.map(b => b.godz.slice(-5)).sort().at(-1),
+      now, alarm: '-PT15M', summary: 'Symulacja egzaminu MPW', desc: sim[0].temat }));
+    for (const b of bl.filter(x => !sim.includes(x))) ev.push(event({ uid: `${date}-mpw-${b.blok}${bl.filter(x => x.blok === b.blok).length > 1 ? `-${b.nr}` : ''}`, date,
+      from: b.godz.slice(0, 5), to: b.godz.slice(-5), now, alarm: '-PT2M', summary: `MPW blok ${b.blok}: ${b.temat}`, desc: `${b.temat}\n${cfaSourceLine(b)}` }));
   }
   return ev.flat();   // lista linii (bez zawijania)
 }
