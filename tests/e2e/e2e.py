@@ -1231,7 +1231,7 @@ async def run_mpw(pw, name, url, mobile):
        f'{tag} Plan: źródła, 5 symulacji, dni wolne')
     # Symulacja w „Dziś”, tydzień, Wymaga uwagi
     await pg.goto(url + '#/dzis?d=2027-02-27'); await pg.wait_for_selector('.dz-mpw')
-    ok('Symulacja egzaminu MPW' in await pg.inner_text('.dz-mpw') and '15:30–18:30' in await pg.inner_text('.dz-mpw'), f'{tag} Dziś: dzień symulacji')
+    ok('Symulacja egzaminu MPW' in await pg.inner_text('.dz-mpw') and '11:20–14:20' in await pg.inner_text('.dz-mpw') and '15:30–18:30' not in await pg.inner_text('.dz-mpw'), f'{tag} Dziś: dzień symulacji (27.02 11:20–14:20 — D-120, opis z planu)')
     await pg.goto(url + '#/dzis?v=tydzien&d=2026-11-24'); await pg.wait_for_selector('.wk-grid')
     ok('MPW: 3 bloki' in await pg.inner_text('.wk-grid'), f'{tag} Tydzień: bloki MPW')
     # D-096: weekendy 8:00–15:23 w slotach A–G (studia bez zakupów, praca magisterska z zakupami, święta, P1–P7 MPW)

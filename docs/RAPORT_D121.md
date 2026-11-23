@@ -51,3 +51,11 @@ zostają w dzienniku (eksport, synchronizacja) — widoki ich nie pokazują.
   się do szacunku tempa. Cofnięcie — przyciskiem przy bloku.
 - Pakiet prywatny z datami faz sprzed D-121 — do aktualizacji skryptem `private_pack_lib.py` (plik użytkownika, poza repozytorium).
 - Pliki dawek prywatnych i pielęgnacji przygotowane dla użytkownika w czacie — nie są częścią repozytorium.
+
+## 5. Aktualizacja planów z plików użytkownika (23.11.2026)
+
+Użytkownik wgrał `MASTER_SCHEDULE_CFA_451_D121.csv` i `MASTER_SCHEDULE_MPW_D121.csv`. Daty i godziny wszystkich bloków — **zgodne z aplikacją**
+(bez zmian w `week.studyMoves`). Różnice tylko w treści, przeniesione do `cfa.json` i `mpw.json`: CFA — `odsylacze_do_materialow` (421 bloków,
+ścieżki bez „../”) i `powiazane_bloki_mpw` (117 bloków, daty bloków MPW po D-121); MPW — `do_przeczytania` i `zadania` symulacji (15 bloków,
+godziny symulacji wg D-120). Eksport `tools/export_plans_csv.mjs` odtwarza teraz oba pliki co do znaku. Testy: jednostkowe 302/302, plan i dni 0 błędów,
+E2E 1778/1778 (kontrola dnia symulacji 27.02 — godziny 11:20–14:20 w opisie), a11y 0 naruszeń, budżety 9/9.
