@@ -55,6 +55,14 @@ Nigdy nie odtwarzaj ani nie zgaduj treści tych plików.
   Wdrażać dopiero po decyzjach użytkownika; proces jak w D-114 (fundament → prototyp do akceptacji na iPhonie → reszta).
 - Obrazy startowe iOS: po zmianie znaku aplikacji `python3 tools/splash.py` (Playwright + Pillow); użytkownik musi dodać ikonę ponownie.
 
+## 3d. Stan 23.11.2026 (D-119…D-121)
+- D-119 (`ab192f3`), D-120 (`e0a5197`) i **D-121** (`5671d9e`, Dzień zero 23.11.2026 — `docs/RAPORT_D121.md`) — opublikowane na `main`.
+- Po D-121 użytkownik musi na każdym urządzeniu (Safari i aplikacja z ekranu początkowego) wczytać w „Dane” dwa pliki prywatne przekazane w czacie
+  (plan pielęgnacji z datami +36 dni, dawki prywatne `2027-private-doses`) i zaktualizować pakiet prywatny (`private_pack_lib.py` — daty faz D-121).
+- Skrypty planu: `plan_d121.py` (uruchamia `plan_d120.py`); kolejna zmiana godzin nauki — nowy skrypt decyzji na tym samym wzorcu.
+- Otwarte: D1 rozwiązane (D-120); nowe typy danych (pominięte dawki, powtórki error logu, daty ważności) — do decyzji; decyzje 2–10 audytu 10.11;
+  święta po 28.03.2027 i dzień obrony (D-116/D-117); plan kończy się 31.12.2027 (silnik planów 2.0 — decyzja 3 audytu).
+
 ## 4. Otwarte sprawy — stan 1.11.2026 (po D-113)
 **Rozstrzygnięte 25.10.2026 (D-111):** D1 — na razie bez zmian (popołudnie od 16.11 jak dotąd; wrócić przed 16.11); założenia D-103 §5 —
 obowiązują; blok J w niedziele i czwartki — bez zmian; kolano — usunięte z dziennika sesji; G-20 i D-031 — zamknięte; skrypt fontu,
