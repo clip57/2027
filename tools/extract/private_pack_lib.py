@@ -54,6 +54,14 @@ UPGRADE = [
     # D-103c: początek całego planu 18.10 (Faza 0 18.10–02.11)
     ("Faza 0 (17.10–02.11)", "Faza 0 (18.10–02.11)", "D-103c"),
     ("17.10–02.11", "18.10–02.11", "D-103c"),
+    # D-121: nowy początek planu — Dzień zero 23.11.2026, Faza 0 24.11–06.12, Faza 1 07.12–10.01, Faza 2 od 11.01.2027
+    ("Faza 1 od 12.11.2026, Faza 2 od 11.12.2026", "Faza 1 od 07.12.2026, Faza 2 od 11.01.2027", "D-121"),
+    ("Faza 0 (18.10–02.11)", "Faza 0 (24.11–06.12)", "D-121"),
+    ("18.10–02.11", "24.11–06.12", "D-121"),
+    ("Faza 1 (12.11–10.12)", "Faza 1 (07.12–10.01)", "D-121"),
+    ("12.11–10.12", "07.12–10.01", "D-121"),
+    ("Faza 2 (od 11.12)", "Faza 2 (od 11.01)", "D-121"),
+    ("od 11.12", "od 11.01", "D-121"),
     # D-104: skyr 75 g (śniadanie i lunch) — sumy dobowe i wyliczone pochodne (tabele składu w rekomp.json aktualizuje tools/extract/diet_skyr75.py)
     ("100 g skyru pakujesz osobno", "75 g skyru pakujesz osobno", "D-104"),
     ("Dodanie 100 g produktu chłodzonego", "Dodanie 75 g produktu chłodzonego", "D-104"),

@@ -27,8 +27,8 @@ test('Wymaga uwagi: zaległe CFA zgodne z modułem CFA, braki przed zakupami, su
 test('Wymaga uwagi: pusty dziennik przed startem CFA — brak ostrzeżeń; koniec preparatów czasowych 14 dni wcześniej', async () => {
   const s = await new Store(new MemoryAdapter()).open();
   assert.deepEqual(attention(s.state, { today: '2026-09-25' }), []);
-  const end = attention(s.state, { today: '2027-12-20' }).find(x => x.id.startsWith('end-'));
-  assert.match(end.text, /31\.12/);   // D-117: preparaty czasowe do 31.12.2027 (wcześniej D-116: do 30.06, D-097: do 28.03)
-  assert.equal(attention(s.state, { today: '2027-12-10' }).find(x => x.id.startsWith('end-')), undefined);
+  const end = attention(s.state, { today: '2027-04-20' }).find(x => x.id.startsWith('end-'));
+  assert.match(end.text, /30\.04/);   // D-121: chondroityna, boswellia i glukozamina do 30.04.2027 (wcześniej D-117: do 31.12.2027)
+  assert.equal(attention(s.state, { today: '2027-04-10' }).find(x => x.id.startsWith('end-')), undefined);
   assert.equal(attention(s.state, { today: '2027-03-17' }).find(x => x.id.startsWith('end-')), undefined);
 });

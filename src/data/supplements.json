@@ -96,9 +96,9 @@
    "src": "SUPL:07:00/chondroityna",
    "note": "na czczo",
    "validity": {
-    "from": "2026-10-18",
-    "until": "2027-12-31",
-    "decision": "D-015, D-116, D-117"
+    "from": "2026-11-24",
+    "until": "2027-04-30",
+    "decision": "D-015, D-121"
    }
   },
   {
@@ -131,9 +131,9 @@
    ],
    "src": "SUPL:09:00/boswellia",
    "validity": {
-    "from": "2026-10-18",
-    "until": "2027-12-31",
-    "decision": "D-015, D-116, D-117"
+    "from": "2026-11-24",
+    "until": "2027-04-30",
+    "decision": "D-015, D-121"
    }
   },
   {
@@ -221,9 +221,9 @@
    ],
    "src": "SUPL:13:20/glukozamina",
    "validity": {
-    "from": "2026-10-18",
-    "until": "2027-12-31",
-    "decision": "D-015, D-116, D-117"
+    "from": "2026-11-24",
+    "until": "2027-04-30",
+    "decision": "D-015, D-121"
    }
   },
   {
@@ -487,9 +487,9 @@
    ],
    "src": "SUPL:21:00/chondroityna",
    "validity": {
-    "from": "2026-10-18",
-    "until": "2027-12-31",
-    "decision": "D-015, D-116, D-117"
+    "from": "2026-11-24",
+    "until": "2027-04-30",
+    "decision": "D-015, D-121"
    }
   },
   {
@@ -574,5 +574,6 @@
   "D-014": "tauryna codziennie, także w czwartek",
   "D-015": "chondroityna, boswellia, glukozamina od 18.10.2026 do 28.03.2027 (D-103c; wcześniej D-103b, D-102, D-101, D-100, D-097; D-087, D-090, I-9)",
   "D-016": "cynk kontynuowany; stan nieśledzony"
- }
+ },
+ "D-015": "chondroityna, boswellia, glukozamina od 24.11.2026 do 30.04.2027 (D-121; wcześniej D-117, D-116, D-103c, D-087, D-090, I-9)"
 }

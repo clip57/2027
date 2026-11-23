@@ -18,7 +18,8 @@ import { PLAN_START } from '../core/resolver.js';
 import { cloudStatus } from '../core/sync/cloud-local.js';
 
 const KIND = { sync: 'Kopia / synchronizacja 2027', 'zapasy-v31': 'Kopia ZAPASY v31', private: 'Pakiet prywatny',
-  'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)', care: 'Plan pielęgnacji (2027-pielegnacja.json)' };
+  'cfa-progress': 'Postęp CFA (postep-nauki.json)', 'cfa-errors': 'Error log CFA (error-log.csv)', care: 'Plan pielęgnacji (2027-pielegnacja.json)',
+  'private-doses': 'Dawki prywatne (plik poza repozytorium)' };
 const TYPE = { 'inv.count': 'stany magazynu', 'inv.move': 'zakupy i korekty', 'cat.upsert': 'własne pozycje', 'cfa.done': 'bloki CFA',
   'cfa.err.put': 'wpisy error logu', 'train.set': 'serie treningowe', 'train.detail': 'szczegóły treningu', setting: 'ustawienia', 'private.pack': 'pakiet prywatny', archive: 'archiwum',
   'care.def': 'kroki i produkty pielęgnacji', 'care.done': 'odhaczenia pielęgnacji', 'mpw.done': 'bloki MPW', 'mpw.err.put': 'wpisy error logu MPW' };
@@ -146,6 +147,10 @@ export async function renderDane(root, ctx) {
       pv.kind === 'private' && (() => { const p = pv.fresh[0]?.d?.pack; return p && h('p', { class: 'muted' }, p.plan?.start
         ? `Pakiet przygotowany dla planu od ${p.plan.start}${p.plan.start === PLAN_START ? ' (bieżący)' : ` — bieżący plan zaczyna się ${PLAN_START}`}.`
         : `Pakiet bez oznaczenia wersji planu${p.created ? ` (utworzony ${p.created})` : ''} — zaktualizuj go skryptem private_pack_lib.py (Diagnostyka danych).`); })(),
+      // D-121: dawki prywatne — co zostanie wczytane (lista zastępuje poprzednią)
+      pv.kind === 'private-doses' && pv.ok && (() => { const v = pv.fresh[0]?.d?.value || []; return h('div', {},
+        h('p', { class: 'muted' }, `Dawek: ${v.length}. Lista zastępuje poprzednio wczytaną; dawki pojawią się w Suplementacji i w planie dnia (bez Zapasów).`),
+        h('ul', { class: 'dn-pv-list' }, v.map(d => h('li', {}, `${d.time} · ${d.name} — ${d.label} · ${d.from ? `od ${d.from}` : 'od zawsze'}${d.until ? ` do ${d.until}` : ' do odwołania'}`)))); })(),
       pv.file && h('p', {}, `Plik wyeksportowany ${when(pv.file.exportedAt)} na urządzeniu ${pv.file.device || '—'}${pv.file.device === store.device ? ' (to urządzenie)' : ''}.`),
       // R2: postęp CFA — z którego planu pochodzi plik i które bloki zostaną oznaczone
       pv.notice && h('div', { class: `banner ${pv.notice.level} dn-pv-note` }, pv.notice.text),

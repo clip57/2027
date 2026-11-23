@@ -35,8 +35,10 @@ const cfaBloki = Object.freeze(cfa.D.bloki.map(b => (SM.cfa[b.nr] ? moveTo(b, SM
 export const mpwBloki = Object.freeze(mpw.D.bloki.map(b => (SM.mpw[b.nr] ? moveTo(b, SM.mpw[b.nr])
   : shifted(b) ? Object.freeze({ ...b, godz: shiftGodz(b.godz, MS.minutes), godz_src: b.godz }) : b)));
 
-export const SRC = { diet, supplements, catalog, training, cfa: Object.freeze({ ...cfa, D: Object.freeze({ ...cfa.D, bloki: cfaBloki }) }),
-  mpw: Object.freeze({ ...mpw, D: Object.freeze({ ...mpw.D, bloki: mpwBloki }) }), safety, dayTemplate, week, phases, seeds, mealprep };
+// D-121: początek planu nauki = data pierwszego bloku po przesunięciach (plik: `start_src`; 20.11 → 23.11.2026)
+const statOf = (D, bloki) => Object.freeze({ ...D.stat, start: bloki.reduce((m, b) => (b.data < m ? b.data : m), bloki[0].data), start_src: D.stat.start });
+export const SRC = { diet, supplements, catalog, training, cfa: Object.freeze({ ...cfa, D: Object.freeze({ ...cfa.D, bloki: cfaBloki, stat: statOf(cfa.D, cfaBloki) }) }),
+  mpw: Object.freeze({ ...mpw, D: Object.freeze({ ...mpw.D, bloki: mpwBloki, stat: statOf(mpw.D, mpwBloki) }) }), safety, dayTemplate, week, phases, seeds, mealprep };
 
 export const plan = (variant, phase) => diet.plans.find(p => p.variant === variant && p.phase === phase);
 export const catalogById = Object.freeze(Object.fromEntries(catalog.items.map(i => [i.id, i])));

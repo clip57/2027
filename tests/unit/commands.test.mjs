@@ -11,7 +11,8 @@ test('pusta fraza: lista poleceń (nawigacja, bez zapisu danych)', () => {
 });
 
 test('data: dd.mm (rok wg zakresu planu), dd.mm.rrrr, ISO; niepoprawna data — bez polecenia', () => {
-  assert.equal(commands('12.11')[0].href, '#/dzis?d=2026-11-12');
+  assert.equal(commands('24.11')[0].href, '#/dzis?d=2026-11-24');
+  assert.equal(commands('12.11')[0].href, '#/dzis?d=2027-11-12', 'D-121: plan od 23.11.2026 — 12.11 to już 2027');
   assert.equal(commands('5.3')[0].href, '#/dzis?d=2027-03-05');
   assert.equal(commands('1.1.2027')[0].href, '#/dzis?d=2027-01-01');
   assert.equal(commands('2026-12-24')[0].href, '#/dzis?d=2026-12-24');

@@ -27,11 +27,11 @@ async def main():
         for w, h, scheme in ((390, 844, 'dark'), (390, 844, 'light'), (1100, 900, 'dark'), (1100, 900, 'light')):
             tag = f'{w}px {scheme}'
             ctx = await b.new_context(viewport={'width': w, 'height': h}, color_scheme=scheme, timezone_id='Europe/Warsaw')
-            await ctx.clock.install(time=dt.datetime(2026, 10, 20, 10, 0, tzinfo=ZoneInfo('Europe/Warsaw')))
+            await ctx.clock.install(time=dt.datetime(2026, 11, 24, 10, 0, tzinfo=ZoneInfo('Europe/Warsaw')))
             await ctx.add_init_script(f"localStorage.setItem('p2027.theme','{scheme}')")
             pg = await ctx.new_page(); errs = []
             pg.on('pageerror', lambda e: errs.append(str(e)))
-            await pg.goto(URL + '#/trening?d=2026-10-20'); await pg.wait_for_selector('.hero-tr', timeout=15000)   # wtorek: LOWER 1
+            await pg.goto(URL + '#/trening?d=2026-11-24'); await pg.wait_for_selector('.hero-tr', timeout=15000)   # wtorek: LOWER 1
             # --- System kolana
             await pg.get_by_role('button', name='System kolana').click(); await pg.wait_for_selector('dialog.sheet[open]')
             await pg.locator("dialog.sheet[open]").evaluate("el => Promise.all(el.getAnimations().map(a => a.finished))")
@@ -63,7 +63,7 @@ async def main():
             ok(await pg.locator('.dn h3').inner_text() == 'Akcent kolanowy', f'{tag} wtorek: notatka „Akcent kolanowy” przy właściwym dniu')
             body = ' '.join((await pg.inner_text('main')).split())
             ok('Rower + ABS 55 min' not in body and 'Dzień wolny od treningu 2 sesje' not in body, f'{tag} wtorek: w schłodzeniu nie ma już tekstu środy')
-            await pg.goto(URL + '#/trening?d=2026-10-21'); await pg.wait_for_selector('.hero-tr', timeout=15000)
+            await pg.goto(URL + '#/trening?d=2026-11-25'); await pg.wait_for_selector('.hero-tr', timeout=15000)
             await pg.evaluate("document.querySelectorAll('details.meal').forEach(x => x.open = true)")
             ok(await pg.locator('.dn-phases li').count() == 3 and 'Rozciąganie · 5 min' in ' '.join((await pg.inner_text('main')).split()), f'{tag} środa: struktura roweru (3 części) i rozciąganie 5 min')
             v = await axe(pg); ok(not v, f'{tag} środa (widok sesji): dostępność {v[:2]}')

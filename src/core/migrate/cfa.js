@@ -21,7 +21,7 @@ function previousMap(D) {
 
 /** @param {any} o @param {any} [D] */
 export function cfaProgressPlan(o, D = SRC.cfa.D) {
-  const label = labelOf(o), saved = savedOn(o), n = D.bloki.length, made = D.finalization?.date || D.stat.start;
+  const label = labelOf(o), saved = savedOn(o), n = D.bloki.length, made = D.finalization?.date || D.stat.start_src || D.stat.start;   // D-121: data planu z pliku (start po przesunięciach jest późniejszy)
   if (label && label === D.version) return { status: 'current', label };
   const req = label && D.previousVersion && label === D.previousVersion ? previousMap(D) : null;
   if (req) return { status: 'previous', label, req };

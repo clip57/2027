@@ -209,7 +209,7 @@ export function renderPielegnacja(root, ctx) {
   function usage(pid) {
     const ids = new Set(model.steps.filter(x => x.product === pid).map(x => x.id));
     let n = 0, last = '';
-    for (const [k, v] of Object.entries(done)) if (v === true && ids.has(k.slice(11))) { n++; if (k.slice(0, 10) > last) last = k.slice(0, 10); }
+    for (const [k, v] of Object.entries(done)) if (v === true && ids.has(k.slice(11)) && k.slice(0, 10) >= PLAN_START) { n++; if (k.slice(0, 10) > last) last = k.slice(0, 10); }   // D-121: bez dni sprzed startu
     return { n, last };
   }
   function productsView() {

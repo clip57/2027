@@ -7,9 +7,11 @@ import { isPrivatePack, privatePackEvent } from '../private.js';
 import { sha256 } from '../hash.js';
 import { cfaProgressEvents, cfaProgressNotice } from '../migrate/cfa.js';
 import { isCarePlan, careDefsFromPlan } from '../calc/care.js';
+import { validPrivateDose, PRIVATE_DOSES_KEY } from '../resolver.js';
 export { sha256 };
 
 export const FORMAT = '2027-sync';
+export const PRIVATE_DOSES_FORMAT = '2027-private-doses';   // D-121: dawki z prywatnego pliku użytkownika
 
 const canonical = events => JSON.stringify([...events].sort((a, b) => (a.id < b.id ? -1 : 1)));
 
@@ -45,13 +47,28 @@ export async function preview(store, obj) {
       const h = (await sha256(JSON.stringify(d))).slice(0, 16);
       events.push({ ...store.makeEvent('care.def', d), id: `care.def:${d.id}:${h}` });
     }
+  } else if (obj && obj.format === PRIVATE_DOSES_FORMAT) {
+    // D-121: dawki prywatne (np. leki) — plik użytkownika poza repozytorium; cała lista jako jedno ustawienie `supp.private` (LWW — nowszy
+    // plik zastępuje poprzedni). Identyfikator z treści — ponowny import tego samego pliku niczego nie dodaje.
+    kind = 'private-doses';
+    const list = Array.isArray(obj.doses) ? obj.doses : null;
+    const bad = list ? list.filter(d => !validPrivateDose(d)) : [];
+    const ids = list ? list.map(d => d?.id) : [];
+    if (!list || !list.length) errors.push('Plik nie zawiera listy dawek (`doses`)');
+    else if (bad.length) errors.push(`Niepoprawne dawki: ${bad.length} (wymagane: id, time GG:MM, name, label; opcjonalnie from, until RRRR-MM-DD, weekdays 1–7, note)`);
+    else if (new Set(ids).size !== ids.length) errors.push('Powtórzony identyfikator dawki (`id`)');
+    else {
+      const value = list.map(d => Object.fromEntries(['id', 'time', 'name', 'label', 'from', 'until', 'weekdays', 'note'].filter(k => d[k] != null).map(k => [k, d[k]])));
+      const h = (await sha256(JSON.stringify(value))).slice(0, 16);
+      events.push({ ...store.makeEvent('setting', { key: PRIVATE_DOSES_KEY, value }), id: `setting:${PRIVATE_DOSES_KEY}:${h}` });
+    }
   } else if (obj && Array.isArray(obj.wykonane)) {
     // R2: plik postępu z innego planu CFA jest blokowany; z poprzedniej wersji — przeliczany; bez wersji — import z ostrzeżeniem
     kind = 'cfa-progress';
     notice = cfaProgressNotice(obj);
     if (notice.blocked) { errors.push(notice.text); notice = null; } else events = cfaProgressEvents(obj);
   } else {
-    return { ok: false, kind: 'unknown', errors: ['Nie rozpoznano pliku. Obsługiwane: kopia 2027 (2027-sync.json), kopia ZAPASY v31, postęp CFA (postep-nauki.json), error log CFA (error-log.csv), pakiet prywatny, plan pielęgnacji.'] };
+    return { ok: false, kind: 'unknown', errors: ['Nie rozpoznano pliku. Obsługiwane: kopia 2027 (2027-sync.json), kopia ZAPASY v31, postęp CFA (postep-nauki.json), error log CFA (error-log.csv), pakiet prywatny, plan pielęgnacji, dawki prywatne.'] };
   }
   const pv = previewEvents(store, events, kind, errors);
   // Informacje o pliku (pola istniejące w formacie od początku — bez zmiany formatu)

@@ -17,9 +17,11 @@ test('D-120: pliki planów bez zmian — przesunięcia tylko w `week.studyMoves`
   assert.ok(cfaJson.D.bloki.every(b => !('godz_src' in b)) && mpwJson.D.bloki.every(b => !('godz_src' in b)));
   for (const [plan, moves] of [['cfa', SRC.week.studyMoves.cfa], ['mpw', SRC.week.studyMoves.mpw]]) {
     const raw = (plan === 'cfa' ? cfaJson : mpwJson).D.bloki;
-    for (const nr of Object.keys(moves)) assert.ok(raw[nr - 1].data >= '2026-11-23', `${plan} ${nr}: przed dniem decyzji`);
+    // D-121: bloki z 20–22.11 też przesunięte (pełna chronologia od Dnia zero 23.11) — żaden blok przed startem planu
+    for (const nr of Object.keys(moves).filter(k => k !== 'decision')) assert.ok(moves[nr].slice(0, 10) >= '2026-11-23', `${plan} ${nr}: przed startem planu`);
+    assert.ok(raw.some(b => b.data < '2026-11-23'), `${plan}: plik planu od 20.11 (bez zmian)`);
   }
-  assert.deepEqual(times('2026-11-21'), ['A 15:30–16:23', 'B 16:30–17:23', 'C 17:30–18:23'], 'dni minione bez zmian');
+  assert.deepEqual(times('2026-11-21'), [], 'D-121: dni sprzed startu planu bez bloków');
 });
 
 test('D-120: dni robocze — MPW A 15:30, B 16:40, C 22:00 (z CFA J: MPW C 21:00, J 22:00); blok dodatkowy 21:00, J 22:00; czwartki z zakupami — tylko J 22:00', () => {
@@ -37,7 +39,7 @@ test('D-120: weekendy — o jeden slot wcześniej; praca dyplomowa 08:00–11:03
   assert.equal(resolveDay('2026-12-12').blocks.title, 'Pisanie pracy dyplomowej');
   assert.deepEqual(times('2026-11-28'), ['A 15:30–16:23', 'B 16:40–17:33']);
   assert.deepEqual(times('2026-11-29'), ['C 15:30–16:23', 'A 16:40–17:33', 'B 21:00–21:53', 'C 22:00–22:53']);
-  assert.deepEqual(mpwByDay['2026-11-29'][0].data_src, '2026-11-28', 'blok C z soboty');
+  assert.deepEqual(mpwByDay['2026-11-29'].map(b => b.nr), [mpwByDay['2026-11-28'][1].nr + 1, mpwByDay['2026-11-28'][1].nr + 2, mpwByDay['2026-11-28'][1].nr + 3, mpwByDay['2026-11-28'][1].nr + 4], 'ostatni blok soboty w niedzielę 15:30 — chronologicznie (D-121: materiał wg kolejności)');
   assert.deepEqual(times('2027-04-04', cfaByDay), ['Dodatkowy 15:30–16:23', 'H 16:40–17:33', 'I 21:00–21:53', 'Dodatkowy 22:00–22:53']);
   // niedziela zjazdowa: wieczór jak w dni z blokiem o 21:00 (relaks 19:45–20:05, prysznic 20:05–20:35, kolacja 20:50–21:00)
   assert.deepEqual(line('2026-11-29').filter(l => l >= '19:30' && l < '21:00'), ['19:30–19:45 Powrót do domu', '19:45–20:05 Relaks', '20:05–20:35 Prysznic całego ciała', '20:35–20:50 Przygotowywanie kolacji i zmywanie', '20:50–21:00 Kolacja']);

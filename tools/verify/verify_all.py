@@ -5,7 +5,7 @@ Użyj --data-only, aby pominąć porównanie wymagające SOURCES_DIR.
 """
 import argparse
 import csv
-from datetime import date as Date
+from datetime import date as Date, timedelta
 import json
 import os
 import re
@@ -147,9 +147,11 @@ ph = data("phases.json")
 try:
     phase_dates = [Date.fromisoformat(x["from"]) for x in ph["phases"]]
     plan_start, plan_end = Date.fromisoformat(ph["start"]), Date.fromisoformat(ph["end"])
-    phases_valid = bool(phase_dates) and phase_dates[0] == plan_start and phase_dates == sorted(set(phase_dates))
+    # D-121: plan od Dnia zero (`zero` = `start`) — Faza 0, dieta, suplementy i treningi od następnego dnia
+    first = plan_start + timedelta(days=1) if ph.get("zero") == ph["start"] else plan_start
+    phases_valid = bool(phase_dates) and phase_dates[0] == first and phase_dates == sorted(set(phase_dates))
     phases_valid &= all(plan_start <= day <= plan_end for day in phase_dates)
-    phases_valid &= all(Date.fromisoformat(ph[key]) == plan_start for key in ("realStart", "dietStart", "trainStart"))
+    phases_valid &= all(Date.fromisoformat(ph[key]) == first for key in ("realStart", "dietStart", "trainStart"))
 except (KeyError, TypeError, ValueError):
     phases_valid = False
 check(phases_valid, "plan: spójny zakres kalendarza i faz")

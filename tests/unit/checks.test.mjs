@@ -6,23 +6,23 @@ import { classifyEvent } from '../../src/core/storage/validate.js';
 import { dosesFor } from '../../src/core/resolver.js';
 import { allItems } from '../../src/core/calc/inventory.js';
 
-const env = (t, d) => ({ id: 'x'.repeat(16), t, d, hlc: '1793000000000:0000:dev', dev: 'dev', v: 1, at: '2026-10-31T10:00:00.000Z' });
+const env = (t, d) => ({ id: 'x'.repeat(16), t, d, hlc: '1793000000000:0000:dev', dev: 'dev', v: 1, at: '2026-12-26T10:00:00.000Z' });
 
 test('klucze dawek i zakupów mieszczą się w walidacji `setting` (każda dawka planu, każda pozycja katalogu)', () => {
-  const doses = dosesFor('2026-10-31');
+  const doses = dosesFor('2026-12-26');
   assert.ok(doses.length > 5);
-  for (const d of doses) assert.equal(classifyEvent(env('setting', { key: doseKey('2026-10-31', d), value: true })), 'ok', doseKey('2026-10-31', d));
-  for (const it of allItems()) assert.equal(classifyEvent(env('setting', { key: shopKey('2026-11-12', it.id), value: true })), 'ok', it.id);
+  for (const d of doses) assert.equal(classifyEvent(env('setting', { key: doseKey('2026-12-26', d), value: true })), 'ok', doseKey('2026-12-26', d));
+  for (const it of allItems()) assert.equal(classifyEvent(env('setting', { key: shopKey('2027-01-07', it.id), value: true })), 'ok', it.id);
 });
 
 test('stan z ustawień: odhaczone / cofnięte (false) / brak klucza', () => {
-  const doses = dosesFor('2026-10-31'), [a, b] = doses;
-  const settings = { [doseKey('2026-10-31', a)]: true, [doseKey('2026-10-31', b)]: false };
-  assert.equal(doseDone(settings, '2026-10-31', a), true);
-  assert.equal(doseDone(settings, '2026-10-31', b), false);
-  assert.equal(doseDone(settings, '2026-11-01', a), false);
-  assert.deepEqual(dosesProgress(settings, '2026-10-31', doses), { done: 1, total: doses.length });
-  assert.equal(shopChecked({ [shopKey('2026-11-12', 'banan')]: true }, '2026-11-12', 'banan'), true);
-  assert.equal(shopChecked({ [shopKey('2026-11-12', 'banan')]: true }, '2026-11-19', 'banan'), false);
+  const doses = dosesFor('2026-12-26'), [a, b] = doses;
+  const settings = { [doseKey('2026-12-26', a)]: true, [doseKey('2026-12-26', b)]: false };
+  assert.equal(doseDone(settings, '2026-12-26', a), true);
+  assert.equal(doseDone(settings, '2026-12-26', b), false);
+  assert.equal(doseDone(settings, '2026-12-27', a), false);
+  assert.deepEqual(dosesProgress(settings, '2026-12-26', doses), { done: 1, total: doses.length });
+  assert.equal(shopChecked({ [shopKey('2027-01-07', 'banan')]: true }, '2027-01-07', 'banan'), true);
+  assert.equal(shopChecked({ [shopKey('2027-01-07', 'banan')]: true }, '2027-01-14', 'banan'), false);
   assert.deepEqual(settingEvents(['k1', 'k2'], false), [['setting', { key: 'k1', value: false }], ['setting', { key: 'k2', value: false }]]);
 });

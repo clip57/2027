@@ -106,7 +106,7 @@ test('R2 (audyt 23.10.2026), D-116: postep-nauki.json z innego planu CFA (V3, V4
   pv = await preview(s, { wersja: D.version, zapis: '2026-11-22T10:00:00.000Z', wykonane: [1, 2] });
   assert.equal(pv.ok, true);
   assert.equal(pv.notice.level, 'info');
-  assert.match(pv.notice.text, /Bloki do oznaczenia: 2 — od nr 1 \(20\.11 E\) do nr 2 \(20\.11 F\)/);
+  assert.match(pv.notice.text, /Bloki do oznaczenia: 2 — od nr 1 \(23\.11 E\) do nr 2 \(23\.11 F\)/);
   // plik bez wersji z okresu bieżącego planu — dozwolony z ostrzeżeniem
   pv = await preview(s, { zapis: '2026-11-22T10:00:00.000Z', wykonane: [1, 2] });
   assert.deepEqual([pv.ok, pv.notice.level, pv.fresh.length], [true, 'warn', 2]);

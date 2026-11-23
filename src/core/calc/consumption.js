@@ -13,7 +13,7 @@ export function consumptionForDay(date) {
   const use = {};
   const add = (id, q) => { if (catalogById[id]?.tracked !== false) use[id] = (use[id] || 0) + q; };
   if (!dp.noDiet) for (const m of p.meals) for (const it of m.items) if (it.prod && it.use) add(it.prod, it.use.qty);   // D-100: dni przed startem diety (obecnie brak)
-  for (const d of dosesFor(date)) add(d.supp, d.qty);
+  for (const d of dosesFor(date)) if (!d.private) add(d.supp, d.qty);   // D-121: dawki prywatne bez zużycia w Zapasach
   for (const x of EXTRA_DAILY) add(x.prod, x.qty);
   Object.freeze(use);
   cache.set(date, use);

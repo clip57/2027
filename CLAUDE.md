@@ -5,24 +5,24 @@ meal prep, trening, nauka (CFA do 11.11.2026, MPW 16.11.2026–20.03.2027), bezp
 Jeden użytkownik, urządzenia: MacBook, iPhone (Safari **i** aplikacja z ekranu początkowego — to dwie osobne bazy danych),
 przeglądarka na komputerze. Język interfejsu i dokumentacji: **polski**.
 
-**Stan (22.11.2026):** D-114 „Instrument” i D-115 „Fundament jakości” — opublikowane na `main` (18–19.11.2026). **D-116** (studia wg harmonogramu,
-plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (`0371a91`). **D-118** (drobne z audytu 10.11: M5–M7, T10, T1) i **D-119** („Instrument+”: przebudowa Suplementacji, Pielęgnacji i Nauki, nowe przyciski odznaczania, tryb rutyny, szacunek tempa — `docs/RAPORT_D119.md`) — **opublikowane na `main` 22.11.2026** (`ab192f3`). **D-120** (godziny nauki dopasowane do planu dnia — D1 rozwiązane, symulacje MPW, dni bez treningu, „Praca” w dni robocze 2027 — `docs/RAPORT_D120.md`) — **opublikowany na `main` 23.11.2026** (`e0a5197`). Następny krok: nowe typy danych (pominięte dawki, powtórki error logu, data ważności produktów) — do decyzji użytkownika.
+**Stan (23.11.2026):** D-114 „Instrument” i D-115 „Fundament jakości” — opublikowane na `main` (18–19.11.2026). **D-116** (studia wg harmonogramu,
+plan MPW od 20.11, nowy plan **CFA Level I 2027** — 451 bloków 20.11.2026–12.05.2027, kalendarz do **30.06.2027**) — **opublikowany na `main` 21.11.2026** (`d7678ad`). **D-117** (egzamin CFA 13.05.2027, bez zjazdu IX, kalendarz do **31.12.2027**) — **opublikowany na `main` 22.11.2026** (`0371a91`). **D-118** (drobne z audytu 10.11: M5–M7, T10, T1) i **D-119** („Instrument+”: przebudowa Suplementacji, Pielęgnacji i Nauki, nowe przyciski odznaczania, tryb rutyny, szacunek tempa — `docs/RAPORT_D119.md`) — **opublikowane na `main` 22.11.2026** (`ab192f3`). **D-120** (godziny nauki dopasowane do planu dnia — D1 rozwiązane, symulacje MPW, dni bez treningu, „Praca” w dni robocze 2027 — `docs/RAPORT_D120.md`) — **opublikowany na `main` 23.11.2026** (`e0a5197`). **D-121** (nowy początek planu: **Dzień zero 23.11.2026**, dni wcześniejsze ukryte, pełna chronologia nauki od 23.11 z nadrabianiem 14–18.12 i 24.12, fazy 24.11 / 07.12 / 11.01, dni bez treningu 12.12 i 24.12, suplementy czasowe do 30.04.2027, dawki prywatne z pliku — `docs/RAPORT_D121.md`) — na gałęzi, czeka na „Publikuj”. Następny krok: nowe typy danych (pominięte dawki, powtórki error logu, data ważności produktów) — do decyzji użytkownika.
 **Otwarte decyzje użytkownika:** (D1 — rozwiązane w D-120);
 z D-116/D-117 (`docs/RAPORT_D116.md` §3, `RAPORT_D117.md`): święta po 28.03.2027 (do końca roku — bez wyjątków), dzień obrony.
 Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-10.md` §11) — czekają na użytkownika.
 
 **Czytaj w razie potrzeby (nie wczytuj wszystkiego na start):**
 - `docs/PRZEKAZANIE.md` — stan, zasady współpracy, niedokończone zadania, pliki spoza repozytorium (**najpierw**, przy większej pracy);
-- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-120 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
-  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-120) i raporty `docs/RAPORT_D0xx.md`;
+- `docs/HISTORIA_STANU.md` — streszczenia decyzji D-086…D-121 z regułami technicznymi (daty i wersje planów, warianty dnia, moduły) —
+  **przed zmianą w danym obszarze przeczytaj jego wpis**; pełny rejestr: `docs/DECYZJE_2027.md` (D-001…D-121) i raporty `docs/RAPORT_D0xx.md`;
 - `docs/PULAPKI.md` — tabela pułapek, które już wystąpiły (część pilnują teraz linter i testy) — **przed zmianą UI, testów lub buildu**;
 - wygląd: `docs/REDESIGN-STATUS.md` → `REDESIGN-SPEC.md` → `REDESIGN-DECISIONS.md` → `REDESIGN-TESTING.md` (klasy używane przez testy).
 
 ## 0. Reguły, które obowiązują zawsze (skrót z historii decyzji — szczegóły w `docs/HISTORIA_STANU.md`)
 
 - **Plan dnia i daty:** typ dnia, dieta, trening, wyjątki dat — zawsze przez `dayPlan(date)` / `resolveDay(date)` z `resolver.js`
-  (nigdy `SRC.week.days[…]`); dni poza planem (`inPlan`, `PLAN_START`, `PLAN_END` = 31.12.2027, D-117) — bez planu, treningu, dawek, bloków;
-  zdarzeń z tych dni nie usuwaj i nie filtruj w `reduce()` ani w synchronizacji. **Godziny bloków nauki — tylko przez `week.studyMoves` (D-120, skrypt decyzji), pliki planów bez zmian; blok w slocie wg godziny.** Bloki weekendowe — `dayBlocks(date)`; najbliższe zakupy —
+  (nigdy `SRC.week.days[…]`); dni poza planem (`inPlan`, `PLAN_START` = Dzień zero 23.11.2026 — D-121, `PLAN_END` = 31.12.2027, D-117) — bez planu, treningu, dawek, bloków, ukryte w historii modułów;
+  zdarzeń z tych dni nie usuwaj i nie filtruj w `reduce()` ani w synchronizacji. **Godziny bloków nauki — tylko przez `week.studyMoves` (D-120, D-121 — skrypt `plan_d121.py`), pliki planów bez zmian; blok w slocie wg godziny.** Bloki weekendowe — `dayBlocks(date)`; najbliższe zakupy —
   `nextShopping()`; zmiany godzin planu dnia — jako skrypt decyzji w `tools/extract/day_plan_dXXX.py` (źródeł użytkownika nie ma w repozytorium).
 - **Nauka:** widok wspólny CFA i MPW w `src/modules/study.js` (konfiguracje `CFA_PLAN`, `MPW_PLAN`); oba plany mogą trwać jednocześnie (D-116 — kolejność slotów w `resolveDay`); liczba bloków nigdy na sztywno
   (`CFA_BLOCKS`, `MPW_BLOCKS` w `validate.js`); `cfa.done` z polem `plan` (`CFA_PLAN_VERSION`); pola z listy `DROP` (`plan-split.js`)
@@ -31,7 +31,7 @@ Decyzje nie-designowe audytu „baza na dekadę” (`docs/RAPORT_AUDYT_2026-11-1
   i odhaczenia wyłącznie przez `setting`** (`src/core/calc/checks.js`: `supp.dose:…`, `zapasy.shop:…`, `cfa.recall:…`); Zapasy — operacje przez
   `manyOp` (stos „Cofnij”). Przycisk odhaczenia zawsze `checkBtn`/`checkInput` (`src/ui/check.js`, D-119); okna zawsze `sheet()` z `components.js`; komunikaty po akcji `ctx.flash()`; przerysowanie w tle `softRender()`.
 - **Pielęgnacja (D-094):** plan wyłącznie w danych użytkownika — **nigdy nie dodawaj treści planu (produkty, leki, kroki) do repozytorium,
-  testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. **Imię i nazwisko użytkownika nie mogą pojawić się nigdzie**
+  testów ani zrzutów**; testy tylko z `fixtures.synthetic_care_plan()`. **Dawki prywatne (leki, D-121) — wyłącznie w pliku użytkownika `2027-private-doses` (import w „Dane” → `setting` `supp.private`), nigdy w repozytorium ani testach.** **Imię i nazwisko użytkownika nie mogą pojawić się nigdzie**
   (także w plikach prywatnych).
 - **Chmura (D-078…D-085):** adres projektu i Publishable Key użytkownik wpisuje na urządzeniu. **Nigdy nie wpisuj do repozytorium adresu
   projektu, kluczy, haseł ani `service_role`.** Opis i kontrola ręczna: `docs/SYNC_CHMURA.md`.

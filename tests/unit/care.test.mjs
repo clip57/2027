@@ -19,8 +19,8 @@ const PLAN = {
     { id: 's.r1', pora: 'rano', group: 'Twarz', order: 1, text: 'Mycie', product: 'p.a', slot: 'slot.0700' },
     { id: 's.r2', pora: 'rano', group: 'Twarz', order: 2, text: 'Krem', warn: 'Odczekaj', wait: 10, slot: 'slot.0700' },
     { id: 's.d1', pora: 'dzien', group: 'Twarz', order: 1, text: 'Doraźnie', asNeeded: true },
-    { id: 's.w1', pora: 'wieczor', group: 'Włosy', order: 1, text: 'Szampon PN i PT', product: 'p.b', days: [1, 5], until: '2026-10-11', slot: 'slot.2035' },
-    { id: 's.w2', pora: 'wieczor', group: 'Włosy', order: 1, text: 'Szampon PN', product: 'p.b', days: [1], from: '2026-10-12', slot: 'slot.2035' },
+    { id: 's.w1', pora: 'wieczor', group: 'Włosy', order: 1, text: 'Szampon PN i PT', product: 'p.b', days: [1, 5], until: '2026-12-06', slot: 'slot.2035' },
+    { id: 's.w2', pora: 'wieczor', group: 'Włosy', order: 1, text: 'Szampon PN', product: 'p.b', days: [1], from: '2026-12-07', slot: 'slot.2035' },
     { id: 's.w3', pora: 'wieczor', group: 'Ciało', order: 2, text: 'Niedziela i środa', product: 'p.c', days: [3, 7] },
   ],
 };
@@ -31,9 +31,9 @@ test('care.def i care.done: walidacja treści i zgodność koperty', () => {
   assert.equal(validateEvent(ev('care.def', { id: 's.1', kind: 'step', data: {}, deleted: true })), null);
   assert.ok(validateEvent(ev('care.def', { id: 's.1', kind: 'inne', data: {} })));
   assert.ok(validateEvent(ev('care.def', { id: 's 1', kind: 'step', data: {} })), 'identyfikator bez spacji');
-  assert.equal(validateEvent(ev('care.done', { date: '2026-10-05', step: 's.1', done: true })), null);
+  assert.equal(validateEvent(ev('care.done', { date: '2026-11-30', step: 's.1', done: true })), null);
   assert.ok(validateEvent(ev('care.done', { date: '2026-13-05', step: 's.1', done: true })));
-  assert.equal(classifyEvent(ev('care.done', { date: '2026-10-05', step: 's.1', done: false })), 'ok');
+  assert.equal(classifyEvent(ev('care.done', { date: '2026-11-30', step: 's.1', done: false })), 'ok');
 });
 
 test('Store: definicje (ostatnia zmiana wygrywa, usunięcie) i odhaczenia w stanie', async () => {
@@ -42,42 +42,42 @@ test('Store: definicje (ostatnia zmiana wygrywa, usunięcie) i odhaczenia w stan
   await s.record('care.def', { id: 's.1', kind: 'step', data: { pora: 'rano', text: 'A' } });
   await s.record('care.def', { id: 's.1', kind: 'step', data: { pora: 'rano', text: 'B' } });
   await s.record('care.def', { id: 's.2', kind: 'step', data: { pora: 'rano', text: 'C' } });
-  await s.record('care.done', { date: '2026-10-05', step: 's.1', done: true });
+  await s.record('care.done', { date: '2026-11-30', step: 's.1', done: true });
   assert.deepEqual(s.state.careDefs.map(d => [d.id, d.text]), [['s.1', 'B'], ['s.2', 'C']]);
-  assert.equal(s.state.careDone['2026-10-05|s.1'], true);
+  assert.equal(s.state.careDone['2026-11-30|s.1'], true);
   await s.record('care.def', { id: 's.2', kind: 'step', data: {}, deleted: true });
-  await s.record('care.done', { date: '2026-10-05', step: 's.1', done: false });
+  await s.record('care.done', { date: '2026-11-30', step: 's.1', done: false });
   assert.deepEqual(s.state.careDefs.map(d => d.id), ['s.1']);
-  assert.equal(s.state.careDone['2026-10-05|s.1'], false);
+  assert.equal(s.state.careDone['2026-11-30|s.1'], false);
 });
 
 test('reguły: dni tygodnia, okres od–do, doraźne poza postępem, pory i grupy, sloty planu dnia', () => {
   const m = careModel(careDefsFromPlan(PLAN).map(d => ({ ...d.data, id: d.id, kind: d.kind })));
   assert.deepEqual(m.steps.map(s => s.id), ['s.r1', 's.r2', 's.d1', 's.w1', 's.w2', 's.w3']);
   const ids = d => stepsFor(m, d).map(s => s.id);
-  assert.deepEqual(ids('2026-10-05'), ['s.r1', 's.r2', 's.d1', 's.w1']);          // pn, szampon do 11.10
-  assert.deepEqual(ids('2026-10-09'), ['s.r1', 's.r2', 's.d1', 's.w1']);          // pt
-  assert.deepEqual(ids('2026-10-16'), ['s.r1', 's.r2', 's.d1']);                  // pt po 11.10 — bez szamponu
-  assert.deepEqual(ids('2026-10-12'), ['s.r1', 's.r2', 's.d1', 's.w2']);          // pn od 12.10
-  assert.deepEqual(ids('2026-10-07'), ['s.r1', 's.r2', 's.d1', 's.w3']);          // śr
-  assert.deepEqual(ids('2026-10-11'), ['s.r1', 's.r2', 's.d1', 's.w3']);          // nd
-  const done = { '2026-10-05|s.r1': true, '2026-10-05|s.d1': true, '2026-10-05|s.w1': false };
-  assert.deepEqual(progress(stepsFor(m, '2026-10-05'), done, '2026-10-05'), { done: 1, total: 3 });
-  assert.deepEqual(byPora(stepsFor(m, '2026-10-07')).map(p => [p.id, p.groups.map(g => g.name)]), [['rano', ['Twarz']], ['dzien', ['Twarz']], ['wieczor', ['Ciało']]]);
-  assert.deepEqual(slotProgress(m, done, '2026-10-05'), { 'slot.0700': { done: 1, total: 2 }, 'slot.2035': { done: 0, total: 1 } });
-  assert.deepEqual(m.steps.map(ruleText), ['codziennie', 'codziennie', 'doraźnie', 'PN, PT · do 11.10', 'PN · od 12.10', 'ŚR, ND']);
-  assert.deepEqual(productUse(m, 'p.b').map(u => u.rule), ['PN, PT · do 11.10', 'PN · od 12.10']);
+  assert.deepEqual(ids('2026-11-30'), ['s.r1', 's.r2', 's.d1', 's.w1']);          // pn, szampon do 11.10
+  assert.deepEqual(ids('2026-12-04'), ['s.r1', 's.r2', 's.d1', 's.w1']);          // pt
+  assert.deepEqual(ids('2026-12-11'), ['s.r1', 's.r2', 's.d1']);                  // pt po 11.10 — bez szamponu
+  assert.deepEqual(ids('2026-12-07'), ['s.r1', 's.r2', 's.d1', 's.w2']);          // pn od 12.10
+  assert.deepEqual(ids('2026-12-02'), ['s.r1', 's.r2', 's.d1', 's.w3']);          // śr
+  assert.deepEqual(ids('2026-12-06'), ['s.r1', 's.r2', 's.d1', 's.w3']);          // nd
+  const done = { '2026-11-30|s.r1': true, '2026-11-30|s.d1': true, '2026-11-30|s.w1': false };
+  assert.deepEqual(progress(stepsFor(m, '2026-11-30'), done, '2026-11-30'), { done: 1, total: 3 });
+  assert.deepEqual(byPora(stepsFor(m, '2026-12-02')).map(p => [p.id, p.groups.map(g => g.name)]), [['rano', ['Twarz']], ['dzien', ['Twarz']], ['wieczor', ['Ciało']]]);
+  assert.deepEqual(slotProgress(m, done, '2026-11-30'), { 'slot.0700': { done: 1, total: 2 }, 'slot.2035': { done: 0, total: 1 } });
+  assert.deepEqual(m.steps.map(ruleText), ['codziennie', 'codziennie', 'doraźnie', 'PN, PT · do 06.12', 'PN · od 07.12', 'ŚR, ND']);
+  assert.deepEqual(productUse(m, 'p.b').map(u => u.rule), ['PN, PT · do 06.12', 'PN · od 07.12']);
 });
 
 test('tydzień i zapowiedź zmian w planie', () => {
   const m = careModel(careDefsFromPlan(PLAN).map(d => ({ ...d.data, id: d.id, kind: d.kind })));
-  const w = weekGrid(m, { '2026-10-05|s.r1': true }, '2026-10-05');
-  assert.deepEqual(w.map(d => d.date), ['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11']);
+  const w = weekGrid(m, { '2026-11-30|s.r1': true }, '2026-11-30');
+  assert.deepEqual(w.map(d => d.date), ['2026-11-30', '2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04', '2026-12-05', '2026-12-06']);
   assert.deepEqual(w.map(d => d.total), [3, 2, 3, 2, 3, 2, 3]);
   assert.equal(w[0].done, 1);
   assert.deepEqual(w.map(d => d.special.map(s => s.id)), [['s.w1'], [], ['s.w3'], [], ['s.w1'], [], ['s.w3']]);
-  assert.deepEqual(upcomingChanges(m, '2026-10-01').map(x => [x.date, x.step.id, x.kind]), [['2026-10-12', 's.w1', 'koniec'], ['2026-10-12', 's.w2', 'start']]);
-  assert.deepEqual(upcomingChanges(m, '2026-10-20'), []);
+  assert.deepEqual(upcomingChanges(m, '2026-11-26').map(x => [x.date, x.step.id, x.kind]), [['2026-12-07', 's.w1', 'koniec'], ['2026-12-07', 's.w2', 'start']]);
+  assert.deepEqual(upcomingChanges(m, '2026-12-15'), []);
 });
 
 test('import planu (format 2027-care): podgląd, zapis, ponowny import bez zmian, zmieniona definicja = nowa wersja', async () => {
@@ -107,10 +107,10 @@ test('B9 (audyt 23.10.2026): sloty do przypięcia kroku — każdy raz, dni z ka
   assert.ok(!o.some(x => /sobota/.test(x[1])), 'żaden slot nie jest opisany „sobota”');
   for (const s of SRC.dayTemplate.slots) assert.ok(label(s.id), `slot szablonu ${s.id} na liście`);
   assert.equal(label('slot.0700'), '07:00 · Pobudka', 'slot codzienny bez opisu dni');
-  assert.match(label('slot.1745z'), /^17:45 · Zakupy \(czw, 22\.10–29\.10\)$/);
+  assert.equal(label('slot.1745z'), undefined, 'D-121: zakupy 17:45 (22.10 i 29.10) sprzed startu planu — poza listą');
   assert.match(label('slot.1530j'), /\(czw, 07\.01–18\.03\)$/, 'D-116: wariant czwartek_st do ostatniego czwartku planu MPW');
   assert.match(label('slot.2015n'), /\(nd, /);
-  assert.match(label('slot.1905b'), /\(czw, 24\.12–31\.12\)$/, 'dni wariantu z kalendarza: 24.12 i 31.12 bez zakupów (D-103, D-109)');
+  assert.match(label('slot.1905b'), /\(czw, 31\.12\)$/, 'dni wariantu z kalendarza: 31.12 bez zakupów (D-109; 24.12 — dzień bez treningu i sauny, D-121)');
   assert.equal(label('slot.1940c'), undefined, 'slot nieużywany w planie (wariant czwartek_k) — poza listą wyboru');
   assert.ok(!o.some(x => /\.\d+$/.test(x[0].split('.').slice(2).join('.'))), 'części przyciętych slotów („slot.1745.1”) jako ten sam slot');
 });
@@ -122,8 +122,8 @@ test('D-111: krok przypięty do slotu innego wariantu dnia — znacznik w slocie
   const defs = slotDefs(SRC.dayTemplate);
   const ids = d => resolveDay(d).slots.map(s => s.id);
   // niedziela z basenem: slot wariantu jest w planie — bez zmian
-  assert.ok(ids('2026-10-25').includes('slot.2015n'));
-  assert.deepEqual(placeSlotProgress({ 'slot.2015n': { done: 1, total: 2 } }, resolveDay('2026-10-25').slots, defs), { 'slot.2015n': { done: 1, total: 2 } });
+  assert.ok(ids('2026-12-20').includes('slot.2015n'));
+  assert.deepEqual(placeSlotProgress({ 'slot.2015n': { done: 1, total: 2 } }, resolveDay('2026-12-20').slots, defs), { 'slot.2015n': { done: 1, total: 2 } });
   // 27.12 i 28.03 (święta, D-096): bez wariantu „basen” — krok trafia do zwykłego slotu 20:15 i sumuje się z jego krokami
   for (const d of ['2026-12-27', '2027-03-28']) {
     assert.ok(!ids(d).includes('slot.2015n') && ids(d).includes('slot.2015'), `${d}: zwykły slot 20:15`);

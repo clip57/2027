@@ -22,13 +22,13 @@ const FIXED = new Set(['studia', 'egzamin']);
 const MEAL_NAMES = { breakfast: 'Śniadanie', lunch: 'Lunch', snack: 'Przekąska', post: 'Posiłek potreningowy',
   dinner: 'Obiad', supper: 'Kolacja', drinks: 'Napoje' };
 
-// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 18.10.2026–31.12.2027 — D-117; plan CFA ma własny zakres — `cfa.json`, 20.11.2026–12.05.2027). Dni
-// wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. Dzień zero (D-097) usunięty z kalendarza w D-100 (obsługa w kodzie zostaje).
+// Plan (D-088, D-103c): kalendarz, dieta, trening i realny początek planu — daty z `phases.json` (`start`, `end`; obecnie 23.11.2026–31.12.2027 — D-117, D-121; plan CFA ma własny zakres — `cfa.json`, 20.11.2026–12.05.2027). Dni
+// wcześniejsze i późniejsze są poza planem — bez treningu, dawek, bloków i zużycia w Zapasach. D-121: plan od Dnia zero 23.11.2026 (dni wcześniejsze ukryte).
 // Zdarzenia z dni poza planem zostają w dzienniku (eksport, synchronizacja, analiza) — pomijają je tylko widoki i obliczenia planu.
 export const PLAN_START = SRC.phases.start;
 export const PLAN_END = SRC.phases.end || '9999-12-31';
-export const DAY_ZERO = /** @type {any} */ (SRC.phases).zero || null;   // D-100: Dzień zero usunięty z kalendarza (zero: null) — obsługa zostaje w kodzie
-// D-100…D-103c: realny początek planu, start diety i treningów — z `phases.json` (`realStart`, `dietStart`, `trainStart`; obecnie wszystkie = `start`, 18.10.2026).
+export const DAY_ZERO = /** @type {any} */ (SRC.phases).zero || null;   // D-121: Dzień zero 23.11.2026 = pierwszy dzień planu (`phases.zero`)
+// D-100…D-103c: realny początek planu, start diety i treningów — z `phases.json` (`realStart`, `dietStart`, `trainStart`; D-121: 24.11.2026 — dzień po Dniu zero).
 // Flaga `noDiet` (dni planu przed startem diety) przy starcie diety = starcie planu nie występuje
 export const PLAN_REAL_START = SRC.phases.realStart || PLAN_START;
 export const DIET_START = SRC.phases.dietStart || PLAN_START;
@@ -39,7 +39,7 @@ export const isZero = date => date === DAY_ZERO;
 export function phaseFor(date) {
   let ph = null;
   for (const p of SRC.phases.phases) if (date >= p.from) ph = p.phase;
-  return ph; // null = przed Fazą 0 (fazy z `phases.json`; obecnie Faza 0 od 18.10.2026, Faza 1 od 12.11, Faza 2 od 11.12 — D-103, D-103c)
+  return ph; // null = przed Fazą 0 (fazy z `phases.json`; D-121: Faza 0 od 24.11.2026, Faza 1 od 07.12, Faza 2 od 11.01.2027)
 }
 
 // Dzień z blokiem J (plan CFA v14, D-099: 21:00–21:53 w dni poza pt i sob) — wieczór układany inaczej (kolacja przed blokiem).
@@ -68,8 +68,29 @@ export function dosesFor(date) {
   const wd = weekday(date);
   const doses = SRC.supplements.doses.filter(d =>
     d.weekdays.includes(wd) && inValidity(d, date));
-  return doses.map(d => ({ ...d, time: doseTime(d.time, date) }));   // D-099, D-103, D-103b
+  const priv = PRIVATE_DOSES.filter(d => (!d.weekdays || d.weekdays.includes(wd)) && (!d.from || date >= d.from) && (!d.until || date <= d.until));
+  return [...doses, ...priv].map(d => ({ ...d, time: doseTime(d.time, date) }));   // D-099, D-103, D-103b
 }
+
+// D-121: dawki z prywatnego pliku użytkownika (np. leki) — plik poza repozytorium, import w „Dane” → ustawienie `supp.private` (lista dawek).
+// Każda dawka: { id, time GG:MM, name, label, from?, until? (RRRR-MM-DD, włącznie), weekdays? [1–7], note? }. Odhaczanie jak dawki planu
+// (`supp.dose:…|<supp>`, supp = `priv.<id>`); bez zużycia w Zapasach i bez pozycji w katalogu. Treść dawek nigdy nie trafia do repozytorium.
+export const PRIVATE_DOSES_KEY = 'supp.private';
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/, TIME_RE = /^\d{2}:\d{2}$/;
+const str = (v, n) => typeof v === 'string' && v.trim().length > 0 && v.length <= n;
+/** @param {any} d */
+export const validPrivateDose = d => !!d && typeof d === 'object' && typeof d.id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(d.id) && TIME_RE.test(d.time)
+  && str(d.name, 120) && str(d.label, 60) && (d.from == null || DATE_RE.test(d.from)) && (d.until == null || DATE_RE.test(d.until))
+  && (d.weekdays == null || (Array.isArray(d.weekdays) && d.weekdays.length > 0 && d.weekdays.every(w => Number.isInteger(w) && w >= 1 && w <= 7)))
+  && (d.note == null || str(d.note, 200));
+/** @type {any[]} */
+let PRIVATE_DOSES = [];
+/** Lista dawek prywatnych z ustawienia `supp.private` (wywołuje aplikacja przed każdym rysowaniem). @param {any} list */
+export function setPrivateDoses(list) {
+  PRIVATE_DOSES = (Array.isArray(list) ? list : []).filter(validPrivateDose).map(d => Object.freeze({ time: d.time, supp: `priv.${d.id}`, qty: 0, label: d.label,
+    name: d.name, note: d.note || undefined, from: d.from, until: d.until, weekdays: d.weekdays, situation_src: 'Dawki z pliku prywatnego', src: 'private', private: true }));
+}
+export const privateDoses = () => PRIVATE_DOSES;
 // Okres przyjmowania preparatów czasowych (D-015; `validity` w `supplements.json`, obecnie 18.10.2026–31.12.2027 — D-117). `from` i `until` opcjonalne
 // (D-116: czwartkowe dawki 17:15 wracają od 19.03 bez daty końca).
 export function inValidity(d, date) {
@@ -84,13 +105,14 @@ export function dayPlan(date) {
   // D-102, D-103b: plan CFA ma własny zakres (`nightRecall`) — recall CFA także w ewentualnych dniach sprzed startu planu, które są historią
   if (!inPlan(date)) return { ...w, dayType: 'free', session: null, sessionName: 'Poza planem', sauna: 0, recall: NIGHT_RECALL.has(date), variant: null,
     outside: true, after: date > PLAN_END, note: null, decision: 'D-088' };
-  // Dzień zero (D-097): jak dzień poza planem (bez diety, treningu, nauki, suplementów i zużycia), ale z własnym widokiem w „Dziś”
-  if (isZero(date)) return { ...w, dayType: 'zero', session: null, sessionName: 'Dzień zero', sauna: 0, recall: false, variant: null,
-    outside: true, zero: true, note: null, decision: 'D-097' };
   const x = SRC.week.exceptions?.[date];
   let d = x ? { ...w, ...x } : w;
   // D-101: sesje recall 22:00 wg harmonogramu CFA (`nightRecall`: codziennie poza 23.10 i 25.10) zamiast reguły „bez pt i sob”
   if (RECALL_FROM_PLAN && date >= CFA_FIRST && date <= CFA_LAST) d = { ...d, recall: NIGHT_RECALL.has(date) };
+  // Dzień zero (D-097, D-121: 23.11.2026 — pierwszy dzień planu): bez diety, treningu, suplementów i zużycia w Zapasach; nauka i recall wg planu,
+  // pielęgnacja tylko wieczorna (`calc/care.js`)
+  if (isZero(date)) return { ...d, dayType: 'free', session: null, sessionName: 'Dzień zero', sauna: 0, diet: 'NT', variant: null, noDiet: true,
+    zero: true, note: 'Dzień zero: bez diety, suplementów i treningu — nauka wg planu, pielęgnacja wieczorna (D-121)', decision: 'D-121' };
   return date < DIET_START ? { ...d, noDiet: true } : d;   // D-100: dni planu przed startem diety (przy starcie diety = start planu — nigdy)
 }
 

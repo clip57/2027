@@ -11,7 +11,7 @@ import { sessions, weekly, streakWeeks } from '../../src/core/calc/training.js';
 import { diagnose } from '../../src/core/calc/diagnostics.js';
 import { SRC } from '../../src/core/data.js';
 
-const D = '2026-10-25';
+const D = '2026-12-20';
 const full = {
   date: D,
   swim: { main_min: 45, dist: 1500, pool: '25', strokes: ['kraul', 'grzbiet'], rpe: 3.5, hr_avg: 118, hr_max: 131, crit: ['oddech3', 'zdanie'], signals: ['pieczenie'], stretch: true },
@@ -121,35 +121,35 @@ test('magazyn: zapis train.detail, ostatni zapis dnia wygrywa, odczyt po ponowny
   assert.deepEqual(s.state.trainDetails[D], { date: D, swim: { dist: 1000 } });
   await s.record('train.detail', { date: D, swim: { dist: 1250, rpe: 3 }, note: 'drugi zapis' });
   assert.deepEqual(s.state.trainDetails[D], { date: D, swim: { dist: 1250, rpe: 3 }, note: 'drugi zapis' }, 'dokument dnia zastępuje poprzedni');
-  await s.record('train.detail', { date: '2026-10-26', knee: { before: 1 } });
+  await s.record('train.detail', { date: '2026-12-21', knee: { before: 1 } });
   await assert.rejects(s.record('train.detail', { date: '2026-02-30', swim: { dist: 1 } }));
   assert.equal(s.state.trainDetails[D].swim.dist, 1250, 'odrzucony zapis nie zmienia stanu');
   s = await new Store(adapter).open();
-  assert.deepEqual(Object.keys(s.state.trainDetails).sort(), [D, '2026-10-26']);
+  assert.deepEqual(Object.keys(s.state.trainDetails).sort(), [D, '2026-12-21']);
   assert.equal(s.state.trainDetails[D].note, 'drugi zapis');
   assert.equal(s.allEvents().filter(e => e.t === 'train.detail').length, 3, 'wszystkie zapisy zostają w dzienniku zdarzeń (eksport, synchronizacja)');
 });
 
 test('sesje: dzień z wpisem basenu lub roweru liczy się jako sesja także bez serii i czasu; sauna i dawny wpis kolana same nie; wpisy sprzed startu treningów pomijane', () => {
-  const det = { '2026-10-25': { date: '2026-10-25', swim: { dist: 1200, main_min: 40 } }, '2026-10-21': { date: '2026-10-21', bike: { main_min: 45 } },
-    '2026-10-20': { date: '2026-10-20', knee: { before: 2 } }, '2026-10-22': { date: '2026-10-22', sauna: { rounds: 2 } }, '2026-10-10': { date: '2026-10-10', swim: { dist: 500 } } };
+  const det = { '2026-12-20': { date: '2026-12-20', swim: { dist: 1200, main_min: 40 } }, '2026-12-16': { date: '2026-12-16', bike: { main_min: 45 } },
+    '2026-12-15': { date: '2026-12-15', knee: { before: 2 } }, '2026-12-17': { date: '2026-12-17', sauna: { rounds: 2 } }, '2026-10-10': { date: '2026-10-10', swim: { dist: 500 } } };
   const all = sessions({}, {}, det);
-  assert.deepEqual(all.map(x => x.date), ['2026-10-21', '2026-10-25']);
+  assert.deepEqual(all.map(x => x.date), ['2026-12-16', '2026-12-20']);
   assert.equal(all[1].detail.swim.dist, 1200);
   assert.deepEqual(sessions({}, {}, {}), []);
-  const wk = weekly({}, {}, 4, '2026-10-26', det);
-  assert.equal(wk.at(-2).sessions, 2, 'tydzień 19–25.10: rower i basen');
+  const wk = weekly({}, {}, 4, '2026-12-21', det);
+  assert.equal(wk.at(-2).sessions, 2, 'tydzień 14–20.12: rower i basen');
   // B8 (audyt 23.10.2026): seria tygodni liczy te same sesje co „Treningi” i wykres tygodniowy
-  assert.equal(streakWeeks({}, {}, '2026-10-26', det), 1, 'tydzień 19–25.10 z basenem i rowerem — seria 1 tydzień');
-  assert.equal(streakWeeks({}, {}, '2026-10-26'), 0, 'bez wpisów dziennika — brak sesji');
-  assert.equal(streakWeeks({}, {}, '2026-10-26', { '2026-10-20': { date: '2026-10-20', knee: { before: 2 } } }), 0, 'dawny wpis kolana nie jest sesją');
+  assert.equal(streakWeeks({}, {}, '2026-12-21', det), 1, 'tydzień 14–20.12 z basenem i rowerem — seria 1 tydzień');
+  assert.equal(streakWeeks({}, {}, '2026-12-21'), 0, 'bez wpisów dziennika — brak sesji');
+  assert.equal(streakWeeks({}, {}, '2026-12-21', { '2026-12-15': { date: '2026-12-15', knee: { before: 2 } } }), 0, 'dawny wpis kolana nie jest sesją');
 });
 
 test('diagnostyka: wpisy dziennika sesji sprzed startu planu zliczane razem z czasami treningu', async () => {
   const s = await new Store(new MemoryAdapter()).open();
   await s.record('train.session', { date: '2026-10-01', minutes: 30 });
   await s.record('train.detail', { date: '2026-10-02', swim: { dist: 100 } });
-  await s.record('train.detail', { date: '2026-10-25', swim: { dist: 900 } });
-  const d = diagnose(s.state, { today: '2026-10-26' });
+  await s.record('train.detail', { date: '2026-12-20', swim: { dist: 900 } });
+  const d = diagnose(s.state, { today: '2026-12-21' });
   assert.equal(d.find(x => x.id === 'pre-start').title, 'Wpisy treningowe sprzed startu planu: 2');
 });

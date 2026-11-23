@@ -29,8 +29,10 @@ const SLOTS_AG = ['08:00–08:53', '09:10–10:03', '10:10–11:03', '11:20–12
 test('MPW v8 (D-116): 392 bloki 1–392, 119 dni 20.11–20.03 (114 × 3 + 5 × 10: P1–P7 w godzinach slotów A–G), bloki także 24–27.12, dni wolne 19–20.02, egzamin 21.03.2027 11:00', () => {
   assert.equal(B.length, 392);
   assert.deepEqual(B.map(b => b.nr), [...Array(392)].map((_, i) => i + 1));
-  assert.deepEqual([D.stat.start, D.stat.end, SRC.mpw.exam, SRC.mpw.examTime], [START, END, '2027-03-21', '11:00']);
-  assert.deepEqual(Object.keys(mpwByDay).sort(), [...range(START, END)].filter(d => !FREE.includes(d)));
+  assert.deepEqual([D.stat.start_src, D.stat.end, SRC.mpw.exam, SRC.mpw.examTime], [START, END, '2027-03-21', '11:00']);
+  assert.equal(D.stat.start, '2026-11-23', 'D-121: plan w aplikacji od Dnia zero 23.11 (materiał z 20.11)');
+  assert.deepEqual(Object.keys(rawByDay).sort(), [...range(START, END)].filter(d => !FREE.includes(d)));
+  assert.deepEqual(Object.keys(mpwByDay).sort(), [...range('2026-11-23', END)].filter(d => !FREE.includes(d)));
   assert.deepEqual(mpwFreeDays(), [['2027-02-19', '2027-02-20']]);
   assert.deepEqual(['2026-12-24', '2026-12-25', '2026-12-26', '2026-12-27'].map(d => mpwByDay[d].map(b => b.blok).join('')), ['ABC', 'ABC', 'ABC', 'ABC'], 'D-116: bloki MPW w święta');
   for (const b of B) assert.equal(b.dzien, dayName(b.data), `nr ${b.nr}`);
@@ -59,8 +61,8 @@ test('MPW: statystyki, fazy i symulacje zgodne z blokami', () => {
   const count = key => B.reduce((m, b) => ((m[b[key]] = (m[b[key]] || 0) + 1), m), {});
   assert.deepEqual(count('kategoria'), D.stat.kat);
   assert.deepEqual(count('tryb'), D.stat.tryb);
-  assert.equal(D.stat.dni, Object.keys(mpwByDay).length);
-  for (const f of Object.values(D.faza)) assert.equal(B.filter(b => b.data >= f.od && b.data <= f.do).length, f.bl);
+  assert.equal(D.stat.dni, Object.keys(rawByDay).length);
+  for (const f of Object.values(D.faza)) assert.equal(RAW.filter(b => b.data >= f.od && b.data <= f.do).length, f.bl);   // fazy wg dat z pliku (D-121: przesunięcia w aplikacji)
   assert.equal(D.mockCFA.length, 5);
   for (const d of D.mockCFA) { assert.ok(mpwByDay[d].filter(b => !b.blok.startsWith('P')).every(b => b.tryb === 'SYMULACJA'), d); assert.match(D.simTest[d], /^\d\d\.\d\d\.\d{4}$/); }
   assert.equal(B.filter(b => b.tryb === 'SYMULACJA').length, 15);
@@ -112,8 +114,8 @@ test('Zakładka (D-095, D-116): CFA do 11.11.2026, MPW 12.11.2026–21.03.2027 (
 });
 
 test('Dzień z MPW: bloki w resolverze, szablon godzin bez zmian (decyzja 29.09.2026), symulacja; D-116 — bloki CFA E–G w swoich slotach', () => {
-  const r = resolveDay('2026-11-24');   // wtorek: MPW A–C (13–15) i CFA E–G
-  assert.deepEqual([r.mpw.inPlan, r.mpw.blocks.map(b => b.nr), r.mpw.isSim], [true, [13, 14, 15], false]);
+  const r = resolveDay('2026-11-24');   // wtorek: MPW A–C (4–6 — D-121: materiał od 23.11) i CFA E–G
+  assert.deepEqual([r.mpw.inPlan, r.mpw.blocks.map(b => b.nr), r.mpw.isSim], [true, [4, 5, 6], false]);
   // D-120: szablon bez zmian, poza 22:00 — blok MPW C zamiast „Wieczoru wolnego”
   assert.deepEqual(r.slots.map(s => `${s.id} ${s.from}–${s.to}`), SRC.dayTemplate.slots.map(s => (s.id === 'slot.2200' ? 'slot.mpw.C.2200 22:00–22:53' : `${s.id} ${s.from}–${s.to}`)));
   // bloki MPW A–C w karcie „Nauka MPW” (D-095) — slot w ich czasie je nazywa (bez treści bloków); blok bez slotu nauki (22:00) ma własny slot
@@ -125,7 +127,7 @@ test('Dzień z MPW: bloki w resolverze, szablon godzin bez zmian (decyzja 29.09.
   assert.equal(resolveDay('2027-02-27').mpw.isSim, true);
   assert.deepEqual([resolveDay('2026-12-25').mpw.inPlan, resolveDay('2026-12-25').mpw.blocks.length], [true, 3], 'D-116: bloki MPW w święta');
   assert.deepEqual([resolveDay('2027-02-19').mpw.inPlan, resolveDay('2027-02-19').mpw.blocks.length], [true, 0]);
-  assert.deepEqual([resolveDay('2026-11-19').mpw.inPlan, resolveDay('2026-11-20').mpw.inPlan, resolveDay('2027-03-21').mpw.inPlan], [false, true, false]);
+  assert.deepEqual([resolveDay('2026-11-22').mpw.inPlan, resolveDay('2026-11-23').mpw.inPlan, resolveDay('2027-03-21').mpw.inPlan], [false, true, false], 'D-121: od Dnia zero 23.11');
   // D-096: P1–P7 w slotach A–G, A–C w karcie
   const p = resolveDay('2027-03-06');
   assert.deepEqual(p.slots.filter(s => s.mpw).map(s => `${s.from} ${s.mpw.blok}`), ['08:00 P1', '09:10 P2', '10:10 P3', '11:20 P4', '12:20 P5', '13:30 A', '14:30 B', '15:30 C', '17:00 P6', '22:00 P7'], 'D-120: symulacja 13:30–16:30, P6 17:00, P7 22:00');
@@ -171,7 +173,7 @@ test('.ics: bloki MPW w godzinach planu MPW; symulacja jako jedno wydarzenie 15:
 
 test('⌘K: bloki MPW i error log MPW', () => {
   const idx = buildIndex({ mpwErrors: [{ id: 'e1', temat: '[TEST] próg wezwania', rodzaj: 'pośpiech' }] }, '2026-11-17');
-  assert.ok(search(idx, 'kodeks cywilny zdolnosc prawna').some(x => x.kind === 'mpw' && x.href === '#/mpw?v=dzien&d=2026-11-20'));
+  assert.ok(search(idx, 'kodeks cywilny zdolnosc prawna').some(x => x.kind === 'mpw' && x.href === '#/mpw?v=dzien&d=2026-11-23'), 'D-121: materiał z 20.11 — 23.11');
   assert.ok(search(idx, 'powtorka calego materialu').some(x => x.kind === 'mpw' && x.href === '#/mpw?v=dzien&d=2027-03-06'));
   assert.ok(search(idx, 'prog wezwania').some(x => x.kind === 'mpwerr' && x.href === '#/mpw?v=log'));
   assert.ok(search(idx, 'mpw').some(x => x.kind === 'mod'));
@@ -193,8 +195,9 @@ test('Synchronizacja plikiem: postęp i error log MPW między urządzeniami (for
 
 test('B6 (audyt 23.10.2026): czas nauki MPW dnia z godzin bloków — czwartki od 07.01 o 16:00, symulacje, P1–P7', () => {
   const s = d => mpwDaySpan(mpwByDay[d]);
-  assert.deepEqual(s('2026-11-20').all, { n: 3, from: '15:30', to: '18:23', min: 159 }, 'zwykły dzień: A–C od 15:30');
-  assert.equal(s('2026-11-20').sim, null);
+  assert.deepEqual(s('2026-12-17').all, { n: 3, from: '15:30', to: '22:53', min: 159 }, 'zwykły dzień: A 15:30, B 16:40, C 22:00 (D-120)');
+  assert.equal(s('2026-12-17').sim, null);
+  assert.deepEqual(s('2026-12-14').all, { n: 6, from: '08:00', to: '22:53', min: 318 }, 'D-121: nadrabianie rano 08:00–11:03 + A–C');
   assert.deepEqual(s('2027-01-07').all, { n: 3, from: '16:00', to: '18:53', min: 159 }, 'czwartek od 07.01: od 16:00 (D-097)');
   assert.deepEqual([s('2027-02-21').sim, s('2027-02-21').rest], [{ n: 3, from: '16:40', to: '19:40', min: 180 }, null], 'symulacja 180 min (D-120: 16:40–19:40)');
   assert.deepEqual([s('2027-03-06').rest.from, s('2027-03-06').rest.to, s('2027-03-06').rest.n, s('2027-03-06').sim.from], ['08:00', '22:53', 7, '13:30'], 'P1–P7 (P7 o 22:00) i symulacja 13:30');

@@ -6,10 +6,11 @@ import { completionDates, tempo } from '../../src/core/calc/tempo.js';
 const ev = (nr, done, at, hlc) => ({ t: 'mpw.done', d: { block: nr, done }, at, hlc });
 
 test('completionDates: zwycięskie zdarzenie (najnowsze hlc), tylko bloki wykonane', () => {
-  const events = [ev(1, true, '2026-11-20T09:00:00', '001'), ev(1, false, '2026-11-21T09:00:00', '002'), ev(1, true, '2026-11-22T09:00:00', '003'),
-    ev(2, true, '2026-11-21T10:00:00', '004'), ev(3, true, '2026-11-21T10:00:00', '005'), { t: 'setting', d: {}, hlc: '006' }];
-  const m = completionDates(events, 'mpw.done', new Set([1, 2]));
-  assert.deepEqual([...m.entries()].sort(), [[1, '2026-11-22'], [2, '2026-11-21']]);
+  const events = [ev(1, true, '2026-11-27T09:00:00', '001'), ev(1, false, '2026-11-28T09:00:00', '002'), ev(1, true, '2026-11-29T09:00:00', '003'),
+    ev(2, true, '2026-11-28T10:00:00', '004'), ev(3, true, '2026-11-28T10:00:00', '005'), { t: 'setting', d: {}, hlc: '006' },
+    ev(4, true, '2026-11-21T10:00:00', '007')];
+  const m = completionDates(events, 'mpw.done', new Set([1, 2, 4]));
+  assert.deepEqual([...m.entries()].sort(), [[1, '2026-11-29'], [2, '2026-11-28']], 'D-121: odhaczenie sprzed startu planu (21.11) nie liczy się do tempa');
 });
 
 test('tempo: za mało dni, brak odhaczeń, koniec planu', () => {

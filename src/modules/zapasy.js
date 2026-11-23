@@ -272,8 +272,8 @@ export function renderZapasy(root, ctx) {
         const fill = () => {
           if (box.firstChild || r.st == null || it.tracked === false) return;
           const from = addDays(today, -13), to = addDays(today, 14), ser = stockSeries(store.state.inv, it.id, from, to);
-          const past = ser.map((p, i) => (i <= 13 ? p.qty : null)), fut = ser.map((p, i) => (i >= 13 ? p.qty : null));
-          const back = ser.find(p => p.qty != null);
+          const past = ser.map((p, i) => (i <= 13 && p.date >= PLAN_START ? p.qty : null)), fut = ser.map((p, i) => (i >= 13 ? p.qty : null));
+          const back = ser.find(p => p.qty != null && p.date >= PLAN_START);   // D-121: dni sprzed startu planu bez historii
           add(box, h('p', { class: 'zp-hist-h' }, h('strong', {}, 'Stan w czasie'), h('span', { class: 'muted' }, ' · 14 dni wstecz i prognoza wg planu')),
             h('div', { class: 'zp-hist-c', style: { '--ch': `var(--${r.status === 'CRITICAL' ? 'danger' : r.status === 'WARNING' ? 'warning' : 'success'})` } },
               areaChart(ser.map(p => `${dayShort(p.date)} ${shortDate(p.date)}`), [{ values: past }, { values: fut, cls: 'is-plan', fill: false }],

@@ -4,9 +4,9 @@ import { consumptionForDay } from '../../src/core/calc/consumption.js';
 import { catalogById } from '../../src/core/data.js';
 import { addDays } from '../../src/core/dates.js';
 
-// D-101: kalendarz od 12.10.2026, 12–15.10 bez treningu (dieta NT), regularny przebieg od 16.10 — ogólna logika na dniach bez wyjątków (wtorek 20.10, Faza 0, dzień T)
+// D-121: plan od Dnia zero 23.11.2026 (bez diety i suplementów), dieta od 24.11 — ogólna logika na dniach bez wyjątków (wtorek 24.11, Faza 0, dzień T)
 test('dzień treningowy F0 (T) = porcje ZAPASY v31 poza decyzjami D-021 i nowymi suplementami', () => {
-  const u = consumptionForDay('2026-10-20');
+  const u = consumptionForDay('2026-11-24');
   for (const [id, it] of Object.entries(catalogById)) {
     if (it.daily_v31 == null) continue;
     const exp = { szczypiorek: 5, melisa: 2 }[id] ?? it.daily_v31;
@@ -17,44 +17,41 @@ test('dzień treningowy F0 (T) = porcje ZAPASY v31 poza decyzjami D-021 i nowymi
 });
 
 test('czwartek (NT): bez kefiru, siemienia, ostropestu, kakao, wanilii, banana i 2 g cynamonu; tauryna zostaje', () => {
-  const t = consumptionForDay('2026-10-20'), n = consumptionForDay('2026-10-22');   // wtorek T, czwartek NT (obie w Fazie 0)
+  const t = consumptionForDay('2026-11-24'), n = consumptionForDay('2026-11-26');   // wtorek T, czwartek NT (obie w Fazie 0)
   for (const id of ['kefir', 'siemie_lniane', 'ostropest', 'kakao', 'wanilia', 'banan']) assert.equal(n[id], undefined, id);
   assert.equal(n.cynamon, 3); assert.equal(t.cynamon, 5);
   assert.equal(n.tauryna, 2); assert.equal(n.bialko_kfd, 30); assert.equal(n.orzech_brazylijski, 4);
 });
 
 test('Faza 1 i 2: owies/makaron/ryż/chleb rosną automatycznie (D-003)', () => {
-  const f0 = consumptionForDay('2026-10-27'), f1 = consumptionForDay('2026-11-17'), f2 = consumptionForDay('2026-12-15');   // wtorki: Faza 0 (do 11.11), 1 (12.11–10.12), 2 (od 11.12) — D-103
-  assert.deepEqual(consumptionForDay('2026-10-20'), consumptionForDay('2026-10-27'), 'Faza 0 trwa do 11.11: wtorki 20.10 i 27.10 jednakowe');
+  const f0 = consumptionForDay('2026-12-01'), f1 = consumptionForDay('2026-12-08'), f2 = consumptionForDay('2027-01-12');   // wtorki: Faza 0 (do 06.12), 1 (07.12–10.01), 2 (od 11.01) — D-121
+  assert.deepEqual(consumptionForDay('2026-11-24'), consumptionForDay('2026-12-01'), 'Faza 0 trwa do 06.12: wtorki 24.11 i 01.12 jednakowe');
   assert.deepEqual([f0.platki_owsiane, f0.penne, f0.ryz_parboiled, f0.chleb_zytni], [70, 70, 70, 35]);
   assert.deepEqual([f1.platki_owsiane, f1.penne, f1.ryz_parboiled, f1.chleb_zytni], [85, 85, 85, 35]);
   assert.deepEqual([f2.platki_owsiane, f2.penne, f2.ryz_parboiled, f2.chleb_zytni], [85, 100, 100, 70]);
 });
 
-test('suplementy czasowe 18.10.2026–31.12.2027 (D-117: 440 dni planu; zapas — wg użytkownika wystarczający, preparaty dotąd nieużywane); dni poza planem (do 17.10 i po 31.12.2027) — bez zużycia', () => {
-  for (const d of ['2026-09-29', '2026-10-08', '2026-10-12', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17']) { assert.equal(consumptionForDay(d).glukozamina, undefined, `${d}: dni przed 18.10 — historia, bez zużycia (D-102, D-103c)`); assert.deepEqual(consumptionForDay(d), {}, d); }
-  assert.equal(consumptionForDay('2026-10-18').glukozamina, 1);
-  assert.equal(consumptionForDay('2027-03-29').glukozamina, 1, 'D-116: plan dalej po 28.03');
-  assert.equal(consumptionForDay('2027-12-31').glukozamina, 1);
-  assert.equal(consumptionForDay('2028-01-01').glukozamina, undefined);
+test('suplementy czasowe 24.11.2026–30.04.2027 (D-121: 158 dni); Dzień zero 23.11 i dni wcześniejsze — bez zużycia', () => {
+  for (const d of ['2026-09-29', '2026-10-18', '2026-11-20', '2026-11-22', '2026-11-23']) { assert.equal(consumptionForDay(d).glukozamina, undefined, `${d}: bez zużycia (D-121)`); assert.deepEqual(consumptionForDay(d), {}, d); }
+  assert.equal(consumptionForDay('2026-11-24').glukozamina, 1);
+  assert.equal(consumptionForDay('2027-04-30').glukozamina, 1);
+  assert.equal(consumptionForDay('2027-05-01').glukozamina, undefined, 'D-121: od 01.05.2027 bez chondroityny, boswellii i glukozaminy');
+  assert.ok(consumptionForDay('2027-12-31').platki_owsiane > 0, 'plan diety do 31.12.2027');
   assert.deepEqual(consumptionForDay('2028-01-01'), {}, 'po końcu planu');
-  const days = []; for (let d = '2026-10-18'; d <= '2027-12-31'; d = addDays(d, 1)) days.push(consumptionForDay(d));
-  assert.equal(days.length, 440);
-  assert.deepEqual(['boswellia', 'chondroityna', 'glukozamina'].map(k => days.reduce((a, c) => a + (c[k] || 0), 0)), [440, 880, 440],
-    '440 dni planu: 440 / 880 / 440 kapsułek');
+  const days = []; for (let d = '2026-11-24'; d <= '2027-12-31'; d = addDays(d, 1)) days.push(consumptionForDay(d));
+  assert.equal(days.length, 403);
+  assert.deepEqual(['boswellia', 'chondroityna', 'glukozamina'].map(k => days.reduce((a, c) => a + (c[k] || 0), 0)), [158, 316, 158],
+    '158 dni (24.11–30.04): 158 / 316 / 158 kapsułek');
 });
 
-test('D-102, D-103, D-103b, D-103c: od 18.10 zużycie wg diety dnia — 01.11 i 02.11 dni nietreningowe (NT), 15–17.10 poza planem; 03–11.11 i święta — dieta NT; 12–15.11 wg nominalnego tygodnia', () => {
-  const nt = consumptionForDay('2026-10-22'), t = consumptionForDay('2026-10-20');
-  for (const d of ['2026-10-15', '2026-10-16', '2026-10-17']) assert.deepEqual(consumptionForDay(d), {}, `${d} — usunięty z kalendarza (D-103b, D-103c): bez zużycia`);
-  assert.ok(consumptionForDay('2026-10-18').platki_owsiane > 0, '18.10 — pierwszy dzień planu, dieta jest (T)');
-  assert.equal(consumptionForDay('2026-10-23').banan, undefined, '23.10 — bez treningu (K i L w oknie treningowym): NT');
-  for (const d of ['2026-11-01', '2026-11-02']) assert.equal(consumptionForDay(d).banan, undefined, `${d}: wyjątkowo bez treningu (D-103b) — dieta NT, bez banana`);
-  assert.equal(consumptionForDay('2026-11-01').cynamon, nt.cynamon, '01.11 — dieta NT');
-  assert.equal(consumptionForDay('2026-10-18').banan, t.banan, '18.10 — niedziela z basenem (T): pierwszy trening'); // basen jak trening: dieta T
-  for (const d of ['2026-11-03', '2026-11-05', '2026-11-07', '2026-11-08', '2026-11-11']) assert.equal(consumptionForDay(d).banan, undefined, `${d}: NT jak w czwartek — bez banana`);
-  for (const d of ['2026-11-13', '2026-11-14', '2026-11-15']) assert.ok(consumptionForDay(d).banan > 0, `${d}: nominalny trening — dieta T`);
-  assert.equal(consumptionForDay('2026-11-12').banan, undefined, '12.11 — czwartek nominalnie NT');
-  assert.equal(consumptionForDay('2026-10-20').cynamon, 5, 'wtorek 20.10 — dzień T (LOWER 1)');
+test('D-121: od 24.11 zużycie wg diety dnia — 12.12 i 24.12 dni nietreningowe (NT); święta — dieta NT', () => {
+  const nt = consumptionForDay('2026-11-26'), t = consumptionForDay('2026-11-24');
+  assert.ok(consumptionForDay('2026-11-24').platki_owsiane > 0, '24.11 — pierwszy dzień diety (T)');
+  for (const d of ['2026-12-12', '2026-12-24']) {
+    assert.equal(consumptionForDay(d).banan, undefined, `${d}: bez treningu (D-121) — dieta NT, bez banana`);
+    assert.equal(consumptionForDay(d).cynamon, nt.cynamon, `${d} — dieta NT`);
+  }
+  assert.equal(consumptionForDay('2026-11-29').banan, t.banan, '29.11 — niedziela z basenem (T)');
+  assert.ok(consumptionForDay('2026-12-05').banan > 0, '05.12 — sobota LOWER 2: dieta T');
   assert.equal(consumptionForDay('2026-12-26').banan, undefined, 'święta — dieta NT');
 });

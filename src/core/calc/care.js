@@ -7,6 +7,10 @@
 //            cycle? { on, off } — cykl dni liczony od `from` (np. 3 dni kroku, 1 dzień przerwy; D-097) }
 // Produkt: { id, kind: 'product', name, area, status?: 'uzywany'|'zapas'|'skonczony', opened?, note?, order? }
 import { weekday, addDays, shortDate, diffDays } from '../dates.js';
+import { SRC } from '../data.js';
+
+// D-121: plan od Dnia zero (`phases.start` = `phases.zero`, 23.11.2026) — w Dniu zero tylko kroki wieczorne; dni sprzed startu planu bez kroków (ukryte)
+const START = SRC.phases.start, ZERO = /** @type {any} */ (SRC.phases).zero || null;
 
 export const PORY = [
   { id: 'rano', label: 'Rano', icon: 'sun' },
@@ -36,7 +40,7 @@ const inCycle = (s, date) => {
   const n = diffDays(s.from, date);
   return n >= 0 && n % (on + off) < on;
 };
-export const activeOn = (s, date) => (!s.days?.length || s.days.includes(weekday(date))) && (!s.from || date >= s.from) && (!s.until || date <= s.until)
+export const activeOn = (s, date) => date >= START && (date !== ZERO || s.pora === 'wieczor') && (!s.days?.length || s.days.includes(weekday(date))) && (!s.from || date >= s.from) && (!s.until || date <= s.until)
   && inCycle(s, date);
 export const doneKey = (date, id) => `${date}|${id}`;
 export const isDone = (done, date, id) => done?.[doneKey(date, id)] === true;

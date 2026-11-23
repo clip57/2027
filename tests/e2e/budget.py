@@ -66,7 +66,7 @@ async def start_ms(pw, url, events):
     b = await pw.chromium.launch()
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, locale='pl-PL', timezone_id='Europe/Warsaw')
     pg = await ctx.new_page()
-    await pg.clock.install(time=at(2026, 11, 18, 10, 40))
+    await pg.clock.install(time=at(2026, 12, 9, 10, 40))
     if events:
         await pg.goto(url.replace('index.html', 'manifest.webmanifest'))
         await pg.evaluate(FILL, events)
@@ -85,7 +85,7 @@ async def dom_and_tap(pw, url):
     b = await pw.chromium.launch()
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, locale='pl-PL', timezone_id='Europe/Warsaw')
     pg = await ctx.new_page()
-    await pg.clock.install(time=at(2026, 11, 18, 10, 40))
+    await pg.clock.install(time=at(2026, 12, 9, 10, 40))
     for routes, limit, label in ((ROUTES, LIMITS['dom_nodes'], 'węzły DOM'), (LIST_ROUTES, LIMITS['dom_nodes_list'], 'węzły DOM, pełna lista')):
         worst = (0, '')
         for r in routes:

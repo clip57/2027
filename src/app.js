@@ -10,7 +10,7 @@ import { GROUPS, byId, modulesOn } from './modules/registry.js';
 import { icon } from './ui/icons.js';
 import { THEMES, themePref, applyTheme, saveTheme, sideCollapsed, setSideCollapsed, startPref, tabsPref } from './ui/prefs.js';
 import { renderSettings } from './ui/settings.js';
-import { PLAN_START, PLAN_END } from './core/resolver.js';
+import { PLAN_START, PLAN_END, DAY_ZERO, setPrivateDoses, PRIVATE_DOSES_KEY } from './core/resolver.js';
 import { diffDays, dayShort, shortDate } from './core/dates.js';
 import { setupShortcuts, searchButton, setCommandExtras } from './ui/search.js';
 import { mountLive, liveRoute, liveTick } from './ui/live.js';
@@ -177,11 +177,12 @@ function syncChip() {
 let syncPaint = null;
 function topbar(id) {
   const mod = byId[id], t = today();
-  const dayNo = t >= PLAN_START && t <= PLAN_END ? diffDays(PLAN_START, t) + 1 : null, total = diffDays(PLAN_START, PLAN_END) + 1;
+  const z = DAY_ZERO === PLAN_START ? 0 : 1;   // D-121: plan od Dnia zero (dzień 0), dzień 1 = 24.11.2026
+  const dayNo = t >= PLAN_START && t <= PLAN_END ? diffDays(PLAN_START, t) + z : null, total = diffDays(PLAN_START, PLAN_END) + z;
   const cur = themePref(), nextTheme = { dark: 'light', light: 'system', system: 'dark' }[cur] || 'dark';
   return h('div', { class: 'topbar', role: 'region', 'aria-label': 'Pasek narzędzi' },
     h('p', { class: 'tb-crumb' }, mod ? [h('span', { class: 'tb-g' }, mod.group), icon('chevron-right', { size: 14 }), h('span', { class: 'tb-m' }, mod.name)] : h('span', { class: 'tb-m' }, PAGES[id] || '')),
-    h('p', { class: 'tb-day' }, h('strong', {}, `${dayShort(t)} ${shortDate(t)}`), dayNo && h('span', {}, ` · dzień ${dayNo} z ${total}`)),
+    h('p', { class: 'tb-day' }, h('strong', {}, `${dayShort(t)} ${shortDate(t)}`), dayNo != null && h('span', {}, dayNo ? ` · dzień ${dayNo} z ${total}` : ' · Dzień zero')),
     searchButton(() => ctx.store?.state, 'tb-search'),
     syncChip(),
     h('button', { class: 'tb-icon', 'aria-label': `Zmień motyw (teraz: ${THEMES.find(x => x[0] === cur)?.[1] || cur})`, title: 'Zmień motyw',
@@ -245,6 +246,7 @@ async function render(keepFocus = false) {
   const uiState = keepFocus === true ? captureUi(document.getElementById('main')) : null;   // D-115 (T2): sekcje i paski po kluczach
   const { id, params } = route();
   renderedDay = today(); tick = null;
+  setPrivateDoses(ctx.store?.state?.settings?.[PRIVATE_DOSES_KEY]);   // D-121: dawki z prywatnego pliku (import w „Dane”)
   // D-114: tryb skupienia (Trening, Nauka, Meal Prep) — pełny ekran bez paneli nawigacji, ekran nie gaśnie; każda inna trasa kończy tryb
   const focus = ['trening', 'cfa', 'mpw', 'mealprep', 'pielegnacja'].includes(id) && params.get('v') === 'fokus';
   document.documentElement.toggleAttribute('data-focus', focus);

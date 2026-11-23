@@ -8,7 +8,7 @@ export function scheduleFor(date) {
   const byTime = new Map();
   for (const d of doses) {
     if (!byTime.has(d.time)) byTime.set(d.time, { time: d.time, situation: d.situation_src, doses: [] });
-    byTime.get(d.time).doses.push({ ...d, name: SRC.supplements.supplements[d.supp]?.name || d.supp,
+    byTime.get(d.time).doses.push({ ...d, name: d.name || SRC.supplements.supplements[d.supp]?.name || d.supp,   // D-121: dawki prywatne — nazwa w danych
       form: SRC.supplements.supplements[d.supp]?.form || '' });
   }
   return [...byTime.values()].sort((a, b) => (a.time < b.time ? -1 : 1));

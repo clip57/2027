@@ -13,9 +13,9 @@ from a11y import ROUTES as A11Y_ROUTES                   # noqa: E402
 from playwright.async_api import async_playwright        # noqa: E402
 
 AXE_SRC = (ROOT / 'node_modules/axe-core/axe.min.js').read_text()
-CLOCK = at(2026, 11, 18, 10, 40)
-ROUTES = list(dict.fromkeys(A11Y_ROUTES + ['#/ustawienia', '#/trening?v=fokus&d=2026-11-18', '#/mpw?v=fokus&d=2026-11-18', '#/mealprep?v=fokus']))
-AXE_ROUTES = ['#/dzis', '#/zapasy', '#/trening?d=2026-10-19', '#/suplementy', '#/mpw', '#/mpw?v=plan', '#/kalendarz', '#/dane', '#/ustawienia', '#/mpw?v=fokus&d=2026-11-18']
+CLOCK = at(2026, 12, 9, 10, 40)
+ROUTES = list(dict.fromkeys(A11Y_ROUTES + ['#/ustawienia', '#/trening?v=fokus&d=2026-12-09', '#/mpw?v=fokus&d=2026-12-09', '#/mealprep?v=fokus']))
+AXE_ROUTES = ['#/dzis', '#/zapasy', '#/trening?d=2026-11-30', '#/suplementy', '#/mpw', '#/mpw?v=plan', '#/kalendarz', '#/dane', '#/ustawienia', '#/mpw?v=fokus&d=2026-12-09']
 results = []
 
 
@@ -87,7 +87,7 @@ async def run_interactions(pw, name, url, mobile):
     else:
         ok(False, f'{tag} okno: nie znaleziono przycisku dodania pozycji')
     # Tryb skupienia Treningu: nawigacja schowana, wyjście przywraca
-    await pg.goto(url + '#/trening?v=fokus&d=2026-11-18'); await pg.wait_for_selector('.fx')
+    await pg.goto(url + '#/trening?v=fokus&d=2026-12-09'); await pg.wait_for_selector('.fx')
     ok(await pg.evaluate("document.documentElement.hasAttribute('data-focus')"), f'{tag} tryb skupienia: html[data-focus]')
     await pg.goto(url + '#/dzis'); await pg.wait_for_selector('main h1')
     ok(not await pg.evaluate("document.documentElement.hasAttribute('data-focus')"), f'{tag} tryb skupienia: wyjście')

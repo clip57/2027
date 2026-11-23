@@ -26,7 +26,7 @@ import { doseKey, doseDone } from '../core/calc/checks.js';
 import { byId, isTab } from './registry.js';
 import { slotClock, currentSlot, toMin, minLabel } from '../core/calc/now.js';
 
-const suppName = id => SRC.supplements.supplements[id]?.name || id;
+const suppName = (id, d) => d?.name || SRC.supplements.supplements[id]?.name || id;   // D-121: dawki prywatne — nazwa w danych
 // Czas nauki MPW dnia z godzin bloków (B6): „159 min · od 16:00” w czwartki od 07.01, „symulacja 180 min · 15:30–18:30”, z P1–P7 — od 8:00
 const mpwHint = bl => { const s = mpwDaySpan(bl);
   return s.sim ? [s.rest && `${s.rest.min} min od ${s.rest.from}`, `symulacja ${s.sim.min} min · ${s.sim.from}–${s.sim.to}`].filter(Boolean).join(' · ')
@@ -64,14 +64,14 @@ function slotView(s, now, care) {
         icon('sparkles', { size: 14 }), h('span', {}, `Pielęgnacja ${care[s.id].done} / ${care[s.id].total}`)),
       s.doses.length > 0 && h('div', { class: 'slot-supps' },
         h('p', { class: 'supps-h' }, 'Suplementy'),
-        h('ul', {}, s.doses.map(d => doseRow(d, h('li', { class: doseCtx?.done(d) ? 'is-taken' : null }, doseCtx && doseBtn(d), h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp)), h('span', { class: 'sd' }, d.label),
+        h('ul', {}, s.doses.map(d => doseRow(d, h('li', { class: doseCtx?.done(d) ? 'is-taken' : null }, doseCtx && doseBtn(d), h('time', {}, d.time), h('span', { class: 'sn' }, suppName(d.supp, d)), h('span', { class: 'sd' }, d.label),
           d.note && h('span', { class: 'muted' }, ` · ${d.note}`))))))));
 }
 // F-D4 (D-113): odhaczanie dawek w planie dnia (ten sam zapis `setting` co w Suplementacji); kontekst ustawiany przy renderze „Dziś”
 let doseCtx = null;
 const doseBtn = d => { const on = doseCtx.done(d);
   // D-119: wspólny przycisk odhaczenia — animacja tylko dawki zmienionej przed chwilą (także po przerysowaniu)
-  return checkBtn({ key: doseCtx.key(d), on, cls: 'dose-ck', aria: `${suppName(d.supp)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
+  return checkBtn({ key: doseCtx.key(d), on, cls: 'dose-ck', aria: `${suppName(d.supp, d)}, ${d.time}: ${on ? 'przyjęte' : 'do przyjęcia'}`,
     onclick: () => doseCtx.mark(d, !on) }); };
 // D-114: gest — przesunięcie wiersza dawki w prawo = przyjęte, w lewo = cofnięcie (odpowiednik: przycisk w wierszu)
 const doseRow = (d, li) => (!doseCtx ? li : swipeRow(li, doseCtx.done(d)

@@ -25,8 +25,10 @@ for (const b of B) {
   else { const [f, t] = b.godz.split('–'); if (toMin(t) - toMin(f) !== 53 && b.tryb !== 'MOCK') warn(`blok ${b.nr} (${k}): długość ${toMin(t) - toMin(f)} min (zwykle 53)`); }
 }
 for (let i = 1; i < B.length; i++) if (B[i].data < B[i - 1].data || (B[i].data === B[i - 1].data && B[i].godz < B[i - 1].godz)) err(`kolejność: blok ${B[i].nr} przed ${B[i - 1].nr}`);
-eq(B[0].data, D.stat.start, 'pierwszy blok vs stat.start'); eq(B[B.length - 1].data, D.stat.end, 'ostatni blok vs stat.end');
-const days = [...new Set(B.map(b => b.data))];
+// statystyki pliku planu — wg dat z pliku (`data_src`; D-120, D-121: przesunięcia `studyMoves` zmieniają daty bloków, plik zostaje bez zmian)
+const FILE = B.map(b => b.data_src || b.data);
+eq(FILE[0], D.stat.start_src ?? D.stat.start, 'pierwszy blok vs stat.start'); eq(FILE[B.length - 1], D.stat.end, 'ostatni blok vs stat.end');
+const days = [...new Set(FILE)];
 eq(days.length, D.stat.dni, 'stat.dni vs liczba dni z blokami');
 for (const [k, n] of Object.entries(D.stat.kat)) eq(B.filter(b => b.kategoria === k).length, n, `stat.kat[${k}]`);
 for (const [k, n] of Object.entries(D.stat.tryb)) eq(B.filter(b => b.tryb === k).length, n, `stat.tryb[${k}]`);
@@ -39,7 +41,7 @@ for (const d of mockDays) if (!D.mockCFA.includes(d)) err(`bloki MOCK/SYMULACJA 
 const nightDates = D.nightDates || D.nightRecall.map(r => r.data), recallSessions = D.recallSessions || [], noNight = D.noNightDates || [];
 eq(D.nightRecall.length + recallSessions.length, D.stat.recall, 'stat.recall vs nightRecall + recallSessions');
 eq(D.nightRecall.length, nightDates.length, 'nightRecall vs nightDates');
-for (const r of D.nightRecall) if (r.data < D.stat.start || r.data > D.stat.end) err(`recall ${r.data} poza zakresem planu`);
+for (const r of D.nightRecall) if (r.data < (D.stat.start_src ?? D.stat.start) || r.data > D.stat.end) err(`recall ${r.data} poza zakresem planu`);
 for (const d of noNight) if (nightDates.includes(d)) err(`${d} jest jednocześnie w nightDates i noNightDates`);
 if (SRC.cfa.exam && recallSessions.some(r => r.data > SRC.cfa.exam)) warn('sesje końcowe recall po dacie egzaminu');
 for (const r of recallSessions) if (r.data <= D.stat.end) warn(`sesja końcowa recall ${r.data} mieści się w okresie planu (widok dnia ją pominie lub zdubluje)`);

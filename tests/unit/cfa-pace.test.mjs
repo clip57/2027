@@ -26,11 +26,13 @@ test('cfaPace: przed startem planu i po jego końcu', () => {
   assert.deepEqual([end.due, end.overdue.length, end.ahead], [6, 0, 0]);
 });
 
-test('cfaPace na prawdziwym harmonogramie (D-116): plan CFA 2027 od 20.11 — 3 bloki (E–G); w dni robocze od 04.01 blok J; po planie MPW H, I, blok dodatkowy i J; po 12.05 wszystkie zaległe', () => {
+test('cfaPace na prawdziwym harmonogramie (D-116): plan CFA 2027 od 23.11 (D-121) — 3 bloki (E–G); 17–18.12 i 24.12 nadrabianie rano; w dni robocze od 04.01 blok J; po planie MPW H, I, blok dodatkowy i J; po 12.05 wszystkie zaległe', () => {
   const D = SRC.cfa.D, P = d => cfaPace(D.bloki, new Set(), d);
-  assert.deepEqual([P('2026-11-19').due, P('2026-11-19').today], [0, 0], 'dni przed 20.11: bez bloków CFA');
-  assert.deepEqual([P('2026-11-20').due, P('2026-11-20').today], [0, 3], '20.11 — E, F, G');
-  assert.deepEqual([P('2026-11-21').due, P('2026-11-21').today], [3, 3]);
+  assert.deepEqual([P('2026-11-22').due, P('2026-11-22').today], [0, 0], 'D-121: dni przed 23.11 bez bloków CFA');
+  assert.deepEqual([P('2026-11-23').due, P('2026-11-23').today], [0, 3], '23.11 — E, F, G (materiał z 20.11)');
+  assert.deepEqual([P('2026-11-24').due, P('2026-11-24').today], [3, 3]);
+  assert.equal(P('2026-12-17').today, 6, '17.12 — 3 bloki nadrabiane rano + 3 zwykłe');
+  assert.equal(P('2026-12-24').today, 3, '24.12 — 3 bloki nadrabiane rano');
   assert.equal(P('2027-01-04').today, 1, 'pierwszy dzień z blokiem J (sam J)');
   assert.equal(P('2027-03-22').today, 4, 'po planie MPW: H, I, blok dodatkowy, J');
   assert.equal(P('2027-05-13').due, D.bloki.length, 'po planie: wszystkie bloki zaległe');

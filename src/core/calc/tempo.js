@@ -3,6 +3,9 @@
 // odhaczenia) na dzień kalendarzowy; koniec = dziś + pozostałe bloki ÷ tempo. Zawsze opisywany w interfejsie jako szacunek.
 // Bez DOM — testy w tests/unit/tempo.test.mjs.
 import { addDays, diffDays, ymd } from '../dates.js';
+import { SRC } from '../data.js';
+
+const START = SRC.phases.start;   // D-121: odhaczenia sprzed startu planu (Dzień zero 23.11.2026) nie liczą się do tempa
 
 export const TEMPO_MIN_DAYS = 7;   // krócej — szacunek byłby przypadkowy
 
@@ -15,7 +18,7 @@ export function completionDates(events, type, done) {
     if (!p || e.hlc > p.hlc) win.set(e.d.block, e);
   }
   const out = new Map();
-  for (const [nr, e] of win) if (done.has(nr) && e.d.done && e.at) out.set(nr, ymd(new Date(e.at)));
+  for (const [nr, e] of win) if (done.has(nr) && e.d.done && e.at) { const d = ymd(new Date(e.at)); if (d >= START) out.set(nr, d); }
   return out;
 }
 

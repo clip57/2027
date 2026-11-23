@@ -27,11 +27,11 @@ async def main():
         for w, hgt, scheme in ((390, 900, 'dark'), (1100, 900, 'light')):
             tag = f'{w}px {scheme}'
             ctx = await b.new_context(viewport={'width': w, 'height': hgt}, color_scheme=scheme, timezone_id='Europe/Warsaw')
-            await ctx.clock.install(time=dt.datetime(2026, 10, 25, 10, 0, tzinfo=ZoneInfo('Europe/Warsaw')))
+            await ctx.clock.install(time=dt.datetime(2026, 11, 29, 10, 0, tzinfo=ZoneInfo('Europe/Warsaw')))
             await ctx.add_init_script(f"localStorage.setItem('p2027.theme','{scheme}')")
             pg = await ctx.new_page(); errs = []
             pg.on('pageerror', lambda e: errs.append(str(e)))
-            await pg.goto(URL + '#/trening?d=2026-10-25'); await pg.wait_for_selector('.tlog', timeout=15000)       # niedziela: basen
+            await pg.goto(URL + '#/trening?d=2026-11-29'); await pg.wait_for_selector('.tlog', timeout=15000)       # niedziela: basen
             ok(await pg.locator('.tl-st', has_text='Basen').count() == 1 and await pg.locator('.tl-st', has_text='Rower').count() == 0, f'{tag} niedziela: sekcja Basen, bez sekcji Rower')
             ok(await pg.locator('details.tl-sec[open]').count() == 1, f'{tag} niedziela: otwarta tylko sekcja Basen (sauna zwinięta)')
             ok(await pg.locator('.tl-st', has_text='Kolano').count() == 0 and await pg.get_by_label('Kolano: Ból wyjściowy przed 1. serią, /10', exact=True).count() == 0, f'{tag} D-111: bez sekcji Kolano w dzienniku sesji')
@@ -70,19 +70,19 @@ async def main():
             hist = ' '.join((await pg.inner_text('main')).split())
             ok('Basen 1500 m · 45 min · RPE 3,5 · 3:00 /100 m' in hist and 'Sauna 1 runda · 90°C' in hist, f'{tag} Historia: podsumowanie wpisów dnia')
             # --- dostępność z otwartymi sekcjami
-            await pg.goto(URL + '#/trening?d=2026-10-25'); await pg.wait_for_selector('.tlog')
+            await pg.goto(URL + '#/trening?d=2026-11-29'); await pg.wait_for_selector('.tlog')
             v = await axe(pg); ok(not v, f'{tag} niedziela (dziennik): dostępność {v[:2]}')
             # --- widoczność zależnie od dnia: wtorek (LOWER — bez kolana, D-111), środa (rower), czwartek (sauna otwarta)
-            await pg.goto(URL + '#/trening?d=2026-10-20'); await pg.wait_for_selector('.tlog')
+            await pg.goto(URL + '#/trening?d=2026-11-24'); await pg.wait_for_selector('.tlog')
             ok(await pg.locator('.tl-st', has_text='Kolano').count() == 0 and await pg.locator('.tl-st', has_text='Basen').count() == 0 and await pg.locator('.tl-st', has_text='Rower').count() == 0 and await pg.locator('.tl-st', has_text='Sauna').count() == 1, f'{tag} wtorek (LOWER 1): tylko sekcja Sauna — bez kolana, basenu i roweru')
-            await pg.goto(URL + '#/trening?d=2026-10-21'); await pg.wait_for_selector('.tlog')
+            await pg.goto(URL + '#/trening?d=2026-11-25'); await pg.wait_for_selector('.tlog')
             ok(await pg.locator('details.tl-sec[open] .tl-st', has_text='Rower').count() == 1 and await pg.locator('.tl-st', has_text='Basen').count() == 0, f'{tag} środa (rower + ABS): sekcja Rower')
             await fill(pg, 'Rower: Tętno średnie, bpm', 128); await pg.get_by_role('radio', name='Niski').click()
             v = await axe(pg); ok(not v, f'{tag} środa (dziennik): dostępność {v[:2]}')
-            await pg.goto(URL + '#/trening?d=2026-11-12'); await pg.wait_for_selector('.tlog')
-            ok(await pg.locator('details.tl-sec[open] .tl-st', has_text='Sauna').count() == 1, f'{tag} czwartek 12.11 (2 × sauna): sauna rozwinięta')
-            await pg.goto(URL + '#/trening?d=2026-10-22'); await pg.wait_for_selector('.tlog')
-            ok(await pg.locator('details.tl-sec[open]').count() == 0 and await pg.locator('.tl-st', has_text='Sauna').count() == 1, f'{tag} czwartek 22.10 (bez sauny, D-103): sekcja Sauna dostępna, ale zwinięta')
+            await pg.goto(URL + '#/trening?d=2026-12-17'); await pg.wait_for_selector('.tlog')
+            ok(await pg.locator('details.tl-sec[open] .tl-st', has_text='Sauna').count() == 1, f'{tag} czwartek 17.12 (2 × sauna): sauna rozwinięta')
+            await pg.goto(URL + '#/trening?d=2026-12-24'); await pg.wait_for_selector('.tlog')
+            ok(await pg.locator('details.tl-sec[open]').count() == 0 and await pg.locator('.tl-st', has_text='Sauna').count() == 1, f'{tag} czwartek 24.12 (bez sauny, D-121): sekcja Sauna dostępna, ale zwinięta')
             ok(not errs, f'{tag}: brak błędów JS {errs[:1]}')
             await ctx.close()
         await b.close()
